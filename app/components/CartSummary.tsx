@@ -1,47 +1,65 @@
-import type {CartApiQueryFragment} from 'storefrontapi.generated';
-import type {CartLayout} from '~/components/CartMain';
-import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
-import {useEffect, useRef} from 'react';
-import {useFetcher} from 'react-router';
+import type { CartApiQueryFragment } from 'storefrontapi.generated';
+import type { CartLayout } from '~/components/CartMain';
+import { CartForm, Money, type OptimisticCart } from '@shopify/hydrogen';
+import { useEffect, useRef } from 'react';
+import { useFetcher } from 'react-router';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
   layout: CartLayout;
 };
 
-export function CartSummary({cart, layout}: CartSummaryProps) {
-  const className =
-    layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
-
+export function CartSummary({ cart, layout }: CartSummaryProps) {
   return (
-    <div aria-labelledby="cart-summary" className={className}>
-      <h4>Totals</h4>
-      <dl className="cart-subtotal">
-        <dt>Subtotal</dt>
-        <dd>
+    <div
+      className={`border-t border-neutral-200 bg-white ${layout === 'aside'
+          ? 'px-4 py-4'
+          : 'p-6 rounded-xl border border-neutral-200'
+        }`}
+    >
+      {/* Subtotal */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm text-neutral-500">Subtotal</span>
+        <span className="text-sm font-semibold">
           {cart?.cost?.subtotalAmount?.amount ? (
-            <Money data={cart?.cost?.subtotalAmount} />
+            <Money data={cart.cost.subtotalAmount} />
           ) : (
-            '-'
+            '—'
           )}
-        </dd>
-      </dl>
+        </span>
+      </div>
+
+      {/* Shipping note */}
+      <p className="text-xs text-neutral-400 mb-4">
+        Taxes and shipping calculated at checkout
+      </p>
+
+      {/* Discount Code */}
       <CartDiscounts discountCodes={cart?.discountCodes} />
       <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
+
+      {/* Checkout Button */}
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
     </div>
   );
 }
 
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
+function CartCheckoutActions({ checkoutUrl }: { checkoutUrl?: string }) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
+    <div className="mt-3">
+      <a
+        href={checkoutUrl}
+        target="_self"
+        className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90"
+        style={{ backgroundColor: '#C5A355', color: '#fff' }}
+      >
+        Checkout →
       </a>
-      <br />
+      <p className="text-center text-xs text-neutral-400 mt-2">
+        Secure checkout powered by Shopify
+      </p>
     </div>
   );
 }
@@ -54,40 +72,45 @@ function CartDiscounts({
   const codes: string[] =
     discountCodes
       ?.filter((discount) => discount.applicable)
-      ?.map(({code}) => code) || [];
+      ?.map(({ code }) => code) || [];
 
   return (
-    <div>
-      {/* Have existing discount, display it with a remove option */}
-      <dl hidden={!codes.length}>
-        <div>
-          <dt>Discount(s)</dt>
+    <div className="mb-3">
+      {/* Existing discount */}
+      {codes.length > 0 && (
+        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-green-50 rounded-lg">
+          <div className="flex items-center gap-2 text-sm text-green-700">
+            <span>🎫</span>
+            <code className="bg-transparent text-green-700 text-xs">
+              {codes.join(', ')}
+            </code>
+          </div>
           <UpdateDiscountForm>
-            <div className="cart-discount">
-              <code>{codes?.join(', ')}</code>
-              &nbsp;
-              <button type="submit" aria-label="Remove discount">
-                Remove
-              </button>
-            </div>
+            <button
+              type="submit"
+              aria-label="Remove discount"
+              className="text-xs text-red-400 hover:text-red-600 transition cursor-pointer"
+            >
+              Remove
+            </button>
           </UpdateDiscountForm>
         </div>
-      </dl>
+      )}
 
-      {/* Show an input to apply a discount */}
+      {/* Apply discount */}
       <UpdateDiscountForm discountCodes={codes}>
-        <div>
-          <label htmlFor="discount-code-input" className="sr-only">
-            Discount code
-          </label>
+        <div className="flex gap-2">
           <input
             id="discount-code-input"
             type="text"
             name="discountCode"
             placeholder="Discount code"
+            className="flex-1 px-3 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#C5A355] focus:border-[#C5A355]"
           />
-          &nbsp;
-          <button type="submit" aria-label="Apply discount code">
+          <button
+            type="submit"
+            className="px-4 py-2 text-xs tracking-wider uppercase bg-neutral-900 text-white rounded-lg hover:bg-neutral-700 transition cursor-pointer"
+          >
             Apply
           </button>
         </div>
@@ -122,7 +145,7 @@ function CartGiftCard({
   giftCardCodes: CartApiQueryFragment['appliedGiftCards'] | undefined;
 }) {
   const giftCardCodeInput = useRef<HTMLInputElement>(null);
-  const giftCardAddFetcher = useFetcher({key: 'gift-card-add'});
+  const giftCardAddFetcher = useFetcher({ key: 'gift-card-add' });
 
   useEffect(() => {
     if (giftCardAddFetcher.data) {
@@ -131,34 +154,47 @@ function CartGiftCard({
   }, [giftCardAddFetcher.data]);
 
   return (
-    <div>
+    <div className="mb-3">
       {giftCardCodes && giftCardCodes.length > 0 && (
-        <dl>
-          <dt>Applied Gift Card(s)</dt>
+        <div className="space-y-2 mb-2">
           {giftCardCodes.map((giftCard) => (
             <RemoveGiftCardForm key={giftCard.id} giftCardId={giftCard.id}>
-              <div className="cart-discount">
-                <code>***{giftCard.lastCharacters}</code>
-                &nbsp;
-                <Money data={giftCard.amountUsed} />
-                &nbsp;
-                <button type="submit">Remove</button>
+              <div className="flex items-center justify-between px-3 py-2 bg-purple-50 rounded-lg text-sm">
+                <div className="flex items-center gap-2 text-purple-700">
+                  <span>🎁</span>
+                  <code className="bg-transparent text-purple-700 text-xs">
+                    ***{giftCard.lastCharacters}
+                  </code>
+                  <span className="text-xs">
+                    <Money data={giftCard.amountUsed} />
+                  </span>
+                </div>
+                <button
+                  type="submit"
+                  className="text-xs text-red-400 hover:text-red-600 transition cursor-pointer"
+                >
+                  Remove
+                </button>
               </div>
             </RemoveGiftCardForm>
           ))}
-        </dl>
+        </div>
       )}
 
       <AddGiftCardForm fetcherKey="gift-card-add">
-        <div>
+        <div className="flex gap-2">
           <input
             type="text"
             name="giftCardCode"
             placeholder="Gift card code"
             ref={giftCardCodeInput}
+            className="flex-1 px-3 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#C5A355] focus:border-[#C5A355]"
           />
-          &nbsp;
-          <button type="submit" disabled={giftCardAddFetcher.state !== 'idle'}>
+          <button
+            type="submit"
+            disabled={giftCardAddFetcher.state !== 'idle'}
+            className="px-4 py-2 text-xs tracking-wider uppercase bg-neutral-900 text-white rounded-lg hover:bg-neutral-700 transition disabled:opacity-50 cursor-pointer"
+          >
             Apply
           </button>
         </div>

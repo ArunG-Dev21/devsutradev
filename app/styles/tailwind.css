@@ -4,3 +4,21 @@
  */
 
 @import 'tailwindcss';
+
+/* Design System Tokens */
+@theme {
+  --color-primary: #000000;
+  --color-secondary: #FFFFFF;
+  --color-accent: #C5A355;
+  --color-accent-hover: #B8963E;
+  --color-silver: #C0C0C0;
+  --color-silver-light: #E5E5E5;
+  --color-bg-dark: #0A0A0A;
+  --color-bg-light: #FAFAFA;
+  --color-text-muted: #6B7280;
+  --color-success: #10B981;
+  --color-error: #EF4444;
+
+  --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}

@@ -5,16 +5,18 @@ import {
   Outlet,
   useLoaderData,
 } from 'react-router';
-import type {Route} from './+types/account';
-import {CUSTOMER_DETAILS_QUERY} from '~/graphql/customer-account/CustomerDetailsQuery';
+import type { Route } from './+types/account';
+import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetailsQuery';
 
 export function shouldRevalidate() {
   return true;
 }
 
-export async function loader({context}: Route.LoaderArgs) {
-  const {customerAccount} = context;
-  const {data, errors} = await customerAccount.query(CUSTOMER_DETAILS_QUERY, {
+export async function loader({ context }: Route.LoaderArgs) {
+  const { customerAccount } = context;
+  customerAccount.handleAuthStatus();
+
+  const { data, errors } = await customerAccount.query(CUSTOMER_DETAILS_QUERY, {
     variables: {
       language: customerAccount.i18n.language,
     },
@@ -25,7 +27,7 @@ export async function loader({context}: Route.LoaderArgs) {
   }
 
   return remixData(
-    {customer: data.customer},
+    { customer: data.customer },
     {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -35,7 +37,7 @@ export async function loader({context}: Route.LoaderArgs) {
 }
 
 export default function AccountLayout() {
-  const {customer} = useLoaderData<typeof loader>();
+  const { customer } = useLoaderData<typeof loader>();
 
   const heading = customer
     ? customer.firstName
@@ -50,7 +52,7 @@ export default function AccountLayout() {
       <AccountMenu />
       <br />
       <br />
-      <Outlet context={{customer}} />
+      <Outlet context={{ customer }} />
     </div>
   );
 }
