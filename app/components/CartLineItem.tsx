@@ -12,9 +12,6 @@ import type {
 
 export type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
-/**
- * Redesigned cart line item with improved styling.
- */
 export function CartLineItem({
   layout,
   line,
@@ -32,8 +29,9 @@ export function CartLineItem({
   const childrenLabelId = `cart-line-children-${id}`;
 
   return (
-    <li key={id} className="py-4">
+    <li key={id} className="py-5 border-b border-stone-100 last:border-b-0">
       <div className="flex gap-4">
+
         {/* Product Image */}
         {image && (
           <Link
@@ -41,15 +39,17 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="flex-shrink-0"
           >
-            <Image
-              alt={title}
-              aspectRatio="1/1"
-              data={image}
-              height={80}
-              loading="lazy"
-              width={80}
-              className="rounded-lg object-cover"
-            />
+            <div className="w-20 h-20 rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
+              <Image
+                alt={title}
+                aspectRatio="1/1"
+                data={image}
+                height={80}
+                loading="lazy"
+                width={80}
+                className="w-full h-full object-cover"
+              />
+            </div>
           </Link>
         )}
 
@@ -59,55 +59,51 @@ export function CartLineItem({
             prefetch="intent"
             to={lineItemUrl}
             onClick={() => layout === 'aside' && close()}
-            className="no-underline"
+            className="no-underline block"
           >
-            <p className="text-sm font-medium text-neutral-800 truncate">
+            <p className="text-sm font-semibold text-stone-900 leading-snug truncate hover:text-stone-600 transition-colors">
               {product.title}
             </p>
           </Link>
 
-          {/* Options */}
-          {selectedOptions.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-1">
-              {selectedOptions.map((option) => (
-                <span
-                  key={option.name}
-                  className="text-[11px] text-neutral-400"
-                >
-                  {option.name}: {option.value}
-                  {selectedOptions.indexOf(option) < selectedOptions.length - 1
-                    ? ' · '
-                    : ''}
-                </span>
-              ))}
+          {/* Variant options */}
+          {(selectedOptions || []).filter(opt => opt.value !== 'Default Title').length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {selectedOptions
+                .filter(opt => opt.value !== 'Default Title')
+                .map((option) => (
+                  <span
+                    key={option.name}
+                    className="inline-block text-[10px] font-medium tracking-wide uppercase text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full"
+                  >
+                    {option.value}
+                  </span>
+                ))}
             </div>
           )}
 
           {/* Price */}
-          <div className="mt-2 text-sm font-semibold" style={{ color: '#C5A355' }}>
+          <div className="mt-2 text-sm font-bold text-stone-900">
             <ProductPrice price={line?.cost?.totalAmount} />
           </div>
 
-          {/* Quantity Controls */}
+          {/* Quantity controls */}
           <CartLineQuantity line={line} />
         </div>
 
-        {/* Remove Button */}
-        <div className="flex-shrink-0 self-start">
-          <CartLineRemoveButton
-            lineIds={[id]}
-            disabled={!!line.isOptimistic}
-          />
+        {/* Remove */}
+        <div className="flex-shrink-0 self-start pt-0.5">
+          <CartLineRemoveButton lineIds={[id]} disabled={!!line.isOptimistic} />
         </div>
       </div>
 
-      {/* Children line components */}
+      {/* Child line items */}
       {lineItemChildren ? (
-        <div className="ml-20 mt-2">
+        <div className="ml-24 mt-3 pl-3 border-l-2 border-stone-100">
           <p id={childrenLabelId} className="sr-only">
             Line items with {product.title}
           </p>
-          <ul aria-labelledby={childrenLabelId} className="space-y-2">
+          <ul aria-labelledby={childrenLabelId} className="space-y-3">
             {lineItemChildren.map((childLine) => (
               <CartLineItem
                 childrenMap={childrenMap}
@@ -123,9 +119,6 @@ export function CartLineItem({
   );
 }
 
-/**
- * Quantity controls with styled +/- buttons.
- */
 function CartLineQuantity({ line }: { line: CartLine }) {
   if (!line || typeof line?.quantity === 'undefined') return null;
   const { id: lineId, quantity, isOptimistic } = line;
@@ -133,20 +126,22 @@ function CartLineQuantity({ line }: { line: CartLine }) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="flex items-center gap-2 mt-2">
+    <div className="flex items-center gap-0 mt-3 w-fit border border-stone-200 rounded-lg overflow-hidden">
       <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
         <button
           aria-label="Decrease quantity"
           disabled={quantity <= 1 || !!isOptimistic}
           name="decrease-quantity"
           value={prevQuantity}
-          className="w-7 h-7 rounded-full border border-neutral-200 flex items-center justify-center text-sm hover:border-neutral-400 transition disabled:opacity-30 cursor-pointer"
+          className="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 transition-colors disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
         >
           −
         </button>
       </CartLineUpdateButton>
 
-      <span className="text-sm font-medium w-6 text-center">{quantity}</span>
+      <span className="w-8 h-8 flex items-center justify-center text-xs font-bold text-stone-900 border-x border-stone-200 select-none">
+        {quantity}
+      </span>
 
       <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
         <button
@@ -154,7 +149,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
           name="increase-quantity"
           value={nextQuantity}
           disabled={!!isOptimistic}
-          className="w-7 h-7 rounded-full border border-neutral-200 flex items-center justify-center text-sm hover:border-neutral-400 transition disabled:opacity-30 cursor-pointer"
+          className="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 transition-colors disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
         >
           +
         </button>
@@ -163,9 +158,6 @@ function CartLineQuantity({ line }: { line: CartLine }) {
   );
 }
 
-/**
- * Remove button — small trash icon.
- */
 function CartLineRemoveButton({
   lineIds,
   disabled,
@@ -183,22 +175,18 @@ function CartLineRemoveButton({
       <button
         disabled={disabled}
         type="submit"
-        className="p-1 text-neutral-300 hover:text-red-500 transition cursor-pointer"
         aria-label="Remove item"
+        className="w-7 h-7 flex items-center justify-center rounded-full text-stone-300 hover:text-stone-900 hover:bg-stone-100 transition-all disabled:opacity-30 cursor-pointer"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          strokeWidth={1.5}
+          strokeWidth={2}
           stroke="currentColor"
-          className="w-4 h-4"
+          className="w-3.5 h-3.5"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 18 18 6M6 6l12 12"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>
       </button>
     </CartForm>
@@ -213,7 +201,6 @@ function CartLineUpdateButton({
   lines: CartLineUpdateInput[];
 }) {
   const lineIds = lines.map((line) => line.id);
-
   return (
     <CartForm
       fetcherKey={getUpdateKey(lineIds)}

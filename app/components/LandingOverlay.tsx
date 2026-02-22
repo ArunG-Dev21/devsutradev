@@ -1,13 +1,18 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import { init, unlock } from '~/lib/audioController';
+
+const OVERLAY_BG = '/overlay-bg.jpeg';
 
 /**
- * Full-screen Himalaya overlay shown on first visit (per session).
- * On CTA click: plays a devotional chant audio + fades out the overlay.
+ * Cinematic full-screen intro overlay shown once per session.
+ *
+ * - Mobile: circle clip-path shrink exit
+ * - Desktop: 5 vertical columns slide alternately up/down
+ * - Audio: unlocks + fades in on enter click
  */
 export function LandingOverlay() {
     const [show, setShow] = useState(false);
-    const [fading, setFading] = useState(false);
-    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [exiting, setExiting] = useState(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -17,85 +22,193 @@ export function LandingOverlay() {
         }
     }, []);
 
-    function handleEnter() {
-        // Play audio
-        try {
-            if (audioRef.current) {
-                audioRef.current.volume = 0.4;
-                audioRef.current.play().catch(() => { });
-            }
-        } catch { }
+    const handleEnter = () => {
+        // Unlock audio directly in the click handler (browser trusts this as a user gesture)
+        init();
+        unlock();
 
-        // Save audio preference
-        localStorage.setItem('devasutra-audio', 'on');
-
-        // Start fade-out
-        setFading(true);
+        setExiting(true);
         sessionStorage.setItem('devasutra-overlay-seen', '1');
 
+        // Dispatch custom event — other components (AudioToggle) listen for this
+        window.dispatchEvent(new CustomEvent('devotion-enter'));
+
+        // Remove overlay after animations complete
         setTimeout(() => {
             setShow(false);
         }, 1500);
-    }
+    };
 
     if (!show) return null;
 
     return (
         <div
-            className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-[1500ms] ${fading ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                }`}
+            id="intro-overlay"
+            style={{
+                position: 'fixed',
+                inset: 0,
+                width: '100%',
+                height: '100dvh',
+                minHeight: '100vh',
+                zIndex: 9999,
+                isolation: 'isolate',
+                overflow: 'hidden',
+                touchAction: 'none',
+                overscrollBehavior: 'none',
+                backgroundColor: '#000',
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Welcome to Devasutra"
         >
-            {/* Background Image */}
+            {/* ── Mobile: Single full-screen panel with circular clip-path exit ── */}
             <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80')" }}
-            />
-            <div className="absolute inset-0 bg-black/50" />
-
-            {/* Content */}
-            <div className="relative z-10 flex flex-col items-center text-center px-6">
-                {/* Brand Name */}
-                <h1
-                    className="text-5xl md:text-7xl font-bold tracking-[0.15em] uppercase mb-4"
+                aria-hidden="true"
+                className="absolute inset-0 md:hidden pointer-events-none"
+            >
+                <div
+                    className="absolute inset-0 transition-all duration-1200"
                     style={{
-                        fontFamily: "'Playfair Display', Georgia, serif",
-                        color: '#FFFFFF',
-                        textShadow: '0 2px 20px rgba(0,0,0,0.5)',
+                        backgroundImage: `url('${OVERLAY_BG}')`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        clipPath: exiting
+                            ? 'circle(0% at 50% 85%)'
+                            : 'circle(150% at 50% 85%)',
+                        transitionTimingFunction: 'cubic-bezier(0.85, 0, 0.15, 1)',
+                        willChange: 'clip-path',
                     }}
-                >
-                    Devasutra
-                </h1>
-                <p
-                    className="text-sm md:text-base tracking-[0.3em] uppercase mb-12"
-                    style={{ color: 'rgba(255,255,255,0.7)' }}
-                >
-                    Sacred Ornaments · Divine Energy
-                </p>
-
-                {/* CTA Button */}
-                <button
-                    onClick={handleEnter}
-                    className="relative px-10 py-4 text-sm tracking-[0.2em] uppercase border-2 rounded-sm transition-all duration-300 hover:scale-105 cursor-pointer"
-                    style={{
-                        borderColor: '#C5A355',
-                        color: '#C5A355',
-                        backgroundColor: 'transparent',
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#C5A355';
-                        e.currentTarget.style.color = '#000';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = '#C5A355';
-                    }}
-                >
-                    Enter the Sacred Store →
-                </button>
+                />
             </div>
 
-            {/* Hidden audio element */}
-            <audio ref={audioRef} src="/audio/chant.mp3" preload="none" />
+            {/* ── Desktop: 5 vertical image-sliced columns ── */}
+            <div
+                aria-hidden="true"
+                className="absolute inset-0 hidden md:grid md:grid-cols-5 pointer-events-none"
+            >
+                {[0, 1, 2, 3, 4].map((index) => (
+                    <div
+                        key={index}
+                        className="relative overflow-hidden transition-transform duration-1200"
+                        style={{
+                            transform: exiting
+                                ? index % 2 === 0
+                                    ? 'translateY(-100%)'
+                                    : 'translateY(100%)'
+                                : 'translateY(0)',
+                            transitionDelay: `${index * 60}ms`,
+                            transitionTimingFunction: 'cubic-bezier(0.85, 0, 0.15, 1)',
+                            willChange: 'transform',
+                        }}
+                    >
+                        <div
+                            className="absolute top-0 left-0"
+                            style={{
+                                width: '100vw',
+                                height: '100dvh',
+                                minHeight: '100vh',
+                                backgroundImage: `url('${OVERLAY_BG}')`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                backgroundRepeat: 'no-repeat',
+                                transform: `translateX(-${index * 20}vw)`,
+                                willChange: 'transform',
+                            }}
+                        />
+                    </div>
+                ))}
+            </div>
+
+            {/* ── Content layer ── */}
+            <div
+                className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-1000 ${exiting ? 'opacity-0 scale-105' : 'opacity-100 scale-100'
+                    }`}
+            >
+                {/* Logo at top center */}
+                <div className="absolute top-10 sm:top-14 md:top-20 left-1/2 -translate-x-1/2 px-6 animate-fade-in" style={{ animationDelay: '300ms' }}>
+                    <img
+                        src="/logo-new.png"
+                        alt="Devasutra"
+                        className="w-[50vw] sm:w-[42vw] md:w-[35vw] lg:w-[28vw] max-w-lg h-auto object-contain drop-shadow-2xl"
+                        onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        }}
+                    />
+                </div>
+
+                {/* Enter Button at bottom center */}
+                <div className="absolute bottom-10 sm:bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 text-center px-4 w-full max-w-md">
+                    <button
+                        onClick={handleEnter}
+                        className="group relative overflow-hidden px-8 sm:px-12 py-3.5 sm:py-5 rounded-full transition-all duration-700 cursor-pointer animate-pulse-slow w-full sm:w-auto"
+                        style={{
+                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                            color: 'rgba(255, 255, 255, 0.95)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                            backdropFilter: 'blur(24px)',
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor =
+                                'rgba(255, 255, 255, 0.4)';
+                            e.currentTarget.style.backgroundColor =
+                                'rgba(255, 255, 255, 0.1)';
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow =
+                                '0 16px 48px rgba(0, 0, 0, 0.3)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor =
+                                'rgba(255, 255, 255, 0.15)';
+                            e.currentTarget.style.backgroundColor =
+                                'rgba(255, 255, 255, 0.03)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow =
+                                '0 8px 32px rgba(0, 0, 0, 0.2)';
+                        }}
+                    >
+                        {/* Shimmer effect on hover */}
+                        <div
+                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                            style={{
+                                background:
+                                    'linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent)',
+                                transform: 'translateX(-100%)',
+                                animation: 'shimmer 2.5s infinite linear',
+                            }}
+                        />
+                        <div className="relative flex items-center justify-center gap-3 sm:gap-4">
+                            {/* Button text */}
+                            <span className="text-xs sm:text-[13px] font-medium tracking-[0.3em] sm:tracking-[0.4em] uppercase animate-text-reveal">
+                                VISIT STORE
+                            </span>
+                            {/* Animated arrow */}
+                            <svg
+                                className="w-4 h-4 sm:w-5 sm:h-5 text-accent animate-bounce-slow"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                                />
+                            </svg>
+                        </div>
+                    </button>
+
+                    {/* Subtle hint text */}
+                    <p
+                        className="text-white/40 text-[9px] sm:text-[11px] mt-4 sm:mt-6 tracking-[0.2em] uppercase animate-fade-in"
+                        style={{ animationDelay: '1000ms', animationFillMode: 'both' }}
+                    >
+                        Click to continue
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }

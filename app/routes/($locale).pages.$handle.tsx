@@ -58,11 +58,35 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className="page">
-      <header>
-        <h1>{page.title}</h1>
-      </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
+    <div className="bg-white text-black min-h-screen">
+      {/* Hero Section */}
+      <section className="border-b border-neutral-200 py-20 px-6 text-center">
+        <h1 className="text-4xl md:text-5xl font-serif tracking-wide uppercase">
+          {page.title}
+        </h1>
+
+        <div className="mt-4 w-16 h-[2px] bg-black mx-auto" />
+      </section>
+
+      {/* Content Section */}
+      <section className="max-w-4xl mx-auto px-6 py-16">
+        <div
+          className="
+            prose
+            prose-neutral
+            max-w-none
+            prose-headings:font-serif
+            prose-headings:tracking-wide
+            prose-p:text-neutral-700
+            prose-p:leading-relaxed
+            prose-strong:text-black
+            prose-a:text-black
+            prose-a:no-underline
+            hover:prose-a:underline
+          "
+          dangerouslySetInnerHTML={{__html: page.body}}
+        />
+      </section>
     </div>
   );
 }

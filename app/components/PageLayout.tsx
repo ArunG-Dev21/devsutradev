@@ -78,22 +78,85 @@ function SearchAside() {
   return (
     <Aside type="search" heading="SEARCH">
       <div className="predictive-search">
-        <br />
         <SearchFormPredictive>
           {({ fetchResults, goToSearch, inputRef }) => (
-            <>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                background: 'var(--color-bg-light)',
+                border: '1px solid var(--color-primary-border)',
+                borderRadius: '999px',
+                padding: '10px 16px',
+                margin: '0 0 16px 0',
+                overflow: 'hidden',
+                outline: 'none',
+              }}
+            >
+              {/* Search icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                style={{ width: '16px', height: '16px', flexShrink: 0, opacity: 0.5 }}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                />
+              </svg>
+
+              {/* Text input */}
               <input
                 name="q"
                 onChange={fetchResults}
                 onFocus={fetchResults}
-                placeholder="Search"
+                onKeyDown={(e) => e.key === 'Enter' && goToSearch()}
+                placeholder="Search sacred items…"
                 ref={inputRef}
-                type="search"
+                type="text"
                 list={queriesDatalistId}
+                autoComplete="off"
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  padding: 0,
+                  margin: 0,
+                  color: 'var(--color-text-main)',
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.03em',
+                  fontFamily: 'inherit',
+                }}
               />
-              &nbsp;
-              <button onClick={goToSearch}>Search</button>
-            </>
+
+              {/* Go button */}
+              <button
+                onClick={goToSearch}
+                title="Search"
+                style={{
+                  flexShrink: 0,
+                  background: 'var(--color-accent, #000)',
+                  border: 'none',
+                  borderRadius: '999px',
+                  padding: '4px 14px',
+                  color: 'var(--color-bg-dark)',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  transition: 'opacity 0.2s',
+                }}
+              >
+                Go
+              </button>
+            </div>
           )}
         </SearchFormPredictive>
 
@@ -102,7 +165,7 @@ function SearchAside() {
             const { articles, collections, pages, products, queries } = items;
 
             if (state === 'loading' && term.current) {
-              return <div>Loading...</div>;
+              return <div style={{ padding: '1rem', fontSize: '0.8rem', opacity: 0.6 }}>Searching…</div>;
             }
 
             if (!total) {
@@ -139,11 +202,20 @@ function SearchAside() {
                   <Link
                     onClick={closeSearch}
                     to={`${SEARCH_ENDPOINT}?q=${term.current}`}
+                    style={{
+                      display: 'block',
+                      textAlign: 'center',
+                      padding: '0.75rem 1rem',
+                      marginTop: '0.5rem',
+                      borderTop: '1px solid var(--color-primary-border)',
+                      fontSize: '0.7rem',
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: 'var(--color-accent, #000)',
+                      fontWeight: 600,
+                    }}
                   >
-                    <p>
-                      View all results for <q>{term.current}</q>
-                      &nbsp; →
-                    </p>
+                    View all results for "{term.current}" →
                   </Link>
                 ) : null}
               </>

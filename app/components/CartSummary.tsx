@@ -13,8 +13,8 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
   return (
     <div
       className={`border-t border-neutral-200 bg-white ${layout === 'aside'
-          ? 'px-4 py-4'
-          : 'p-6 rounded-xl border border-neutral-200'
+        ? 'px-4 py-4'
+        : 'p-6 rounded-xl border border-neutral-200'
         }`}
     >
       {/* Subtotal */}
@@ -52,8 +52,7 @@ function CartCheckoutActions({ checkoutUrl }: { checkoutUrl?: string }) {
       <a
         href={checkoutUrl}
         target="_self"
-        className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90"
-        style={{ backgroundColor: '#C5A355', color: '#fff' }}
+        className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-stone-900 text-white"
       >
         Checkout →
       </a>
@@ -78,10 +77,10 @@ function CartDiscounts({
     <div className="mb-3">
       {/* Existing discount */}
       {codes.length > 0 && (
-        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-green-50 rounded-lg">
-          <div className="flex items-center gap-2 text-sm text-green-700">
+        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-stone-50 rounded-lg">
+          <div className="flex items-center gap-2 text-sm text-stone-700">
             <span>🎫</span>
-            <code className="bg-transparent text-green-700 text-xs">
+            <code className="bg-transparent text-stone-700 text-xs">
               {codes.join(', ')}
             </code>
           </div>
@@ -89,7 +88,7 @@ function CartDiscounts({
             <button
               type="submit"
               aria-label="Remove discount"
-              className="text-xs text-red-400 hover:text-red-600 transition cursor-pointer"
+              className="text-xs text-stone-400 hover:text-stone-600 transition cursor-pointer"
             >
               Remove
             </button>
@@ -105,7 +104,7 @@ function CartDiscounts({
             type="text"
             name="discountCode"
             placeholder="Discount code"
-            className="flex-1 px-3 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#C5A355] focus:border-[#C5A355]"
+            className="flex-1 px-3 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-stone-900 focus:border-stone-900"
           />
           <button
             type="submit"
@@ -159,10 +158,10 @@ function CartGiftCard({
         <div className="space-y-2 mb-2">
           {giftCardCodes.map((giftCard) => (
             <RemoveGiftCardForm key={giftCard.id} giftCardId={giftCard.id}>
-              <div className="flex items-center justify-between px-3 py-2 bg-purple-50 rounded-lg text-sm">
-                <div className="flex items-center gap-2 text-purple-700">
+              <div className="flex items-center justify-between px-3 py-2 bg-stone-50 rounded-lg text-sm">
+                <div className="flex items-center gap-2 text-stone-700">
                   <span>🎁</span>
-                  <code className="bg-transparent text-purple-700 text-xs">
+                  <code className="bg-transparent text-stone-700 text-xs">
                     ***{giftCard.lastCharacters}
                   </code>
                   <span className="text-xs">
@@ -171,7 +170,7 @@ function CartGiftCard({
                 </div>
                 <button
                   type="submit"
-                  className="text-xs text-red-400 hover:text-red-600 transition cursor-pointer"
+                  className="text-xs text-stone-400 hover:text-stone-600 transition cursor-pointer"
                 >
                   Remove
                 </button>
@@ -188,7 +187,7 @@ function CartGiftCard({
             name="giftCardCode"
             placeholder="Gift card code"
             ref={giftCardCodeInput}
-            className="flex-1 px-3 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#C5A355] focus:border-[#C5A355]"
+            className="flex-1 px-3 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-stone-900 focus:border-stone-900"
           />
           <button
             type="submit"

@@ -18,19 +18,18 @@ export function Footer({
     <Suspense>
       <Await resolve={footerPromise}>
         {(footer) => (
-          <footer className="bg-neutral-950 text-white mt-0">
+          <footer className="bg-bg-dark border-t border-primary-border text-text-main mt-0 relative z-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
               {/* 4-Column Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
                 {/* Column 1 — Brand */}
                 <div>
                   <h3
-                    className="text-xl font-bold tracking-[0.15em] uppercase mb-3"
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                    className="text-xl font-bold tracking-[0.15em] uppercase mb-3 text-glow font-heading"
                   >
                     {header.shop.name || SITE_NAME}
                   </h3>
-                  <p className="text-neutral-400 text-sm leading-relaxed mb-4">
+                  <p className="text-text-muted text-sm leading-relaxed mb-4">
                     {SITE_TAGLINE}
                   </p>
                   <p className="text-neutral-500 text-xs leading-relaxed">
@@ -42,7 +41,7 @@ export function Footer({
 
                 {/* Column 2 — Quick Links */}
                 <div>
-                  <h4 className="text-xs tracking-[0.2em] uppercase text-neutral-400 mb-4 font-semibold">
+                  <h4 className="text-xs tracking-[0.2em] uppercase text-text-muted mb-4 font-semibold">
                     Quick Links
                   </h4>
                   <ul className="space-y-2.5">
@@ -56,7 +55,7 @@ export function Footer({
                         <NavLink
                           to={link.url}
                           prefetch="intent"
-                          className="text-neutral-300 text-sm hover:text-[#C5A355] transition duration-300"
+                          className="text-text-main text-sm hover:text-accent transition duration-300 hover:shadow-glow"
                         >
                           {link.title}
                         </NavLink>
@@ -67,7 +66,7 @@ export function Footer({
 
                 {/* Column 3 — Policies */}
                 <div>
-                  <h4 className="text-xs tracking-[0.2em] uppercase text-neutral-400 mb-4 font-semibold">
+                  <h4 className="text-xs tracking-[0.2em] uppercase text-text-muted mb-4 font-semibold">
                     Policies
                   </h4>
                   <ul className="space-y-2.5">
@@ -87,7 +86,7 @@ export function Footer({
                             <NavLink
                               to={url}
                               prefetch="intent"
-                              className="text-neutral-300 text-sm hover:text-[#C5A355] transition duration-300"
+                              className="text-text-main text-sm hover:text-accent transition duration-300 hover:shadow-glow"
                             >
                               {item.title}
                             </NavLink>
@@ -98,7 +97,7 @@ export function Footer({
                         <li key={link.title}>
                           <NavLink
                             to={link.url}
-                            className="text-neutral-300 text-sm hover:text-[#C5A355] transition duration-300"
+                            className="text-text-main text-sm hover:text-accent transition duration-300 hover:shadow-glow"
                           >
                             {link.title}
                           </NavLink>
@@ -109,10 +108,10 @@ export function Footer({
 
                 {/* Column 4 — Contact & Social */}
                 <div>
-                  <h4 className="text-xs tracking-[0.2em] uppercase text-neutral-400 mb-4 font-semibold">
+                  <h4 className="text-xs tracking-[0.2em] uppercase text-text-muted mb-4 font-semibold">
                     Get In Touch
                   </h4>
-                  <ul className="space-y-2.5 text-sm text-neutral-300">
+                  <ul className="space-y-2.5 text-sm text-text-main">
                     <li className="flex items-start gap-2">
                       <span className="mt-0.5">📧</span>
                       <span>support@devasutra.com</span>
@@ -140,7 +139,7 @@ export function Footer({
                         href={social.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-9 h-9 rounded-full border border-neutral-700 flex items-center justify-center text-xs text-neutral-400 hover:border-[#C5A355] hover:text-[#C5A355] transition duration-300"
+                        className="w-9 h-9 rounded-full border border-primary-border flex items-center justify-center text-xs text-text-muted hover:border-accent hover:text-accent shadow-silver hover:shadow-glow transition duration-300"
                         aria-label={social.label}
                       >
                         {social.icon}
@@ -151,8 +150,8 @@ export function Footer({
               </div>
 
               {/* Bottom Bar */}
-              <div className="mt-12 pt-6 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-neutral-500 text-xs tracking-wide">
+              <div className="mt-12 pt-6 border-t border-primary-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p className="text-text-muted text-xs tracking-wide">
                   © {new Date().getFullYear()} {header.shop.name || SITE_NAME}
                   . All rights reserved.
                 </p>
@@ -160,7 +159,7 @@ export function Footer({
                   {['Visa', 'MC', 'UPI', 'GPay'].map((pm) => (
                     <span
                       key={pm}
-                      className="px-2 py-1 text-[10px] border border-neutral-700 rounded text-neutral-500 uppercase tracking-wider"
+                      className="px-2 py-1 text-[10px] border border-primary-border rounded text-text-muted uppercase tracking-wider shadow-silver"
                     >
                       {pm}
                     </span>
@@ -169,9 +168,10 @@ export function Footer({
               </div>
             </div>
           </footer>
-        )}
-      </Await>
-    </Suspense>
+        )
+        }
+      </Await >
+    </Suspense >
   );
 }
 

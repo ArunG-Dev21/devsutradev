@@ -1,4 +1,4 @@
-import { SwiperComponent } from './SwiperComponent';
+import { SwiperComponent, type HeroSlide } from './SwiperComponent';
 import { FeaturedCollectionComponent } from './FeaturedCollectionComponent';
 
 interface HeroProps {
@@ -26,18 +26,19 @@ interface HeroProps {
       }>;
     };
   };
+  slides?: HeroSlide[];
 }
 
 /**
  * Split hero section — Swiper on left, Featured Collection on right.
  * Full viewport height on desktop, stacked on mobile.
  */
-export function Hero({ collection }: HeroProps) {
+export function Hero({ collection, slides }: HeroProps) {
   if (!collection) return null;
 
   return (
     <section className="grid lg:grid-cols-2">
-      <SwiperComponent />
+      <SwiperComponent slides={slides} />
       <FeaturedCollectionComponent collection={collection} />
     </section>
   );

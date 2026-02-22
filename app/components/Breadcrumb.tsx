@@ -16,7 +16,7 @@ export function Breadcrumb({
 }: BreadcrumbProps) {
     return (
         <nav className="flex items-center gap-2 text-xs text-neutral-400 mb-6 flex-wrap">
-            <Link to="/" className="hover:text-[#C5A355] transition no-underline">
+            <Link to="/" className="hover:text-stone-900 transition no-underline">
                 Home
             </Link>
             <span>›</span>
@@ -24,7 +24,7 @@ export function Breadcrumb({
                 <>
                     <Link
                         to={`/collections/${collectionHandle}`}
-                        className="hover:text-[#C5A355] transition no-underline"
+                        className="hover:text-stone-900 transition no-underline"
                     >
                         {collectionTitle}
                     </Link>
@@ -34,7 +34,7 @@ export function Breadcrumb({
                 <>
                     <Link
                         to="/collections/all"
-                        className="hover:text-[#C5A355] transition no-underline"
+                        className="hover:text-stone-900 transition no-underline"
                     >
                         Shop
                     </Link>

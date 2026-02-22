@@ -1,7 +1,7 @@
 'use client';
 
-import {Swiper, SwiperSlide} from 'swiper/react';
-import {Autoplay, Pagination} from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -14,7 +14,7 @@ interface SplitHeroProps {
   }[];
 }
 
-export function SplitHero({featuredProducts}: SplitHeroProps) {
+export function SplitHero({ featuredProducts }: SplitHeroProps) {
   return (
     <section className="min-h-[85vh] grid lg:grid-cols-2">
 
@@ -22,8 +22,8 @@ export function SplitHero({featuredProducts}: SplitHeroProps) {
       <div className="relative">
         <Swiper
           modules={[Autoplay, Pagination]}
-          autoplay={{delay: 4000}}
-          pagination={{clickable: true}}
+          autoplay={{ delay: 4000 }}
+          pagination={{ clickable: true }}
           loop
           className="h-full"
         >
@@ -54,14 +54,14 @@ export function SplitHero({featuredProducts}: SplitHeroProps) {
       </div>
 
       {/* RIGHT - FEATURED COLLECTION */}
-      <div className="bg-neutral-50 flex items-center">
+      <div className="bg-bg-light flex items-center border-l border-primary-border">
         <div className="px-10 lg:px-20 w-full">
 
-          <p className="text-xs tracking-[0.3em] uppercase text-amber-700 mb-3">
+          <p className="text-[10px] tracking-[0.3em] uppercase text-accent mb-3 font-medium">
             Sacred Collection
           </p>
 
-          <h2 className="text-4xl font-light mb-8">
+          <h2 className="text-4xl lg:text-5xl font-heading font-medium text-text-main mb-8 text-glow">
             Shop Devotional Bracelets
           </h2>
 
@@ -77,11 +77,11 @@ export function SplitHero({featuredProducts}: SplitHeroProps) {
                   />
                 </div>
 
-                <h3 className="text-sm uppercase tracking-wide">
+                <h3 className="text-sm uppercase tracking-widest text-text-main mt-4 mb-1">
                   {product.title}
                 </h3>
 
-                <p className="text-sm text-neutral-600">
+                <p className="text-sm text-text-muted">
                   {product.price}
                 </p>
 
