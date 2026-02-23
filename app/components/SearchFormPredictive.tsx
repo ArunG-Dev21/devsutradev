@@ -4,9 +4,9 @@ import {
   type FormProps,
   type Fetcher,
 } from 'react-router';
-import React, {useRef, useEffect} from 'react';
-import type {PredictiveSearchReturn} from '~/lib/search';
-import {useAside} from './Aside';
+import React, { useRef, useEffect } from 'react';
+import type { PredictiveSearchReturn } from '~/lib/search';
+import { useAside } from './Aside';
 
 type SearchFormPredictiveChildren = (args: {
   fetchResults: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -29,7 +29,7 @@ export function SearchFormPredictive({
   className = 'predictive-search-form',
   ...props
 }: SearchFormPredictiveProps) {
-  const fetcher = useFetcher<PredictiveSearchReturn>({key: 'search'});
+  const fetcher = useFetcher<PredictiveSearchReturn>({ key: 'search' });
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
   const aside = useAside();
@@ -53,16 +53,14 @@ export function SearchFormPredictive({
   /** Fetch search results based on the input value */
   function fetchResults(event: React.ChangeEvent<HTMLInputElement>) {
     void fetcher.submit(
-      {q: event.target.value || '', limit: 5, predictive: true},
-      {method: 'GET', action: SEARCH_ENDPOINT},
+      { q: event.target.value || '', limit: 5, predictive: true },
+      { method: 'GET', action: SEARCH_ENDPOINT },
     );
   }
 
-  // ensure the passed input has a type of search, because SearchResults
-  // will select the element based on the input
-  useEffect(() => {
-    inputRef?.current?.setAttribute('type', 'search');
-  }, []);
+  // Removed the useEffect that manually mutates `inputRef?.current?.setAttribute('type', 'search')` 
+  // because mutating DOM attributes directly in React causes hydration mismatches and 
+  // infinite re-render loops in Firefox when combined with useFetcher.
 
   if (typeof children !== 'function') {
     return null;
@@ -70,7 +68,7 @@ export function SearchFormPredictive({
 
   return (
     <fetcher.Form {...props} className={className} onSubmit={resetInput}>
-      {children({inputRef, fetcher, fetchResults, goToSearch})}
+      {children({ inputRef, fetcher, fetchResults, goToSearch })}
     </fetcher.Form>
   );
 }

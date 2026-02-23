@@ -40,7 +40,7 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
   const canAutoplay = slideData.length > 1;
 
   return (
-    <div className="relative w-full h-[60vh] md:h-[90vh]">
+    <div className="relative w-full h-full">
       <Swiper
         modules={[Autoplay, Pagination, EffectFade]}
         effect="fade"
@@ -75,46 +75,50 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
 
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+              {/* <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" /> */}
 
               {/* Content */}
-              <div className="relative h-full flex flex-col justify-end p-8 lg:p-12 xl:p-16 pb-20 lg:pb-24">
-                <div className="max-w-lg">
-                  <h2
-                    className="text-4xl lg:text-5xl xl:text-6xl font-medium text-white mb-5 leading-tight"
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      textShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                    }}
-                  >
-                    {slide.heading}
-                  </h2>
-                  <span
-                    className="inline-block text-xs font-medium tracking-[0.25em] uppercase mb-4"
-                  >
-                    {slide.subheading}
-                  </span>
+              <div className="relative h-full flex items-center lg:items-end">
+                <div className="w-full px-8 lg:px-12 xl:px-20 pb-16 lg:pb-24">
 
-                  {/* CTA Button */}
-                  <Link
-                    to={slide.ctaLink}
-                    className="inline-flex items-center gap-2 px-7 py-3.5 bg-white/95 text-black text-sm font-medium tracking-wider uppercase rounded-full hover:bg-white hover:shadow-lg transition-all duration-300 no-underline"
-                  >
-                    {slide.ctaText}
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
+                  <div className="max-w-2xl">
+                    {/* Heading */}
+                    <h2
+                      className="text-4xl md:text-5xl lg:text-6xl xl:text-5xl font-semibold text-white leading-[1.05] mb-8"
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        textShadow: '0 6px 30px rgba(0,0,0,0.45)',
+                      }}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                      />
-                    </svg>
-                  </Link>
+                      {slide.heading}
+                    </h2>
+                    {/* Subheading */}
+                    <span className="block text-lg text-neutral-300 mb-6">
+                      {slide.subheading}
+                    </span>
+
+                    {/* CTA Button */}
+                    <Link
+                      to={slide.ctaLink}
+                      className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black text-xs tracking-[0.25em] uppercase font-medium rounded-full border border-white transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
+                    >
+                      {slide.ctaText}
+                      <svg
+                        className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                        />
+                      </svg>
+                    </Link>
+
+                  </div>
                 </div>
               </div>
             </div>

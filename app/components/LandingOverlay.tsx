@@ -16,10 +16,7 @@ export function LandingOverlay() {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        const seen = sessionStorage.getItem('devasutra-overlay-seen');
-        if (!seen) {
-            setShow(true);
-        }
+        setShow(true);
     }, []);
 
     const handleEnter = () => {
@@ -28,7 +25,6 @@ export function LandingOverlay() {
         unlock();
 
         setExiting(true);
-        sessionStorage.setItem('devasutra-overlay-seen', '1');
 
         // Dispatch custom event — other components (AudioToggle) listen for this
         window.dispatchEvent(new CustomEvent('devotion-enter'));

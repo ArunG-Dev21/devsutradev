@@ -413,9 +413,22 @@ export type FeaturedCollectionWithProductsQuery = {
             featuredImage?: StorefrontAPI.Maybe<
               Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
             >;
+            images: {
+              nodes: Array<
+                Pick<
+                  StorefrontAPI.Image,
+                  'url' | 'altText' | 'width' | 'height'
+                >
+              >;
+            };
             variants: {
               nodes: Array<
-                Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'>
+                Pick<
+                  StorefrontAPI.ProductVariant,
+                  'id' | 'availableForSale'
+                > & {
+                  price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+                }
               >;
             };
           }
@@ -1327,7 +1340,7 @@ interface GeneratedQueryTypes {
     return: FooterQuery;
     variables: FooterQueryVariables;
   };
-  '#graphql\n  query FeaturedCollectionWithProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int!\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: "featured") {\n      id\n      title\n      handle\n      description\n      image {\n        url\n        altText\n        width\n        height\n      }\n      products(first: $first, sortKey: BEST_SELLING) {\n        nodes {\n          id\n          title\n          handle\n          availableForSale\n          priceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n          compareAtPriceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n          featuredImage {\n            url\n            altText\n            width\n            height\n          }\n          variants(first: 1) {\n            nodes {\n              id\n              availableForSale\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query FeaturedCollectionWithProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int!\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: "featured") {\n      id\n      title\n      handle\n      description\n      image {\n        url\n        altText\n        width\n        height\n      }\n      products(first: $first, sortKey: BEST_SELLING) {\n        nodes {\n          id\n          title\n          handle\n          availableForSale\n          priceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n          compareAtPriceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n          featuredImage {\n            url\n            altText\n            width\n            height\n          }\n\n          # ── ADDED: second image for hover swap ──────────────────────────────\n          # images.nodes[0] = same as featuredImage (primary)\n          # images.nodes[1] = second Shopify media image (shown on hover)\n          images(first: 2) {\n            nodes {\n              url\n              altText\n              width\n              height\n            }\n          }\n\n          # ── ADDED: first variant needed for Add to Cart ──────────────────────\n          variants(first: 1) {\n            nodes {\n              id\n              availableForSale\n              price {\n                amount\n                currencyCode\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: FeaturedCollectionWithProductsQuery;
     variables: FeaturedCollectionWithProductsQueryVariables;
   };

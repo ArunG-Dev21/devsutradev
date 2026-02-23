@@ -1,64 +1,163 @@
 import { useState, useRef } from 'react';
-import { Image, Money } from '@shopify/hydrogen';
+import { Image, Money, CartForm } from '@shopify/hydrogen';
 import { Link } from 'react-router';
 import { QuickViewModal } from '~/components/QuickViewModal';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type ImageNode = {
+  url: string;
+  altText?: string | null;
+  width?: number;
+  height?: number;
+};
+
+type ProductVariant = {
+  id: string;
+  availableForSale: boolean;
+  price?: { amount: string; currencyCode: string };
+};
 
 type ProductNode = {
   id: string;
   title: string;
   handle: string;
   availableForSale?: boolean;
-  featuredImage?: {
-    url: string;
-    altText?: string | null;
-    width?: number;
-    height?: number;
-  } | null;
+  featuredImage?: ImageNode | null;
+  images?: { nodes: ImageNode[] };
   priceRange: {
     minVariantPrice: { amount: string; currencyCode: any };
   };
   compareAtPriceRange?: {
     minVariantPrice: { amount: string; currencyCode: any };
   };
+  variants?: { nodes: ProductVariant[] };
 };
 
 interface FeaturedCollectionProps {
   collection: {
     title: string;
     handle: string;
-    products: {
-      nodes: ProductNode[];
-    };
+    products: { nodes: ProductNode[] };
   };
 }
 
-export function FeaturedCollectionComponent({
-  collection,
-}: FeaturedCollectionProps) {
+// ─── Add to Cart Button ───────────────────────────────────────────────────────
+/**
+ * Uses CartForm with a unique fetcherKey per product — exactly the same
+ * pattern as QuickViewModal. This is why QuickViewModal works and raw
+ * useFetcher posted to /cart does not: CartForm targets the cart route's
+ * action internally via Hydrogen's cart handler, not the current page action.
+ */
+function AddToCartButton({ product }: { product: ProductNode }) {
+  const [justAdded, setJustAdded] = useState(false);
+
+  const firstVariant = product.variants?.nodes?.[0];
+  const isAvailable =
+    firstVariant?.availableForSale ?? product.availableForSale !== false;
+
+  if (!firstVariant || !isAvailable) {
+    return (
+      <div className="mt-3 w-full py-2.5 text-center text-[10px] font-medium tracking-widest uppercase text-stone-400 border border-stone-200 rounded-full select-none">
+        Sold Out
+      </div>
+    );
+  }
+
+  return (
+    <CartForm
+      route="/cart"
+      action={CartForm.ACTIONS.LinesAdd}
+      inputs={{
+        lines: [{ merchandiseId: firstVariant.id, quantity: 1 }],
+      }}
+      // Unique key per product so multiple cards don't share fetcher state
+      fetcherKey={`add-to-cart-${product.id}`}
+    >
+      {(fetcher) => {
+        const isAdding = fetcher.state !== 'idle';
+
+        // After fetcher returns to idle with data, flash "Added" for 1.8s
+        if (!isAdding && fetcher.data && !justAdded) {
+          // no-op: justAdded is set on click, cleared by timeout
+        }
+
+        return (
+          <button
+            type="submit"
+            disabled={isAdding}
+            onClick={() => {
+              setJustAdded(true);
+              setTimeout(() => setJustAdded(false), 1800);
+            }}
+            className={[
+              'mt-3 w-full py-2.5 rounded-full',
+              'text-[10px] font-medium tracking-widest uppercase',
+              'flex items-center justify-center gap-1.5',
+              'border transition-all duration-300 cursor-pointer select-none',
+              isAdding
+                ? 'bg-stone-100 border-stone-200 text-stone-400 scale-[0.97] cursor-not-allowed'
+                : justAdded
+                  ? 'bg-stone-900 border-stone-900 text-stone-50 scale-[0.97]'
+                  : 'bg-transparent border-stone-900/25 text-stone-900 hover:bg-stone-900 hover:border-stone-900 hover:text-stone-50 active:scale-[0.96]',
+            ].join(' ')}
+          >
+            {isAdding ? (
+              <>
+                <svg
+                  className="animate-spin"
+                  width="11" height="11" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" strokeWidth="2.5"
+                >
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                </svg>
+                Adding…
+              </>
+            ) : justAdded ? (
+              <>
+                <svg
+                  width="11" height="11" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" strokeWidth="2.5"
+                  strokeLinecap="round"
+                >
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+                Added
+              </>
+            ) : (
+              'Add to Cart'
+            )}
+          </button>
+        );
+      }}
+    </CartForm>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+export function FeaturedCollectionComponent({ collection }: FeaturedCollectionProps) {
   const [sortKey, setSortKey] = useState('featured');
   const [quickViewProduct, setQuickViewProduct] = useState<ProductNode | null>(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [sortDropdownPos, setSortDropdownPos] = useState({ top: 0, right: 0 });
+  const [visibleCount, setVisibleCount] = useState(6);
 
-  const scrollRef = useRef<HTMLDivElement>(null);
   const sortButtonRef = useRef<HTMLButtonElement>(null);
-
   const products = [...collection.products.nodes];
 
   const sortedProducts = (() => {
     switch (sortKey) {
       case 'price-asc':
-        return products.sort(
-          (a, b) =>
-            parseFloat(a.priceRange.minVariantPrice.amount) -
-            parseFloat(b.priceRange.minVariantPrice.amount)
+        return products.sort((a, b) =>
+          parseFloat(a.priceRange.minVariantPrice.amount) -
+          parseFloat(b.priceRange.minVariantPrice.amount),
         );
       case 'price-desc':
-        return products.sort(
-          (a, b) =>
-            parseFloat(b.priceRange.minVariantPrice.amount) -
-            parseFloat(a.priceRange.minVariantPrice.amount)
+        return products.sort((a, b) =>
+          parseFloat(b.priceRange.minVariantPrice.amount) -
+          parseFloat(a.priceRange.minVariantPrice.amount),
         );
       case 'az':
         return products.sort((a, b) => a.title.localeCompare(b.title));
@@ -77,6 +176,8 @@ export function FeaturedCollectionComponent({
     { value: 'za', label: 'Name: Z → A' },
   ];
 
+  const visibleProducts = sortedProducts.slice(0, visibleCount);
+
   const handleSortToggle = () => {
     if (sortButtonRef.current) {
       const rect = sortButtonRef.current.getBoundingClientRect();
@@ -89,52 +190,37 @@ export function FeaturedCollectionComponent({
   };
 
   return (
-    <div className="relative flex flex-col overflow-hidden bg-gradient-to-br from-black via-neutral-950 to-neutral-900">
-      {/* Glow Trail */}
-      <div className="pointer-events-none absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-10 blur-3xl bg-white" />
+    <div className="relative bg-stone-50 text-stone-900 flex flex-col lg:h-full lg:overflow-hidden">
 
-      {/* HEADER */}
-      <div className="flex-none px-6 md:px-10 lg:px-14 pt-10 pb-6 backdrop-blur-xl border-b border-white/10 bg-white/[0.02]">
+      {/* ── HEADER ── */}
+      <div className="px-6 md:px-10 lg:px-14 pt-10 pb-6 border-b border-stone-900/10 flex-shrink-0">
+        <p className="text-[10px] font-medium tracking-widest uppercase text-amber-700 mb-3">
+          Sacred Collection
+        </p>
         <h2
-          className="text-5xl md:text-6xl font-semibold leading-tight mb-6 text-white"
+          className="text-5xl md:text-6xl lg:text-7xl font-light leading-tight tracking-tight text-stone-900 mb-8"
           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
         >
           {collection.title}
         </h2>
 
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <p
-            className="text-xl text-white font-bold tracking-[0.22em] uppercase"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-          >
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <span className="text-[10px] font-normal tracking-widest uppercase text-stone-500">
             Discover What Calls You
-          </p>
+          </span>
 
-          {/* Sort Button */}
           <button
             ref={sortButtonRef}
             onClick={handleSortToggle}
-            className="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold tracking-wider text-white bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-200"
+            className="flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-medium tracking-wider uppercase text-stone-900 bg-transparent border border-stone-900/30 hover:bg-stone-900 hover:text-stone-50 hover:border-stone-900 transition-all duration-200 cursor-pointer"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="opacity-60"
-            >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M3 6h18M7 12h10M11 18h2" />
             </svg>
-            Sort
+            {sortOptions.find((o) => o.value === sortKey)?.label ?? 'Sort'}
             <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
+              width="11" height="11" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" strokeWidth="2.5"
               className={`transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`}
             >
               <path d="M6 9l6 6 6-6" />
@@ -143,112 +229,176 @@ export function FeaturedCollectionComponent({
         </div>
       </div>
 
-      {/* GRID */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto px-6 md:px-10 lg:px-14 py-10"
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {sortedProducts.map((product) => {
+      {/* ── GRID ── */}
+      <div className="px-6 md:px-10 lg:px-14 py-8 flex-1 lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:snap-none md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {visibleProducts.map((product) => {
             const isHovered = hoveredId === product.id;
             const isUnavailable = product.availableForSale === false;
+
+            /**
+             * IMAGE SWAP:
+             * After adding images(first:2) to the query:
+             *   images.nodes[0] === featuredImage  → primary (always shown)
+             *   images.nodes[1]                    → secondary (shown on hover)
+             *
+             * We skip nodes[0] and grab nodes[1] directly.
+             * If undefined, no swap happens — primary just zooms.
+             */
+            const secondaryImage = product.images?.nodes?.[1] ?? null;
 
             return (
               <div
                 key={product.id}
-                className="group relative rounded-2xl overflow-hidden transition-all duration-500 bg-white/[0.04] border border-white/[0.06] backdrop-blur-xl"
-                style={{
-                  transform: isHovered ? 'translateY(-6px)' : 'none',
-                }}
+                className="relative bg-white rounded-2xl overflow-hidden flex flex-col border border-stone-100 shadow-sm hover:shadow-md transition-shadow duration-300 min-w-[280px] w-[80vw] flex-shrink-0 snap-center md:w-auto md:min-w-0"
                 onMouseEnter={() => setHoveredId(product.id)}
                 onMouseLeave={() => setHoveredId(null)}
               >
-                <Link to={`/products/${product.handle}`}>
-                  <div className="aspect-[4/5] overflow-hidden">
+                {/* ── IMAGE ── */}
+                <Link to={`/products/${product.handle}`} className="block">
+                  <div className="relative aspect-[1/1] overflow-hidden bg-stone-100">
+
+                    {/* Primary image — fades out when hovered + secondary exists */}
                     {product.featuredImage && (
                       <Image
                         data={product.featuredImage}
-                        className="w-full h-full object-cover transition-transform duration-700"
+                        className="absolute inset-0 w-full h-full object-cover"
                         style={{
-                          transform: isHovered ? 'scale(1.06)' : 'scale(1)',
+                          opacity: isHovered && secondaryImage ? 0 : 1,
+                          transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                          transition: 'opacity 0.55s ease, transform 0.65s ease',
+                          willChange: 'opacity, transform',
+                          zIndex: 1,
                         }}
                       />
                     )}
-                  </div>
 
-                  <div className="px-5 py-4">
-                    <h3
-                      className="text-[15px] font-semibold mb-1 transition-colors duration-200"
+                    {/* Secondary image — always rendered, fades in on hover */}
+                    {secondaryImage && (
+                      <Image
+                        data={secondaryImage}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        style={{
+                          opacity: isHovered ? 1 : 0,
+                          transform: isHovered ? 'scale(1.02)' : 'scale(1.07)',
+                          transition: 'opacity 0.55s ease, transform 0.65s ease',
+                          willChange: 'opacity, transform',
+                          zIndex: 2,
+                        }}
+                      />
+                    )}
+
+                    {/* Gradient vignette */}
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-stone-900/15 to-transparent pointer-events-none"
                       style={{
-                        fontFamily: "'Cormorant Garamond', Georgia, serif",
-                        color: isHovered ? '#dfdfdf' : 'white',
+                        opacity: isHovered ? 1 : 0,
+                        transition: 'opacity 0.4s ease',
+                        zIndex: 3,
                       }}
-                    >
-                      {product.title}
-                    </h3>
+                    />
 
-                    <span className="text-white/80 text-[14px] font-semibold">
-                      <Money data={product.priceRange.minVariantPrice as any} />
-                    </span>
+                    {/* Sold out badge */}
+                    {isUnavailable && (
+                      <span
+                        className="absolute top-3 left-3 text-[9px] font-medium tracking-wider uppercase px-3 py-1 bg-white/90 text-stone-500 border border-stone-200 rounded-full backdrop-blur-sm"
+                        style={{ zIndex: 4 }}
+                      >
+                        Sold Out
+                      </span>
+                    )}
+
+                    {/* Eye / Quick View — bottom-right of image, slides up on hover */}
+                    {!isUnavailable && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setQuickViewProduct(product);
+                        }}
+                        aria-label="Quick view"
+                        className="absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center border border-white/50 bg-white/85 hover:bg-stone-900 backdrop-blur-sm group/eye"
+                        style={{
+                          opacity: isHovered ? 1 : 0,
+                          transform: isHovered ? 'translateY(0px)' : 'translateY(8px)',
+                          transition: 'opacity 0.3s ease, transform 0.3s ease, background-color 0.2s ease',
+                          zIndex: 4,
+                        }}
+                      >
+                        <svg
+                          width="16" height="16" viewBox="0 0 24 24"
+                          fill="none" strokeWidth="1.8"
+                          strokeLinecap="round" strokeLinejoin="round"
+                          className="stroke-stone-800 group-hover/eye:stroke-white transition-colors duration-150"
+                        >
+                          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                 </Link>
 
-                {/* Plus Icon — opens Quick View */}
-                {!isUnavailable && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setQuickViewProduct(product);
-                    }}
-                    className="absolute bottom-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border border-white/20 backdrop-blur-md"
-                    style={{
-                      background: isHovered
-                        ? 'rgba(255,255,255,0.3)'
-                        : 'rgba(255,255,255,0.1)',
-                    }}
-                    aria-label="Quick view"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="white"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
+                {/* ── INFO + ADD TO CART ── */}
+                <div className="px-4 pt-3 pb-5 flex flex-col">
+                  <Link to={`/products/${product.handle}`} className="flex flex-col gap-0.5">
+                    <p
+                      className="text-[1rem] font-normal leading-snug text-stone-900 tracking-wide"
+                      style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                     >
-                      <path d="M12 5v14M5 12h14" />
-                    </svg>
-                  </button>
-                )}
+                      {product.title}
+                    </p>
+                    <span className="text-sm text-stone-500">
+                      <Money data={product.priceRange.minVariantPrice as any} />
+                    </span>
+                  </Link>
+
+                  <AddToCartButton product={product} />
+                </div>
               </div>
             );
           })}
         </div>
 
-        {/* Bottom Section */}
-        <div className="mt-16 pt-8 flex items-center justify-end border-t border-white/[0.08]">
+        {/* ── VIEW MORE BUTTON ── */}
+        {visibleCount < sortedProducts.length && (
+          <div className="mt-10 flex justify-center">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 6)}
+              className="px-8 py-3 w-full sm:w-auto rounded-full text-[10px] font-medium tracking-widest uppercase text-stone-900 bg-transparent border border-stone-900/30 hover:bg-stone-900 hover:text-stone-50 hover:border-stone-900 transition-all duration-300 cursor-pointer"
+            >
+              View More
+            </button>
+          </div>
+        )}
+
+        {/* ── FOOTER ── */}
+        <div className="mt-10 pt-6 flex items-center justify-between border-t border-stone-900/10">
+          <span className="text-[10px] tracking-widest uppercase text-stone-400">
+            {sortedProducts.length} products
+          </span>
           <Link
             to={`/collections/${collection.handle}`}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold tracking-[0.25em] uppercase border border-white/20 text-white hover:bg-white/5 hover:border-white/40 transition-all duration-200"
+            className="inline-flex items-center gap-2 text-[10px] font-medium tracking-widest uppercase text-stone-900 border-b border-stone-300 pb-0.5 hover:text-amber-700 hover:border-amber-700 transition-all duration-200"
           >
-            Explore Full Collection →
+            Explore Full Collection
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
       </div>
 
-      {/* Sort Dropdown — fixed, renders above ALL stacking contexts including backdrop-blur cards */}
+      {/* ── SORT DROPDOWN ── */}
       {isSortOpen && (
         <>
+          <div className="fixed inset-0 z-[100]" onClick={() => setIsSortOpen(false)} />
           <div
-            className="fixed inset-0 z-[100]"
-            onClick={() => setIsSortOpen(false)}
-          />
-          <div
-            className="fixed z-[101] w-56 py-1.5 rounded-2xl bg-neutral-900 border border-white/10 shadow-2xl shadow-black/60"
+            className="fixed z-[101] w-52 rounded-xl overflow-hidden bg-stone-900 border border-white/10 shadow-2xl shadow-black/40"
             style={{ top: sortDropdownPos.top, right: sortDropdownPos.right }}
           >
-            <p className="px-5 py-2 text-[10px] tracking-[0.2em] uppercase text-white/30 font-semibold border-b border-white/5 mb-1">
+            <p className="px-5 pt-3 pb-2 text-[9px] tracking-widest uppercase text-white/30 font-medium border-b border-white/10">
               Sort By
             </p>
             {sortOptions.map((option) => (
@@ -256,23 +406,15 @@ export function FeaturedCollectionComponent({
                 key={option.value}
                 onClick={() => {
                   setSortKey(option.value);
+                  setVisibleCount(6);
                   setIsSortOpen(false);
                 }}
-                className={`w-full text-left px-5 py-2.5 text-[13px] transition-colors duration-150 hover:bg-white/5 flex items-center justify-between ${sortKey === option.value
-                    ? 'text-white font-semibold'
-                    : 'text-white/80'
+                className={`w-full text-left px-5 py-2.5 text-xs flex items-center justify-between transition-colors duration-150 hover:bg-white/5 cursor-pointer ${sortKey === option.value ? 'text-white font-medium' : 'text-white/60'
                   }`}
               >
                 {option.label}
                 {sortKey === option.value && (
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                  >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M5 13l4 4L19 7" />
                   </svg>
                 )}
@@ -282,7 +424,7 @@ export function FeaturedCollectionComponent({
         </>
       )}
 
-      {/* Quick View Modal */}
+      {/* ── QUICK VIEW MODAL ── */}
       {quickViewProduct && (
         <QuickViewModal
           product={quickViewProduct}

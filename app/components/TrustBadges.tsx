@@ -59,7 +59,7 @@ export function TrustBadges() {
   ];
 
   return (
-    <section className="relative bg-gradient-to-b from-white via-neutral-50 to-white overflow-hidden">
+    <section className="relative bg-[#f5f7fa] to-white overflow-hidden">
 
       {/* ===== Soft Divine Glow Background ===== */}
       <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-gradient-radial from-neutral-200/40 via-transparent to-transparent blur-3xl opacity-60 pointer-events-none"></div>

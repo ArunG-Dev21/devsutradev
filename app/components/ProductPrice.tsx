@@ -11,15 +11,15 @@ export function ProductPrice({
   return (
     <div className="product-price">
       {compareAtPrice ? (
-        <div className="flex items-center gap-3">
-          <span className="text-2xl font-bold text-stone-900">
+        <div className="flex items-center gap-4">
+          <span className="text-2xl lg:text-3xl font-light text-stone-900 tracking-wide" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
             {price ? <Money data={price} /> : null}
           </span>
-          <s className="text-base text-neutral-400">
+          <s className="text-lg text-stone-400 tracking-wide">
             <Money data={compareAtPrice} />
           </s>
           {price && (
-            <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-stone-100 text-stone-700">
+            <span className="px-3 py-1 text-[10px] font-semibold tracking-widest uppercase rounded-md bg-stone-100 text-stone-600 border border-stone-200">
               {Math.round(
                 ((parseFloat(compareAtPrice.amount) -
                   parseFloat(price.amount)) /
@@ -31,7 +31,7 @@ export function ProductPrice({
           )}
         </div>
       ) : price ? (
-        <span className="text-2xl font-bold text-stone-900">
+        <span className="text-2xl lg:text-3xl font-light text-stone-900 tracking-wide" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
           <Money data={price} />
         </span>
       ) : (

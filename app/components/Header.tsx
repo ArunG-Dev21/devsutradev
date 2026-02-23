@@ -35,8 +35,8 @@ export function Header({
   const { shop, menu } = header;
 
   return (
-    <header className="relative top-0 z-50 bg-white backdrop-blur-xl border-b border-primary-border shadow-sm transition-all duration-300 text-text-main">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-7 flex items-center gap-4 relative">
+    <header className="relative top-0 z-50 bg-black border-primary-border shadow-sm transition-all duration-300 text-text-main">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-8 flex items-center gap-4 relative">
         {/* Mobile Menu Toggle (left on mobile) */}
         <div className="md:hidden">
           <HeaderMenuMobileToggle />
@@ -44,38 +44,38 @@ export function Header({
 
         {/* Logo — left on mobile, centered on desktop */}
         <NavLink
-  to="/"
-  end
-  prefetch="intent"
-  className="md:absolute md:left-1/2 md:-translate-x-1/2 shrink-0"
->
-  <img
-    src="/logo.png"
-    alt={shop.name}
-    className="h-6 md:h-12 w-auto object-contain"
-  />
-</NavLink>
+          to="/"
+          end
+          prefetch="intent"
+          className="md:absolute md:left-1/2 md:-translate-x-1/2 -mt-7 shrink-0"
+        >
+          <img
+            src="/logo-white-single.png"
+            alt={shop.name}
+            className="h-6 md:h-12 w-auto object-contain"
+          />
+        </NavLink>
 
         {/* Spacer to push icons right on desktop */}
         {/* Desktop Left Links (About + Contact) */}
-<div className="hidden md:flex items-center gap-8">
-  <NavLink
-    to="/pages/about"
-    className="text-xs tracking-[0.18em] uppercase font-semibold text-slate-700 hover:text-black transition"
-  >
-    About
-  </NavLink>
+        <div className="hidden md:flex items-center gap-8">
+          <NavLink
+            to="/pages/about"
+            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-white hover:text-black transition"
+          >
+            About
+          </NavLink>
 
-  <NavLink
-    to="/pages/contact"
-    className="text-xs tracking-[0.18em] uppercase font-semibold text-slate-700 hover:text-black transition"
-  >
-    Contact
-  </NavLink>
-</div>
+          <NavLink
+            to="/pages/contact"
+            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-white hover:text-black transition"
+          >
+            Contact
+          </NavLink>
+        </div>
 
-{/* Spacer */}
-<div className="flex-1" />
+        {/* Spacer */}
+        <div className="flex-1" />
 
         {/* Right Side Icons */}
         <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
@@ -103,65 +103,63 @@ function SubNavIsland({
 }) {
   const rawItems = menu?.items?.length ? menu.items : FALLBACK_HEADER_MENU.items;
 
-// Filter out About + Contact
-const items = rawItems.filter(
-  (item) =>
-    !['About', 'Contact'].includes(item.title)
-);
+  // Filter out About + Contact
+  const items = rawItems.filter(
+    (item) =>
+      !['About', 'Contact'].includes(item.title)
+  );
 
-return (
-  <div className="hidden md:flex justify-center relative -mb-8">
-    <nav
-      className="
-        bg-white
+  return (
+    <div className="hidden md:flex justify-center absolute top-28 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      <nav
+        className="
+        bg-black
         shadow-inner
         rounded-full
-        px-1 py-1
+        px-2.5 py-2
         flex items-center gap-2
         relative z-50
         -translate-y-1
-        border border-gray-200
       "
-    >
-      {items.map((item) => {
-        if (!item.url) return null;
+      >
+        {items.map((item) => {
+          if (!item.url) return null;
 
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
+          const url =
+            item.url.includes('myshopify.com') ||
+              item.url.includes(publicStoreDomain) ||
+              item.url.includes(primaryDomainUrl)
+              ? new URL(item.url).pathname
+              : item.url;
 
-        return (
-          <NavLink
-            key={item.id}
-            to={url}
-            end
-            prefetch="intent"
-            className={({ isActive }) =>
-              `
+          return (
+            <NavLink
+              key={item.id}
+              to={url}
+              end
+              prefetch="intent"
+              className={({ isActive }) =>
+                `
               px-8 py-3
               text-sm tracking-[0.15em]
               uppercase
               font-semibold
               rounded-full
               transition-all duration-300
-              ${
-                isActive
+              ${isActive
                   ? 'bg-black text-white shadow-lg'
-                  : 'text-neutral-700 hover:text-black hover:bg-neutral-100 border border-gray-200'
-              }
+                  : 'text-black bg-white border border-gray-200'
+                }
               `
-            }
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
-    </nav>
-  </div>
-);
+              }
+            >
+              {item.title}
+            </NavLink>
+          );
+        })}
+      </nav>
+    </div>
+  );
 }
 
 export function HeaderMenu({
@@ -197,8 +195,8 @@ export function HeaderMenu({
 
         const url =
           item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
+            item.url.includes(publicStoreDomain) ||
+            item.url.includes(primaryDomainUrl)
             ? new URL(item.url).pathname
             : item.url;
 
@@ -210,8 +208,7 @@ export function HeaderMenu({
             prefetch="intent"
             onClick={close}
             className={({ isActive }) =>
-              `py-3 border-b border-primary-border transition-colors duration-300 hover:text-accent ${
-                isActive ? 'text-accent' : ''
+              `py-3 border-b border-primary-border transition-colors duration-300 hover:text-accent ${isActive ? 'text-accent' : ''
               }`
             }
           >
@@ -251,7 +248,7 @@ function HeaderCtas({
       <NavLink
         to="/account"
         prefetch="intent"
-        className="hover:text-accent transition hidden md:block"
+        className="text-white transition hidden md:block"
         aria-label="Account"
       >
         <svg
@@ -260,7 +257,7 @@ function HeaderCtas({
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-5 h-5"
+          className="w-5 h-5 xl:w-8 h-8"
         >
           <path
             strokeLinecap="round"
@@ -368,7 +365,7 @@ function DesktopSearchBar() {
     <div ref={containerRef} className="hidden md:block relative">
       <form
         onSubmit={handleSubmit}
-        className="flex items-center bg-bg-light rounded-full px-3 py-1.5 gap-2 w-44 lg:w-56 transition-all border border-primary-border focus-within:ring-1 focus-within:ring-accent focus-within:bg-bg-subtle"
+        className="flex items-center bg-white rounded-full px-5 py-3 gap-2 w-44 lg:w-64 transition-all border border-primary-border focus-within:ring-1 focus-within:ring-accent focus-within:bg-bg-subtle"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -400,7 +397,7 @@ function DesktopSearchBar() {
 
       {open && (
         <div
-          className="absolute top-full right-0 mt-2 w-80 lg:w-96 bg-bg-light rounded-xl shadow-silver border border-primary-border overflow-hidden z-[200]"
+          className="absolute top-full right-0 mt-2 w-80 lg:w-96 bg-white rounded-xl shadow-silver border border-primary-border overflow-hidden z-[200]"
           style={{ maxHeight: '70vh', overflowY: 'auto' }}
         >
           {isLoading && term && (
@@ -432,7 +429,7 @@ function DesktopSearchBar() {
                           <Link
                             to={productUrl}
                             onClick={closeDropdown}
-                            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-bg-subtle transition-colors"
+                            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white transition-colors"
                           >
                             {image && (
                               <Image
@@ -446,7 +443,7 @@ function DesktopSearchBar() {
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-text-main truncate">{product.title}</p>
                               {price && (
-                                <span className="text-xs text-accent font-medium">
+                                <span className="text-xs text-black font-medium">
                                   <Money data={price} />
                                 </span>
                               )}
@@ -524,7 +521,7 @@ function DesktopSearchBar() {
                 <Link
                   to={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(term)}`}
                   onClick={closeDropdown}
-                  className="block px-4 py-3 text-center text-xs uppercase tracking-wider text-accent hover:bg-bg-subtle transition-colors font-medium"
+                  className="block px-4 py-3 text-center text-xs uppercase tracking-wider text-black hover:bg-gray-100 transition-colors font-medium"
                 >
                   View all {total} results →
                 </Link>
@@ -579,7 +576,7 @@ function CartBadge({ count }: { count: number | null }) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className="relative hover:text-accent transition cursor-pointer"
+      className="relative text-white transition cursor-pointer"
       aria-label={`Cart with ${count ?? 0} items`}
     >
       <svg
@@ -588,7 +585,7 @@ function CartBadge({ count }: { count: number | null }) {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="w-5 h-5"
+        className="w-5 h-5 xl:w-8 xl:h-8"
       >
         <path
           strokeLinecap="round"

@@ -37,9 +37,25 @@ export function Hero({ collection, slides }: HeroProps) {
   if (!collection) return null;
 
   return (
-    <section className="grid lg:grid-cols-2">
-      <SwiperComponent slides={slides} />
-      <FeaturedCollectionComponent collection={collection} />
+    <section className="flex flex-col lg:grid lg:grid-cols-2 lg:h-screen">
+      <div
+        className="w-full h-[60vh] min-h-[400px] lg:h-full lg:min-h-0"
+        onWheel={(e) => {
+          // Stop scroll events on the Swiper from scrolling the whole page (only relevant on desktop)
+          if (window.innerWidth >= 1024) {
+            e.stopPropagation();
+          }
+        }}
+        onTouchMove={(e) => {
+          // Allow natural mobile scroll but prevent swiper vertical drag from stealing it
+          e.stopPropagation();
+        }}
+      >
+        <SwiperComponent slides={slides} />
+      </div>
+      <div className="w-full h-auto lg:h-full lg:overflow-y-auto">
+        <FeaturedCollectionComponent collection={collection} />
+      </div>
     </section>
   );
 }

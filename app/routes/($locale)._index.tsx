@@ -21,9 +21,6 @@ export async function loader(args: Route.LoaderArgs) {
   return { ...criticalData };
 }
 
-/**
- * Load featured collection, homepage slides, and testimonials from Shopify.
- */
 async function loadCriticalData({ context }: Route.LoaderArgs) {
   const { storefront } = context;
 
@@ -35,19 +32,17 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
     storefront.query(TESTIMONIALS_QUERY),
   ]);
 
-  // Transform metaobject nodes into clean slide objects
   const heroSlides = (slidesResult?.metaobjects?.nodes ?? [])
     .map((node: any) => {
       const fields = Object.fromEntries(
         (node.fields ?? []).map((f: any) => [f.key, f]),
       );
-      // Convert full Shopify URLs to relative paths
       let ctaLink = fields.cta_link?.value ?? '/collections/all';
       try {
         const url = new URL(ctaLink);
         ctaLink = url.pathname;
       } catch {
-        // already a relative path
+        // already relative
       }
       return {
         image: fields.background_image?.reference?.image?.url ?? '',
@@ -59,8 +54,6 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
     })
     .filter((slide: any) => slide.image && slide.heading);
 
-  // Transform testimonial metaobjects
-  // Field keys from Shopify: name, review, rating, customer_image, product_reference
   const testimonials = (testimonialsResult?.metaobjects?.nodes ?? [])
     .map((node: any) => {
       const fields = Object.fromEntries(
@@ -88,25 +81,18 @@ export default function Homepage() {
 
   return (
     <div className="home">
-      {/* Hero Section — Swiper + Featured Collection */}
       {data.featuredCollection && (
         <Hero
           collection={data.featuredCollection}
           slides={data.heroSlides}
         />
       )}
-
-      {/* Trust & Promise Section */}
       <TrustBadges />
-
-      {/* Testimonials + Contact Section */}
-      <section className="py-12 md:py-20">
+      <section className="py-12 md:py-20 bg-[#f5f7fa]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
-            {/* Left — Testimonials */}
-            <Testimonials items={data.testimonials} />
-            {/* Right — Contact Form */}
-            <ContactForm />
+            {/* <Testimonials items={data.testimonials} />
+            <ContactForm /> */}
           </div>
         </div>
       </section>
@@ -114,7 +100,7 @@ export default function Homepage() {
   );
 }
 
-// ─── GraphQL Queries ─────────────────────────────────────────────────────────
+// ─── GraphQL Queries ──────────────────────────────────────────────────────────
 
 const FEATURED_COLLECTION_WITH_PRODUCTS_QUERY = `#graphql
   query FeaturedCollectionWithProducts(
@@ -157,10 +143,28 @@ const FEATURED_COLLECTION_WITH_PRODUCTS_QUERY = `#graphql
             width
             height
           }
+
+          # ── ADDED: second image for hover swap ──────────────────────────────
+          # images.nodes[0] = same as featuredImage (primary)
+          # images.nodes[1] = second Shopify media image (shown on hover)
+          images(first: 2) {
+            nodes {
+              url
+              altText
+              width
+              height
+            }
+          }
+
+          # ── ADDED: first variant needed for Add to Cart ──────────────────────
           variants(first: 1) {
             nodes {
               id
               availableForSale
+              price {
+                amount
+                currencyCode
+              }
             }
           }
         }
@@ -169,11 +173,6 @@ const FEATURED_COLLECTION_WITH_PRODUCTS_QUERY = `#graphql
   }
 ` as const;
 
-/**
- * Fetch Homepage Slides metaobjects.
- * Metaobject type: homepage_slides
- * Fields: background_image (file_reference), heading, subheading, cta_text, cta_link
- */
 const HOMEPAGE_SLIDES_QUERY = `#graphql
   query HomepageSlides {
     metaobjects(type: "homepage_slides", first: 10) {
@@ -199,11 +198,6 @@ const HOMEPAGE_SLIDES_QUERY = `#graphql
   }
 ` as const;
 
-/**
- * Fetch Testimonials metaobjects.
- * Metaobject type: testimonials
- * Fields discovered dynamically via key-value pairs.
- */
 const TESTIMONIALS_QUERY = `#graphql
   query Testimonials {
     metaobjects(type: "testimonials", first: 20) {

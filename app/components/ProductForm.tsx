@@ -41,11 +41,11 @@ export function ProductForm({
                   swatch,
                 } = value;
 
-                const pillClass = `px-4 py-2 text-sm rounded-full border transition-all duration-300 cursor-pointer ${selected
-                    ? 'bg-neutral-900 text-white border-neutral-900'
-                    : available
-                      ? 'border-neutral-300 hover:border-neutral-900 text-neutral-700'
-                      : 'border-neutral-200 text-neutral-300 line-through cursor-not-allowed'
+                const pillClass = `px-5 py-2.5 text-[11px] font-medium tracking-widest uppercase rounded-full border transition-all duration-300 cursor-pointer ${selected
+                  ? 'bg-stone-900 text-white border-stone-900'
+                  : available
+                    ? 'border-stone-200 hover:border-stone-400 text-stone-700 bg-white shadow-sm'
+                    : 'border-stone-100 text-stone-300 line-through cursor-not-allowed bg-stone-50'
                   }`;
 
                 if (isDifferentProduct) {

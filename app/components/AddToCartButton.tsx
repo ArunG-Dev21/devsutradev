@@ -27,7 +27,10 @@ export function AddToCartButton({
             type="submit"
             onClick={onClick}
             disabled={disabled ?? fetcher.state !== 'idle'}
-            className="add-to-cart-button"
+            className={`w-full py-4 rounded-full text-[11px] font-medium tracking-[0.2em] uppercase transition-all duration-300 border flex justify-center items-center ${disabled ?? fetcher.state !== 'idle'
+                ? 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
+                : 'bg-stone-900 border-stone-900 text-stone-50 hover:bg-stone-800 hover:border-stone-800 cursor-pointer shadow-sm hover:shadow-md'
+              }`}
           >
             {children}
           </button>
