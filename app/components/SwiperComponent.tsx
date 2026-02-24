@@ -47,15 +47,11 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
         fadeEffect={{ crossFade: true }}
         autoplay={
           canAutoplay
-            ? { delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }
+            ? { delay: 1000, disableOnInteraction: false, pauseOnMouseEnter: true }
             : false
         }
         pagination={{
           clickable: true,
-          bulletClass:
-            'swiper-pagination-bullet !bg-white/50 !w-2 !h-2 !mx-1.5 !rounded-full transition-all duration-300',
-          bulletActiveClass:
-            '!bg-white !w-8 !rounded-full !opacity-100',
         }}
         loop={canLoop}
         speed={1200}
@@ -84,23 +80,19 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
                   <div className="max-w-2xl">
                     {/* Heading */}
                     <h2
-                      className="text-4xl md:text-5xl lg:text-6xl xl:text-5xl font-semibold text-white leading-[1.05] mb-8"
-                      style={{
-                        fontFamily: 'var(--font-heading)',
-                        textShadow: '0 6px 30px rgba(0,0,0,0.45)',
-                      }}
+                      className="text-4xl md:text-5xl lg:text-6xl xl:text-5xl font-semibold text-white leading-[1.05] mb-8 font-heading"
                     >
                       {slide.heading}
                     </h2>
                     {/* Subheading */}
-                    <span className="block text-lg text-neutral-300 mb-6">
+                    <span className="block text-2xl text-neutral-300 mb-6">
                       {slide.subheading}
                     </span>
 
                     {/* CTA Button */}
                     <Link
                       to={slide.ctaLink}
-                      className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black text-xs tracking-[0.25em] uppercase font-medium rounded-full border border-white transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
+                      className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black text-lg uppercase font-medium rounded-full border border-white transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
                     >
                       {slide.ctaText}
                       <svg

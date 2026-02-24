@@ -16,13 +16,21 @@ export function LandingOverlay() {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        setShow(true);
+
+        // Check if we've already shown the overlay in this session
+        const hasShown = sessionStorage.getItem('devasutra_overlay_shown');
+        if (!hasShown) {
+            setShow(true);
+        }
     }, []);
 
     const handleEnter = () => {
         // Unlock audio directly in the click handler (browser trusts this as a user gesture)
         init();
         unlock();
+
+        // Mark as shown in session storage
+        sessionStorage.setItem('devasutra_overlay_shown', 'true');
 
         setExiting(true);
 

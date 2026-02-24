@@ -26,13 +26,13 @@ input {
 .swiper-pagination-bullet {
   background: rgba(255, 255, 255, 0.5) !important;
   opacity: 1 !important;
-  width: 8px !important;
-  height: 8px !important;
+  width: 10px !important;
+  height: 10px !important;
   transition: all 0.3s !important;
 }
 
 .swiper-pagination-bullet-active {
-  background: black !important;
-  width: 24px !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  width: 30px !important;
   border-radius: 4px !important;
 }

@@ -35,7 +35,7 @@ export function Header({
   const { shop, menu } = header;
 
   return (
-    <header className="relative top-0 z-50 bg-black border-primary-border shadow-sm transition-all duration-300 text-text-main">
+    <header className="relative top-0 z-50 bg-white border-primary-border shadow-sm transition-all duration-300 text-text-main">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-8 flex items-center gap-4 relative">
         {/* Mobile Menu Toggle (left on mobile) */}
         <div className="md:hidden">
@@ -50,7 +50,7 @@ export function Header({
           className="md:absolute md:left-1/2 md:-translate-x-1/2 -mt-7 shrink-0"
         >
           <img
-            src="/logo-white-single.png"
+            src="/logo.png"
             alt={shop.name}
             className="h-6 md:h-12 w-auto object-contain"
           />
@@ -61,14 +61,14 @@ export function Header({
         <div className="hidden md:flex items-center gap-8">
           <NavLink
             to="/pages/about"
-            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-white hover:text-black transition"
+            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-black hover:text-black transition"
           >
             About
           </NavLink>
 
           <NavLink
             to="/pages/contact"
-            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-white hover:text-black transition"
+            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-black hover:text-black transition"
           >
             Contact
           </NavLink>
@@ -113,7 +113,7 @@ function SubNavIsland({
     <div className="hidden md:flex justify-center absolute top-28 left-1/2 -translate-x-1/2 -translate-y-1/2">
       <nav
         className="
-        bg-black
+        bg-white
         shadow-inner
         rounded-full
         px-2.5 py-2
@@ -147,7 +147,7 @@ function SubNavIsland({
               rounded-full
               transition-all duration-300
               ${isActive
-                  ? 'bg-black text-white shadow-lg'
+                  ? 'bg-gold text-white shadow-lg'
                   : 'text-black bg-white border border-gray-200'
                 }
               `
@@ -248,7 +248,7 @@ function HeaderCtas({
       <NavLink
         to="/account"
         prefetch="intent"
-        className="text-white transition hidden md:block"
+        className="text-black transition hidden md:block"
         aria-label="Account"
       >
         <svg
@@ -576,7 +576,7 @@ function CartBadge({ count }: { count: number | null }) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className="relative text-white transition cursor-pointer"
+      className="relative text-black transition cursor-pointer"
       aria-label={`Cart with ${count ?? 0} items`}
     >
       <svg

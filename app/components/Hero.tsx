@@ -37,9 +37,9 @@ export function Hero({ collection, slides }: HeroProps) {
   if (!collection) return null;
 
   return (
-    <section className="flex flex-col lg:grid lg:grid-cols-2 lg:h-screen">
+    <section className="flex flex-col lg:grid lg:grid-cols-2 lg:h-[90vh]">
       <div
-        className="w-full h-[60vh] min-h-[400px] lg:h-full lg:min-h-0"
+        className="w-full h-[60vh] min-h-[400px] lg:h-[90vh] lg:min-h-0"
         onWheel={(e) => {
           // Stop scroll events on the Swiper from scrolling the whole page (only relevant on desktop)
           if (window.innerWidth >= 1024) {

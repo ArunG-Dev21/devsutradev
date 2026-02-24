@@ -2,8 +2,6 @@ import { useLoaderData } from 'react-router';
 import type { Route } from './+types/_index';
 import { Hero } from '~/components/Hero';
 import { TrustBadges } from '~/components/TrustBadges';
-import { Testimonials } from '~/components/Testimonials';
-import { ContactForm } from '~/components/ContactForm';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -88,14 +86,6 @@ export default function Homepage() {
         />
       )}
       <TrustBadges />
-      <section className="py-12 md:py-20 bg-[#f5f7fa]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
-            {/* <Testimonials items={data.testimonials} />
-            <ContactForm /> */}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

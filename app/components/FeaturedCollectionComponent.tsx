@@ -99,7 +99,7 @@ function AddToCartButton({ product }: { product: ProductNode }) {
                 ? 'bg-stone-100 border-stone-200 text-stone-400 scale-[0.97] cursor-not-allowed'
                 : justAdded
                   ? 'bg-stone-900 border-stone-900 text-stone-50 scale-[0.97]'
-                  : 'bg-transparent border-stone-900/25 text-stone-900 hover:bg-stone-900 hover:border-stone-900 hover:text-stone-50 active:scale-[0.96]',
+                  : 'bg-black border-stone-900/25 text-white hover:bg-white hover:border-stone-900 hover:text-black active:scale-[0.96]',
             ].join(' ')}
           >
             {isAdding ? (
@@ -190,23 +190,19 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
   };
 
   return (
-    <div className="relative bg-stone-50 text-stone-900 flex flex-col lg:h-full lg:overflow-hidden">
+    <div className="relative text-stone-900 flex flex-col lg:h-full lg:overflow-hidden">
 
       {/* ── HEADER ── */}
-      <div className="px-6 md:px-10 lg:px-14 pt-10 pb-6 border-b border-stone-900/10 flex-shrink-0">
-        <p className="text-[10px] font-medium tracking-widest uppercase text-amber-700 mb-3">
-          Sacred Collection
-        </p>
+      <div className="px-6 md:px-10 lg:px-14 pt-16 pb-6 border-b border-stone-900/10 flex-shrink-0">
         <h2
-          className="text-5xl md:text-6xl lg:text-7xl font-light leading-tight tracking-tight text-stone-900 mb-8"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          className="text-5xl md:text-6xl lg:text-5xl font-medium leading-tight tracking-tight mb-3 font-heading"
         >
           {collection.title}
         </h2>
 
         <div className="flex items-center justify-between flex-wrap gap-4">
-          <span className="text-[10px] font-normal tracking-widest uppercase text-stone-500">
-            Discover What Calls You
+          <span className="text-xl uppercase font-light tracking-wider">
+            Top Picks This Season
           </span>
 
           <button
@@ -345,7 +341,6 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                   <Link to={`/products/${product.handle}`} className="flex flex-col gap-0.5">
                     <p
                       className="text-[1rem] font-normal leading-snug text-stone-900 tracking-wide"
-                      style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                     >
                       {product.title}
                     </p>

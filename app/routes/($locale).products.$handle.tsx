@@ -98,7 +98,7 @@ export default function Product() {
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900">
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
 
         {/* Breadcrumb */}
         <div className="mb-8">
