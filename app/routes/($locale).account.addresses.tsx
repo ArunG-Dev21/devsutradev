@@ -1,4 +1,4 @@
-import type {CustomerAddressInput} from '@shopify/hydrogen/customer-account-api-types';
+import type { CustomerAddressInput } from '@shopify/hydrogen/customer-account-api-types';
 import type {
   AddressFragment,
   CustomerFragment,
@@ -11,7 +11,7 @@ import {
   useOutletContext,
   type Fetcher,
 } from 'react-router';
-import type {Route} from './+types/account.addresses';
+import type { Route } from './+types/account.addresses';
 import {
   UPDATE_ADDRESS_MUTATION,
   DELETE_ADDRESS_MUTATION,
@@ -28,17 +28,17 @@ export type ActionResponse = {
 };
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Addresses'}];
+  return [{ title: 'Addresses' }];
 };
 
-export async function loader({context}: Route.LoaderArgs) {
+export async function loader({ context }: Route.LoaderArgs) {
   context.customerAccount.handleAuthStatus();
 
   return {};
 }
 
-export async function action({request, context}: Route.ActionArgs) {
-  const {customerAccount} = context;
+export async function action({ request, context }: Route.ActionArgs) {
+  const { customerAccount } = context;
 
   try {
     const form = await request.formData();
@@ -54,7 +54,7 @@ export async function action({request, context}: Route.ActionArgs) {
     const isLoggedIn = await customerAccount.isLoggedIn();
     if (!isLoggedIn) {
       return data(
-        {error: {[addressId]: 'Unauthorized'}},
+        { error: { [addressId]: 'Unauthorized' } },
         {
           status: 401,
         },
@@ -89,7 +89,7 @@ export async function action({request, context}: Route.ActionArgs) {
       case 'POST': {
         // handle new address creation
         try {
-          const {data, errors} = await customerAccount.mutate(
+          const { data, errors } = await customerAccount.mutate(
             CREATE_ADDRESS_MUTATION,
             {
               variables: {
@@ -120,14 +120,14 @@ export async function action({request, context}: Route.ActionArgs) {
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
-              {error: {[addressId]: error.message}},
+              { error: { [addressId]: error.message } },
               {
                 status: 400,
               },
             );
           }
           return data(
-            {error: {[addressId]: error}},
+            { error: { [addressId]: error } },
             {
               status: 400,
             },
@@ -138,7 +138,7 @@ export async function action({request, context}: Route.ActionArgs) {
       case 'PUT': {
         // handle address updates
         try {
-          const {data, errors} = await customerAccount.mutate(
+          const { data, errors } = await customerAccount.mutate(
             UPDATE_ADDRESS_MUTATION,
             {
               variables: {
@@ -170,14 +170,14 @@ export async function action({request, context}: Route.ActionArgs) {
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
-              {error: {[addressId]: error.message}},
+              { error: { [addressId]: error.message } },
               {
                 status: 400,
               },
             );
           }
           return data(
-            {error: {[addressId]: error}},
+            { error: { [addressId]: error } },
             {
               status: 400,
             },
@@ -188,7 +188,7 @@ export async function action({request, context}: Route.ActionArgs) {
       case 'DELETE': {
         // handles address deletion
         try {
-          const {data, errors} = await customerAccount.mutate(
+          const { data, errors } = await customerAccount.mutate(
             DELETE_ADDRESS_MUTATION,
             {
               variables: {
@@ -210,18 +210,18 @@ export async function action({request, context}: Route.ActionArgs) {
             throw new Error('Customer address delete failed.');
           }
 
-          return {error: null, deletedAddress: addressId};
+          return { error: null, deletedAddress: addressId };
         } catch (error: unknown) {
           if (error instanceof Error) {
             return data(
-              {error: {[addressId]: error.message}},
+              { error: { [addressId]: error.message } },
               {
                 status: 400,
               },
             );
           }
           return data(
-            {error: {[addressId]: error}},
+            { error: { [addressId]: error } },
             {
               status: 400,
             },
@@ -231,7 +231,7 @@ export async function action({request, context}: Route.ActionArgs) {
 
       default: {
         return data(
-          {error: {[addressId]: 'Method not allowed'}},
+          { error: { [addressId]: 'Method not allowed' } },
           {
             status: 405,
           },
@@ -241,14 +241,14 @@ export async function action({request, context}: Route.ActionArgs) {
   } catch (error: unknown) {
     if (error instanceof Error) {
       return data(
-        {error: error.message},
+        { error: error.message },
         {
           status: 400,
         },
       );
     }
     return data(
-      {error},
+      { error },
       {
         status: 400,
       },
@@ -257,30 +257,42 @@ export async function action({request, context}: Route.ActionArgs) {
 }
 
 export default function Addresses() {
-  const {customer} = useOutletContext<{customer: CustomerFragment}>();
-  const {defaultAddress, addresses} = customer;
+  const { customer } = useOutletContext<{ customer: CustomerFragment }>();
+  const { defaultAddress, addresses } = customer;
 
   return (
     <div className="account-addresses">
-      <h2>Addresses</h2>
-      <br />
-      {!addresses.nodes.length ? (
-        <p>You have no addresses saved.</p>
-      ) : (
+      <div className="mb-8 border-b border-neutral-100 pb-6">
+        <h2 className="text-2xl font-bold text-black tracking-tight">Your Addresses</h2>
+        <p className="text-sm text-neutral-500 mt-2">
+          Manage the locations where your sacred items will be delivered.
+        </p>
+      </div>
+
+      <div className="space-y-12">
+        {/* Add New Address Section */}
         <div>
-          <div>
-            <legend>Create address</legend>
+          <h3 className="text-lg font-bold text-stone-900 mb-6">Add a New Address</h3>
+          <div className="bg-white rounded-3xl border border-neutral-200 p-6 shadow-sm">
             <NewAddressForm />
           </div>
-          <br />
-          <hr />
-          <br />
-          <ExistingAddresses
-            addresses={addresses}
-            defaultAddress={defaultAddress}
-          />
         </div>
-      )}
+
+        {/* Existing Addresses Section */}
+        {addresses.nodes.length > 0 ? (
+          <div>
+            <h3 className="text-lg font-bold text-stone-900 mb-6">Saved Addresses</h3>
+            <ExistingAddresses
+              addresses={addresses}
+              defaultAddress={defaultAddress}
+            />
+          </div>
+        ) : (
+          <div className="p-8 text-center bg-stone-50 rounded-2xl border border-neutral-200 border-dashed">
+            <p className="text-stone-500">You haven't saved any addresses yet.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -306,14 +318,15 @@ function NewAddressForm() {
       address={newAddress}
       defaultAddress={null}
     >
-      {({stateForMethod}) => (
-        <div>
+      {({ stateForMethod }) => (
+        <div className="mt-6 flex justify-end">
           <button
             disabled={stateForMethod('POST') !== 'idle'}
             formMethod="POST"
             type="submit"
+            className="px-6 py-3 bg-black text-white text-xs font-semibold tracking-[0.15em] uppercase rounded-xl hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {stateForMethod('POST') !== 'idle' ? 'Creating' : 'Create'}
+            {stateForMethod('POST') !== 'idle' ? 'Adding Address...' : 'Add Address'}
           </button>
         </div>
       )}
@@ -326,34 +339,63 @@ function ExistingAddresses({
   defaultAddress,
 }: Pick<CustomerFragment, 'addresses' | 'defaultAddress'>) {
   return (
-    <div>
-      <legend>Existing addresses</legend>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {addresses.nodes.map((address) => (
-        <AddressForm
-          key={address.id}
-          addressId={address.id}
-          address={address}
-          defaultAddress={defaultAddress}
-        >
-          {({stateForMethod}) => (
-            <div>
-              <button
-                disabled={stateForMethod('PUT') !== 'idle'}
-                formMethod="PUT"
-                type="submit"
-              >
-                {stateForMethod('PUT') !== 'idle' ? 'Saving' : 'Save'}
-              </button>
-              <button
-                disabled={stateForMethod('DELETE') !== 'idle'}
-                formMethod="DELETE"
-                type="submit"
-              >
-                {stateForMethod('DELETE') !== 'idle' ? 'Deleting' : 'Delete'}
-              </button>
+        <div key={address.id} className="bg-white rounded-3xl border border-neutral-200 p-6 shadow-sm relative group overflow-hidden">
+          {defaultAddress?.id === address.id && (
+            <div className="absolute top-0 right-0 bg-stone-100 text-stone-600 text-[10px] font-bold tracking-wider uppercase px-4 py-1.5 rounded-bl-xl border-l border-b border-neutral-200">
+              Default
             </div>
           )}
-        </AddressForm>
+
+          <details className="group/details">
+            <summary className="list-none cursor-pointer">
+              <div className="mb-4">
+                <p className="font-semibold text-stone-900">{address.firstName} {address.lastName}</p>
+                {address.company && <p className="text-stone-600 text-sm mt-1">{address.company}</p>}
+                <p className="text-stone-500 text-sm mt-1">{address.address1}</p>
+                {address.address2 && <p className="text-stone-500 text-sm mt-1">{address.address2}</p>}
+                <p className="text-stone-500 text-sm mt-1">{address.city}, {address.zoneCode} {address.zip}</p>
+                <p className="text-stone-500 text-sm mt-1">{address.territoryCode}</p>
+                {address.phoneNumber && <p className="text-stone-500 text-sm mt-1">{address.phoneNumber}</p>}
+              </div>
+
+              <div className="mt-4 flex items-center justify-between pt-4 border-t border-neutral-100">
+                <span className="text-xs font-semibold text-stone-900 group-open/details:hidden underline hover:text-stone-600 transition-colors">Edit Address</span>
+                <span className="text-xs font-semibold text-stone-900 hidden group-open/details:block underline hover:text-stone-600 transition-colors">Close Editor</span>
+              </div>
+            </summary>
+
+            <div className="mt-6 pt-6 border-t border-neutral-100">
+              <AddressForm
+                addressId={address.id}
+                address={address}
+                defaultAddress={defaultAddress}
+              >
+                {({ stateForMethod }) => (
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <button
+                      disabled={stateForMethod('PUT') !== 'idle'}
+                      formMethod="PUT"
+                      type="submit"
+                      className="px-5 py-2.5 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50"
+                    >
+                      {stateForMethod('PUT') !== 'idle' ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button
+                      disabled={stateForMethod('DELETE') !== 'idle'}
+                      formMethod="DELETE"
+                      type="submit"
+                      className="px-5 py-2.5 bg-rose-50 text-rose-600 text-xs font-semibold tracking-widest uppercase rounded-lg hover:bg-rose-100 transition-colors disabled:opacity-50"
+                    >
+                      {stateForMethod('DELETE') !== 'idle' ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </div>
+                )}
+              </AddressForm>
+            </div>
+          </details>
+        </div>
       ))}
     </div>
   );
@@ -372,145 +414,192 @@ export function AddressForm({
     stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state'];
   }) => React.ReactNode;
 }) {
-  const {state, formMethod} = useNavigation();
+  const { state, formMethod } = useNavigation();
   const action = useActionData<ActionResponse>();
   const error = action?.error?.[addressId];
   const isDefaultAddress = defaultAddress?.id === addressId;
+
+  const inputClass = "w-full px-4 py-2.5 bg-stone-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-stone-900 focus:bg-white transition-colors text-sm";
+  const labelClass = "block text-xs font-semibold text-stone-700 mb-1.5";
+
   return (
-    <Form id={addressId}>
-      <fieldset>
-        <input type="hidden" name="addressId" defaultValue={addressId} />
-        <label htmlFor="firstName">First name*</label>
+    <Form id={addressId} className="space-y-4">
+      <input type="hidden" name="addressId" defaultValue={addressId} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor={`firstName-${addressId}`} className={labelClass}>First name*</label>
+          <input
+            id={`firstName-${addressId}`}
+            name="firstName"
+            type="text"
+            required
+            aria-label="First name"
+            autoComplete="given-name"
+            placeholder="First name"
+            defaultValue={address?.firstName ?? ''}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label htmlFor={`lastName-${addressId}`} className={labelClass}>Last name*</label>
+          <input
+            id={`lastName-${addressId}`}
+            name="lastName"
+            type="text"
+            required
+            aria-label="Last name"
+            autoComplete="family-name"
+            placeholder="Last name"
+            defaultValue={address?.lastName ?? ''}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor={`company-${addressId}`} className={labelClass}>Company</label>
         <input
-          aria-label="First name"
-          autoComplete="given-name"
-          defaultValue={address?.firstName ?? ''}
-          id="firstName"
-          name="firstName"
-          placeholder="First name"
-          required
+          id={`company-${addressId}`}
+          name="company"
           type="text"
-        />
-        <label htmlFor="lastName">Last name*</label>
-        <input
-          aria-label="Last name"
-          autoComplete="family-name"
-          defaultValue={address?.lastName ?? ''}
-          id="lastName"
-          name="lastName"
-          placeholder="Last name"
-          required
-          type="text"
-        />
-        <label htmlFor="company">Company</label>
-        <input
           aria-label="Company"
           autoComplete="organization"
-          defaultValue={address?.company ?? ''}
-          id="company"
-          name="company"
           placeholder="Company"
-          type="text"
+          defaultValue={address?.company ?? ''}
+          className={inputClass}
         />
-        <label htmlFor="address1">Address line*</label>
+      </div>
+
+      <div>
+        <label htmlFor={`address1-${addressId}`} className={labelClass}>Address line 1*</label>
         <input
+          id={`address1-${addressId}`}
+          name="address1"
+          type="text"
+          required
           aria-label="Address line 1"
           autoComplete="address-line1"
+          placeholder="Address line 1"
           defaultValue={address?.address1 ?? ''}
-          id="address1"
-          name="address1"
-          placeholder="Address line 1*"
-          required
-          type="text"
+          className={inputClass}
         />
-        <label htmlFor="address2">Address line 2</label>
+      </div>
+
+      <div>
+        <label htmlFor={`address2-${addressId}`} className={labelClass}>Address line 2</label>
         <input
+          id={`address2-${addressId}`}
+          name="address2"
+          type="text"
           aria-label="Address line 2"
           autoComplete="address-line2"
+          placeholder="Apartment, suite, etc."
           defaultValue={address?.address2 ?? ''}
-          id="address2"
-          name="address2"
-          placeholder="Address line 2"
-          type="text"
+          className={inputClass}
         />
-        <label htmlFor="city">City*</label>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor={`city-${addressId}`} className={labelClass}>City*</label>
+          <input
+            id={`city-${addressId}`}
+            name="city"
+            type="text"
+            required
+            aria-label="City"
+            autoComplete="address-level2"
+            placeholder="City"
+            defaultValue={address?.city ?? ''}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label htmlFor={`zoneCode-${addressId}`} className={labelClass}>State / Province*</label>
+          <input
+            id={`zoneCode-${addressId}`}
+            name="zoneCode"
+            type="text"
+            required
+            aria-label="State/Province"
+            autoComplete="address-level1"
+            placeholder="State / Province"
+            defaultValue={address?.zoneCode ?? ''}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor={`zip-${addressId}`} className={labelClass}>Zip / Postal Code*</label>
+          <input
+            id={`zip-${addressId}`}
+            name="zip"
+            type="text"
+            required
+            aria-label="Zip"
+            autoComplete="postal-code"
+            placeholder="Zip Code"
+            defaultValue={address?.zip ?? ''}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label htmlFor={`territoryCode-${addressId}`} className={labelClass}>Country Code*</label>
+          <input
+            id={`territoryCode-${addressId}`}
+            name="territoryCode"
+            type="text"
+            required
+            maxLength={2}
+            aria-label="Country Code"
+            autoComplete="country"
+            placeholder="US, CA, etc."
+            defaultValue={address?.territoryCode ?? ''}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor={`phoneNumber-${addressId}`} className={labelClass}>Phone Number</label>
         <input
-          aria-label="City"
-          autoComplete="address-level2"
-          defaultValue={address?.city ?? ''}
-          id="city"
-          name="city"
-          placeholder="City"
-          required
-          type="text"
-        />
-        <label htmlFor="zoneCode">State / Province*</label>
-        <input
-          aria-label="State/Province"
-          autoComplete="address-level1"
-          defaultValue={address?.zoneCode ?? ''}
-          id="zoneCode"
-          name="zoneCode"
-          placeholder="State / Province"
-          required
-          type="text"
-        />
-        <label htmlFor="zip">Zip / Postal Code*</label>
-        <input
-          aria-label="Zip"
-          autoComplete="postal-code"
-          defaultValue={address?.zip ?? ''}
-          id="zip"
-          name="zip"
-          placeholder="Zip / Postal Code"
-          required
-          type="text"
-        />
-        <label htmlFor="territoryCode">Country Code*</label>
-        <input
-          aria-label="territoryCode"
-          autoComplete="country"
-          defaultValue={address?.territoryCode ?? ''}
-          id="territoryCode"
-          name="territoryCode"
-          placeholder="Country"
-          required
-          type="text"
-          maxLength={2}
-        />
-        <label htmlFor="phoneNumber">Phone</label>
-        <input
+          id={`phoneNumber-${addressId}`}
+          name="phoneNumber"
+          type="tel"
+          pattern="^\+?[1-9]\d{3,14}$"
           aria-label="Phone Number"
           autoComplete="tel"
+          placeholder="+1234567890"
           defaultValue={address?.phoneNumber ?? ''}
-          id="phoneNumber"
-          name="phoneNumber"
-          placeholder="+16135551111"
-          pattern="^\+?[1-9]\d{3,14}$"
-          type="tel"
+          className={inputClass}
         />
-        <div>
-          <input
-            defaultChecked={isDefaultAddress}
-            id="defaultAddress"
-            name="defaultAddress"
-            type="checkbox"
-          />
-          <label htmlFor="defaultAddress">Set as default address</label>
+      </div>
+
+      <div className="flex items-center gap-2.5 pt-2">
+        <input
+          id={`defaultAddress-${addressId}`}
+          name="defaultAddress"
+          type="checkbox"
+          defaultChecked={isDefaultAddress}
+          className="rounded border-neutral-300 text-stone-900 focus:ring-stone-900 h-4 w-4 cursor-pointer"
+        />
+        <label htmlFor={`defaultAddress-${addressId}`} className="text-sm text-stone-700 cursor-pointer select-none">
+          Set as default address
+        </label>
+      </div>
+
+      {error && (
+        <div className="p-3 bg-rose-50 text-rose-600 rounded-xl text-sm border border-rose-100 mt-4">
+          <p>{error}</p>
         </div>
-        {error ? (
-          <p>
-            <mark>
-              <small>{error}</small>
-            </mark>
-          </p>
-        ) : (
-          <br />
-        )}
-        {children({
-          stateForMethod: (method) => (formMethod === method ? state : 'idle'),
-        })}
-      </fieldset>
+      )}
+
+      {children({
+        stateForMethod: (method) => (formMethod === method ? state : 'idle'),
+      })}
     </Form>
   );
 }

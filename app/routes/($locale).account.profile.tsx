@@ -1,6 +1,6 @@
-import type {CustomerFragment} from 'customer-accountapi.generated';
-import type {CustomerUpdateInput} from '@shopify/hydrogen/customer-account-api-types';
-import {CUSTOMER_UPDATE_MUTATION} from '~/graphql/customer-account/CustomerUpdateMutation';
+import type { CustomerFragment } from 'customer-accountapi.generated';
+import type { CustomerUpdateInput } from '@shopify/hydrogen/customer-account-api-types';
+import { CUSTOMER_UPDATE_MUTATION } from '~/graphql/customer-account/CustomerUpdateMutation';
 import {
   data,
   Form,
@@ -8,7 +8,7 @@ import {
   useNavigation,
   useOutletContext,
 } from 'react-router';
-import type {Route} from './+types/account.profile';
+import type { Route } from './+types/account.profile';
 
 export type ActionResponse = {
   error: string | null;
@@ -16,20 +16,20 @@ export type ActionResponse = {
 };
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Profile'}];
+  return [{ title: 'Profile' }];
 };
 
-export async function loader({context}: Route.LoaderArgs) {
+export async function loader({ context }: Route.LoaderArgs) {
   context.customerAccount.handleAuthStatus();
 
   return {};
 }
 
-export async function action({request, context}: Route.ActionArgs) {
-  const {customerAccount} = context;
+export async function action({ request, context }: Route.ActionArgs) {
+  const { customerAccount } = context;
 
   if (request.method !== 'PUT') {
-    return data({error: 'Method not allowed'}, {status: 405});
+    return data({ error: 'Method not allowed' }, { status: 405 });
   }
 
   const form = await request.formData();
@@ -47,7 +47,7 @@ export async function action({request, context}: Route.ActionArgs) {
     }
 
     // update customer and possibly password
-    const {data, errors} = await customerAccount.mutate(
+    const { data, errors } = await customerAccount.mutate(
       CUSTOMER_UPDATE_MUTATION,
       {
         variables: {
@@ -71,7 +71,7 @@ export async function action({request, context}: Route.ActionArgs) {
     };
   } catch (error: any) {
     return data(
-      {error: error.message, customer: null},
+      { error: error.message, customer: null },
       {
         status: 400,
       },
@@ -80,53 +80,76 @@ export async function action({request, context}: Route.ActionArgs) {
 }
 
 export default function AccountProfile() {
-  const account = useOutletContext<{customer: CustomerFragment}>();
-  const {state} = useNavigation();
+  const account = useOutletContext<{ customer: CustomerFragment }>();
+  const { state } = useNavigation();
   const action = useActionData<ActionResponse>();
   const customer = action?.customer ?? account?.customer;
+  const isUpdating = state !== 'idle';
 
   return (
-    <div className="account-profile">
-      <h2>My profile</h2>
-      <br />
-      <Form method="PUT">
-        <legend>Personal information</legend>
-        <fieldset>
-          <label htmlFor="firstName">First name</label>
-          <input
-            id="firstName"
-            name="firstName"
-            type="text"
-            autoComplete="given-name"
-            placeholder="First name"
-            aria-label="First name"
-            defaultValue={customer.firstName ?? ''}
-            minLength={2}
-          />
-          <label htmlFor="lastName">Last name</label>
-          <input
-            id="lastName"
-            name="lastName"
-            type="text"
-            autoComplete="family-name"
-            placeholder="Last name"
-            aria-label="Last name"
-            defaultValue={customer.lastName ?? ''}
-            minLength={2}
-          />
-        </fieldset>
-        {action?.error ? (
-          <p>
-            <mark>
-              <small>{action.error}</small>
-            </mark>
-          </p>
-        ) : (
-          <br />
+    <div className="bg-white rounded-3xl border border-neutral-200 p-6 md:p-8 lg:p-10 shadow-sm max-w-3xl">
+      <div className="mb-8 border-b border-neutral-100 pb-6">
+        <h2 className="text-2xl font-bold text-black tracking-tight">Personal Information</h2>
+        <p className="text-sm text-neutral-500 mt-2">
+          Update your contact details to keep your account secure.
+        </p>
+      </div>
+
+      <Form method="PUT" className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label htmlFor="firstName" className="block text-sm font-semibold text-stone-900">
+              First name
+            </label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              autoComplete="given-name"
+              placeholder="First name"
+              aria-label="First name"
+              defaultValue={customer.firstName ?? ''}
+              minLength={2}
+              className="w-full px-4 py-3 bg-stone-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-stone-900 focus:bg-white transition-colors"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="lastName" className="block text-sm font-semibold text-stone-900">
+              Last name
+            </label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              autoComplete="family-name"
+              placeholder="Last name"
+              aria-label="Last name"
+              defaultValue={customer.lastName ?? ''}
+              minLength={2}
+              className="w-full px-4 py-3 bg-stone-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-stone-900 focus:bg-white transition-colors"
+            />
+          </div>
+        </div>
+
+        {action?.error && (
+          <div className="p-4 bg-rose-50 text-rose-600 rounded-xl text-sm border border-rose-100 flex items-start gap-3">
+            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p>{action.error}</p>
+          </div>
         )}
-        <button type="submit" disabled={state !== 'idle'}>
-          {state !== 'idle' ? 'Updating' : 'Update'}
-        </button>
+
+        <div className="pt-4 flex items-center justify-end">
+          <button
+            type="submit"
+            disabled={isUpdating}
+            className="px-8 py-3.5 bg-black text-white text-sm font-semibold tracking-[0.15em] uppercase rounded-xl hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isUpdating ? 'Saving Changes...' : 'Save Changes'}
+          </button>
+        </div>
       </Form>
     </div>
   );

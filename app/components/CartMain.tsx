@@ -46,7 +46,7 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
   const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className={`h-full flex ${layout === 'page' && cartHasItems ? 'flex-col lg:flex-row gap-8 lg:gap-12 items-start' : 'flex-col'} bg-white`}>
 
       {/* Free Shipping Progress — aside only */}
       {layout === 'aside' && cartHasItems && (
@@ -75,7 +75,7 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
       )}
 
       {/* Cart Lines */}
-      <div className={`flex-1 overflow-y-auto ${layout === 'aside' ? 'px-5' : ''}`}>
+      <div className={`flex-1 overflow-y-auto ${layout === 'aside' ? 'px-5' : 'w-full lg:w-3/5 xl:w-2/3'}`}>
         <CartEmpty hidden={linesCount} layout={layout} />
         <ul>
           {(cart?.lines?.nodes ?? []).map((line) => {
@@ -98,7 +98,11 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
       </div>
 
       {/* Summary */}
-      {cartHasItems && <CartSummary cart={cart} layout={layout} />}
+      {cartHasItems && (
+        <div className={`${layout === 'page' ? 'w-full lg:w-2/5 xl:w-1/3 lg:sticky lg:top-8' : ''}`}>
+          <CartSummary cart={cart} layout={layout} />
+        </div>
+      )}
     </div>
   );
 }
