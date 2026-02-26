@@ -1,6 +1,6 @@
 import { redirect, useLoaderData } from 'react-router';
 import type { Route } from './+types/collections.$handle';
-import { getPaginationVariables, Analytics, Image, Money } from '@shopify/hydrogen';
+import { getPaginationVariables, Analytics, Image, Money, CartForm } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { ProductItemFragment } from 'storefrontapi.generated';
@@ -237,12 +237,11 @@ export default function Collection() {
               resourcesClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"
             >
               {({ node: product, index }) => (
-                <a
+                <div
                   key={product.id}
-                  href={`/products/${product.handle}`}
                   className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-neutral-200"
                 >
-                  <div className="aspect-square bg-neutral-100 overflow-hidden relative">
+                  <a href={`/products/${product.handle}`} className="aspect-square bg-neutral-100 overflow-hidden relative block">
                     {product.featuredImage ? (
                       <Image
                         data={product.featuredImage}
@@ -267,42 +266,64 @@ export default function Collection() {
                         ✓ Certified
                       </span>
                     </div>
-                  </div>
+                  </a>
 
                   <div className="p-3.5 flex flex-col flex-1">
                     <p className="text-[10px] tracking-[0.15em] uppercase text-neutral-500 mb-1">
                       Devasutra
                     </p>
 
-                    <h3 className="text-base font-semibold text-black mb-2 leading-snug line-clamp-2">
-                      {product.title}
-                    </h3>
+                    <a href={`/products/${product.handle}`} className="block">
+                      <h3 className="text-base font-semibold text-black mb-2 leading-snug line-clamp-2 hover:underline">
+                        {product.title}
+                      </h3>
+                    </a>
 
                     <div className="mt-auto flex items-center justify-between">
                       <Money
                         data={product.priceRange.minVariantPrice}
-                        className="text-sm font-bold text-black"
+                        className="text-sm font-bold text-black border border-transparent"
                       />
 
-                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors group-hover:bg-neutral-800">
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5h.008v.008h-.008v-.008Zm5.375 0h.008v.008h-.008v-.008Z"
-                          />
-                        </svg>
-                        Add
-                      </span>
+                      <CartForm
+                        route="/cart"
+                        inputs={{
+                          lines: [
+                            {
+                              merchandiseId: product.variants?.nodes?.[0]?.id,
+                              quantity: 1,
+                            },
+                          ],
+                        }}
+                        action={CartForm.ACTIONS.LinesAdd}
+                      >
+                        {(fetcher) => (
+                          <button
+                            type="submit"
+                            disabled={!product.variants?.nodes?.[0]?.availableForSale || fetcher.state !== 'idle'}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+                            aria-label="Add to cart"
+                          >
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5h.008v.008h-.008v-.008Zm5.375 0h.008v.008h-.008v-.008Z"
+                              />
+                            </svg>
+                            {product.variants?.nodes?.[0]?.availableForSale ? 'Add' : 'Sold Out'}
+                          </button>
+                        )}
+                      </CartForm>
                     </div>
                   </div>
-                </a>
+                </div>
               )}
             </PaginatedResourceSection>
           </div>
@@ -330,6 +351,7 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    tags
     featuredImage {
       id
       altText
@@ -343,6 +365,12 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
       }
       maxVariantPrice {
         ...MoneyProductItem
+      }
+    }
+    variants(first: 1) {
+      nodes {
+        id
+        availableForSale
       }
     }
   }

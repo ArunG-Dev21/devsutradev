@@ -196,6 +196,22 @@ export default function OrderRoute() {
 }
 
 function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
+  const unitPriceAmount = Number(lineItem.price?.amount ?? 0);
+  const totalBeforeDiscount = unitPriceAmount * Number(lineItem.quantity ?? 0);
+  const totalDiscountAmount = Number(lineItem.totalDiscount?.amount ?? 0);
+  const totalAfterDiscount = Math.max(totalBeforeDiscount - totalDiscountAmount, 0);
+  const currencyCode =
+    lineItem.price?.currencyCode || lineItem.totalDiscount?.currencyCode;
+
+  const totalMoney =
+    currencyCode
+      ? { amount: totalAfterDiscount.toFixed(2), currencyCode }
+      : null;
+  const beforeMoney =
+    currencyCode
+      ? { amount: totalBeforeDiscount.toFixed(2), currencyCode }
+      : null;
+
   return (
     <div className="p-6 flex flex-col sm:flex-row gap-6">
       <div className="shrink-0">
@@ -222,13 +238,13 @@ function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
 
       <div className="sm:text-right flex flex-col justify-center">
         <p className="font-bold text-stone-900 text-lg">
-          <Money data={lineItem.totalDiscount!} />
+          {totalMoney ? <Money data={totalMoney} /> : null}
         </p>
-        {(lineItem.price?.amount !== lineItem.totalDiscount?.amount) && (
+        {totalDiscountAmount > 0 && beforeMoney ? (
           <p className="text-xs text-stone-400 line-through mt-1">
-            <Money data={lineItem.price!} />
+            <Money data={beforeMoney} />
           </p>
-        )}
+        ) : null}
       </div>
     </div>
   );

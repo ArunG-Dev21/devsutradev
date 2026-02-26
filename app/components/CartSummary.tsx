@@ -35,24 +35,10 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         Taxes and shipping calculated at checkout
       </p>
 
-      {/* Extra Shopify Elements Placeholder for Page layout */}
+      {/* Terms checkbox — page layout only */}
       {layout === 'page' && (
-        <div className="space-y-4 mb-6 border-y border-neutral-100 py-6">
-          <details className="group">
-            <summary className="text-sm font-semibold text-stone-900 cursor-pointer list-none flex items-center justify-between">
-              Add order note
-              <span className="transition group-open:rotate-180 text-neutral-400">
-                <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-              </span>
-            </summary>
-            <textarea
-              name="note"
-              placeholder="Special instructions for delivery..."
-              className="mt-4 w-full p-3 text-xs border border-neutral-200 rounded-xl focus:outline-none focus:border-stone-900 focus:ring-1 focus:ring-stone-900 min-h-[80px]"
-            />
-          </details>
-
-          <div className="flex items-start gap-2.5 pt-2">
+        <div className="mb-6 border-y border-neutral-100 py-6">
+          <div className="flex items-start gap-2.5">
             <input type="checkbox" id="terms" className="mt-0.5 rounded border-neutral-300 text-stone-900 focus:ring-stone-900 h-3.5 w-3.5 cursor-pointer" />
             <label htmlFor="terms" className="text-[11px] text-stone-500 leading-relaxed cursor-pointer select-none">
               I agree to the <a href="/policies/terms-of-service" className="underline hover:text-stone-900">terms and conditions</a> and <a href="/policies/refund-policy" className="underline hover:text-stone-900">refund policy</a>.
@@ -61,9 +47,20 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         </div>
       )}
 
-      {/* Discount Code */}
-      <CartDiscounts discountCodes={cart?.discountCodes} />
-      <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
+      {/* Discount & Gift Card — page layout only; aside shows a note instead */}
+      {layout === 'page' ? (
+        <>
+          <CartDiscounts discountCodes={cart?.discountCodes} />
+          <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
+        </>
+      ) : (
+        <div className="mb-4 flex items-start gap-2.5 px-3 py-3 bg-stone-50 rounded-xl border border-stone-100">
+          <span className="text-base leading-none mt-0.5">🏷️</span>
+          <p className="text-[11px] text-stone-500 leading-relaxed">
+            <span className="font-semibold text-stone-700">Discounts &amp; gift cards</span> can be applied at Shopify checkout.
+          </p>
+        </div>
+      )}
 
       {/* Checkout Button */}
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} layout={layout} />

@@ -149,36 +149,26 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
 
                         {/* Buy Now & Full Details Row */}
                         <div className="grid grid-cols-2 gap-3 mt-1">
-                            {firstVariant && isAvailable && (
-                                <CartForm
-                                    route="/cart"
-                                    action={CartForm.ACTIONS.LinesAdd}
-                                    inputs={{
-                                        lines: [
-                                            {
-                                                merchandiseId: firstVariant.id,
-                                                quantity: 1,
-                                            },
-                                        ],
-                                    }}
-                                >
-                                    <input type="hidden" name="buyNow" value="true" />
-                                    <button
-                                        type="submit"
+                            {firstVariant && isAvailable && (() => {
+                                // Strip GID prefix: "gid://shopify/ProductVariant/12345" → "12345"
+                                const numericId = firstVariant.id.split('/').pop();
+                                return (
+                                    <a
+                                        href={`/cart/${numericId}:1`}
                                         onClick={onClose}
-                                        className="w-full py-3.5 text-[10px] tracking-widest uppercase font-medium rounded-full border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white transition-all duration-300 cursor-pointer text-center"
+                                        className="w-full py-3.5 text-[10px] tracking-widest uppercase font-medium rounded-full border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white transition-all duration-300 cursor-pointer text-center flex items-center justify-center"
                                     >
                                         Buy Now
-                                    </button>
-                                </CartForm>
-                            )}
+                                    </a>
+                                );
+                            })()}
 
                             <Link
                                 to={`/products/${product.handle}`}
                                 onClick={onClose}
                                 className={`w-full py-3.5 text-[10px] tracking-widest uppercase font-medium rounded-full transition-all duration-300 cursor-pointer text-center flex items-center justify-center ${!(firstVariant && isAvailable)
-                                        ? 'col-span-2 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white'
-                                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+                                    ? 'col-span-2 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white'
+                                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
                                     }`}
                             >
                                 Full Details

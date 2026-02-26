@@ -1,6 +1,6 @@
-import {Link} from 'react-router';
-import {Image, Money, Pagination} from '@shopify/hydrogen';
-import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
+import { Link } from 'react-router';
+import { Image, Money, Pagination } from '@shopify/hydrogen';
+import { urlWithTrackingParams, type RegularSearchReturn } from '~/lib/search';
 
 type SearchItems = RegularSearchReturn['result']['items'];
 type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
@@ -10,7 +10,7 @@ type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
   Pick<RegularSearchReturn, 'term'>;
 
 type SearchResultsProps = RegularSearchReturn & {
-  children: (args: SearchItems & {term: string}) => React.ReactNode;
+  children: (args: SearchItems & { term: string }) => React.ReactNode;
 };
 
 export function SearchResults({
@@ -22,7 +22,7 @@ export function SearchResults({
     return null;
   }
 
-  return children({...result.items, term});
+  return children({ ...result.items, term });
 }
 
 SearchResults.Articles = SearchResultsArticles;
@@ -40,8 +40,8 @@ function SearchResultsArticles({
 
   return (
     <div className="search-result">
-      <h2>Articles</h2>
-      <div>
+      <h2 className="text-2xl font-heading text-text-main mb-6 border-b border-primary-border pb-4">Articles</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {articles?.nodes?.map((article) => {
           const articleUrl = urlWithTrackingParams({
             baseUrl: `/blogs/${article.handle}`,
@@ -50,28 +50,30 @@ function SearchResultsArticles({
           });
 
           return (
-            <div className="search-results-item" key={article.id}>
-              <Link prefetch="intent" to={articleUrl}>
-                {article.title}
+            <div className="bg-white border border-primary-border rounded-xl p-6 hover:shadow-glow transition-all duration-300 transform hover:-translate-y-1 group" key={article.id}>
+              <Link prefetch="intent" to={articleUrl} className="flex items-center justify-between text-lg font-medium text-text-main group-hover:text-text-muted block">
+                <span>{article.title}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
               </Link>
             </div>
           );
         })}
       </div>
-      <br />
     </div>
   );
 }
 
-function SearchResultsPages({term, pages}: PartialSearchResult<'pages'>) {
+function SearchResultsPages({ term, pages }: PartialSearchResult<'pages'>) {
   if (!pages?.nodes.length) {
     return null;
   }
 
   return (
     <div className="search-result">
-      <h2>Pages</h2>
-      <div>
+      <h2 className="text-2xl font-heading text-text-main mb-6 border-b border-primary-border pb-4">Pages</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {pages?.nodes?.map((page) => {
           const pageUrl = urlWithTrackingParams({
             baseUrl: `/pages/${page.handle}`,
@@ -80,15 +82,17 @@ function SearchResultsPages({term, pages}: PartialSearchResult<'pages'>) {
           });
 
           return (
-            <div className="search-results-item" key={page.id}>
-              <Link prefetch="intent" to={pageUrl}>
-                {page.title}
+            <div className="bg-white border border-primary-border rounded-xl p-6 hover:shadow-glow transition-all duration-300 transform hover:-translate-y-1 group" key={page.id}>
+              <Link prefetch="intent" to={pageUrl} className="flex items-center justify-between text-lg font-medium text-text-main group-hover:text-text-muted block">
+                <span>{page.title}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
               </Link>
             </div>
           );
         })}
       </div>
-      <br />
     </div>
   );
 }
@@ -103,9 +107,9 @@ function SearchResultsProducts({
 
   return (
     <div className="search-result">
-      <h2>Products</h2>
+      <h2 className="text-2xl font-heading text-text-main mb-8 border-b border-primary-border pb-4">Products</h2>
       <Pagination connection={products}>
-        {({nodes, isLoading, NextLink, PreviousLink}) => {
+        {({ nodes, isLoading, NextLink, PreviousLink }) => {
           const ItemsMarkup = nodes.map((product) => {
             const productUrl = urlWithTrackingParams({
               baseUrl: `/products/${product.handle}`,
@@ -117,33 +121,37 @@ function SearchResultsProducts({
             const image = product?.selectedOrFirstAvailableVariant?.image;
 
             return (
-              <div className="search-results-item" key={product.id}>
-                <Link prefetch="intent" to={productUrl}>
+              <Link prefetch="intent" to={productUrl} key={product.id} className="group relative flex flex-col h-full animate-fade-up no-underline">
+                <div className="relative overflow-hidden rounded-xl mb-4 bg-bg-light border border-primary-border flex-1 aspect-[4/5] shadow-silver transform transition-all duration-500 group-hover:shadow-glow group-hover:-translate-y-1">
                   {image && (
-                    <Image data={image} alt={product.title} width={50} />
+                    <Image data={image} alt={product.title} sizes="(min-width: 45em) 400px, 100vw" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                   )}
-                  <div>
-                    <p>{product.title}</p>
-                    <small>{price && <Money data={price} />}</small>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-white/5 transition-colors duration-500" />
+                </div>
+                <div className="flex flex-col items-center text-center mt-auto px-2 pb-2">
+                  <h3 className="text-[13px] md:text-sm font-medium text-text-main mb-1.5 transition-colors duration-300 group-hover:text-text-muted line-clamp-2 leading-relaxed">
+                    {product.title}
+                  </h3>
+                  <div className="text-[13px] tracking-wide text-text-muted font-medium">
+                    {price && <Money data={price} />}
                   </div>
-                </Link>
-              </div>
+                </div>
+              </Link>
             );
           });
 
           return (
             <div>
-              <div>
-                <PreviousLink>
+              <div className="flex justify-center mb-10">
+                <PreviousLink className="inline-block border border-primary-border px-6 py-2 rounded-full text-sm font-medium text-text-main hover:bg-text-main hover:text-white transition-colors duration-300">
                   {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
                 </PreviousLink>
               </div>
-              <div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
                 {ItemsMarkup}
-                <br />
               </div>
-              <div>
-                <NextLink>
+              <div className="flex justify-center mt-12">
+                <NextLink className="inline-block border border-primary-border px-6 py-2 rounded-full text-sm font-medium text-text-main hover:bg-text-main hover:text-white transition-colors duration-300">
                   {isLoading ? 'Loading...' : <span>Load more ↓</span>}
                 </NextLink>
               </div>
@@ -151,11 +159,17 @@ function SearchResultsProducts({
           );
         }}
       </Pagination>
-      <br />
     </div>
   );
 }
 
 function SearchResultsEmpty() {
-  return <p>No results, try a different search.</p>;
+  return (
+    <div className="text-center py-20 px-6 bg-white border border-primary-border rounded-xl shadow-sm">
+      <h3 className="text-2xl font-subheading text-text-main mb-4">No results found</h3>
+      <p className="text-text-muted text-lg max-w-md mx-auto">
+        We couldn't find any sacred items matching your search. Try using different keywords or explore our collections.
+      </p>
+    </div>
+  );
 }

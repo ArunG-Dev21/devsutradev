@@ -18,151 +18,133 @@ export function Footer({
     <Suspense>
       <Await resolve={footerPromise}>
         {(footer) => (
-          <footer className="bg-bg-dark border-t border-primary-border text-text-main mt-0 relative z-10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-              {/* 4-Column Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
-                {/* Column 1 — Brand */}
-                <div>
-                  <h3
-                    className="text-xl font-bold tracking-[0.15em] uppercase mb-3 text-glow font-heading"
-                  >
-                    {header.shop.name || SITE_NAME}
+          <footer className="bg-bg-dark border-t border-primary-border text-text-main mt-0 relative z-10 w-full">
+            <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 pt-20 pb-10">
+
+              {/* Top Section */}
+              <div className="flex flex-col lg:flex-row justify-between items-start mb-20 gap-16 lg:gap-8">
+                {/* Left side Tagline */}
+                <div className="lg:w-1/3">
+                  <h3 className="text-3xl md:text-5xl font-subheading tracking-tight text-text-main mb-6">
+                    Experience divine craftsmanship.
                   </h3>
-                  <p className="text-text-muted text-sm leading-relaxed mb-4">
-                    {SITE_TAGLINE}
-                  </p>
-                  <p className="text-neutral-500 text-xs leading-relaxed">
+                  <p className="text-text-muted text-lg leading-relaxed max-w-md">
                     Authentic devotional ornaments handcrafted with love and
-                    blessed by spiritual experts. Bringing divine energy to your
-                    doorstep.
+                    blessed by spiritual experts.
                   </p>
                 </div>
 
-                {/* Column 2 — Quick Links */}
-                <div>
-                  <h4 className="text-xs tracking-[0.2em] uppercase text-text-muted mb-4 font-semibold">
-                    Quick Links
-                  </h4>
-                  <ul className="space-y-2.5">
-                    {[
-                      { title: 'Home', url: '/' },
-                      { title: 'Shop All', url: '/collections/all' },
-                      { title: 'About Us', url: '/pages/about' },
-                      { title: 'Contact', url: '/pages/contact' },
-                    ].map((link) => (
-                      <li key={link.title}>
-                        <NavLink
-                          to={link.url}
-                          prefetch="intent"
-                          className="text-text-main text-sm hover:text-accent transition duration-300 hover:shadow-glow"
-                        >
-                          {link.title}
-                        </NavLink>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Column 3 — Policies */}
-                <div>
-                  <h4 className="text-xs tracking-[0.2em] uppercase text-text-muted mb-4 font-semibold">
-                    Policies
-                  </h4>
-                  <ul className="space-y-2.5">
-                    {footer?.menu
-                      ? footer.menu.items.map((item) => {
-                        if (!item.url) return null;
-                        const url =
-                          item.url.includes('myshopify.com') ||
-                            item.url.includes(publicStoreDomain) ||
-                            item.url.includes(
-                              header.shop.primaryDomain?.url || '',
-                            )
-                            ? new URL(item.url).pathname
-                            : item.url;
-                        return (
-                          <li key={item.id}>
-                            <NavLink
-                              to={url}
-                              prefetch="intent"
-                              className="text-text-main text-sm hover:text-accent transition duration-300 hover:shadow-glow"
-                            >
-                              {item.title}
-                            </NavLink>
-                          </li>
-                        );
-                      })
-                      : FALLBACK_POLICY_LINKS.map((link) => (
+                {/* Right side Links */}
+                <div className="flex flex-wrap lg:justify-end gap-16 sm:gap-24 w-full lg:w-2/3">
+                  {/* Quick Links */}
+                  <div className="flex flex-col">
+                    <ul className="space-y-5">
+                      {[
+                        { title: 'Home', url: '/' },
+                        { title: 'Shop All', url: '/collections/all' },
+                        { title: 'About Us', url: '/pages/about' },
+                        { title: 'Contact', url: '/pages/contact' },
+                      ].map((link) => (
                         <li key={link.title}>
                           <NavLink
                             to={link.url}
-                            className="text-text-main text-sm hover:text-accent transition duration-300 hover:shadow-glow"
+                            prefetch="intent"
+                            className="text-text-muted hover:text-text-main text-[15px] font-medium transition-colors duration-300"
                           >
                             {link.title}
                           </NavLink>
                         </li>
                       ))}
-                  </ul>
-                </div>
+                    </ul>
+                  </div>
 
-                {/* Column 4 — Contact & Social */}
-                <div>
-                  <h4 className="text-xs tracking-[0.2em] uppercase text-text-muted mb-4 font-semibold">
-                    Get In Touch
-                  </h4>
-                  <ul className="space-y-2.5 text-sm text-text-main">
-                    <li className="flex items-start gap-2">
-                      <span className="mt-0.5">📧</span>
-                      <span>support@devasutra.com</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="mt-0.5">📞</span>
-                      <span>+91 XXXXX XXXXX</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="mt-0.5">📍</span>
-                      <span>India</span>
-                    </li>
-                  </ul>
+                  {/* Policies */}
+                  <div className="flex flex-col">
+                    <ul className="space-y-5">
+                      {footer?.menu
+                        ? footer.menu.items.map((item) => {
+                          if (!item.url) return null;
+                          const url =
+                            item.url.includes('myshopify.com') ||
+                              item.url.includes(publicStoreDomain) ||
+                              item.url.includes(
+                                header.shop.primaryDomain?.url || '',
+                              )
+                              ? new URL(item.url).pathname
+                              : item.url;
+                          return (
+                            <li key={item.id}>
+                              <NavLink
+                                to={url}
+                                prefetch="intent"
+                                className="text-text-muted hover:text-text-main text-[15px] font-medium transition-colors duration-300"
+                              >
+                                {item.title}
+                              </NavLink>
+                            </li>
+                          );
+                        })
+                        : FALLBACK_POLICY_LINKS.map((link) => (
+                          <li key={link.title}>
+                            <NavLink
+                              to={link.url}
+                              className="text-text-muted hover:text-text-main text-[15px] font-medium transition-colors duration-300"
+                            >
+                              {link.title}
+                            </NavLink>
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
 
-                  {/* Social Icons */}
-                  <div className="flex gap-3 mt-5">
-                    {[
-                      { label: 'Instagram', icon: 'IG', url: '#' },
-                      { label: 'Facebook', icon: 'FB', url: '#' },
-                      { label: 'YouTube', icon: 'YT', url: '#' },
-                      { label: 'WhatsApp', icon: 'WA', url: '#' },
-                    ].map((social) => (
-                      <a
-                        key={social.label}
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-9 h-9 rounded-full border border-primary-border flex items-center justify-center text-xs text-text-muted hover:border-accent hover:text-accent shadow-silver hover:shadow-glow transition duration-300"
-                        aria-label={social.label}
-                      >
-                        {social.icon}
-                      </a>
-                    ))}
+                  {/* Socials */}
+                  <div className="flex flex-col">
+                    <ul className="space-y-5">
+                      {[
+                        { label: 'Instagram', url: '#' },
+                        { label: 'Facebook', url: '#' },
+                        { label: 'YouTube', url: '#' },
+                        { label: 'WhatsApp', url: '#' },
+                      ].map((social) => (
+                        <li key={social.label}>
+                          <a
+                            href={social.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-text-muted hover:text-text-main text-[15px] font-medium transition-colors duration-300"
+                          >
+                            {social.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>
 
+              {/* Massive Brand Name */}
+              <div className="w-full flex justify-center items-center mt-10 mb-10 cursor-default select-none">
+                <span className="text-[13vw] sm:text-[10vw] leading-none font-bold tracking-tighter text-text-main uppercase font-heading">
+                  {header.shop.name || SITE_NAME}
+                </span>
+              </div>
+
               {/* Bottom Bar */}
-              <div className="mt-12 pt-6 border-t border-primary-border flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-text-muted text-xs tracking-wide">
-                  © {new Date().getFullYear()} {header.shop.name || SITE_NAME}
-                  . All rights reserved.
-                </p>
-                <div className="flex items-center gap-3">
-                  {['Visa', 'MC', 'UPI', 'GPay'].map((pm) => (
-                    <span
-                      key={pm}
-                      className="px-2 py-1 text-[10px] border border-primary-border rounded text-text-muted uppercase tracking-wider shadow-silver"
+              <div className="border-t border-primary-border pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="text-text-main font-bold tracking-wider uppercase flex items-center gap-2">
+                  <span className="text-lg">©</span>
+                  {new Date().getFullYear()} {header.shop.name || SITE_NAME}
+                </div>
+
+                <div className="flex flex-wrap justify-center gap-6">
+                  {['Privacy Policy', 'Terms of Service', 'Refund Policy'].map((item) => (
+                    <NavLink
+                      key={item}
+                      to={`/policies/${item.toLowerCase().replace(/ /g, '-')}`}
+                      className="text-text-muted text-sm hover:text-text-main transition-colors"
                     >
-                      {pm}
-                    </span>
+                      {item}
+                    </NavLink>
                   ))}
                 </div>
               </div>

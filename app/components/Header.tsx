@@ -120,6 +120,8 @@ function SubNavIsland({
         flex items-center gap-2
         relative z-50
         -translate-y-1
+        border-1
+        border-gray-200
       "
       >
         {items.map((item) => {

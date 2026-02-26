@@ -1,8 +1,8 @@
-import {useLoaderData} from 'react-router';
-import type {Route} from './+types/search';
-import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
-import {SearchForm} from '~/components/SearchForm';
-import {SearchResults} from '~/components/SearchResults';
+import { useLoaderData } from 'react-router';
+import type { Route } from './+types/search';
+import { getPaginationVariables, Analytics } from '@shopify/hydrogen';
+import { SearchForm } from '~/components/SearchForm';
+import { SearchResults } from '~/components/SearchResults';
 import {
   type RegularSearchReturn,
   type PredictiveSearchReturn,
@@ -14,20 +14,20 @@ import type {
 } from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{ title: `Hydrogen | Search` }];
 };
 
-export async function loader({request, context}: Route.LoaderArgs) {
+export async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const isPredictive = url.searchParams.has('predictive');
   const searchPromise: Promise<PredictiveSearchReturn | RegularSearchReturn> =
     isPredictive
-      ? predictiveSearch({request, context})
-      : regularSearch({request, context});
+      ? predictiveSearch({ request, context })
+      : regularSearch({ request, context });
 
   searchPromise.catch((error: Error) => {
     console.error(error);
-    return {term: '', result: null, error: error.message};
+    return { term: '', result: null, error: error.message };
   });
 
   return await searchPromise;
@@ -37,42 +37,61 @@ export async function loader({request, context}: Route.LoaderArgs) {
  * Renders the /search route
  */
 export default function SearchPage() {
-  const {type, term, result, error} = useLoaderData<typeof loader>();
+  const { type, term, result, error } = useLoaderData<typeof loader>();
   if (type === 'predictive') return null;
 
   return (
-    <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
+    <div className="bg-bg-light min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl md:text-6xl font-heading tracking-tight text-text-main text-center mb-10">Search</h1>
+        <div className="max-w-2xl mx-auto mb-16">
+          <SearchForm>
+            {({ inputRef }) => (
+              <div className="relative flex items-center shadow-sm hover:shadow-glow transition-shadow duration-300 rounded-full">
+                <input
+                  defaultValue={term}
+                  name="q"
+                  placeholder="Search sacred items…"
+                  ref={inputRef}
+                  type="text"
+                  className="w-full bg-white border rounded-full py-4 pl-8 pr-16 text-lg text-text-main placeholder:text-text-muted focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                />
+                <button type="submit" aria-label="Search" className="absolute right-2 p-3 bg-gold text-white rounded-full transition-colors flex items-center justify-center cursor-pointer hover:bg-gold-600 hover:shadow-lg hover:scale-105 active:scale-95" >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </SearchForm>
+        </div>
+        {error && <p className="text-rose-500 text-center mb-8">{error}</p>}
+        {!term || !result?.total ? (
+          <SearchResults.Empty />
+        ) : (
+          <SearchResults result={result} term={term}>
+            {({ articles, pages, products, term }) => (
+              <div className="space-y-20">
+                <SearchResults.Products products={products} term={term} />
+                <SearchResults.Pages pages={pages} term={term} />
+                <SearchResults.Articles articles={articles} term={term} />
+              </div>
+            )}
+          </SearchResults>
         )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
-      ) : (
-        <SearchResults result={result} term={term}>
-          {({articles, pages, products, term}) => (
-            <div>
-              <SearchResults.Products products={products} term={term} />
-              <SearchResults.Pages pages={pages} term={term} />
-              <SearchResults.Articles articles={articles} term={term} />
-            </div>
-          )}
-        </SearchResults>
-      )}
-      <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
+        <Analytics.SearchView data={{ searchTerm: term, searchResults: result }} />
+      </div>
     </div>
   );
 }
@@ -220,18 +239,18 @@ async function regularSearch({
   Route.LoaderArgs,
   'request' | 'context'
 >): Promise<RegularSearchReturn> {
-  const {storefront} = context;
+  const { storefront } = context;
   const url = new URL(request.url);
-  const variables = getPaginationVariables(request, {pageBy: 8});
+  const variables = getPaginationVariables(request, { pageBy: 8 });
   const term = String(url.searchParams.get('q') || '');
 
   // Search articles, pages, and products for the `q` term
   const {
     errors,
     ...items
-  }: {errors?: Array<{message: string}>} & RegularSearchQuery =
+  }: { errors?: Array<{ message: string }> } & RegularSearchQuery =
     await storefront.query(SEARCH_QUERY, {
-      variables: {...variables, term},
+      variables: { ...variables, term },
     });
 
   if (!items) {
@@ -239,15 +258,15 @@ async function regularSearch({
   }
 
   const total = Object.values(items).reduce(
-    (acc: number, {nodes}: {nodes: Array<unknown>}) => acc + nodes.length,
+    (acc: number, { nodes }: { nodes: Array<unknown> }) => acc + nodes.length,
     0,
   );
 
   const error = errors
-    ? errors.map(({message}: {message: string}) => message).join(', ')
+    ? errors.map(({ message }: { message: string }) => message).join(', ')
     : undefined;
 
-  return {type: 'regular', term, error, result: {total, items}};
+  return { type: 'regular', term, error, result: { total, items } };
 }
 
 /**
@@ -385,19 +404,19 @@ async function predictiveSearch({
   Route.ActionArgs,
   'request' | 'context'
 >): Promise<PredictiveSearchReturn> {
-  const {storefront} = context;
+  const { storefront } = context;
   const url = new URL(request.url);
   const term = String(url.searchParams.get('q') || '').trim();
   const limit = Number(url.searchParams.get('limit') || 10);
   const type = 'predictive';
 
-  if (!term) return {type, term, result: getEmptyPredictiveSearchResult()};
+  if (!term) return { type, term, result: getEmptyPredictiveSearchResult() };
 
   // Predictively search articles, collections, pages, products, and queries (suggestions)
   const {
     predictiveSearch: items,
     errors,
-  }: PredictiveSearchQuery & {errors?: Array<{message: string}>} =
+  }: PredictiveSearchQuery & { errors?: Array<{ message: string }> } =
     await storefront.query(PREDICTIVE_SEARCH_QUERY, {
       variables: {
         // customize search options as needed
@@ -410,7 +429,7 @@ async function predictiveSearch({
   if (errors) {
     throw new Error(
       `Shopify API errors: ${errors
-        .map(({message}: {message: string}) => message)
+        .map(({ message }: { message: string }) => message)
         .join(', ')}`,
     );
   }
@@ -424,5 +443,5 @@ async function predictiveSearch({
     0,
   );
 
-  return {type, term, result: {items, total}};
+  return { type, term, result: { items, total } };
 }

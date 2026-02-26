@@ -1,4 +1,5 @@
 import type { CartLineUpdateInput } from '@shopify/hydrogen/storefront-api-types';
+import { useState } from 'react';
 import type { CartLayout, LineItemChildrenMap } from '~/components/CartMain';
 import { CartForm, Image, type OptimisticCartLine } from '@shopify/hydrogen';
 import { useVariantUrl } from '~/lib/variants';
@@ -29,7 +30,14 @@ export function CartLineItem({
   const childrenLabelId = `cart-line-children-${id}`;
 
   return (
-    <li key={id} className="py-5 border-b border-stone-100 last:border-b-0">
+    <li
+      key={id}
+      className={
+        layout === 'page'
+          ? 'p-4 mb-4 rounded-2xl border border-stone-200 bg-white shadow-sm last:mb-0 transition-shadow hover:shadow-md'
+          : 'py-5 border-b border-stone-100 last:border-b-0'
+      }
+    >
       <div className="flex gap-4">
 
         {/* Product Image */}
@@ -130,6 +138,11 @@ function CartLineQuantity({ line }: { line: CartLine }) {
       <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
         <button
           aria-label="Decrease quantity"
+          title={
+            quantity <= 1
+              ? 'Minimum quantity is 1'
+              : `Set quantity to ${prevQuantity}`
+          }
           disabled={quantity <= 1 || !!isOptimistic}
           name="decrease-quantity"
           value={prevQuantity}
@@ -146,6 +159,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
       <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
         <button
           aria-label="Increase quantity"
+          title={`Set quantity to ${nextQuantity}`}
           name="increase-quantity"
           value={nextQuantity}
           disabled={!!isOptimistic}
@@ -165,18 +179,16 @@ function CartLineRemoveButton({
   lineIds: string[];
   disabled: boolean;
 }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+
   return (
-    <CartForm
-      fetcherKey={getUpdateKey(lineIds)}
-      route="/cart"
-      action={CartForm.ACTIONS.LinesRemove}
-      inputs={{ lineIds }}
-    >
+    <>
       <button
+        type="button"
         disabled={disabled}
-        type="submit"
+        onClick={() => setShowConfirm(true)}
         aria-label="Remove item"
-        className="w-7 h-7 flex items-center justify-center rounded-full text-stone-300 hover:text-stone-900 hover:bg-stone-100 transition-all disabled:opacity-30 cursor-pointer"
+        className="w-8 h-8 flex items-center justify-center rounded-full text-stone-500 hover:text-rose-600 hover:bg-rose-50 transition-all disabled:opacity-30 cursor-pointer shadow-sm border border-gray-200 hover:border-rose-100"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -184,12 +196,55 @@ function CartLineRemoveButton({
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="w-3.5 h-3.5"
+          className="w-4 h-4"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>
       </button>
-    </CartForm>
+
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/40 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-stone-200 w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-stone-900 mb-2">Remove Item?</h3>
+              <p className="text-sm text-stone-500 leading-relaxed mb-6">
+                Are you sure you want to remove this sacred ornament from your cart? You can always add it back later.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(false)}
+                  className="flex-1 px-4 py-2.5 rounded-full border border-stone-200 text-stone-600 text-xs font-bold uppercase tracking-wider hover:bg-stone-50 transition-colors"
+                >
+                  Keep It
+                </button>
+
+                <CartForm
+                  fetcherKey={getUpdateKey(lineIds)}
+                  route="/cart"
+                  action={CartForm.ACTIONS.LinesRemove}
+                  inputs={{ lineIds }}
+                >
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
+                  >
+                    Remove
+                  </button>
+                </CartForm>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

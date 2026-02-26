@@ -9,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
+  Link,
 } from 'react-router';
 import type { Route } from './+types/root';
 import favicon from '~/assets/favicon.svg';
@@ -207,15 +208,51 @@ export function ErrorBoundary() {
     errorMessage = error.message;
   }
 
+  const isNotFound = errorStatus === 404;
+
   return (
-    <div className="route-error">
-      <h1>Oops</h1>
-      <h2>{errorStatus}</h2>
-      {errorMessage && (
-        <fieldset>
-          <pre>{errorMessage}</pre>
-        </fieldset>
-      )}
+    <div className="min-h-screen bg-[#f5f7fa] text-black">
+      <div className="relative bg-neutral-950 overflow-hidden">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400 rounded-full blur-3xl" />
+        </div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <p className="text-xs tracking-[0.35em] uppercase text-neutral-400 mb-4">
+            {isNotFound ? 'Page Not Found' : 'Application Error'}
+          </p>
+          <h1 className="text-5xl md:text-7xl font-bold text-white leading-none mb-4">
+            {errorStatus}
+          </h1>
+          <p className="text-sm md:text-base text-neutral-300 max-w-2xl mx-auto">
+            {isNotFound
+              ? 'The page you requested does not exist or has moved.'
+              : 'Something went wrong while loading this page.'}
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-white border border-neutral-200 rounded-3xl p-6 md:p-8 shadow-sm">
+          <div className="flex flex-wrap gap-3 mb-6">
+            <Link
+              to="/"
+              className="inline-flex items-center justify-center px-6 py-3 text-xs tracking-[0.16em] uppercase font-semibold rounded-xl bg-black text-white hover:bg-neutral-800 transition-colors no-underline"
+            >
+              Go Home
+            </Link>
+            <Link
+              to="/collections/all"
+              className="inline-flex items-center justify-center px-6 py-3 text-xs tracking-[0.16em] uppercase font-semibold rounded-xl border border-neutral-300 text-black hover:bg-neutral-100 transition-colors no-underline"
+            >
+              Shop All
+            </Link>
+          </div>
+          <p className="text-xs text-neutral-500">
+            {errorMessage}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
