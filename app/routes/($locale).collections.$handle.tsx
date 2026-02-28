@@ -1,10 +1,10 @@
 import { redirect, useLoaderData } from 'react-router';
-import type { Route } from './+types/collections.$handle';
+import type { Route } from './+types/($locale).collections.$handle';
 import { getPaginationVariables, Analytics, Image, Money, CartForm } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { ProductItemFragment } from 'storefrontapi.generated';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [{ title: `${data?.collection.title ?? ''} | Devasutra` }];
@@ -38,7 +38,7 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
   return { collection };
 }
 
-function loadDeferredData() {
+function loadDeferredData(_args: Route.LoaderArgs) {
   return {};
 }
 
@@ -71,45 +71,47 @@ function FilterSidebar({
   onToggleFilter: (f: string) => void;
 }) {
   return (
-    <div className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-sm sticky top-6">
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-neutral-500">
+    <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm sticky top-6">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/40">
+        <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
         </h2>
         {activeFilters.length > 0 && (
           <button
             onClick={() => activeFilters.forEach(onToggleFilter)}
-            className="text-[10px] text-black tracking-wide underline underline-offset-2"
+            className="text-[10px] text-muted-foreground hover:text-foreground tracking-wide hover:underline transition-all underline-offset-4"
           >
             Clear all
           </button>
         )}
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {FILTER_GROUPS.map((group) => (
           <div key={group.label}>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-500 font-semibold mb-3">
+            <p className="text-xs tracking-wider uppercase text-foreground font-semibold mb-4">
               {group.label}
             </p>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {group.options.map((opt) => {
                 const isActive = activeFilters.includes(opt);
                 return (
-                  <label
+                  <button
                     key={opt}
-                    className="flex items-center gap-2.5 cursor-pointer group"
+                    type="button"
+                    className="flex items-center gap-3 cursor-pointer group w-full text-left"
                     onClick={() => onToggleFilter(opt)}
+                    aria-pressed={isActive}
                   >
                     <div
-                      className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-all duration-200 ${isActive
-                        ? 'bg-black border-black'
-                        : 'border-neutral-300 group-hover:border-black'
+                      className={`w-4.5 h-4.5 rounded-[4px] border flex-shrink-0 flex items-center justify-center transition-all duration-200 ${isActive
+                        ? 'bg-foreground border-foreground'
+                        : 'border-muted-foreground/40 group-hover:border-foreground bg-background'
                         }`}
                     >
                       {isActive && (
                         <svg
-                          className="w-2.5 h-2.5 text-white"
+                          className="w-3 h-3 text-background"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth={3}
@@ -124,14 +126,14 @@ function FilterSidebar({
                       )}
                     </div>
                     <span
-                      className={`text-xs transition-colors ${isActive
-                        ? 'text-black font-medium'
-                        : 'text-neutral-500 group-hover:text-black'
+                      className={`text-[13px] transition-colors ${isActive
+                        ? 'text-foreground font-medium'
+                        : 'text-muted-foreground group-hover:text-foreground'
                         }`}
                     >
                       {opt}
                     </span>
-                  </label>
+                  </button>
                 );
               })}
             </div>
@@ -139,14 +141,16 @@ function FilterSidebar({
         ))}
       </div>
 
-      <div className="mt-6 pt-5 border-t border-neutral-200">
-        <div className="bg-neutral-50 rounded-xl p-3 text-center border border-neutral-100">
-          <p className="text-[10px] tracking-widest uppercase text-black font-semibold mb-1">
-            Free Shipping
-          </p>
-          <p className="text-[11px] text-neutral-500">
-            On all orders above ₹999
-          </p>
+      <div className="mt-8 pt-6 border-t border-border/40">
+        <div className="bg-muted/30 rounded-xl p-4 text-center border border-border/50 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative z-10">
+            <p className="text-[11px] tracking-widest uppercase text-foreground font-bold mb-1.5 flex items-center justify-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+              Free Shipping
+            </p>
+            <p className="text-xs text-muted-foreground">On all orders above ₹999</p>
+          </div>
         </div>
       </div>
     </div>
@@ -154,6 +158,68 @@ function FilterSidebar({
 }
 
 /* ───────── Page ───────── */
+
+function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange: (nextSort: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const activeOption = SORT_OPTIONS.find((o) => o.value === sort) || SORT_OPTIONS[0];
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-[180px] text-left text-xs border border-border rounded-xl px-4 py-2.5 bg-card text-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring cursor-pointer hover:bg-muted/50 transition-colors shadow-sm"
+      >
+        <span className="truncate block font-medium">{activeOption.label}</span>
+        <svg
+          className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ml-2 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 right-0 w-[180px] mt-2 bg-card border border-border rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+          <div className="py-1.5 max-h-60 overflow-auto">
+            {SORT_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => {
+                  onSortChange(option.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-4 py-2.5 text-xs transition-colors hover:bg-muted ${sort === option.value ? 'bg-muted/50 font-medium text-foreground' : 'text-muted-foreground'
+                  }`}
+              >
+                <span>{option.label}</span>
+                {sort === option.value && (
+                  <svg className="w-3.5 h-3.5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m4.5 12.75 6 6 9-13.5" />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Collection() {
   const { collection } = useLoaderData<typeof loader>();
@@ -170,39 +236,49 @@ export default function Collection() {
   /* ───────── FILTER LOGIC ───────── */
 
   const filteredConnection = useMemo(() => {
-    if (activeFilters.length === 0) return collection.products;
+    let filteredNodes = collection.products.nodes;
 
-    const filteredNodes = collection.products.nodes.filter((product) => {
-      const price = Number(product.priceRange.minVariantPrice.amount);
+    if (activeFilters.length > 0) {
+      filteredNodes = filteredNodes.filter((product) => {
+        const price = Number(product.priceRange.minVariantPrice.amount);
 
-      return activeFilters.every((filter) => {
-        if (filter === 'Under ₹500') return price < 500;
-        if (filter === '₹500 – ₹1,500')
-          return price >= 500 && price <= 1500;
-        if (filter === '₹1,500 – ₹5,000')
-          return price >= 1500 && price <= 5000;
-        if (filter === 'Above ₹5,000') return price > 5000;
-        return true;
+        return activeFilters.every((filter) => {
+          if (filter === 'Under ₹500') return price < 500;
+          if (filter === '₹500 – ₹1,500')
+            return price >= 500 && price <= 1500;
+          if (filter === '₹1,500 – ₹5,000')
+            return price >= 1500 && price <= 5000;
+          if (filter === 'Above ₹5,000') return price > 5000;
+          return true;
+        });
       });
+    }
+
+    const sortedNodes = [...filteredNodes].sort((a, b) => {
+      const priceA = Number(a.priceRange.minVariantPrice.amount);
+      const priceB = Number(b.priceRange.minVariantPrice.amount);
+      if (sort === 'price-asc') return priceA - priceB;
+      if (sort === 'price-desc') return priceB - priceA;
+      return 0;
     });
 
     return {
       ...collection.products,
-      nodes: filteredNodes,
+      nodes: sortedNodes,
     };
-  }, [activeFilters, collection.products]);
+  }, [activeFilters, collection.products, sort]);
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa]">
+    <div className="min-h-screen text-foreground">
 
       {/* HERO (unchanged structure, just palette) */}
       <div className="relative bg-neutral-950 overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/60 dark:bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400/60 dark:bg-neutral-700/40 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
           <p className="text-[10px] tracking-[0.4em] uppercase text-neutral-400 mb-3">
             ✦ Handpicked & Energised ✦
           </p>
@@ -232,6 +308,25 @@ export default function Collection() {
 
           <div className="flex-1 min-w-0">
 
+            <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setMobileFiltersOpen(true)}
+                  className="lg:hidden flex items-center gap-2 px-3 py-2 border border-border rounded-xl text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                >
+                  Filters
+                </button>
+                <p className="text-xs text-muted-foreground tracking-wide">Browsing {collection.title}</p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] tracking-widest uppercase text-muted-foreground hidden sm:block font-medium">
+                  Sort by
+                </span>
+                <CustomSortDropdown sort={sort} onSortChange={setSort} />
+              </div>
+            </div>
+
             <PaginatedResourceSection<ProductItemFragment>
               connection={filteredConnection}
               resourcesClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"
@@ -239,9 +334,9 @@ export default function Collection() {
               {({ node: product, index }) => (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-neutral-200"
+                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-border"
                 >
-                  <a href={`/products/${product.handle}`} className="aspect-square bg-neutral-100 overflow-hidden relative block">
+                  <a href={`/products/${product.handle}`} className="aspect-square bg-muted overflow-hidden relative block">
                     {product.featuredImage ? (
                       <Image
                         data={product.featuredImage}
@@ -249,32 +344,32 @@ export default function Collection() {
                         loading={index < 8 ? 'eager' : 'lazy'}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-neutral-100">
-                        <span className="text-5xl opacity-20 text-black">
+                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                        <span className="text-5xl opacity-20 text-muted-foreground">
                           ✦
                         </span>
                       </div>
                     )}
 
                     {/* corner ornaments preserved */}
-                    <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-neutral-300 rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-neutral-300 rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-border rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-border rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                     {/* certified badge */}
                     <div className="absolute top-2.5 right-2.5">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-neutral-200 text-black text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-background border border-border text-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
                         ✓ Certified
                       </span>
                     </div>
                   </a>
 
                   <div className="p-3.5 flex flex-col flex-1">
-                    <p className="text-[10px] tracking-[0.15em] uppercase text-neutral-500 mb-1">
+                    <p className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground mb-1">
                       Devasutra
                     </p>
 
                     <a href={`/products/${product.handle}`} className="block">
-                      <h3 className="text-base font-semibold text-black mb-2 leading-snug line-clamp-2 hover:underline">
+                      <h3 className="text-base font-semibold text-foreground mb-2 leading-snug line-clamp-2 hover:underline">
                         {product.title}
                       </h3>
                     </a>
@@ -282,7 +377,7 @@ export default function Collection() {
                     <div className="mt-auto flex items-center justify-between">
                       <Money
                         data={product.priceRange.minVariantPrice}
-                        className="text-sm font-bold text-black border border-transparent"
+                        className="text-sm font-bold text-foreground border border-transparent"
                       />
 
                       <CartForm

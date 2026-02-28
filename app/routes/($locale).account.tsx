@@ -6,7 +6,7 @@ import {
   useLoaderData,
   useLocation,
 } from 'react-router';
-import type { Route } from './+types/account';
+import type { Route } from './+types/($locale).account';
 import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetailsQuery';
 
 export function shouldRevalidate() {
@@ -41,14 +41,14 @@ export default function AccountLayout() {
   const { customer } = useLoaderData<typeof loader>();
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
         {/* Header Section */}
         <div className="mb-10">
-          <h1 className="text-3xl md:text-5xl font-bold text-black tracking-tight mb-3">
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">
             My Account
           </h1>
-          <p className="text-base text-neutral-500">
+          <p className="text-base text-muted-foreground">
             Welcome back, {customer?.firstName || 'Valued Customer'}. Manage your sacred journey here.
           </p>
         </div>
@@ -80,7 +80,7 @@ function AccountMenu() {
   ];
 
   return (
-    <div className="bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-sm">
+    <div className="bg-card text-card-foreground rounded-3xl border border-border overflow-hidden shadow-sm">
       <nav role="navigation" className="flex flex-col">
         {menuItems.map((item) => {
           const isActive = location.pathname.includes(item.to);
@@ -89,8 +89,8 @@ function AccountMenu() {
               key={item.name}
               to={item.to}
               className={`flex items-center gap-4 px-6 py-4 text-sm font-semibold transition-all duration-300 border-l-4 ${isActive
-                  ? 'border-black text-black bg-stone-50'
-                  : 'border-transparent text-neutral-500 hover:text-black hover:bg-neutral-50'
+                  ? 'border-foreground text-foreground bg-muted'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/60'
                 }`}
             >
               <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -101,7 +101,7 @@ function AccountMenu() {
           );
         })}
 
-        <div className="border-t border-neutral-100">
+        <div className="border-t border-border">
           <Logout />
         </div>
       </nav>
@@ -114,7 +114,7 @@ function Logout() {
     <Form className="w-full" method="POST" action="/account/logout">
       <button
         type="submit"
-        className="w-full flex items-center gap-4 px-6 py-4 text-sm font-semibold text-rose-500 hover:bg-rose-50 transition-colors border-l-4 border-transparent text-left cursor-pointer"
+        className="w-full flex items-center gap-4 px-6 py-4 text-sm font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors border-l-4 border-transparent text-left cursor-pointer"
       >
         <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />

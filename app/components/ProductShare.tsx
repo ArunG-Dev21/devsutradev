@@ -30,7 +30,7 @@ export function ProductShare({ title }: { title: string }) {
 
   return (
     <div className="mt-6">
-      <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-500 mb-3 font-semibold">
+      <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-3 font-semibold">
         Share
       </p>
       <div className="flex items-center gap-2 flex-wrap">
@@ -38,7 +38,7 @@ export function ProductShare({ title }: { title: string }) {
           href={`https://wa.me/?text=${encodedText}`}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-stone-200 bg-white text-stone-700 hover:text-stone-900 hover:border-stone-400 transition-colors text-xs no-underline"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-border bg-card text-foreground hover:text-foreground hover:bg-muted transition-colors text-xs no-underline"
           title="Share on WhatsApp"
         >
           <WhatsAppIcon />
@@ -49,7 +49,7 @@ export function ProductShare({ title }: { title: string }) {
           href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-stone-200 bg-white text-stone-700 hover:text-stone-900 hover:border-stone-400 transition-colors text-xs no-underline"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-border bg-card text-foreground hover:text-foreground hover:bg-muted transition-colors text-xs no-underline"
           title="Share on Facebook"
         >
           <FacebookIcon />
@@ -63,7 +63,7 @@ export function ProductShare({ title }: { title: string }) {
               window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
             });
           }}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-stone-200 bg-white text-stone-700 hover:text-stone-900 hover:border-stone-400 transition-colors text-xs cursor-pointer"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-border bg-card text-foreground hover:text-foreground hover:bg-muted transition-colors text-xs cursor-pointer"
           title="Copy link and open Instagram"
         >
           <InstagramIcon />
@@ -73,7 +73,7 @@ export function ProductShare({ title }: { title: string }) {
         <button
           type="button"
           onClick={() => void copy()}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-stone-200 bg-white text-stone-700 hover:text-stone-900 hover:border-stone-400 transition-colors text-xs cursor-pointer"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-border bg-card text-foreground hover:text-foreground hover:bg-muted transition-colors text-xs cursor-pointer"
           title="Copy link"
         >
           <LinkIcon />
@@ -116,4 +116,3 @@ function LinkIcon() {
     </svg>
   );
 }
-

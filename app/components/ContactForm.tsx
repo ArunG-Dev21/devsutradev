@@ -116,8 +116,8 @@ export default function ContactForm() {
         try {
             await new Promise((r) => setTimeout(r, 1200));
 
-            // Placeholder: log to console (replace with actual API call)
-            console.log("Contact form submitted:", {
+            // Placeholder: replace with actual API call
+            console.warn("Contact form submitted:", {
                 name: form.name.trim(),
                 email: form.email.trim(),
                 phone: form.phone.trim(),
@@ -138,10 +138,10 @@ export default function ContactForm() {
     };
 
     const inputBase =
-        "w-full px-4 py-3 bg-white/60 border rounded-xl text-sm text-charcoal placeholder-stone-light/60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50";
+        "w-full px-4 py-3 bg-input border rounded-xl text-sm text-foreground placeholder-muted-foreground/60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/50";
 
     return (
-        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        <form onSubmit={(e) => { void handleSubmit(e); }} noValidate className="space-y-5">
             {/* Honeypot — invisible to humans */}
             <div className="absolute opacity-0 h-0 overflow-hidden" aria-hidden="true">
                 <input ref={honeypotRef} type="text" name="website" tabIndex={-1} autoComplete="off" />
@@ -210,7 +210,7 @@ export default function ContactForm() {
                     ) : (
                         <span />
                     )}
-                    <span className="text-[10px] text-stone-light">{form.message.length}/1000</span>
+                    <span className="text-[10px] text-muted-foreground">{form.message.length}/1000</span>
                 </div>
             </div>
 
@@ -219,10 +219,10 @@ export default function ContactForm() {
                 type="submit"
                 disabled={status === "submitting"}
                 className={`w-full sm:w-auto px-8 py-3 text-sm font-medium tracking-wider uppercase rounded-xl transition-all duration-300 disabled:cursor-not-allowed ${status === "success"
-                        ? "bg-green-600 text-white"
-                        : status === "error"
-                            ? "bg-red-500 text-white"
-                            : "bg-charcoal text-white hover:bg-gold"
+                    ? "bg-green-600 text-white"
+                    : status === "error"
+                        ? "bg-red-500 text-white"
+                        : "bg-foreground text-background hover:bg-gold hover:text-white"
                     }`}
             >
                 {status === "submitting" ? (

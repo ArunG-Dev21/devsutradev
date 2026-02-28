@@ -1,5 +1,5 @@
 import { redirect } from 'react-router';
-import type { Route } from './+types/account.$';
+import type { Route } from './+types/($locale).account.$';
 
 // Fallback wild card for all unauthenticated routes in account section.
 // If the user is not logged in, handleAuthStatus() redirects to login.

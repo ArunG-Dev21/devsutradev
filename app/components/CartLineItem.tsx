@@ -34,8 +34,8 @@ export function CartLineItem({
       key={id}
       className={
         layout === 'page'
-          ? 'p-4 mb-4 rounded-2xl border border-stone-200 bg-white shadow-sm last:mb-0 transition-shadow hover:shadow-md'
-          : 'py-5 border-b border-stone-100 last:border-b-0'
+          ? 'p-4 mb-4 rounded-2xl border border-border bg-card shadow-sm last:mb-0 transition-shadow hover:shadow-md'
+          : 'py-5 border-b border-border last:border-b-0'
       }
     >
       <div className="flex gap-4">
@@ -47,7 +47,7 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="flex-shrink-0"
           >
-            <div className="w-20 h-20 rounded-xl overflow-hidden bg-stone-100 border border-stone-200">
+            <div className="w-20 h-20 rounded-xl overflow-hidden bg-muted border border-border">
               <Image
                 alt={title}
                 aspectRatio="1/1"
@@ -69,7 +69,7 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="no-underline block"
           >
-            <p className="text-sm font-semibold text-stone-900 leading-snug truncate hover:text-stone-600 transition-colors">
+            <p className="text-sm font-semibold text-foreground leading-snug truncate hover:text-muted-foreground transition-colors">
               {product.title}
             </p>
           </Link>
@@ -82,7 +82,7 @@ export function CartLineItem({
                 .map((option) => (
                   <span
                     key={option.name}
-                    className="inline-block text-[10px] font-medium tracking-wide uppercase text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full"
+                    className="inline-block text-[10px] font-medium tracking-wide uppercase text-muted-foreground bg-muted px-2 py-0.5 rounded-full"
                   >
                     {option.value}
                   </span>
@@ -91,7 +91,7 @@ export function CartLineItem({
           )}
 
           {/* Price */}
-          <div className="mt-2 text-sm font-bold text-stone-900">
+          <div className="mt-2 text-sm font-bold text-foreground">
             <ProductPrice price={line?.cost?.totalAmount} />
           </div>
 
@@ -107,7 +107,7 @@ export function CartLineItem({
 
       {/* Child line items */}
       {lineItemChildren ? (
-        <div className="ml-24 mt-3 pl-3 border-l-2 border-stone-100">
+        <div className="ml-24 mt-3 pl-3 border-l-2 border-border">
           <p id={childrenLabelId} className="sr-only">
             Line items with {product.title}
           </p>
@@ -134,7 +134,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="flex items-center gap-0 mt-3 w-fit border border-stone-200 rounded-lg overflow-hidden">
+    <div className="flex items-center gap-0 mt-3 w-fit border border-border rounded-lg overflow-hidden">
       <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
         <button
           aria-label="Decrease quantity"
@@ -146,13 +146,13 @@ function CartLineQuantity({ line }: { line: CartLine }) {
           disabled={quantity <= 1 || !!isOptimistic}
           name="decrease-quantity"
           value={prevQuantity}
-          className="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 transition-colors disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
+          className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
         >
           −
         </button>
       </CartLineUpdateButton>
 
-      <span className="w-8 h-8 flex items-center justify-center text-xs font-bold text-stone-900 border-x border-stone-200 select-none">
+      <span className="w-8 h-8 flex items-center justify-center text-xs font-bold text-foreground border-x border-border select-none">
         {quantity}
       </span>
 
@@ -163,7 +163,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
           name="increase-quantity"
           value={nextQuantity}
           disabled={!!isOptimistic}
-          className="w-8 h-8 flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 transition-colors disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
+          className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
         >
           +
         </button>
@@ -188,7 +188,7 @@ function CartLineRemoveButton({
         disabled={disabled}
         onClick={() => setShowConfirm(true)}
         aria-label="Remove item"
-        className="w-8 h-8 flex items-center justify-center rounded-full text-stone-500 hover:text-rose-600 hover:bg-rose-50 transition-all disabled:opacity-30 cursor-pointer shadow-sm border border-gray-200 hover:border-rose-100"
+        className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-rose-600 hover:bg-muted transition-all disabled:opacity-30 cursor-pointer shadow-sm border border-border"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -205,15 +205,15 @@ function CartLineRemoveButton({
       {/* Confirmation Modal */}
       {showConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/40 backdrop-blur-sm px-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-stone-200 w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-card text-card-foreground rounded-2xl shadow-xl border border-border w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-6 text-center">
               <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-stone-900 mb-2">Remove Item?</h3>
-              <p className="text-sm text-stone-500 leading-relaxed mb-6">
+              <h3 className="text-lg font-bold text-foreground mb-2">Remove Item?</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-6">
                 Are you sure you want to remove this sacred ornament from your cart? You can always add it back later.
               </p>
 
@@ -221,7 +221,7 @@ function CartLineRemoveButton({
                 <button
                   type="button"
                   onClick={() => setShowConfirm(false)}
-                  className="flex-1 px-4 py-2.5 rounded-full border border-stone-200 text-stone-600 text-xs font-bold uppercase tracking-wider hover:bg-stone-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-full border border-border text-muted-foreground text-xs font-bold uppercase tracking-wider hover:bg-muted hover:text-foreground transition-colors"
                 >
                   Keep It
                 </button>

@@ -18,6 +18,7 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
 import { PageLayout } from './components/PageLayout';
+import { ThemeProvider, ThemeScript } from '~/context/theme';
 
 export type RootLoader = typeof loader;
 
@@ -156,11 +157,12 @@ export function Layout({ children }: { children?: React.ReactNode }) {
   const nonce = useNonce();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet"/>
+        <ThemeScript nonce={nonce} />
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"/>
         <link rel="stylesheet" href={tailwindCss}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
@@ -168,7 +170,7 @@ export function Layout({ children }: { children?: React.ReactNode }) {
         <Links />
       </head>
       <body className="font-body antialiased">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
       </body>
@@ -211,7 +213,7 @@ export function ErrorBoundary() {
   const isNotFound = errorStatus === 404;
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] text-black">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="relative bg-neutral-950 overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
@@ -233,7 +235,7 @@ export function ErrorBoundary() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white border border-neutral-200 rounded-3xl p-6 md:p-8 shadow-sm">
+        <div className="bg-card text-card-foreground border border-border rounded-3xl p-6 md:p-8 shadow-sm">
           <div className="flex flex-wrap gap-3 mb-6">
             <Link
               to="/"
@@ -243,7 +245,7 @@ export function ErrorBoundary() {
             </Link>
             <Link
               to="/collections/all"
-              className="inline-flex items-center justify-center px-6 py-3 text-xs tracking-[0.16em] uppercase font-semibold rounded-xl border border-neutral-300 text-black hover:bg-neutral-100 transition-colors no-underline"
+              className="inline-flex items-center justify-center px-6 py-3 text-xs tracking-[0.16em] uppercase font-semibold rounded-xl border border-border text-foreground hover:bg-muted transition-colors no-underline"
             >
               Shop All
             </Link>

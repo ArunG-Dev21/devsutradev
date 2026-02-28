@@ -11,13 +11,13 @@
 /*---break---
  */
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Design System Tokens */
 @theme {
-  --font-heading: 'Cinzel', serif;
-  --font-subheading: 'Lato', sans-serif;
-  --font-body: 'Lato', sans-serif;
+  --font-heading: 'Cormorant', serif;
+  --font-subheading: 'Montserrat', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
 }
 
 @utility text-glow {

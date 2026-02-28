@@ -70,15 +70,15 @@ export function TrustBadges() {
       </section>
 
       {/* Trust / About Section */}
-      <section id="about" className="bg-cream py-20 lg:py-28">
-        <div className="mx-auto px-6 lg:px-16 xl:px-24 text-center scroll-reveal">
+      <section id="about" className="dark:bg-black bg-stone-50 py-20 lg:py-28">
+        <div className="mx-auto container px-6 text-center scroll-reveal">
           <span className="text-gold-muted text-xs font-medium tracking-[0.25em] uppercase">
             Our Promise
           </span>
-          <h2 className="text-3xl lg:text-5xl font-heading font-medium text-charcoal mt-3 mb-6">
+          <h2 className="text-3xl lg:text-5xl font-heading font-medium text-foreground mt-3 mb-6">
             Crafted with Intention
           </h2>
-          <p className="text-stone text-base lg:text-lg leading-relaxed max-w-2xl lg:max-w-3xl mx-auto">
+          <p className="text-muted-foreground text-base lg:text-lg leading-relaxed max-w-2xl lg:max-w-3xl mx-auto">
             Every devotional bracelet in our collection is handcrafted by skilled
             artisans using authentic, ethically sourced materials. We honor
             centuries-old traditions to bring you pieces that carry genuine
@@ -106,10 +106,10 @@ export function TrustBadges() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-lg font-heading font-medium text-charcoal mb-2">
+              <h3 className="text-lg font-heading font-medium text-foreground mb-2">
                 Authentic Materials
               </h3>
-              <p className="text-sm text-stone leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Genuine Rudraksha, Sandalwood, Tiger Eye, and sacred gemstones.
               </p>
             </div>
@@ -134,10 +134,10 @@ export function TrustBadges() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-lg font-heading font-medium text-charcoal mb-2">
+              <h3 className="text-lg font-heading font-medium text-foreground mb-2">
                 Blessed & Purified
               </h3>
-              <p className="text-sm text-stone leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Each piece undergoes traditional purification rituals before
                 reaching you.
               </p>
@@ -163,10 +163,10 @@ export function TrustBadges() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-lg font-heading font-medium text-charcoal mb-2">
+              <h3 className="text-lg font-heading font-medium text-foreground mb-2">
                 Spiritual Energy
               </h3>
-              <p className="text-sm text-stone leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Designed to enhance meditation, promote healing, and offer
                 protection.
               </p>
@@ -178,23 +178,23 @@ export function TrustBadges() {
       {/* Contact Section */}
       <section
         id="contact"
-        className="relative container mx-auto py-20 lg:py-28 overflow-hidden"
+        className="relative bg-background py-20 lg:py-28 overflow-hidden"
       >
         {/* Decorative gradient orb */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-gold/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-gold/5 to-transparent rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none"></div>
 
-        <div className="mx-auto px-6 lg:px-16 xl:px-24">
+        <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-20 items-start">
             {/* Left: Info */}
             <div className="lg:col-span-2 scroll-reveal-left">
-              <span className="text-xs font-medium tracking-[0.25em] uppercase">
+              <span className="text-xs font-medium tracking-[0.25em] uppercase text-muted-foreground">
                 Get in Touch
               </span>
-              <h2 className="text-3xl lg:text-4xl font-heading font-medium text-charcoal mt-3 mb-4">
-                We're Here to Help
+              <h2 className="text-3xl lg:text-4xl font-heading font-medium text-foreground mt-3 mb-4">
+                We&apos;re Here to Help
               </h2>
-              <p className="text-stone text-base leading-relaxed mb-8">
+              <p className="text-muted-foreground text-base leading-relaxed mb-8">
                 Have a question about our bracelets, need sizing help, or want
                 guidance choosing the right piece? Our team is happy to assist
                 you on your spiritual journey.
@@ -219,10 +219,10 @@ export function TrustBadges() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-charcoal">
+                    <p className="text-sm font-medium text-foreground">
                       Response Time
                     </p>
-                    <p className="text-xs text-stone">Usually within 24 hours</p>
+                    <p className="text-xs text-muted-foreground">Usually within 24 hours</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -242,10 +242,10 @@ export function TrustBadges() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-charcoal">
+                    <p className="text-sm font-medium text-foreground">
                       Expert Guidance
                     </p>
-                    <p className="text-xs text-stone">
+                    <p className="text-xs text-muted-foreground">
                       Personalized bracelet recommendations
                     </p>
                   </div>
@@ -255,7 +255,7 @@ export function TrustBadges() {
 
             {/* Right: Form */}
             <div className="lg:col-span-3 relative scroll-reveal-right">
-              <div className="bg-cream/40 backdrop-blur-sm border border-gold-muted/10 rounded-2xl p-6 lg:p-8 shadow-sm">
+              <div className="bg-card backdrop-blur-sm border border-border rounded-2xl p-6 lg:p-8 shadow-sm">
                 <ContactForm />
               </div>
             </div>

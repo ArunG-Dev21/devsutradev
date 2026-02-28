@@ -11,11 +11,14 @@ import type { HeaderQuery, CartApiQueryFragment } from 'storefrontapi.generated'
 import { useAside } from '~/components/Aside';
 import { SUB_NAV_ITEMS } from '~/lib/constants';
 import { SEARCH_ENDPOINT } from '~/components/SearchFormPredictive';
+import { BrandLogo } from '~/components/BrandLogo';
 import {
   getEmptyPredictiveSearchResult,
   urlWithTrackingParams,
   type PredictiveSearchReturn,
 } from '~/lib/search';
+
+import { BRAND_LOGO_DARK_SRC, BRAND_LOGO_LIGHT_SRC } from '~/lib/branding';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -35,7 +38,7 @@ export function Header({
   const { shop, menu } = header;
 
   return (
-    <header className="relative top-0 z-50 bg-white border-primary-border shadow-sm transition-all duration-300 text-text-main">
+    <header className="relative top-0 z-50 bg-background text-foreground border-b border-border shadow-sm transition-all duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-8 flex items-center gap-4 relative">
         {/* Mobile Menu Toggle (left on mobile) */}
         <div className="md:hidden">
@@ -49,8 +52,9 @@ export function Header({
           prefetch="intent"
           className="md:absolute md:left-1/2 md:-translate-x-1/2 -mt-7 shrink-0"
         >
-          <img
-            src="/logo.png"
+          <BrandLogo
+            lightSrc={BRAND_LOGO_LIGHT_SRC}
+            darkSrc={BRAND_LOGO_DARK_SRC}
             alt={shop.name}
             className="h-6 md:h-12 w-auto object-contain"
           />
@@ -61,16 +65,23 @@ export function Header({
         <div className="hidden md:flex items-center gap-8">
           <NavLink
             to="/pages/about"
-            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-black hover:text-black transition"
+            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-foreground hover:text-foreground transition"
           >
             About
           </NavLink>
 
           <NavLink
             to="/pages/contact"
-            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-black hover:text-black transition"
+            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-foreground hover:text-foreground transition"
           >
             Contact
+          </NavLink>
+
+          <NavLink
+            to="/blogs"
+            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-foreground hover:text-foreground transition"
+          >
+            Blog
           </NavLink>
         </div>
 
@@ -113,7 +124,7 @@ function SubNavIsland({
     <div className="hidden md:flex justify-center absolute top-28 left-1/2 -translate-x-1/2 -translate-y-1/2">
       <nav
         className="
-        bg-white
+        bg-card
         shadow-inner
         rounded-full
         px-2.5 py-2
@@ -121,7 +132,7 @@ function SubNavIsland({
         relative z-50
         -translate-y-1
         border-1
-        border-gray-200
+        border-border
       "
       >
         {items.map((item) => {
@@ -150,7 +161,7 @@ function SubNavIsland({
               transition-all duration-300
               ${isActive
                   ? 'bg-gold text-white shadow-lg'
-                  : 'text-black bg-white border border-gray-200'
+                  : 'text-foreground bg-card border border-border'
                 }
               `
               }
@@ -187,7 +198,7 @@ export function HeaderMenu({
         to="/"
         end
         onClick={close}
-        className="py-3 border-b border-primary-border hover:text-accent transition-colors duration-300"
+        className="py-3 border-b border-border hover:text-accent transition-colors duration-300"
       >
         Home
       </NavLink>
@@ -210,7 +221,7 @@ export function HeaderMenu({
             prefetch="intent"
             onClick={close}
             className={({ isActive }) =>
-              `py-3 border-b border-primary-border transition-colors duration-300 hover:text-accent ${isActive ? 'text-accent' : ''
+              `py-3 border-b border-border transition-colors duration-300 hover:text-accent ${isActive ? 'text-accent' : ''
               }`
             }
           >
@@ -228,7 +239,7 @@ export function HeaderMenu({
           key={item.title}
           to={item.link}
           onClick={close}
-          className="py-2 border-b border-primary-border hover:text-accent transition"
+          className="py-2 border-b border-border hover:text-accent transition"
         >
           {item.title}
         </NavLink>
@@ -250,7 +261,7 @@ function HeaderCtas({
       <NavLink
         to="/account"
         prefetch="intent"
-        className="text-black transition hidden md:block"
+        className="text-foreground transition hidden md:block"
         aria-label="Account"
       >
         <svg
@@ -322,7 +333,7 @@ function DesktopSearchBar() {
       const q = e.target.value;
       if (q.length > 0) {
         setOpen(true);
-        fetcher.submit(
+        void fetcher.submit(
           { q, limit: '5', predictive: 'true' },
           { method: 'GET', action: SEARCH_ENDPOINT },
         );
@@ -338,7 +349,7 @@ function DesktopSearchBar() {
     const q = inputRef.current?.value?.trim();
     if (q) {
       setOpen(false);
-      navigate(`${SEARCH_ENDPOINT}?q=${encodeURIComponent(q)}`);
+      void navigate(`${SEARCH_ENDPOINT}?q=${encodeURIComponent(q)}`);
     }
   }
 
@@ -367,7 +378,7 @@ function DesktopSearchBar() {
     <div ref={containerRef} className="hidden md:block relative">
       <form
         onSubmit={handleSubmit}
-        className="flex items-center bg-white rounded-full px-5 py-3 gap-2 w-44 lg:w-64 transition-all border border-primary-border focus-within:ring-1 focus-within:ring-accent focus-within:bg-bg-subtle"
+        className="flex items-center bg-card rounded-full px-5 py-3 gap-2 w-44 lg:w-64 transition-all border border-border focus-within:ring-1 focus-within:ring-ring focus-within:bg-muted"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -399,7 +410,7 @@ function DesktopSearchBar() {
 
       {open && (
         <div
-          className="absolute top-full right-0 mt-2 w-80 lg:w-96 bg-white rounded-xl shadow-silver border border-primary-border overflow-hidden z-[200]"
+          className="absolute top-full right-0 mt-2 w-80 lg:w-96 bg-card rounded-xl shadow-silver border border-border overflow-hidden z-[200]"
           style={{ maxHeight: '70vh', overflowY: 'auto' }}
         >
           {isLoading && term && (
@@ -431,7 +442,7 @@ function DesktopSearchBar() {
                           <Link
                             to={productUrl}
                             onClick={closeDropdown}
-                            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white transition-colors"
+                            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-muted transition-colors"
                           >
                             {image && (
                               <Image
@@ -445,7 +456,7 @@ function DesktopSearchBar() {
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-text-main truncate">{product.title}</p>
                               {price && (
-                                <span className="text-xs text-black font-medium">
+                                <span className="text-xs text-foreground font-medium">
                                   <Money data={price} />
                                 </span>
                               )}
@@ -459,7 +470,7 @@ function DesktopSearchBar() {
               )}
 
               {items.collections.length > 0 && (
-                <div className="p-3 border-t border-primary-border">
+                <div className="p-3 border-t border-border">
                   <h6 className="text-[10px] uppercase tracking-widest text-text-muted mb-2 px-1">Collections</h6>
                   <ul className="space-y-1">
                     {items.collections.map((collection) => {
@@ -473,7 +484,7 @@ function DesktopSearchBar() {
                           <Link
                             to={collectionUrl}
                             onClick={closeDropdown}
-                            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-bg-subtle transition-colors"
+                            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-muted transition-colors"
                           >
                             {collection.image?.url && (
                               <Image
@@ -494,7 +505,7 @@ function DesktopSearchBar() {
               )}
 
               {items.pages.length > 0 && (
-                <div className="p-3 border-t border-primary-border">
+                <div className="p-3 border-t border-border">
                   <h6 className="text-[10px] uppercase tracking-widest text-text-muted mb-2 px-1">Pages</h6>
                   <ul className="space-y-1">
                     {items.pages.map((page) => {
@@ -508,7 +519,7 @@ function DesktopSearchBar() {
                           <Link
                             to={pageUrl}
                             onClick={closeDropdown}
-                            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-bg-subtle transition-colors"
+                            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-muted transition-colors"
                           >
                             <span className="text-sm text-text-main">{page.title}</span>
                           </Link>
@@ -519,11 +530,11 @@ function DesktopSearchBar() {
                 </div>
               )}
 
-              <div className="border-t border-primary-border">
+              <div className="border-t border-border">
                 <Link
                   to={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(term)}`}
                   onClick={closeDropdown}
-                  className="block px-4 py-3 text-center text-xs uppercase tracking-wider text-black hover:bg-gray-100 transition-colors font-medium"
+                  className="block px-4 py-3 text-center text-xs uppercase tracking-wider text-foreground hover:bg-muted transition-colors font-medium"
                 >
                   View all {total} results →
                 </Link>
@@ -578,7 +589,7 @@ function CartBadge({ count }: { count: number | null }) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className="relative text-black transition cursor-pointer"
+      className="relative text-foreground transition cursor-pointer"
       aria-label={`Cart with ${count ?? 0} items`}
     >
       <svg
@@ -640,6 +651,11 @@ const FALLBACK_HEADER_MENU = {
       id: 'gid://shopify/MenuItem/461609566264',
       title: 'Contact',
       url: '/pages/contact',
+    },
+    {
+      id: 'gid://shopify/MenuItem/461609599032',
+      title: 'Blog',
+      url: '/blogs',
     },
   ],
 };

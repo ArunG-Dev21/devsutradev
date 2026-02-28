@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Image, Money, CartForm } from '@shopify/hydrogen';
+import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { Link } from 'react-router';
 import { QuickViewModal } from '~/components/QuickViewModal';
 
@@ -8,14 +9,14 @@ import { QuickViewModal } from '~/components/QuickViewModal';
 type ImageNode = {
   url: string;
   altText?: string | null;
-  width?: number;
-  height?: number;
+  width?: number | null;
+  height?: number | null;
 };
 
 type ProductVariant = {
   id: string;
   availableForSale: boolean;
-  price?: { amount: string; currencyCode: string };
+  price?: { amount: string; currencyCode: CurrencyCode };
 };
 
 type ProductNode = {
@@ -26,10 +27,10 @@ type ProductNode = {
   featuredImage?: ImageNode | null;
   images?: { nodes: ImageNode[] };
   priceRange: {
-    minVariantPrice: { amount: string; currencyCode: any };
+    minVariantPrice: { amount: string; currencyCode: CurrencyCode };
   };
   compareAtPriceRange?: {
-    minVariantPrice: { amount: string; currencyCode: any };
+    minVariantPrice: { amount: string; currencyCode: CurrencyCode };
   };
   variants?: { nodes: ProductVariant[] };
 };
@@ -58,7 +59,7 @@ function AddToCartButton({ product }: { product: ProductNode }) {
 
   if (!firstVariant || !isAvailable) {
     return (
-      <div className="mt-3 w-full py-2.5 text-center text-[10px] font-medium tracking-widest uppercase text-stone-400 border border-stone-200 rounded-full select-none">
+      <div className="mt-3 w-full py-2.5 text-center text-[10px] font-medium tracking-widest uppercase text-muted-foreground border border-border rounded-full select-none">
         Sold Out
       </div>
     );
@@ -96,10 +97,10 @@ function AddToCartButton({ product }: { product: ProductNode }) {
               'flex items-center justify-center gap-1.5',
               'border transition-all duration-300 cursor-pointer select-none',
               isAdding
-                ? 'bg-stone-100 border-stone-200 text-stone-400 scale-[0.97] cursor-not-allowed'
+                ? 'bg-muted border-border text-muted-foreground scale-[0.97] cursor-not-allowed'
                 : justAdded
-                  ? 'bg-stone-900 border-stone-900 text-stone-50 scale-[0.97]'
-                  : 'bg-black border-stone-900/25 text-white hover:bg-white hover:border-stone-900 hover:text-black active:scale-[0.96]',
+                  ? 'bg-foreground border-foreground text-background scale-[0.97]'
+                  : 'bg-foreground border-foreground text-background hover:bg-background hover:border-foreground hover:text-foreground active:scale-[0.96]',
             ].join(' ')}
           >
             {isAdding ? (
@@ -190,10 +191,10 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
   };
 
   return (
-    <div className="relative text-stone-900 flex flex-col lg:h-full lg:overflow-hidden">
+    <div className="relative bg-background text-foreground flex flex-col lg:h-full lg:overflow-hidden">
 
       {/* ── HEADER ── */}
-      <div className="px-6 md:px-10 lg:px-14 pt-16 pb-6 border-b border-stone-900/10 flex-shrink-0">
+      <div className="px-6 md:px-10 lg:px-14 pt-16 pb-6 border-b border-border flex-shrink-0">
         <h2
           className="text-5xl md:text-6xl lg:text-5xl font-medium leading-tight tracking-tight mb-3 font-heading"
         >
@@ -208,7 +209,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
           <button
             ref={sortButtonRef}
             onClick={handleSortToggle}
-            className="flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-medium tracking-wider uppercase text-stone-900 bg-transparent border border-stone-900/30 hover:bg-stone-900 hover:text-stone-50 hover:border-stone-900 transition-all duration-200 cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-medium tracking-wider uppercase text-foreground bg-transparent border border-border hover:bg-foreground hover:text-background transition-all duration-200 cursor-pointer"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M3 6h18M7 12h10M11 18h2" />
@@ -246,7 +247,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
             return (
               <div
                 key={product.id}
-                className="relative bg-white rounded-2xl overflow-hidden flex flex-col border border-stone-100 shadow-sm hover:shadow-md transition-shadow duration-300 min-w-[280px] w-[80vw] flex-shrink-0 snap-center md:w-auto md:min-w-0"
+                className="relative bg-card text-card-foreground rounded-2xl overflow-hidden flex flex-col border border-border shadow-sm hover:shadow-md transition-shadow duration-300 min-w-[280px] w-[80vw] flex-shrink-0 snap-center md:w-auto md:min-w-0"
                 onMouseEnter={() => setHoveredId(product.id)}
                 onMouseLeave={() => setHoveredId(null)}
               >
@@ -297,7 +298,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                     {/* Sold out badge */}
                     {isUnavailable && (
                       <span
-                        className="absolute top-3 left-3 text-[9px] font-medium tracking-wider uppercase px-3 py-1 bg-white/90 text-stone-500 border border-stone-200 rounded-full backdrop-blur-sm"
+                        className="absolute top-3 left-3 text-[9px] font-medium tracking-wider uppercase px-3 py-1 bg-card/90 text-muted-foreground border border-border rounded-full backdrop-blur-sm"
                         style={{ zIndex: 4 }}
                       >
                         Sold Out
@@ -314,7 +315,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                           setQuickViewProduct(product);
                         }}
                         aria-label="Quick view"
-                        className="absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center border border-white/50 bg-white/85 hover:bg-stone-900 backdrop-blur-sm group/eye"
+                        className="absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center border border-border bg-card/85 hover:bg-foreground hover:text-background backdrop-blur-sm group/eye"
                         style={{
                           opacity: isHovered ? 1 : 0,
                           transform: isHovered ? 'translateY(0px)' : 'translateY(8px)',
@@ -326,7 +327,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                           width="16" height="16" viewBox="0 0 24 24"
                           fill="none" strokeWidth="1.8"
                           strokeLinecap="round" strokeLinejoin="round"
-                          className="stroke-stone-800 group-hover/eye:stroke-white transition-colors duration-150"
+                          className="stroke-stone-800 dark:stroke-stone-200 group-hover/eye:stroke-white dark:group-hover/eye:stroke-stone-900 transition-colors duration-150"
                         >
                           <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
                           <circle cx="12" cy="12" r="3" />
@@ -340,11 +341,11 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                 <div className="px-4 pt-3 pb-5 flex flex-col">
                   <Link to={`/products/${product.handle}`} className="flex flex-col gap-0.5">
                     <p
-                      className="text-[1rem] font-normal leading-snug text-stone-900 tracking-wide"
+                      className="text-[1rem] font-normal leading-snug text-foreground tracking-wide"
                     >
                       {product.title}
                     </p>
-                    <span className="text-sm text-stone-500">
+                    <span className="text-sm text-muted-foreground">
                       <Money data={product.priceRange.minVariantPrice as any} />
                     </span>
                   </Link>
@@ -361,7 +362,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
           <div className="mt-10 flex justify-center">
             <button
               onClick={() => setVisibleCount((prev) => prev + 6)}
-              className="px-8 py-3 w-full sm:w-auto rounded-full text-[10px] font-medium tracking-widest uppercase text-stone-900 bg-transparent border border-stone-900/30 hover:bg-stone-900 hover:text-stone-50 hover:border-stone-900 transition-all duration-300 cursor-pointer"
+              className="px-8 py-3 w-full sm:w-auto rounded-full text-[10px] font-medium tracking-widest uppercase text-foreground bg-transparent border border-border hover:bg-foreground hover:text-background transition-all duration-300 cursor-pointer"
             >
               View More
             </button>
@@ -369,13 +370,13 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
         )}
 
         {/* ── FOOTER ── */}
-        <div className="mt-10 pt-6 flex items-center justify-between border-t border-stone-900/10">
-          <span className="text-[10px] tracking-widest uppercase text-stone-400">
+        <div className="mt-10 pt-6 flex items-center justify-between border-t border-border">
+          <span className="text-[10px] tracking-widest uppercase text-muted-foreground">
             {sortedProducts.length} products
           </span>
           <Link
             to={`/collections/${collection.handle}`}
-            className="inline-flex items-center gap-2 text-[10px] font-medium tracking-widest uppercase text-stone-900 border-b border-stone-300 pb-0.5 hover:text-amber-700 hover:border-amber-700 transition-all duration-200"
+            className="inline-flex items-center gap-2 text-[10px] font-medium tracking-widest uppercase text-muted-foreground border-b border-border pb-0.5 hover:text-foreground hover:border-foreground transition-all duration-200"
           >
             Explore Full Collection
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -386,16 +387,33 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
       </div>
 
       {/* ── SORT DROPDOWN ── */}
+      {/* ── SORT DROPDOWN ── */}
       {isSortOpen && (
         <>
-          <div className="fixed inset-0 z-[100]" onClick={() => setIsSortOpen(false)} />
+          <button
+            type="button"
+            className="fixed inset-0 z-40"
+            aria-label="Close sort dropdown"
+            onClick={() => setIsSortOpen(false)}
+          />
+
           <div
-            className="fixed z-[101] w-52 rounded-xl overflow-hidden bg-stone-900 border border-white/10 shadow-2xl shadow-black/40"
+            className="
+        fixed z-50 w-52 rounded-xl overflow-hidden
+        bg-card
+        border border-border
+        shadow-xl
+      "
             style={{ top: sortDropdownPos.top, right: sortDropdownPos.right }}
           >
-            <p className="px-5 pt-3 pb-2 text-[9px] tracking-widest uppercase text-white/30 font-medium border-b border-white/10">
+            <p className="
+        px-5 pt-3 pb-2 text-[9px] tracking-widest uppercase font-medium
+        text-muted-foreground
+        border-b border-border
+      ">
               Sort By
             </p>
+
             {sortOptions.map((option) => (
               <button
                 key={option.value}
@@ -404,12 +422,28 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                   setVisibleCount(6);
                   setIsSortOpen(false);
                 }}
-                className={`w-full text-left px-5 py-2.5 text-xs flex items-center justify-between transition-colors duration-150 hover:bg-white/5 cursor-pointer ${sortKey === option.value ? 'text-white font-medium' : 'text-white/60'
-                  }`}
+                className={`
+            w-full text-left px-5 py-2.5 text-xs flex items-center justify-between
+            transition-colors duration-150 cursor-pointer
+            hover:bg-muted
+            ${sortKey === option.value
+                    ? "text-foreground font-medium"
+                    : "text-muted-foreground"
+                  }
+          `}
               >
                 {option.label}
+
                 {sortKey === option.value && (
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    className="text-foreground"
+                  >
                     <path d="M5 13l4 4L19 7" />
                   </svg>
                 )}

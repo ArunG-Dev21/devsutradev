@@ -1,5 +1,5 @@
 import { useLoaderData } from 'react-router';
-import type { Route } from './+types/search';
+import type { Route } from './+types/($locale).search';
 import { getPaginationVariables, Analytics } from '@shopify/hydrogen';
 import { SearchForm } from '~/components/SearchForm';
 import { SearchResults } from '~/components/SearchResults';
@@ -41,9 +41,9 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="bg-bg-light min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl md:text-6xl font-heading tracking-tight text-text-main text-center mb-10">Search</h1>
+    <div className="bg-background text-foreground min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto">
+        <h1 className="text-4xl md:text-6xl font-heading tracking-tight text-foreground text-center mb-10">Search</h1>
         <div className="max-w-2xl mx-auto mb-16">
           <SearchForm>
             {({ inputRef }) => (
@@ -54,7 +54,7 @@ export default function SearchPage() {
                   placeholder="Search sacred items…"
                   ref={inputRef}
                   type="text"
-                  className="w-full bg-white border rounded-full py-4 pl-8 pr-16 text-lg text-text-main placeholder:text-text-muted focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                  className="w-full bg-background border border-border rounded-full py-4 pl-8 pr-16 text-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring transition-all appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                 />
                 <button type="submit" aria-label="Search" className="absolute right-2 p-3 bg-gold text-white rounded-full transition-colors flex items-center justify-center cursor-pointer hover:bg-gold-600 hover:shadow-lg hover:scale-105 active:scale-95" >
                   <svg

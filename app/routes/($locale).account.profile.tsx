@@ -8,7 +8,7 @@ import {
   useNavigation,
   useOutletContext,
 } from 'react-router';
-import type { Route } from './+types/account.profile';
+import type { Route } from './+types/($locale).account.profile';
 
 export type ActionResponse = {
   error: string | null;
@@ -87,10 +87,10 @@ export default function AccountProfile() {
   const isUpdating = state !== 'idle';
 
   return (
-    <div className="bg-white rounded-3xl border border-neutral-200 p-6 md:p-8 lg:p-10 shadow-sm max-w-3xl">
-      <div className="mb-8 border-b border-neutral-100 pb-6">
-        <h2 className="text-2xl font-bold text-black tracking-tight">Personal Information</h2>
-        <p className="text-sm text-neutral-500 mt-2">
+    <div className="bg-card text-card-foreground rounded-3xl border border-border p-6 md:p-8 lg:p-10 shadow-sm max-w-3xl">
+      <div className="mb-8 border-b border-border pb-6">
+        <h2 className="text-2xl font-bold text-foreground tracking-tight">Personal Information</h2>
+        <p className="text-sm text-muted-foreground mt-2">
           Update your contact details to keep your account secure.
         </p>
       </div>
@@ -98,7 +98,7 @@ export default function AccountProfile() {
       <Form method="PUT" className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label htmlFor="firstName" className="block text-sm font-semibold text-stone-900">
+            <label htmlFor="firstName" className="block text-sm font-semibold text-foreground">
               First name
             </label>
             <input
@@ -110,12 +110,12 @@ export default function AccountProfile() {
               aria-label="First name"
               defaultValue={customer.firstName ?? ''}
               minLength={2}
-              className="w-full px-4 py-3 bg-stone-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-stone-900 focus:bg-white transition-colors"
+              className="w-full px-4 py-3 bg-background text-foreground placeholder:text-muted-foreground border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-ring focus:bg-background transition-colors"
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="lastName" className="block text-sm font-semibold text-stone-900">
+            <label htmlFor="lastName" className="block text-sm font-semibold text-foreground">
               Last name
             </label>
             <input
@@ -127,7 +127,7 @@ export default function AccountProfile() {
               aria-label="Last name"
               defaultValue={customer.lastName ?? ''}
               minLength={2}
-              className="w-full px-4 py-3 bg-stone-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-stone-900 focus:bg-white transition-colors"
+              className="w-full px-4 py-3 bg-background text-foreground placeholder:text-muted-foreground border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-ring focus:bg-background transition-colors"
             />
           </div>
         </div>

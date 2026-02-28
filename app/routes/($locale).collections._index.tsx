@@ -1,5 +1,5 @@
 import { useLoaderData, Link } from 'react-router';
-import type { Route } from './+types/collections._index';
+import type { Route } from './+types/($locale).collections._index';
 import { getPaginationVariables, Image } from '@shopify/hydrogen';
 import type { CollectionFragment } from 'storefrontapi.generated';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
@@ -46,15 +46,15 @@ export default function Collections() {
   const { collections } = useLoaderData<typeof loader>();
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa]">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
       <div className="relative bg-neutral-950 overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/60 dark:bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 text-center">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 text-center">
           <p className="text-[10px] tracking-[0.4em] uppercase text-neutral-400 mb-3">
             ✦ Sacred Offerings ✦
           </p>
@@ -95,12 +95,12 @@ function CollectionItem({
 }) {
   return (
     <Link
-      className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col border border-neutral-200"
+      className="group bg-card text-card-foreground rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col border border-border"
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
     >
-      <div className="aspect-[2/1] bg-neutral-900 border-b border-neutral-200 overflow-hidden relative">
+      <div className="aspect-[2/1] bg-neutral-900 border-b border-border overflow-hidden relative">
         {collection?.image ? (
           <Image
             alt={collection.image.altText || collection.title}
@@ -111,7 +111,7 @@ function CollectionItem({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-neutral-100">
-            <span className="text-6xl opacity-20 text-black">✦</span>
+            <span className="text-6xl opacity-20 text-muted-foreground">✦</span>
           </div>
         )}
 
@@ -122,15 +122,15 @@ function CollectionItem({
 
       <div className="p-6 md:p-8 flex flex-col sm:flex-row items-center sm:items-start justify-between text-center sm:text-left gap-4">
         <div>
-          <h3 className="text-2xl font-bold text-black tracking-tight mb-2">
+          <h3 className="text-2xl font-bold text-foreground tracking-tight mb-2">
             {collection.title}
           </h3>
-          <p className="text-xs text-neutral-500 uppercase tracking-widest font-medium">
+          <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium">
             Explore Collection
           </p>
         </div>
 
-        <span className="shrink-0 w-12 h-12 rounded-full border border-neutral-300 flex items-center justify-center transition-all duration-300 group-hover:bg-black group-hover:border-black group-hover:text-white text-black shadow-sm group-hover:shadow-md">
+        <span className="shrink-0 w-12 h-12 rounded-full border border-border flex items-center justify-center transition-all duration-300 group-hover:bg-foreground group-hover:border-foreground group-hover:text-background text-foreground shadow-sm group-hover:shadow-md">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
           </svg>

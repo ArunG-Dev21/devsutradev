@@ -1,11 +1,9 @@
-import type {Route} from './+types/collections.all';
-import {useLoaderData, useSearchParams} from 'react-router';
-import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
-import type {CollectionItemFragment} from 'storefrontapi.generated';
-import {useMemo, useState} from 'react';
+import type { Route } from './+types/($locale).collections.all';
+import { useLoaderData, useSearchParams } from 'react-router';
+import { getPaginationVariables, Image, Money } from '@shopify/hydrogen';
+import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 
-type CategoryFilter = {
+import { useMemo, useState, useRef, useEffect } from 'react'; type CategoryFilter = {
   id: string;
   label: string;
   handle: string;
@@ -24,47 +22,47 @@ type FilterOption = {
 };
 
 const CATEGORY_FILTERS: CategoryFilter[] = [
-  {id: 'karingali', label: 'Karingali', handle: 'karingali'},
-  {id: 'rudraksha', label: 'Rudraksha', handle: 'rudraksha'},
-  {id: 'bracelets', label: 'Bracelets', handle: 'bracelets'},
+  { id: 'karungali', label: 'Karungali', handle: 'karungali' },
+  { id: 'Rudraksha', label: 'Rudraksha', handle: 'rudraksha' },
+  { id: 'bracelets', label: 'Bracelets', handle: 'bracelets' },
 ];
 
 const PRICE_FILTERS: PriceFilter[] = [
-  {id: 'under-500', label: 'Under Rs 500', min: 0, max: 499.99},
-  {id: '500-1500', label: 'Rs 500 - Rs 1,500', min: 500, max: 1500},
-  {id: '1500-5000', label: 'Rs 1,500 - Rs 5,000', min: 1500, max: 5000},
-  {id: 'above-5000', label: 'Above Rs 5,000', min: 5000.01, max: Number.MAX_SAFE_INTEGER},
+  { id: 'under-500', label: 'Under Rs 500', min: 0, max: 499.99 },
+  { id: '500-1500', label: 'Rs 500 - Rs 1,500', min: 500, max: 1500 },
+  { id: '1500-5000', label: 'Rs 1,500 - Rs 5,000', min: 1500, max: 5000 },
+  { id: 'above-5000', label: 'Above Rs 5,000', min: 5000.01, max: Number.MAX_SAFE_INTEGER },
 ];
 
 const SORT_OPTIONS = [
-  {label: 'Featured', value: 'featured'},
-  {label: 'Price: Low to High', value: 'price-asc'},
-  {label: 'Price: High to Low', value: 'price-desc'},
-  {label: 'Newest First', value: 'newest'},
-  {label: 'Best Selling', value: 'best-selling'},
+  { label: 'Featured', value: 'featured' },
+  { label: 'Price: Low to High', value: 'price-asc' },
+  { label: 'Price: High to Low', value: 'price-desc' },
+  { label: 'Newest First', value: 'newest' },
+  { label: 'Best Selling', value: 'best-selling' },
 ];
 
 const SORT_MAP: Record<
   string,
-  {sortKey: 'BEST_SELLING' | 'PRICE' | 'CREATED_AT'; reverse: boolean}
+  { sortKey: 'BEST_SELLING' | 'PRICE' | 'CREATED_AT'; reverse: boolean }
 > = {
-  featured: {sortKey: 'BEST_SELLING', reverse: true},
-  'best-selling': {sortKey: 'BEST_SELLING', reverse: true},
-  'price-asc': {sortKey: 'PRICE', reverse: false},
-  'price-desc': {sortKey: 'PRICE', reverse: true},
-  newest: {sortKey: 'CREATED_AT', reverse: true},
+  featured: { sortKey: 'BEST_SELLING', reverse: true },
+  'best-selling': { sortKey: 'BEST_SELLING', reverse: true },
+  'price-asc': { sortKey: 'PRICE', reverse: false },
+  'price-desc': { sortKey: 'PRICE', reverse: true },
+  newest: { sortKey: 'CREATED_AT', reverse: true },
 };
 
-const FILTER_GROUPS: Array<{id: 'category' | 'price'; label: string; options: FilterOption[]}> = [
+const FILTER_GROUPS: Array<{ id: 'category' | 'price'; label: string; options: FilterOption[] }> = [
   {
     id: 'category',
     label: 'Category',
-    options: CATEGORY_FILTERS.map(({id, label}) => ({id, label})),
+    options: CATEGORY_FILTERS.map(({ id, label }) => ({ id, label })),
   },
   {
     id: 'price',
     label: 'Price Range',
-    options: PRICE_FILTERS.map(({id, label}) => ({id, label})),
+    options: PRICE_FILTERS.map(({ id, label }) => ({ id, label })),
   },
 ];
 
@@ -72,59 +70,23 @@ const CATEGORY_BY_ID = new Map(CATEGORY_FILTERS.map((item) => [item.id, item]));
 const PRICE_BY_ID = new Map(PRICE_FILTERS.map((item) => [item.id, item]));
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'All Products | Devasutra - Sacred Living'}];
+  return [{ title: 'All Products | Devasutra - Sacred Living' }];
 };
 
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return {...deferredData, ...criticalData};
+  return { ...deferredData, ...criticalData };
 }
 
-async function loadCriticalData({context, request}: Route.LoaderArgs) {
-  const {storefront} = context;
+async function loadCriticalData({ context, request }: Route.LoaderArgs) {
+  const { storefront } = context;
+  const paginationVariables = getPaginationVariables(request, { pageBy: 8 });
   const url = new URL(request.url);
-  const paginationVariables = getPaginationVariables(request, {pageBy: 8});
-  const selectedCategoryIds = url.searchParams.getAll('category').filter(Boolean);
   const sort = url.searchParams.get('sort') || 'featured';
-  const {sortKey, reverse} = SORT_MAP[sort] ?? SORT_MAP.featured;
+  const { sortKey, reverse } = SORT_MAP[sort] ?? SORT_MAP.featured;
 
-  if (selectedCategoryIds.length > 0) {
-    const selectedHandles = selectedCategoryIds
-      .map((id) => CATEGORY_BY_ID.get(id)?.handle)
-      .filter(Boolean) as string[];
-
-    const categoryResults = await Promise.all(
-      selectedHandles.map((handle) =>
-        storefront.query(CATEGORY_COLLECTION_PRODUCTS_QUERY, {
-          variables: {handle, first: 120},
-        }),
-      ),
-    );
-
-    const mergedProducts = new Map<string, CollectionItemFragment>();
-
-    for (const result of categoryResults) {
-      const nodes = result.collection?.products?.nodes ?? [];
-      for (const node of nodes) mergedProducts.set(node.id, node);
-    }
-
-    const sortedNodes = sortProducts([...mergedProducts.values()], sort);
-
-    return {
-      products: {
-        nodes: sortedNodes,
-        pageInfo: {
-          hasPreviousPage: false,
-          hasNextPage: false,
-          startCursor: null,
-          endCursor: null,
-        },
-      },
-    };
-  }
-
-  const {products} = await storefront.query(CATALOG_QUERY, {
+  const { products } = await storefront.query(CATALOG_QUERY, {
     variables: {
       ...paginationVariables,
       sortKey,
@@ -132,34 +94,14 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     },
   });
 
-  return {products};
+  return { products };
 }
 
-function loadDeferredData({context}: Route.LoaderArgs) {
+function loadDeferredData({ context }: Route.LoaderArgs) {
   return {};
 }
 
-function sortProducts(products: CollectionItemFragment[], sort: string) {
-  const sorted = [...products];
-  if (sort === 'price-asc') {
-    sorted.sort(
-      (a, b) =>
-        Number(a.priceRange.minVariantPrice.amount) -
-        Number(b.priceRange.minVariantPrice.amount),
-    );
-  } else if (sort === 'price-desc') {
-    sorted.sort(
-      (a, b) =>
-        Number(b.priceRange.minVariantPrice.amount) -
-        Number(a.priceRange.minVariantPrice.amount),
-    );
-  } else if (sort === 'newest') {
-    sorted.sort(
-      (a, b) => Number(new Date(b.createdAt)) - Number(new Date(a.createdAt)),
-    );
-  }
-  return sorted;
-}
+
 
 function FilterSidebar({
   activeFilterIds,
@@ -171,46 +113,47 @@ function FilterSidebar({
   onClearAll: () => void;
 }) {
   return (
-    <div className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-sm sticky top-6">
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-neutral-500">
+    <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm sticky top-6">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/40">
+        <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
         </h2>
         {activeFilterIds.length > 0 && (
           <button
             onClick={onClearAll}
-            className="text-[10px] text-black tracking-wide underline underline-offset-2"
+            className="text-[10px] text-muted-foreground hover:text-foreground tracking-wide hover:underline transition-all underline-offset-4"
           >
             Clear all
           </button>
         )}
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {FILTER_GROUPS.map((group) => (
           <div key={group.label}>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-500 font-semibold mb-3">
+            <p className="text-xs tracking-wider uppercase text-foreground font-semibold mb-4">
               {group.label}
             </p>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {group.options.map((option) => {
                 const isActive = activeFilterIds.includes(option.id);
                 return (
-                  <label
+                  <button
                     key={option.id}
-                    className="flex items-center gap-2.5 cursor-pointer group"
+                    type="button"
+                    className="flex items-center gap-3 cursor-pointer group w-full text-left"
                     onClick={() => onToggleFilter(option.id)}
+                    aria-pressed={isActive}
                   >
                     <div
-                      className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-all duration-200 ${
-                        isActive
-                          ? 'bg-black border-black'
-                          : 'border-neutral-300 group-hover:border-black'
-                      }`}
+                      className={`w-4.5 h-4.5 rounded-[4px] border flex-shrink-0 flex items-center justify-center transition-all duration-200 ${isActive
+                        ? 'bg-foreground border-foreground'
+                        : 'border-muted-foreground/40 group-hover:border-foreground bg-background'
+                        }`}
                     >
                       {isActive && (
                         <svg
-                          className="w-2.5 h-2.5 text-white"
+                          className="w-3 h-3 text-background"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth={3}
@@ -225,15 +168,14 @@ function FilterSidebar({
                       )}
                     </div>
                     <span
-                      className={`text-xs transition-colors ${
-                        isActive
-                          ? 'text-black font-medium'
-                          : 'text-neutral-500 group-hover:text-black'
-                      }`}
+                      className={`text-[13px] transition-colors ${isActive
+                        ? 'text-foreground font-medium'
+                        : 'text-muted-foreground group-hover:text-foreground'
+                        }`}
                     >
                       {option.label}
                     </span>
-                  </label>
+                  </button>
                 );
               })}
             </div>
@@ -241,24 +183,90 @@ function FilterSidebar({
         ))}
       </div>
 
-      <div className="mt-6 pt-5 border-t border-neutral-200">
-        <div className="bg-neutral-50 rounded-xl p-3 text-center border border-neutral-100">
-          <p className="text-[10px] tracking-widest uppercase text-black font-semibold mb-1">
-            Free Shipping
-          </p>
-          <p className="text-[11px] text-neutral-500">On all orders above Rs 999</p>
+      <div className="mt-8 pt-6 border-t border-border/40">
+        <div className="bg-muted/30 rounded-xl p-4 text-center border border-border/50 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative z-10">
+            <p className="text-[11px] tracking-widest uppercase text-foreground font-bold mb-1.5 flex items-center justify-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+              Free Shipping
+            </p>
+            <p className="text-xs text-muted-foreground">On all orders above Rs 999</p>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
+function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange: (nextSort: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const activeOption = SORT_OPTIONS.find((o) => o.value === sort) || SORT_OPTIONS[0];
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-[180px] text-left text-xs border border-border rounded-xl px-4 py-2.5 bg-card text-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring cursor-pointer hover:bg-muted/50 transition-colors shadow-sm"
+      >
+        <span className="truncate block font-medium">{activeOption.label}</span>
+        <svg
+          className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ml-2 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 right-0 w-[180px] mt-2 bg-card border border-border rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+          <div className="py-1.5 max-h-60 overflow-auto">
+            {SORT_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => {
+                  onSortChange(option.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-4 py-2.5 text-xs transition-colors hover:bg-muted ${sort === option.value ? 'bg-muted/50 font-medium text-foreground' : 'text-muted-foreground'
+                  }`}
+              >
+                <span>{option.label}</span>
+                {sort === option.value && (
+                  <svg className="w-3.5 h-3.5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m4.5 12.75 6 6 9-13.5" />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Collection() {
-  const {products} = useLoaderData<typeof loader>();
+  const { products } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [activeCategoryIds, setActiveCategoryIds] = useState<string[]>([]);
   const sort = searchParams.get('sort') || 'featured';
-  const activeCategoryIds = searchParams.getAll('category').filter(Boolean);
   const activePriceIds = searchParams.getAll('price').filter(Boolean);
   const activeFilterIds = useMemo(
     () => [...activeCategoryIds, ...activePriceIds],
@@ -273,11 +281,16 @@ export default function Collection() {
   }, []);
 
   function toggleFilter(filterId: string) {
-    const key = CATEGORY_BY_ID.has(filterId)
-      ? 'category'
-      : PRICE_BY_ID.has(filterId)
-        ? 'price'
-        : 'filter';
+    if (CATEGORY_BY_ID.has(filterId)) {
+      setActiveCategoryIds((prev) =>
+        prev.includes(filterId)
+          ? prev.filter((id) => id !== filterId)
+          : [...prev, filterId],
+      );
+      return;
+    }
+
+    const key = PRICE_BY_ID.has(filterId) ? 'price' : 'filter';
     const next = new URLSearchParams(searchParams);
     const values = next.getAll(key);
 
@@ -295,8 +308,8 @@ export default function Collection() {
   }
 
   function clearAllFilters() {
+    setActiveCategoryIds([]);
     const next = new URLSearchParams(searchParams);
-    next.delete('category');
     next.delete('price');
     next.delete('filter');
     next.delete('cursor');
@@ -317,25 +330,47 @@ export default function Collection() {
     [activePriceIds],
   );
 
-  const filteredConnection = useMemo(() => {
-    if (activePriceFilters.length === 0) return products;
+  const activeCategoryHandles = useMemo(
+    () =>
+      activeCategoryIds
+        .map((id) => CATEGORY_BY_ID.get(id)?.handle)
+        .filter(Boolean) as string[],
+    [activeCategoryIds],
+  );
 
-    const filteredNodes = (products?.nodes ?? []).filter((product) => {
-      const price = Number(product.priceRange.minVariantPrice.amount);
-      return activePriceFilters.every((rule) => price >= rule.min && price <= rule.max);
+  const filteredConnection = useMemo(() => {
+    const hasCategory = activeCategoryHandles.length > 0;
+    const hasPrice = activePriceFilters.length > 0;
+    if (!hasCategory && !hasPrice) return products;
+
+    const filteredNodes = (products?.nodes ?? []).filter((product: any) => {
+      if (hasCategory) {
+        const productCollections: string[] =
+          product.collections?.nodes?.map((c: any) => c.handle) ?? [];
+        const matchesCategory = activeCategoryHandles.some((h) =>
+          productCollections.includes(h),
+        );
+        if (!matchesCategory) return false;
+      }
+      if (hasPrice) {
+        const price = Number(product.priceRange.minVariantPrice.amount);
+        if (!activePriceFilters.every((rule) => price >= rule.min && price <= rule.max))
+          return false;
+      }
+      return true;
     });
 
     return {
       ...products,
       nodes: filteredNodes,
     };
-  }, [activePriceFilters, products]);
+  }, [activeCategoryHandles, activePriceFilters, products]);
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa]">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="relative bg-neutral-950 overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/60 dark:bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400 rounded-full blur-3xl" />
         </div>
         <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
@@ -343,7 +378,7 @@ export default function Collection() {
           <div className="absolute w-[320px] h-[320px] border border-white rounded-full" />
           <div className="absolute w-[160px] h-[160px] border border-white rounded-full" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
           <p className="text-[10px] tracking-[0.4em] uppercase text-neutral-400 mb-3">
             Handpicked and Energised
           </p>
@@ -368,18 +403,20 @@ export default function Collection() {
 
           {mobileFiltersOpen && (
             <div className="fixed inset-0 z-50 lg:hidden">
-              <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              <button
+                type="button"
+                aria-label="Close filters"
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm border-0 p-0"
                 onClick={() => setMobileFiltersOpen(false)}
               />
-              <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl overflow-y-auto p-5 border-r border-neutral-200">
+              <div className="absolute left-0 top-0 h-full w-72 bg-card text-card-foreground shadow-xl overflow-y-auto p-5 border-r border-border">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-neutral-500">
+                  <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground">
                     Filters
                   </h2>
                   <button
                     onClick={() => setMobileFiltersOpen(false)}
-                    className="text-neutral-500 hover:text-black text-2xl leading-none"
+                    className="text-muted-foreground hover:text-foreground text-2xl leading-none"
                   >
                     x
                   </button>
@@ -398,28 +435,18 @@ export default function Collection() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setMobileFiltersOpen(true)}
-                  className="lg:hidden flex items-center gap-2 px-3 py-2 border border-neutral-300 rounded-xl text-xs text-neutral-600 hover:bg-neutral-100 hover:text-black transition-colors"
+                  className="lg:hidden flex items-center gap-2 px-3 py-2 border border-border rounded-xl text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 >
                   Filters
                 </button>
-                <p className="text-xs text-neutral-500 tracking-wide">Browsing all products</p>
+                <p className="text-xs text-muted-foreground tracking-wide">Browsing all products</p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] tracking-widest uppercase text-neutral-500 hidden sm:block">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] tracking-widest uppercase text-muted-foreground hidden sm:block font-medium">
                   Sort by
                 </span>
-                <select
-                  value={sort}
-                  onChange={(e) => handleSortChange(e.target.value)}
-                  className="text-xs border border-neutral-200 rounded-xl px-3 py-2 bg-white text-black focus:outline-none focus:border-neutral-300 focus:ring-1 focus:ring-neutral-300 cursor-pointer"
-                >
-                  {SORT_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <CustomSortDropdown sort={sort} onSortChange={handleSortChange} />
               </div>
             </div>
 
@@ -428,12 +455,12 @@ export default function Collection() {
                 {activeFilterIds.map((filterId) => (
                   <span
                     key={filterId}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-black text-xs rounded-full border border-neutral-200 shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted text-foreground text-xs rounded-full border border-border shadow-sm"
                   >
                     {labelById[filterId] ?? filterId}
                     <button
                       onClick={() => toggleFilter(filterId)}
-                      className="text-neutral-500 hover:text-black transition-colors leading-none"
+                      className="text-muted-foreground hover:text-foreground transition-colors leading-none"
                     >
                       x
                     </button>
@@ -442,15 +469,15 @@ export default function Collection() {
               </div>
             )}
 
-            <PaginatedResourceSection<CollectionItemFragment>
+            <PaginatedResourceSection
               connection={filteredConnection}
               resourcesClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"
             >
-              {({node: product, index}) => (
+              {({ node: product, index }) => (
                 <a
                   key={product.id}
                   href={`/products/${product.handle}`}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-neutral-200"
+                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-border"
                 >
                   <div className="aspect-square bg-neutral-100 overflow-hidden relative">
                     {product.featuredImage ? (
@@ -462,23 +489,23 @@ export default function Collection() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-neutral-100">
-                        <span className="text-5xl opacity-20 text-black">*</span>
+                        <span className="text-5xl opacity-20 text-muted-foreground">*</span>
                       </div>
                     )}
-                    <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-neutral-300 rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-neutral-300 rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-border rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-border rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="absolute top-2.5 right-2.5">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-neutral-200 text-black text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-background border border-border text-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
                         Certified
                       </span>
                     </div>
                   </div>
 
                   <div className="p-3.5 flex flex-col flex-1">
-                    <p className="text-[10px] tracking-[0.15em] uppercase text-neutral-500 mb-1">
+                    <p className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground mb-1">
                       Devasutra
                     </p>
-                    <h3 className="text-base font-semibold text-black mb-2 leading-snug line-clamp-2">
+                    <h3 className="text-base font-semibold text-foreground mb-2 leading-snug line-clamp-2">
                       {product.title}
                     </h3>
 
@@ -486,12 +513,12 @@ export default function Collection() {
                       <div>
                         <Money
                           data={product.priceRange.minVariantPrice}
-                          className="text-sm font-bold text-black"
+                          className="text-sm font-bold text-foreground"
                         />
                         {product.priceRange.maxVariantPrice.amount !==
                           product.priceRange.minVariantPrice.amount && (
-                          <span className="text-[10px] text-neutral-500 ml-1">onwards</span>
-                        )}
+                            <span className="text-[10px] text-muted-foreground ml-1">onwards</span>
+                          )}
                       </div>
                       <span className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors group-hover:bg-neutral-800">
                         Add
@@ -504,9 +531,9 @@ export default function Collection() {
 
             {!(filteredConnection?.nodes?.length > 0) && (
               <div className="text-center py-24">
-                <span className="text-6xl text-neutral-200 block mb-4">*</span>
-                <h3 className="text-xl font-bold text-black mb-2">No products found</h3>
-                <p className="text-sm text-neutral-500 mb-6">
+                <span className="text-6xl text-muted-foreground/30 block mb-4">*</span>
+                <h3 className="text-xl font-bold text-foreground mb-2">No products found</h3>
+                <p className="text-sm text-muted-foreground mb-6">
                   Try adjusting your filters or browse all categories.
                 </p>
                 <a
@@ -550,6 +577,12 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
         ...MoneyCollectionItem
       }
     }
+    collections(first: 10) {
+      nodes {
+        handle
+        title
+      }
+    }
   }
 ` as const;
 
@@ -586,21 +619,4 @@ const CATALOG_QUERY = `#graphql
   ${COLLECTION_ITEM_FRAGMENT}
 ` as const;
 
-const CATEGORY_COLLECTION_PRODUCTS_QUERY = `#graphql
-  query CollectionProducts(
-    $country: CountryCode
-    $language: LanguageCode
-    $handle: String!
-    $first: Int!
-  ) @inContext(country: $country, language: $language) {
-    collection(handle: $handle) {
-      products(first: $first) {
-        nodes {
-          ...CollectionItem
-        }
-      }
-    }
-  }
-  ${COLLECTION_ITEM_FRAGMENT}
-` as const;
 

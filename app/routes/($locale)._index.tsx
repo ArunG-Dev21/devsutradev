@@ -1,5 +1,5 @@
 import { useLoaderData } from 'react-router';
-import type { Route } from './+types/_index';
+import type { Route } from './+types/($locale)._index';
 import { Hero } from '~/components/Hero';
 import { TrustBadges } from '~/components/TrustBadges';
 

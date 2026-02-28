@@ -4,16 +4,17 @@ import {
   useOptimisticCart,
   type OptimisticCartLine,
 } from '@shopify/hydrogen';
-import {useEffect, useMemo, useRef, useState} from 'react';
-import {Link, useFetcher} from 'react-router';
-import {Navigation} from 'swiper/modules';
-import {Swiper, SwiperSlide} from 'swiper/react';
-import type {Swiper as SwiperType} from 'swiper/types';
-import type {CartApiQueryFragment} from 'storefrontapi.generated';
-import {useAside} from '~/components/Aside';
-import {CartLineItem, type CartLine} from '~/components/CartLineItem';
-import {CartSummary} from './CartSummary';
-import {FREE_SHIPPING_THRESHOLD} from '~/lib/constants';
+import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useFetcher } from 'react-router';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import type { Swiper as SwiperType } from 'swiper/types';
+import type { CartApiQueryFragment } from 'storefrontapi.generated';
+import { useAside } from '~/components/Aside';
+import { CartLineItem, type CartLine } from '~/components/CartLineItem';
+import { CartSummary } from './CartSummary';
+import { FREE_SHIPPING_THRESHOLD } from '~/lib/constants';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
@@ -24,7 +25,7 @@ export type CartMainProps = {
   layout: CartLayout;
 };
 
-export type LineItemChildrenMap = {[parentId: string]: CartLine[]};
+export type LineItemChildrenMap = { [parentId: string]: CartLine[] };
 
 function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
   const children: LineItemChildrenMap = {};
@@ -45,9 +46,9 @@ function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
   return children;
 }
 
-export function CartMain({layout, cart: originalCart}: CartMainProps) {
+export function CartMain({ layout, cart: originalCart }: CartMainProps) {
   const cart = useOptimisticCart(originalCart);
-  const {close} = useAside();
+  const { close } = useAside();
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
@@ -67,29 +68,28 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
 
   return (
     <div
-      className={`h-full flex ${
-        layout === 'page' && cartHasItems
-          ? 'flex-col lg:flex-row gap-8 lg:gap-12 items-start'
-          : 'flex-col'
-      } bg-white`}
+      className={`h-full flex ${layout === 'page' && cartHasItems
+        ? 'flex-col lg:flex-row gap-8 lg:gap-12 items-start'
+        : 'flex-col'
+        } bg-transparent text-foreground`}
     >
       {layout === 'aside' && cartHasItems && (
-        <div className="px-5 py-3.5 bg-white border-b border-gray-200">
+        <div className="px-5 py-3.5 bg-card border-b border-border">
           {remaining > 0 ? (
             <>
-              <p className="text-[11px] text-stone-500 mb-2 tracking-wide">
-                Add <span className="font-bold text-stone-900">Rs {remaining.toFixed(0)}</span>{' '}
+              <p className="text-[11px] text-muted-foreground mb-2 tracking-wide">
+                Add <span className="font-bold text-foreground">Rs {remaining.toFixed(0)}</span>{' '}
                 more for free shipping
               </p>
-              <div className="w-full h-1 bg-stone-200 rounded-full overflow-hidden">
+              <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-stone-900 rounded-full transition-all duration-500"
-                  style={{width: `${shippingProgress}%`}}
+                  className="h-full bg-foreground rounded-full transition-all duration-500"
+                  style={{ width: `${shippingProgress}%` }}
                 />
               </div>
             </>
           ) : (
-            <p className="text-[11px] font-semibold text-stone-900 tracking-wide">
+            <p className="text-[11px] font-semibold text-foreground tracking-wide">
               You qualify for free shipping.
             </p>
           )}
@@ -97,9 +97,8 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
       )}
 
       <div
-        className={`flex-1 overflow-y-auto ${
-          layout === 'aside' ? 'px-5' : 'w-full lg:w-3/5 xl:w-2/3'
-        }`}
+        className={`flex-1 overflow-y-auto ${layout === 'aside' ? 'px-5' : 'w-full lg:w-3/5 xl:w-2/3'
+          }`}
       >
         <CartEmpty hidden={linesCount} layout={layout} />
         <ul>
@@ -131,9 +130,8 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
 
       {cartHasItems && (
         <div
-          className={`${
-            layout === 'page' ? 'w-full lg:w-2/5 xl:w-1/3 lg:sticky lg:top-8' : ''
-          }`}
+          className={`${layout === 'page' ? 'w-full lg:w-2/5 xl:w-1/3 lg:sticky lg:top-8' : ''
+            }`}
         >
           <CartSummary cart={cart} layout={layout} />
         </div>
@@ -154,10 +152,10 @@ type RecommendedProduct = {
     height?: number | null;
   } | null;
   priceRange: {
-    minVariantPrice: {amount: string; currencyCode: string};
-    maxVariantPrice?: {amount: string; currencyCode: string};
+    minVariantPrice: { amount: string; currencyCode: CurrencyCode };
+    maxVariantPrice?: { amount: string; currencyCode: CurrencyCode };
   };
-  variant?: {id: string; availableForSale: boolean} | null;
+  variant?: { id: string; availableForSale: boolean } | null;
 };
 
 function CartRecommendations({
@@ -169,7 +167,7 @@ function CartRecommendations({
   excludeProductIds: string[];
   onNavigateAway: () => void;
 }) {
-  const fetcher = useFetcher<{products: RecommendedProduct[]}>();
+  const fetcher = useFetcher<{ products: RecommendedProduct[] }>();
   const limit = layout === 'aside' ? 8 : 8;
   const exclude = excludeProductIds.join(',');
   const loadKey = `${limit}:${exclude}`;
@@ -177,12 +175,13 @@ function CartRecommendations({
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(layout === 'aside' ? 8 : 3);
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return;
     if (lastLoadedKeyRef.current === loadKey) return;
     lastLoadedKeyRef.current = loadKey;
-    fetcher.load(
+    void fetcher.load(
       `/api/recommendations?limit=${limit}&exclude=${encodeURIComponent(exclude)}`,
     );
   }, [exclude, fetcher, limit, loadKey]);
@@ -193,7 +192,7 @@ function CartRecommendations({
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-stone-400">
+        <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-stone-400 dark:text-stone-400">
           You may also like
         </p>
         {layout === 'aside' && (
@@ -202,19 +201,23 @@ function CartRecommendations({
               type="button"
               onClick={() => swiper?.slidePrev()}
               disabled={!swiper || isBeginning}
-              className="w-7 h-7 rounded-full border border-stone-300 text-stone-700 text-xs disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-stone-100 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               aria-label="Previous recommendations"
             >
-              ‹
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+              </svg>
             </button>
             <button
               type="button"
               onClick={() => swiper?.slideNext()}
               disabled={!swiper || isEnd}
-              className="w-7 h-7 rounded-full border border-stone-300 text-stone-700 text-xs disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-stone-100 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               aria-label="Next recommendations"
             >
-              ›
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+              </svg>
             </button>
           </div>
         )}
@@ -235,8 +238,8 @@ function CartRecommendations({
             setIsEnd(instance.isEnd);
           }}
           breakpoints={{
-            540: {slidesPerView: 1.5, spaceBetween: 12},
-            700: {slidesPerView: 2, spaceBetween: 12},
+            540: { slidesPerView: 1.5, spaceBetween: 12 },
+            700: { slidesPerView: 2, spaceBetween: 12 },
           }}
           className="pb-1"
         >
@@ -251,14 +254,27 @@ function CartRecommendations({
           ))}
         </Swiper>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
-          {products.map((product) => (
-            <RecommendationCard
-              key={product.id}
-              product={product}
-              onNavigateAway={onNavigateAway}
-            />
-          ))}
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            {products.slice(0, visibleCount).map((product) => (
+              <RecommendationCard
+                key={product.id}
+                product={product}
+                onNavigateAway={onNavigateAway}
+              />
+            ))}
+          </div>
+
+          {visibleCount < products.length && (
+            <div className="flex justify-center mt-2">
+              <button
+                onClick={() => setVisibleCount((prev) => prev + 3)}
+                className="px-8 py-3 w-full sm:w-auto rounded-full text-[10px] font-medium tracking-widest uppercase text-stone-900 dark:text-stone-100 bg-transparent border border-stone-900/30 dark:border-white/30 hover:bg-stone-900 hover:text-stone-50 dark:hover:bg-white dark:hover:text-stone-900 hover:border-stone-900 dark:hover:border-white transition-all duration-300 cursor-pointer"
+              >
+                View More
+              </button>
+            </div>
+          )}
         </div>
       )}
     </section>
@@ -279,14 +295,14 @@ function RecommendationCard({
   const badgeTag = product.tags?.[0];
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-neutral-200">
+    <div className="group bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-border h-full relative">
       <Link
         to={`/products/${product.handle}`}
         onClick={onNavigateAway}
         className="no-underline block"
         prefetch="intent"
       >
-        <div className="aspect-square bg-neutral-100 overflow-hidden relative">
+        <div className={`${compact ? 'aspect-square' : 'aspect-[4/5]'} bg-muted overflow-hidden relative`}>
           {product.featuredImage?.url ? (
             <img
               src={product.featuredImage.url}
@@ -295,16 +311,41 @@ function RecommendationCard({
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-neutral-100">
-              <span className="text-5xl opacity-20 text-black">*</span>
+            <div className="w-full h-full flex items-center justify-center bg-muted">
+              <span className="text-5xl opacity-20 text-muted-foreground">*</span>
             </div>
           )}
-          <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-neutral-300 rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-neutral-300 rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute top-2.5 right-2.5">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-neutral-200 text-black text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
-              Certified
-            </span>
+          <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-border rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-border rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-2">
+            {badgeTag && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-background border border-border text-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
+                Certified
+              </span>
+            )}
+
+            {canAdd ? (
+              <CartForm
+                route="/cart"
+                action={CartForm.ACTIONS.LinesAdd}
+                inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1 }] }}
+              >
+                <button
+                  type="submit"
+                  title="Add to Cart"
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-black/80 dark:bg-white/90 text-white dark:text-black hover:bg-black dark:hover:bg-white backdrop-blur-sm border border-stone-800/20 dark:border-white/20 shadow-md transition-all cursor-pointer opacity-90 hover:opacity-100 hover:scale-105"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+              </CartForm>
+            ) : (
+              <span className="inline-flex items-center justify-center px-2.5 py-1 bg-muted/90 backdrop-blur-sm border border-border/50 text-muted-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
+                Sold Out
+              </span>
+            )}
           </div>
         </div>
       </Link>
@@ -323,10 +364,10 @@ function RecommendationCard({
         <Link
           to={`/products/${product.handle}`}
           onClick={onNavigateAway}
-          className="no-underline"
+          className="no-underline group-hover/title:underline"
           prefetch="intent"
         >
-          <h3 className="text-sm font-semibold text-black mb-2 leading-snug line-clamp-2">
+          <h3 className={`${compact ? 'text-sm' : 'text-base font-medium'} text-foreground mb-2 leading-snug line-clamp-2`}>
             {product.title}
           </h3>
         </Link>
@@ -334,29 +375,10 @@ function RecommendationCard({
         <div className="mt-auto">
           <Money
             data={product.priceRange.minVariantPrice}
-            className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-black`}
+            className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-foreground`}
           />
         </div>
       </div>
-
-      {canAdd ? (
-        <CartForm
-          route="/cart"
-          action={CartForm.ACTIONS.LinesAdd}
-          inputs={{lines: [{merchandiseId: variantId!, quantity: 1}]}}
-        >
-          <button
-            type="submit"
-            className="w-full py-3 text-[10px] tracking-[0.18em] uppercase font-semibold bg-black text-white hover:bg-neutral-800 transition-colors cursor-pointer"
-          >
-            Add
-          </button>
-        </CartForm>
-      ) : (
-        <div className="w-full py-3 text-center text-[10px] tracking-[0.18em] uppercase font-semibold text-stone-400 bg-white border-t border-stone-100">
-          Sold out
-        </div>
-      )}
     </div>
   );
 }
@@ -368,10 +390,10 @@ function CartEmpty({
   hidden: boolean;
   layout?: CartMainProps['layout'];
 }) {
-  const {close} = useAside();
+  const { close } = useAside();
   return (
     <div hidden={hidden} className="flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mb-5">
+      <div className="w-16 h-16 rounded-full bg-stone-100 dark:bg-stone-900/50 flex items-center justify-center mb-5 border border-transparent dark:border-white/10">
         <svg
           className="w-7 h-7 text-stone-400"
           fill="none"
@@ -387,8 +409,8 @@ function CartEmpty({
         </svg>
       </div>
 
-      <p className="text-base font-semibold text-stone-900 mb-1">Your cart is empty</p>
-      <p className="text-xs text-stone-400 mb-8 leading-relaxed">
+      <p className="text-base font-semibold text-stone-900 dark:text-stone-100 mb-1">Your cart is empty</p>
+      <p className="text-xs text-stone-400 dark:text-stone-500 mb-8 leading-relaxed">
         Looks like you have not added anything yet.
       </p>
 
@@ -396,7 +418,7 @@ function CartEmpty({
         to="/collections/all"
         onClick={close}
         prefetch="viewport"
-        className="no-underline inline-flex items-center gap-2 px-6 py-2.5 bg-stone-900 text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-stone-700 transition-colors duration-200"
+        className="no-underline inline-flex items-center gap-2 px-6 py-2.5 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-stone-700 dark:hover:bg-white transition-colors duration-200"
       >
         Start shopping
         <svg
@@ -416,4 +438,3 @@ function CartEmpty({
     </div>
   );
 }
-

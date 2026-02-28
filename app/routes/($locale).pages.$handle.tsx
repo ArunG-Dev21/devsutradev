@@ -1,5 +1,5 @@
 import {useLoaderData} from 'react-router';
-import type {Route} from './+types/pages.$handle';
+import type {Route} from './+types/($locale).pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
@@ -58,14 +58,14 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className="bg-white text-black min-h-screen">
+    <div className="bg-background text-foreground min-h-screen">
       {/* Hero Section */}
-      <section className="border-b border-neutral-200 py-20 px-6 text-center">
+      <section className="border-b border-border py-20 px-6 text-center">
         <h1 className="text-4xl md:text-5xl font-serif tracking-wide uppercase">
           {page.title}
         </h1>
 
-        <div className="mt-4 w-16 h-[2px] bg-black mx-auto" />
+        <div className="mt-4 w-16 h-[2px] bg-foreground mx-auto" />
       </section>
 
       {/* Content Section */}
@@ -75,12 +75,13 @@ export default function Page() {
             prose
             prose-neutral
             max-w-none
+            dark:prose-invert
             prose-headings:font-serif
             prose-headings:tracking-wide
-            prose-p:text-neutral-700
+            prose-p:text-muted-foreground
             prose-p:leading-relaxed
-            prose-strong:text-black
-            prose-a:text-black
+            prose-strong:text-foreground
+            prose-a:text-foreground
             prose-a:no-underline
             hover:prose-a:underline
           "

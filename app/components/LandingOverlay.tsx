@@ -16,12 +16,8 @@ export function LandingOverlay() {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-
-        // Check if we've already shown the overlay in this session
-        const hasShown = sessionStorage.getItem('devasutra_overlay_shown');
-        if (!hasShown) {
-            setShow(true);
-        }
+        // Always show overlay on every page load
+        setShow(true);
     }, []);
 
     const handleEnter = () => {
@@ -29,8 +25,7 @@ export function LandingOverlay() {
         init();
         unlock();
 
-        // Mark as shown in session storage
-        sessionStorage.setItem('devasutra_overlay_shown', 'true');
+
 
         setExiting(true);
 
@@ -142,7 +137,7 @@ export function LandingOverlay() {
                 </div>
 
                 {/* Enter Button at bottom center */}
-                <div className="absolute bottom-10 sm:bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 text-center px-4 w-full max-w-md">
+                <div className="absolute bottom-24 sm:bottom-28 md:bottom-20 left-1/2 -translate-x-1/2 text-center px-4 w-full max-w-md">
                     <button
                         onClick={handleEnter}
                         className="group relative overflow-hidden px-8 sm:px-12 py-3.5 sm:py-5 rounded-full transition-all duration-700 cursor-pointer animate-pulse-slow w-full sm:w-auto"

@@ -1,5 +1,5 @@
 import {Link} from 'react-router';
-import type {Route} from './+types/pages._index';
+import type {Route} from './+types/($locale).pages._index';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: 'Pages | Devasutra'}];
@@ -20,13 +20,13 @@ const PAGE_LINKS = [
 
 export default function PagesIndexRoute() {
   return (
-    <div className="min-h-screen bg-[#f5f7fa]">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="relative bg-neutral-950 overflow-hidden">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/60 dark:bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400 rounded-full blur-3xl" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">Pages</h1>
           <p className="text-sm text-neutral-300 max-w-xl mx-auto">
             Explore essential information about Devasutra.
@@ -40,16 +40,16 @@ export default function PagesIndexRoute() {
             <Link
               key={page.href}
               to={page.href}
-              className="group bg-white rounded-2xl border border-neutral-200 p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all no-underline"
+              className="group bg-card text-card-foreground rounded-2xl border border-border p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all no-underline"
             >
-              <p className="text-[10px] tracking-[0.2em] uppercase text-neutral-500 mb-3">
+              <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-3">
                 Page
               </p>
-              <h2 className="text-2xl font-semibold text-black mb-3 group-hover:text-neutral-700 transition-colors">
+              <h2 className="text-2xl font-semibold text-foreground mb-3 group-hover:text-muted-foreground transition-colors">
                 {page.title}
               </h2>
-              <p className="text-sm text-neutral-500 mb-6">{page.description}</p>
-              <span className="inline-flex items-center gap-2 text-xs tracking-[0.15em] uppercase font-semibold text-black">
+              <p className="text-sm text-muted-foreground mb-6">{page.description}</p>
+              <span className="inline-flex items-center gap-2 text-xs tracking-[0.15em] uppercase font-semibold text-foreground">
                 Open
                 <svg
                   className="w-3.5 h-3.5"
@@ -72,4 +72,3 @@ export default function PagesIndexRoute() {
     </div>
   );
 }
-

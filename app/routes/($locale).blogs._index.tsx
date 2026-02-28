@@ -1,72 +1,130 @@
-import {Link, useLoaderData} from 'react-router';
-import type {Route} from './+types/blogs._index';
-import {getPaginationVariables} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
-import type {BlogsQuery} from 'storefrontapi.generated';
-
-type BlogNode = BlogsQuery['blogs']['nodes'][0];
+import { Link, useLoaderData } from 'react-router';
+import type { Route } from './+types/($locale).blogs._index';
+import { getPaginationVariables, Image } from '@shopify/hydrogen';
+import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Blogs`}];
+  return [{ title: `Devasutra | Blog` }];
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
-  return {...deferredData, ...criticalData};
+  return { ...deferredData, ...criticalData };
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
-async function loadCriticalData({context, request}: Route.LoaderArgs) {
+async function loadCriticalData({ context, request }: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
-    pageBy: 10,
+    pageBy: 12,
   });
 
-  const [{blogs}] = await Promise.all([
+  const [{ blogs }] = await Promise.all([
     context.storefront.query(BLOGS_QUERY, {
       variables: {
         ...paginationVariables,
       },
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {blogs};
+  return { blogs };
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({context}: Route.LoaderArgs) {
+function loadDeferredData({ context }: Route.LoaderArgs) {
   return {};
 }
 
+interface BlogNode {
+  title: string;
+  handle: string;
+  seo: { title: string | null; description: string | null };
+  articles: {
+    nodes: Array<{
+      id: string;
+      title: string;
+      handle: string;
+      publishedAt: string;
+      image: { id: string; altText: string | null; url: string; width: number; height: number } | null;
+      excerpt: string | null;
+      blog: { handle: string };
+    }>;
+  };
+}
+
 export default function Blogs() {
-  const {blogs} = useLoaderData<typeof loader>();
+  const { blogs } = useLoaderData<typeof loader>();
 
   return (
-    <div className="blogs">
-      <h1>Blogs</h1>
-      <div className="blogs-grid">
+    <div className="blog-index-page">
+      {/* Hero Header */}
+      <div className="blog-hero">
+        <div className="blog-hero-content">
+          <h1 className="blog-hero-title">Our Blog</h1>
+          <p className="blog-hero-subtitle">
+            Insights, stories, and wisdom from the world of sacred traditions
+          </p>
+        </div>
+      </div>
+
+      {/* Blog Sections */}
+      <div className="blog-index-container">
         <PaginatedResourceSection<BlogNode> connection={blogs}>
-          {({node: blog}) => (
-            <Link
-              className="blog"
-              key={blog.handle}
-              prefetch="intent"
-              to={`/blogs/${blog.handle}`}
-            >
-              <h2>{blog.title}</h2>
-            </Link>
+          {({ node: blog }) => (
+            <div key={blog.handle} className="blog-section">
+              <div className="blog-section-header">
+                <h2 className="blog-section-title">{blog.title}</h2>
+                <Link
+                  to={`/blogs/${blog.handle}`}
+                  className="blog-section-link"
+                  prefetch="intent"
+                >
+                  View all →
+                </Link>
+              </div>
+
+              {blog.articles.nodes.length > 0 ? (
+                <div className="blog-articles-grid">
+                  {blog.articles.nodes.map((article, index) => {
+                    const publishedAt = new Intl.DateTimeFormat('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    }).format(new Date(article.publishedAt));
+
+                    return (
+                      <Link
+                        key={article.id}
+                        to={`/blogs/${article.blog.handle}/${article.handle}`}
+                        className={`blog-card ${index === 0 ? 'blog-card-featured' : ''}`}
+                        prefetch="intent"
+                      >
+                        {article.image && (
+                          <div className="blog-card-image">
+                            <Image
+                              alt={article.image.altText || article.title}
+                              data={article.image}
+                              sizes={index === 0 ? '(min-width: 768px) 60vw, 100vw' : '(min-width: 768px) 30vw, 100vw'}
+                              loading={index < 2 ? 'eager' : 'lazy'}
+                            />
+                          </div>
+                        )}
+                        <div className="blog-card-body">
+                          <time className="blog-card-date">{publishedAt}</time>
+                          <h3 className="blog-card-title">{article.title}</h3>
+                          {article.excerpt && (
+                            <p className="blog-card-excerpt">{article.excerpt}</p>
+                          )}
+                          <span className="blog-card-read-more">Read more →</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="blog-empty-message">
+                  No articles published yet. Check back soon!
+                </p>
+              )}
+            </div>
           )}
         </PaginatedResourceSection>
       </div>
@@ -74,7 +132,6 @@ export default function Blogs() {
   );
 }
 
-// NOTE: https://shopify.dev/docs/api/storefront/latest/objects/blog
 const BLOGS_QUERY = `#graphql
   query Blogs(
     $country: CountryCode
@@ -102,6 +159,25 @@ const BLOGS_QUERY = `#graphql
         seo {
           title
           description
+        }
+        articles(first: 4, sortKey: PUBLISHED_AT, reverse: true) {
+          nodes {
+            id
+            title
+            handle
+            publishedAt
+            excerpt: excerptHtml
+            image {
+              id
+              altText
+              url
+              width
+              height
+            }
+            blog {
+              handle
+            }
+          }
         }
       }
     }

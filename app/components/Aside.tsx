@@ -59,28 +59,30 @@ export function Aside({
       role="dialog"
     >
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity"
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity border-0 p-0"
         onClick={close}
+        aria-label="Close dialog"
       />
 
       {/* Aside Panel */}
       <aside
-        className={`absolute top-0 right-0 w-[min(420px,100vw)] h-[100dvh] bg-white text-stone-900 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${expanded ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`absolute top-0 right-0 w-[min(420px,100vw)] h-[100dvh] bg-card text-card-foreground shadow-2xl flex flex-col transition-transform duration-300 ease-out ${expanded ? 'translate-x-0' : 'translate-x-full'}`}
       >
-        <header className="flex items-center justify-between h-16 px-6 border-b border-stone-100 shrink-0">
+        <header className="flex items-center justify-between h-16 px-6 border-b border-border shrink-0">
           <h3 className="m-0 text-[0.75rem] font-semibold tracking-[0.15em] uppercase">
             {heading}
           </h3>
           <button
-            className="p-2 -mr-2 text-stone-400 hover:text-stone-900 transition-colors bg-transparent border-none cursor-pointer flex items-center justify-center hover:no-underline"
+            className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer flex items-center justify-center hover:no-underline"
             onClick={close}
             aria-label="Close"
           >
             <span className="text-3xl leading-none font-light">&times;</span>
           </button>
         </header>
-        <main className="flex-1 overflow-y-auto bg-white flex flex-col m-0">
+        <main className="flex-1 overflow-y-auto bg-card flex flex-col m-0">
           {children}
         </main>
       </aside>

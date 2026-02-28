@@ -16,7 +16,7 @@ import {
 } from '~/components/SearchFormPredictive';
 import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
 import { LandingOverlay } from '~/components/LandingOverlay';
-import { AudioToggle } from '~/components/AudioToggle';
+import { FloatingControls } from '~/components/FloatingControls';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -38,7 +38,7 @@ export function PageLayout({
   return (
     <Aside.Provider>
       <LandingOverlay />
-      <AudioToggle />
+      <FloatingControls />
       <CartAside cart={cart} />
       <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
@@ -51,7 +51,7 @@ export function PageLayout({
         />
       )}
       <RouteBreadcrumbBanner />
-      <main>{children}</main>
+      <main className='bg-background'>{children}</main>
       <Footer
         footer={footer}
         header={header}
@@ -217,7 +217,7 @@ function SearchAside() {
                       fontWeight: 600,
                     }}
                   >
-                    View all results for "{term.current}" →
+                    View all results for &quot;{term.current}&quot; →
                   </Link>
                 ) : null}
               </>

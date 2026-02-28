@@ -13,6 +13,7 @@
  * Aside (Cart / Search / Mobile Menu)
  * --------------------------------------------------
  */
+
 @media (max-width: 45em) {
   html:has(.overlay.expanded) {
     overflow: hidden;
@@ -149,27 +150,385 @@ input[type="text"] {
  * Blog
  * --------------------------------------------------
  */
-.blog-grid {
-  display: grid;
-  grid-gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  margin-bottom: 2rem;
+
+/* ── Blog Hero ── */
+.blog-hero {
+  background: var(--color-bg-dark);
+  color: var(--color-text-inverse, #fff);
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  position: relative;
 }
 
-.blog-article-image {
-  aspect-ratio: 3/2;
+.blog-hero-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.blog-hero-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.blog-hero-subtitle {
+  font-size: 0.95rem;
+  opacity: 0.7;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+}
+
+.blog-back-link {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.blog-back-link:hover {
+  opacity: 1;
+}
+
+/* ── Blog Index & Listing Containers ── */
+.blog-index-container,
+.blog-listing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+/* ── Blog Section ── */
+.blog-section {
+  margin-bottom: 3rem;
+}
+
+.blog-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-primary-border);
+}
+
+.blog-section-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.blog-section-link {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.blog-section-link:hover {
+  opacity: 1;
+}
+
+/* ── Blog Card Grid ── */
+.blog-articles-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .blog-articles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .blog-articles-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Blog Card ── */
+.blog-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-card, var(--color-bg-light));
+  border: 1px solid var(--color-primary-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  color: inherit;
+}
+
+.blog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.blog-card-featured {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 640px) {
+  .blog-card-featured {
+    flex-direction: row;
+  }
+
+  .blog-card-featured .blog-card-image {
+    flex: 1 1 55%;
+    max-height: none;
+  }
+
+  .blog-card-featured .blog-card-body {
+    flex: 1 1 45%;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .blog-card-featured .blog-card-title {
+    font-size: 1.6rem;
+  }
+}
+
+.blog-card-image {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.blog-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.blog-card:hover .blog-card-image img {
+  transform: scale(1.04);
+}
+
+.blog-card-body {
+  padding: 1.5rem;
+}
+
+.blog-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.blog-card-date {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.55;
+}
+
+.blog-card-author {
+  font-size: 0.7rem;
+  opacity: 0.55;
+  font-style: italic;
+}
+
+.blog-card-title {
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.blog-card-excerpt {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  opacity: 0.65;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.blog-card-read-more {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 500;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.blog-card:hover .blog-card-read-more {
+  opacity: 1;
+}
+
+.blog-empty-message {
+  text-align: center;
+  padding: 3rem;
+  opacity: 0.5;
+  font-size: 0.9rem;
+}
+
+/* ── Article Detail Page ── */
+.article-page {
+  min-height: 100vh;
+}
+
+.article-hero {
+  position: relative;
+  width: 100%;
+  max-height: 480px;
+  overflow: hidden;
+}
+
+.article-hero-image {
+  width: 100%;
+}
+
+.article-hero-image img {
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: cover;
   display: block;
 }
 
-.blog-article-image img {
-  height: 100%;
-  border-radius: 12px;
+.article-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, var(--color-bg-light, #fff) 100%);
+  pointer-events: none;
 }
 
-.article img {
-  height: auto;
+.article-content-wrapper {
+  max-width: 740px;
+  margin: -2rem auto 0;
+  padding: 0 1.5rem 5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.article-nav {
+  margin-bottom: 2rem;
+}
+
+.article-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.article-title {
+  font-size: 2rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .article-title {
+    font-size: 2.6rem;
+  }
+}
+
+.article-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.55;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.article-meta-separator {
+  opacity: 0.4;
+}
+
+.article-author {
+  font-style: normal;
+  display: inline;
+}
+
+.article-date {
+  display: inline;
+}
+
+/* ── Article Body (prose typography) ── */
+.article-body {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--color-text-main);
+}
+
+.article-body h2 {
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin: 2.5rem 0 1rem;
+  letter-spacing: 0.03em;
+}
+
+.article-body h3 {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 2rem 0 0.75rem;
+}
+
+.article-body p {
+  margin-bottom: 1.25rem;
+}
+
+.article-body img {
   width: 100%;
+  height: auto;
   border-radius: 12px;
+  margin: 1.5rem 0;
+}
+
+.article-body blockquote {
+  border-left: 3px solid var(--color-silver-dark, #999);
+  padding-left: 1.25rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.article-body ul,
+.article-body ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.article-body li {
+  margin-bottom: 0.5rem;
+}
+
+.article-body a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.3s;
+}
+
+.article-body a:hover {
+  opacity: 0.7;
+}
+
+.article-footer-nav {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-primary-border);
 }
 
 /*

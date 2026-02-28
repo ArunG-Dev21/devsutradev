@@ -11,7 +11,7 @@ import {
   useOutletContext,
   type Fetcher,
 } from 'react-router';
-import type { Route } from './+types/account.addresses';
+import type { Route } from './+types/($locale).account.addresses';
 import {
   UPDATE_ADDRESS_MUTATION,
   DELETE_ADDRESS_MUTATION,
@@ -262,8 +262,8 @@ export default function Addresses() {
 
   return (
     <div className="account-addresses">
-      <div className="mb-8 border-b border-neutral-100 pb-6">
-        <h2 className="text-2xl font-bold text-black tracking-tight">Your Addresses</h2>
+      <div className="mb-8 border-b border-border pb-6">
+        <h2 className="text-2xl font-bold text-foreground tracking-tight">Your Addresses</h2>
         <p className="text-sm text-neutral-500 mt-2">
           Manage the locations where your sacred items will be delivered.
         </p>
@@ -273,7 +273,7 @@ export default function Addresses() {
         {/* Add New Address Section */}
         <div>
           <h3 className="text-lg font-bold text-stone-900 mb-6">Add a New Address</h3>
-          <div className="bg-white rounded-3xl border border-neutral-200 p-6 shadow-sm">
+          <div className="bg-card text-card-foreground rounded-3xl border border-border p-6 shadow-sm">
             <NewAddressForm />
           </div>
         </div>
@@ -288,8 +288,8 @@ export default function Addresses() {
             />
           </div>
         ) : (
-          <div className="p-8 text-center bg-stone-50 rounded-2xl border border-neutral-200 border-dashed">
-            <p className="text-stone-500">You haven't saved any addresses yet.</p>
+          <div className="p-8 text-center bg-muted rounded-2xl border border-border border-dashed">
+            <p className="text-stone-500">You haven&apos;t saved any addresses yet.</p>
           </div>
         )}
       </div>
@@ -341,9 +341,9 @@ function ExistingAddresses({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {addresses.nodes.map((address) => (
-        <div key={address.id} className="bg-white rounded-3xl border border-neutral-200 p-6 shadow-sm relative group overflow-hidden">
+        <div key={address.id} className="bg-card text-card-foreground rounded-3xl border border-border p-6 shadow-sm relative group overflow-hidden">
           {defaultAddress?.id === address.id && (
-            <div className="absolute top-0 right-0 bg-stone-100 text-stone-600 text-[10px] font-bold tracking-wider uppercase px-4 py-1.5 rounded-bl-xl border-l border-b border-neutral-200">
+            <div className="absolute top-0 right-0 bg-muted text-muted-foreground text-[10px] font-bold tracking-wider uppercase px-4 py-1.5 rounded-bl-xl border-l border-b border-border">
               Default
             </div>
           )}
@@ -360,13 +360,13 @@ function ExistingAddresses({
                 {address.phoneNumber && <p className="text-stone-500 text-sm mt-1">{address.phoneNumber}</p>}
               </div>
 
-              <div className="mt-4 flex items-center justify-between pt-4 border-t border-neutral-100">
+              <div className="mt-4 flex items-center justify-between pt-4 border-t border-border">
                 <span className="text-xs font-semibold text-stone-900 group-open/details:hidden underline hover:text-stone-600 transition-colors">Edit Address</span>
                 <span className="text-xs font-semibold text-stone-900 hidden group-open/details:block underline hover:text-stone-600 transition-colors">Close Editor</span>
               </div>
             </summary>
 
-            <div className="mt-6 pt-6 border-t border-neutral-100">
+            <div className="mt-6 pt-6 border-t border-border">
               <AddressForm
                 addressId={address.id}
                 address={address}
@@ -419,7 +419,7 @@ export function AddressForm({
   const error = action?.error?.[addressId];
   const isDefaultAddress = defaultAddress?.id === addressId;
 
-  const inputClass = "w-full px-4 py-2.5 bg-stone-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-stone-900 focus:bg-white transition-colors text-sm";
+  const inputClass = "w-full px-4 py-2.5 bg-background text-foreground placeholder:text-muted-foreground border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-ring focus:bg-background transition-colors text-sm";
   const labelClass = "block text-xs font-semibold text-stone-700 mb-1.5";
 
   return (

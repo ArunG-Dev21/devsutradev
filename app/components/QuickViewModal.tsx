@@ -1,6 +1,6 @@
 import { Image, Money, CartForm } from '@shopify/hydrogen';
-import { Link } from 'react-router';
-import { useFetcher } from 'react-router';
+import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
+import { Link, useFetcher } from 'react-router';
 import { useEffect } from 'react';
 
 interface QuickViewModalProps {
@@ -8,9 +8,9 @@ interface QuickViewModalProps {
         id: string;
         title: string;
         handle: string;
-        featuredImage?: { url: string; altText?: string | null; width?: number; height?: number } | null;
+        featuredImage?: { url: string; altText?: string | null; width?: number | null; height?: number | null } | null;
         priceRange: {
-            minVariantPrice: { amount: string; currencyCode: string };
+            minVariantPrice: { amount: string; currencyCode: CurrencyCode };
         };
         variants?: {
             nodes: Array<{ id: string; availableForSale: boolean }>;
@@ -34,6 +34,13 @@ interface QuickViewModalProps {
 export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
     const firstVariant = product.variants?.nodes?.[0];
     const isAvailable = firstVariant?.availableForSale ?? false;
+    const normalizedFeaturedImage = product.featuredImage
+        ? {
+            ...product.featuredImage,
+            width: product.featuredImage.width ?? undefined,
+            height: product.featuredImage.height ?? undefined,
+        }
+        : null;
 
     // Use a fetcher to track when the cart mutation completes,
     // then close the modal automatically.
@@ -48,22 +55,25 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
     }, [fetcher.state, fetcher.data, onClose]);
 
     return (
-        <div
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6"
-            onClick={onClose}
-        >
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-md" />
+            <button
+                type="button"
+                aria-label="Close dialog"
+                className="absolute inset-0 bg-stone-900/40 backdrop-blur-md border-0 p-0"
+                onClick={onClose}
+            />
 
             {/* Modal */}
             <div
-                className="relative bg-white sm:rounded-2xl rounded-xl w-full max-w-[850px] shadow-2xl overflow-hidden flex flex-col md:flex-row transform transition-all"
-                onClick={(e) => e.stopPropagation()}
+                className="relative z-10 bg-card text-card-foreground sm:rounded-2xl rounded-xl w-full max-w-[850px] shadow-2xl overflow-hidden flex flex-col md:flex-row transform transition-all border border-border"
+                role="dialog"
+                aria-modal="true"
             >
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/80 hover:bg-stone-100 backdrop-blur-sm flex items-center justify-center text-stone-600 hover:text-stone-900 transition-colors cursor-pointer border border-stone-200"
+                    className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-card/80 hover:bg-muted backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border"
                     aria-label="Close"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -72,10 +82,10 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                 </button>
 
                 {/* Product Image */}
-                <div className="w-full md:w-1/2 aspect-square md:aspect-auto md:h-[550px] bg-stone-50 relative overflow-hidden group">
-                    {product.featuredImage ? (
+                <div className="w-full md:w-1/2 aspect-square md:aspect-auto md:h-[550px] bg-muted relative overflow-hidden group">
+                    {normalizedFeaturedImage ? (
                         <Image
-                            data={product.featuredImage}
+                            data={normalizedFeaturedImage}
                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                             sizes="(min-width: 768px) 50vw, 100vw"
                         />
@@ -87,21 +97,21 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                 </div>
 
                 {/* Product Info */}
-                <div className="w-full md:w-1/2 p-6 md:p-10 lg:p-12 flex flex-col justify-center bg-white">
+                <div className="w-full md:w-1/2 p-6 md:p-10 lg:p-12 flex flex-col justify-center bg-transparent">
 
-                    <p className="text-[10px] font-medium tracking-widest uppercase text-stone-400 mb-3">
+                    <p className="text-[10px] font-medium tracking-widest uppercase text-muted-foreground mb-3">
                         Quick View
                     </p>
 
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-light mb-4 text-stone-900 leading-tight" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-light mb-4 text-foreground leading-tight" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
                         {product.title}
                     </h3>
 
-                    <div className="text-lg font-normal mb-8 text-stone-600">
-                        <Money data={product.priceRange.minVariantPrice as any} />
+                    <div className="text-lg font-normal mb-8 text-muted-foreground">
+                        <Money data={product.priceRange.minVariantPrice} />
                     </div>
 
-                    <div className="w-8 h-px bg-stone-200 mb-8" />
+                    <div className="w-8 h-px bg-border mb-8" />
 
                     {/* Action Buttons */}
                     <div className="flex flex-col gap-3 mt-auto md:mt-0">
@@ -141,7 +151,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                         ) : (
                             <button
                                 disabled
-                                className="w-full py-4 text-[11px] tracking-[0.2em] uppercase font-medium rounded-full border border-stone-200 text-stone-400 cursor-not-allowed text-center"
+                                className="w-full py-4 text-[11px] tracking-[0.2em] uppercase font-medium rounded-full border border-border text-muted-foreground cursor-not-allowed text-center"
                             >
                                 Sold Out
                             </button>
@@ -156,7 +166,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                                     <a
                                         href={`/cart/${numericId}:1`}
                                         onClick={onClose}
-                                        className="w-full py-3.5 text-[10px] tracking-widest uppercase font-medium rounded-full border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white transition-all duration-300 cursor-pointer text-center flex items-center justify-center"
+                                        className="w-full py-3.5 text-[10px] tracking-widest uppercase font-medium rounded-full border border-border text-foreground hover:bg-foreground hover:text-background transition-all duration-300 cursor-pointer text-center flex items-center justify-center"
                                     >
                                         Buy Now
                                     </a>
@@ -167,8 +177,8 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                                 to={`/products/${product.handle}`}
                                 onClick={onClose}
                                 className={`w-full py-3.5 text-[10px] tracking-widest uppercase font-medium rounded-full transition-all duration-300 cursor-pointer text-center flex items-center justify-center ${!(firstVariant && isAvailable)
-                                    ? 'col-span-2 border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white'
-                                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+                                    ? 'col-span-2 border border-border text-foreground hover:bg-foreground hover:text-background'
+                                    : 'bg-muted text-muted-foreground hover:bg-muted hover:text-foreground'
                                     }`}
                             >
                                 Full Details

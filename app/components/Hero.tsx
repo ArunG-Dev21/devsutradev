@@ -1,5 +1,6 @@
 import { SwiperComponent, type HeroSlide } from './SwiperComponent';
 import { FeaturedCollectionComponent } from './FeaturedCollectionComponent';
+import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 
 interface HeroProps {
   collection: {
@@ -14,11 +15,11 @@ interface HeroProps {
         featuredImage?: {
           url: string;
           altText?: string | null;
-          width?: number;
-          height?: number;
+          width?: number | null;
+          height?: number | null;
         } | null;
         priceRange: {
-          minVariantPrice: { amount: string; currencyCode: string };
+          minVariantPrice: { amount: string; currencyCode: CurrencyCode };
         };
         variants?: {
           nodes: Array<{ id: string; availableForSale: boolean }>;

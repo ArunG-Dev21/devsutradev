@@ -1,5 +1,5 @@
 import { useLoaderData, data, type HeadersFunction } from 'react-router';
-import type { Route } from './+types/cart';
+import type { Route } from './+types/($locale).cart';
 import type { CartQueryDataReturn } from '@shopify/hydrogen';
 import { CartForm } from '@shopify/hydrogen';
 import { CartMain } from '~/components/CartMain';
@@ -105,22 +105,22 @@ export default function Cart() {
   const cart = useLoaderData<typeof loader>();
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header Area */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <h1 className="text-3xl md:text-5xl font-bold text-black tracking-tight">
+      <div className="bg-card border-b border-border">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
             Your Cart
           </h1>
-          <p className="mt-2 text-sm text-neutral-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             Review your sacred items before proceeding to checkout.
           </p>
         </div>
       </div>
 
       {/* Main Cart Content */}
-      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
-        <div className="bg-white rounded-3xl shadow-sm border border-neutral-200 p-6 md:p-8 lg:p-10">
+      <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
+        <div className="bg-card text-card-foreground rounded-3xl shadow-sm border border-border p-6 md:p-8 lg:p-10">
           <CartMain layout="page" cart={cart} />
         </div>
       </div>

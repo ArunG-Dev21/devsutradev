@@ -1,5 +1,6 @@
 import { data } from 'react-router';
-import type { Route } from './+types/api.recommendations';
+import type { Route } from './+types/($locale).api.recommendations';
+import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 
 type RecommendedProduct = {
   id: string;
@@ -13,7 +14,7 @@ type RecommendedProduct = {
     height?: number | null;
   } | null;
   priceRange: {
-    minVariantPrice: { amount: string; currencyCode: string };
+    minVariantPrice: { amount: string; currencyCode: CurrencyCode };
   };
   variant?: { id: string; availableForSale: boolean } | null;
 };
@@ -46,7 +47,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     },
   });
 
-  const collections = resp?.collections?.nodes ?? [];
+  const collections: any[] = resp?.collections?.nodes ?? [];
 
   const perCollection: RecommendedProduct[] = [];
   const remaining: RecommendedProduct[] = [];

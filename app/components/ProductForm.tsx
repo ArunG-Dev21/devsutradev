@@ -25,7 +25,7 @@ export function ProductForm({
 
         return (
           <div key={option.name}>
-            <p className="text-xs tracking-[0.15em] uppercase text-neutral-500 mb-3 font-medium">
+            <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-3 font-medium">
               {option.name}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -44,8 +44,8 @@ export function ProductForm({
                 const pillClass = `px-5 py-2.5 text-[11px] font-medium tracking-widest uppercase rounded-full border transition-all duration-300 cursor-pointer ${selected
                   ? 'bg-stone-900 text-white border-stone-900'
                   : available
-                    ? 'border-stone-200 hover:border-stone-400 text-stone-700 bg-white shadow-sm'
-                    : 'border-stone-100 text-stone-300 line-through cursor-not-allowed bg-stone-50'
+                    ? 'border-stone-200 hover:border-stone-400 dark:border-border dark:hover:border-ring text-stone-700 dark:text-foreground bg-white dark:bg-card shadow-sm'
+                    : 'border-stone-100 dark:border-border text-stone-300 dark:text-muted-foreground line-through cursor-not-allowed bg-stone-50 dark:bg-muted/50'
                   }`;
 
                 if (isDifferentProduct) {

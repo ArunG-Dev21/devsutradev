@@ -13,15 +13,15 @@ type CartSummaryProps = {
 export function CartSummary({ cart, layout }: CartSummaryProps) {
   return (
     <div
-      className={`bg-white ${layout === 'aside'
-        ? 'border-t border-neutral-200 px-4 py-4'
-        : 'p-6 md:p-8 rounded-3xl border border-neutral-200 shadow-sm'
+      className={`bg-card text-card-foreground ${layout === 'aside'
+        ? 'border-t border-border px-4 py-4'
+        : 'p-6 md:p-8 rounded-3xl border border-border shadow-sm'
         }`}
     >
       {/* Subtotal */}
       <div className="flex items-center justify-between mb-2">
-        <span className="text-base font-semibold text-stone-900">Subtotal</span>
-        <span className="text-base font-bold text-stone-900">
+        <span className="text-base font-semibold text-foreground">Subtotal</span>
+        <span className="text-base font-bold text-foreground">
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money data={cart.cost.subtotalAmount} />
           ) : (
@@ -31,17 +31,17 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
       </div>
 
       {/* Shipping note */}
-      <p className="text-[11px] text-neutral-500 mb-6">
+      <p className="text-[11px] text-muted-foreground mb-6">
         Taxes and shipping calculated at checkout
       </p>
 
       {/* Terms checkbox — page layout only */}
       {layout === 'page' && (
-        <div className="mb-6 border-y border-neutral-100 py-6">
+        <div className="mb-6 border-y border-border py-6">
           <div className="flex items-start gap-2.5">
-            <input type="checkbox" id="terms" className="mt-0.5 rounded border-neutral-300 text-stone-900 focus:ring-stone-900 h-3.5 w-3.5 cursor-pointer" />
-            <label htmlFor="terms" className="text-[11px] text-stone-500 leading-relaxed cursor-pointer select-none">
-              I agree to the <a href="/policies/terms-of-service" className="underline hover:text-stone-900">terms and conditions</a> and <a href="/policies/refund-policy" className="underline hover:text-stone-900">refund policy</a>.
+            <input type="checkbox" id="terms" className="mt-0.5 rounded border-border text-foreground focus:ring-ring h-3.5 w-3.5 cursor-pointer" />
+            <label htmlFor="terms" className="text-[11px] text-muted-foreground leading-relaxed cursor-pointer select-none">
+              I agree to the <a href="/policies/terms-of-service" className="underline hover:text-foreground">terms and conditions</a> and <a href="/policies/refund-policy" className="underline hover:text-foreground">refund policy</a>.
             </label>
           </div>
         </div>
@@ -54,10 +54,10 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
           <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
         </>
       ) : (
-        <div className="mb-4 flex items-start gap-2.5 px-3 py-3 bg-stone-50 rounded-xl border border-stone-100">
+        <div className="mb-4 flex items-start gap-2.5 px-3 py-3 bg-muted rounded-xl border border-border">
           <span className="text-base leading-none mt-0.5">🏷️</span>
-          <p className="text-[11px] text-stone-500 leading-relaxed">
-            <span className="font-semibold text-stone-700">Discounts &amp; gift cards</span> can be applied at Shopify checkout.
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            <span className="font-semibold text-foreground">Discounts &amp; gift cards</span> can be applied at Shopify checkout.
           </p>
         </div>
       )}
@@ -67,8 +67,8 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
 
       {/* Trust Badges for Page Layout */}
       {layout === 'page' && (
-        <div className="mt-8 pt-6 border-t border-neutral-100 flex flex-col items-center">
-          <p className="text-[10px] uppercase tracking-widest text-neutral-400 font-semibold mb-4">Secure Checkout</p>
+        <div className="mt-8 pt-6 border-t border-border flex flex-col items-center">
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-4">Secure Checkout</p>
           <div className="flex items-center justify-center gap-3 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
             <svg className="w-8 h-8" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" width="38" height="24" aria-labelledby="pi-visa"><title id="pi-visa">Visa</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" /><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" /><path d="M28.3 10.1H28c-.4 1-.7 1.5-1 3h1.9c-.3-1.5-.3-2.2-.6-3zm2.9 5.9h-1.7c-.1 0-.1 0-.2-.1l-.2-.9-.1-.2h-2.4c-.1 0-.2 0-.2.2l-.3.9c0 .1-.1.1-.1.1h-2.1l.2-.5L27 8.7c0-.5.3-.7.8-.7h1.5c.1 0 .2 0 .2.2l1.4 6.5c.1.4.2.7.2.9.1.1.1.1.1.1m-10.3-6h-1.6l-.3 1.1-1.3 4.9c-.1.3-.2.4-.5.4h-2.6l-1.3-4.9c-.1-.3-.2-.4-.5-.4h-1.6l1.9 6h1.7l1.5-6h1.6l-1-6m8.8.1h-1.6l-.1.1c-1 0-1.2.6-1.5 1.5h1.9l-.1.3c-.6.8-1.5 1-2.5 1-.9 0-1.6-.3-1.6-.9 0-.4.3-.8 1.1-1.1s2-.6 2-1c0-.4-.4-.8-1.2-.8-1.2 0-2 .4-2.4.9l-.3.3.4 1.4c.5-.4 1.2-.7 1.8-.7.6 0 1.1.2 1.1.7 0 .3-.2.6-.9.9s-2.1.8-2.1 1.6c0 1 .8 1.5 2 1.5 1.5 0 2.6-.6 3.1-1.3l.3.2z" fill="#142688" /></svg>
             <svg className="w-8 h-8" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" width="38" height="24" aria-labelledby="pi-master"><title id="pi-master">Mastercard</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" /><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" /><path fill="#ff5f00" d="M22 16.6c-2.8 0-5.2-1.8-6.1-4.4-.9-2.5.1-5.4 2.1-7.1 2-1.7 5-2 7.3-.6-1.8 1.1-3 3.1-3 5.4 0 2.3 1.2 4.3 3 5.4-1 .9-2.2 1.4-3.5 1.4z" /><path fill="#eb001b" d="M12.7 16.6c-2.8 0-5.2-1.8-6.1-4.4-.9-2.5.1-5.4 2.1-7.1 2-1.7 5-2 7.3-.6-1.8 1.1-3 3.1-3 5.4 0 2.3 1.2 4.3 3 5.4-1 .9-2.2 1.4-3.5 1.4z" /><path fill="#f79e1b" d="M28.4 16.6c1.3 0 2.5-.5 3.5-1.4-1.8-1.1-3-3.1-3-5.4 0-2.3 1.2-4.3 3-5.4-2.3-1.4-5.3-1.1-7.3.6-2 1.7-3 4.6-2.1 7.1.9 2.5 3.3 4.4 6.1 4.4z" /></svg>
@@ -83,15 +83,15 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
 }
 
 function CartCheckoutActions({ checkoutUrl, layout }: { checkoutUrl?: string, layout: CartLayout }) {
-  if (!checkoutUrl) return null;
   const { close } = useAside();
+  if (!checkoutUrl) return null;
 
   return (
     <div className="mt-3 flex flex-col gap-2">
       <a
         href={checkoutUrl}
         target="_self"
-        className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-stone-900 text-white"
+        className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
       >
         Checkout →
       </a>
@@ -100,12 +100,12 @@ function CartCheckoutActions({ checkoutUrl, layout }: { checkoutUrl?: string, la
           to="/cart"
           onClick={close}
           prefetch="viewport"
-          className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg border border-stone-200 text-stone-900 transition-all duration-300 hover:bg-stone-50"
+          className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg border border-border text-foreground transition-all duration-300 hover:bg-muted"
         >
           View Cart
         </Link>
       )}
-      <p className="text-center text-xs text-neutral-400 mt-2">
+      <p className="text-center text-xs text-muted-foreground mt-2">
         Secure checkout powered by Shopify
       </p>
     </div>
@@ -126,10 +126,10 @@ function CartDiscounts({
     <div className="mb-3">
       {/* Existing discount */}
       {codes.length > 0 && (
-        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-stone-50 rounded-lg">
-          <div className="flex items-center gap-2 text-sm text-stone-700">
+        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted rounded-lg">
+          <div className="flex items-center gap-2 text-sm text-foreground">
             <span>🎫</span>
-            <code className="bg-transparent text-stone-700 text-xs">
+            <code className="bg-transparent text-foreground text-xs">
               {codes.join(', ')}
             </code>
           </div>
@@ -137,7 +137,7 @@ function CartDiscounts({
             <button
               type="submit"
               aria-label="Remove discount"
-              className="text-xs text-stone-400 hover:text-stone-600 transition cursor-pointer"
+              className="text-xs text-muted-foreground hover:text-foreground transition cursor-pointer"
             >
               Remove
             </button>
@@ -153,11 +153,11 @@ function CartDiscounts({
             type="text"
             name="discountCode"
             placeholder="Discount code"
-            className="flex-1 px-3 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-stone-900 focus:border-stone-900"
+            className="flex-1 px-3 py-2 text-xs border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-ring"
           />
           <button
             type="submit"
-            className="px-4 py-2 text-xs tracking-wider uppercase bg-neutral-900 text-white rounded-lg hover:bg-neutral-700 transition cursor-pointer"
+            className="px-4 py-2 text-xs tracking-wider uppercase bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-700 dark:hover:bg-neutral-300 transition cursor-pointer"
           >
             Apply
           </button>
@@ -207,7 +207,7 @@ function CartGiftCard({
         <div className="space-y-2 mb-2">
           {giftCardCodes.map((giftCard) => (
             <RemoveGiftCardForm key={giftCard.id} giftCardId={giftCard.id}>
-              <div className="flex items-center justify-between px-3 py-2 bg-stone-50 rounded-lg text-sm">
+              <div className="flex items-center justify-between px-3 py-2 bg-muted rounded-lg text-sm">
                 <div className="flex items-center gap-2 text-stone-700">
                   <span>🎁</span>
                   <code className="bg-transparent text-stone-700 text-xs">
@@ -236,12 +236,12 @@ function CartGiftCard({
             name="giftCardCode"
             placeholder="Gift card code"
             ref={giftCardCodeInput}
-            className="flex-1 px-3 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-stone-900 focus:border-stone-900"
+            className="flex-1 px-3 py-2 text-xs border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-ring"
           />
           <button
             type="submit"
             disabled={giftCardAddFetcher.state !== 'idle'}
-            className="px-4 py-2 text-xs tracking-wider uppercase bg-neutral-900 text-white rounded-lg hover:bg-neutral-700 transition disabled:opacity-50 cursor-pointer"
+            className="px-4 py-2 text-xs tracking-wider uppercase bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-700 dark:hover:bg-neutral-300 transition disabled:opacity-50 cursor-pointer"
           >
             Apply
           </button>
