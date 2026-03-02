@@ -134,58 +134,152 @@ function SubNavIsland({
 
   return (
     <>
-      {/* Mobile Dropdown (sub-nav) */}
-      <div className="md:hidden absolute left-4 right-4 top-[70px] z-50">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-card shadow-sm rounded-full px-6 py-3 border border-border flex justify-between items-center text-sm uppercase tracking-widest font-semibold text-foreground transition active:scale-95"
-        >
-          <span>Collections</span>
-          <svg className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m19 9-7 7-7-7" />
-          </svg>
-        </button>
-        <div className={`absolute left-0 right-0 top-full z-[60] overflow-hidden transition-all duration-500 origin-top bg-card rounded-2xl ${isOpen ? 'max-h-[800px] opacity-100 border border-border mt-2 shadow-xl' : 'max-h-0 opacity-0 border-transparent shadow-none'}`}>
-          <nav className="flex flex-col py-2 w-full">
-            {items.map((item) => {
-              if (!item.url) return null;
+{/* Animated trigger button — fixed to top-right of the header */}
+<div className="md:hidden">
+  {/* ── TRIGGER BUTTON ── */}
+  <button
+    onClick={() => setIsOpen(!isOpen)}
+    aria-label="Browse collections"
+    className={`
+      group absolute top-20 right-4 z-50
+      w-12 h-12 rounded-full
+      flex items-center justify-center
+      border border-border bg-card/80 backdrop-blur-md
+      shadow-md active:scale-90
+      transition-all duration-300 ease-out
+      ${isOpen ? 'scale-90 ring-2 ring-foreground/20' : ''}
+    `}
+  >
+    {/* PNG icon — fades + shrinks when open */}
+    <img
+      src="/icons/collections.png"
+      alt=""
+      className={`w-7 h-7 object-contain transition-all duration-300
+        ${isOpen ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`}
+    />
 
-              const url =
-                item.url.includes('myshopify.com') ||
-                  item.url.includes(publicStoreDomain) ||
-                  item.url.includes(primaryDomainUrl)
-                  ? new URL(item.url).pathname
-                  : item.url;
+    {/* X — fades in when open */}
+    <svg
+      width="14" height="14" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+      className={`absolute transition-all duration-300 text-foreground
+        ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
+    >
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
 
-              const imageUrl = getCollectionImage(url);
+    {/* Pulse ring — only when closed, invites interaction */}
+    {!isOpen && (
+      <span className="absolute inset-0 rounded-full border border-foreground/25 animate-ping pointer-events-none" />
+    )}
+  </button>
 
-              return (
-                <NavLink
-                  key={item.id}
-                  to={url}
-                  end
-                  prefetch="intent"
-                  onClick={() => setIsOpen(false)}
-                  className={({ isActive }) =>
-                    `px-6 py-3 text-[11px] tracking-[0.15em] uppercase font-semibold transition-colors border-b border-border last:border-0 flex items-center gap-3 ${isActive ? 'text-accent bg-muted' : 'text-foreground hover:bg-muted'}`
-                  }
-                >
-                  {imageUrl && (
-                    <Image
-                      src={imageUrl}
-                      alt={item.title}
-                      width={24}
-                      height={24}
-                      className="rounded-full object-cover w-6 h-6 shrink-0"
-                    />
-                  )}
-                  <span>{item.title}</span>
-                </NavLink>
-              );
-            })}
-          </nav>
-        </div>
-      </div>
+  {/* ── BACKDROP ── */}
+  <div
+    onClick={() => setIsOpen(false)}
+    className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-400
+      ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+  />
+
+  {/* ── SLIDE-UP MODAL PANEL ── */}
+  <div
+    className={`
+      fixed left-3 right-3 bottom-4 z-50
+      bg-card rounded-3xl border border-border shadow-2xl
+      transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
+      ${isOpen
+        ? 'translate-y-0 opacity-100'
+        : 'translate-y-[110%] opacity-0 pointer-events-none'}
+    `}
+  >
+    {/* Handle bar */}
+    <div className="flex justify-center pt-3 pb-1">
+      <div className="w-10 h-1 rounded-full bg-border" />
+    </div>
+
+    {/* Header row */}
+    <div className="flex items-center justify-between px-5 pt-2 pb-4 border-b border-border">
+      <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-muted-foreground">
+        Browse Collections
+      </p>
+      <button
+        onClick={() => setIsOpen(false)}
+        className="w-7 h-7 rounded-full flex items-center justify-center bg-muted text-muted-foreground hover:bg-foreground hover:text-background transition-all duration-200 active:scale-90"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    {/* Collection cards grid */}
+    <nav className="p-4 grid grid-cols-2 gap-3 max-h-[65vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      {items.map((item, index) => {
+        if (!item.url) return null;
+
+        const url =
+          item.url.includes('myshopify.com') ||
+            item.url.includes(publicStoreDomain) ||
+            item.url.includes(primaryDomainUrl)
+            ? new URL(item.url).pathname
+            : item.url;
+
+        const imageUrl = getCollectionImage(url);
+
+        return (
+          <NavLink
+            key={item.id}
+            to={url}
+            end
+            prefetch="intent"
+            onClick={() => setIsOpen(false)}
+            className={({ isActive }) =>
+              `group relative rounded-2xl overflow-hidden aspect-[3/4] flex items-end
+               transition-all duration-300 active:scale-95
+               ${isActive ? 'ring-2 ring-foreground ring-offset-2 ring-offset-card' : ''}
+               ${index === 0 && items.length % 2 !== 0 ? 'col-span-2 aspect-[16/7]' : ''}`
+            }
+            style={{
+              animationDelay: `${index * 60}ms`,
+            }}
+          >
+            {/* Background image */}
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={item.title}
+                width={400}
+                height={500}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-active:scale-105"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
+            )}
+
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/20 to-transparent" />
+
+            {/* Collection name */}
+            <div className="relative w-full px-3.5 pb-3.5">
+              <p className="text-white text-[11px] font-semibold tracking-[0.12em] uppercase leading-tight drop-shadow-sm line-clamp-2">
+                {item.title}
+              </p>
+              <div className="mt-1.5 flex items-center gap-1 opacity-70">
+                <span className="text-white/80 text-[9px] tracking-wider uppercase font-medium">Shop</span>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </NavLink>
+        );
+      })}
+    </nav>
+
+    <div className="h-2" />
+  </div>
+</div>
 
       {/* Desktop Horizontal List */}
       <div className="hidden md:flex justify-center absolute mt-2 pb-3 md:pb-0 md:mt-0 md:top-28 md:left-1/2 w-full px-2 md:px-0 md:-translate-x-1/2 md:-translate-y-1/2 z-50">

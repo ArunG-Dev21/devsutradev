@@ -102,7 +102,7 @@ export function RouteBreadcrumbBanner() {
 
   return (
     <div
-      className="mx-auto container py-4 px-6 md:py-8 md:px-10 absolute z-40 top-20 md:top-30 left-0 md:left-45 max-w-full"
+      className="mx-auto container py-4 px-6 md:py-8 md:px-10"
       style={{ color: '#ffffff', mixBlendMode: 'difference', borderColor: '#ffffff', }}
     >
       <nav

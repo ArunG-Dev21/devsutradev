@@ -66,33 +66,37 @@ const FILTER_GROUPS = [
 function FilterSidebar({
   activeFilters,
   onToggleFilter,
+  isMobile = false,
 }: {
   activeFilters: string[];
   onToggleFilter: (f: string) => void;
+  isMobile?: boolean;
 }) {
   return (
-    <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm sticky top-6">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/40">
+    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'border border-border rounded-2xl p-6 shadow-sm sticky top-6'}`}>
+      <div className="flex items-center justify-between mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border/40">
         <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
         </h2>
-        {activeFilters.length > 0 && (
-          <button
-            onClick={() => activeFilters.forEach(onToggleFilter)}
-            className="text-[10px] text-muted-foreground hover:text-foreground tracking-wide hover:underline transition-all underline-offset-4"
-          >
-            Clear all
-          </button>
-        )}
+        <div className="flex items-center gap-4">
+          {activeFilters.length > 0 && (
+            <button
+              onClick={() => activeFilters.forEach(onToggleFilter)}
+              className="text-[10px] text-muted-foreground hover:text-foreground tracking-wide hover:underline transition-all underline-offset-4"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6 lg:space-y-8">
         {FILTER_GROUPS.map((group) => (
           <div key={group.label}>
-            <p className="text-xs tracking-wider uppercase text-foreground font-semibold mb-4">
+            <p className="text-xs tracking-wider uppercase text-foreground font-semibold mb-3 lg:mb-4">
               {group.label}
             </p>
-            <div className="space-y-3">
+            <div className="space-y-2 lg:space-y-3">
               {group.options.map((opt) => {
                 const isActive = activeFilters.includes(opt);
                 return (
@@ -126,7 +130,7 @@ function FilterSidebar({
                       )}
                     </div>
                     <span
-                      className={`text-[13px] transition-colors ${isActive
+                      className={`text-xs lg:text-[13px] transition-colors ${isActive
                         ? 'text-foreground font-medium'
                         : 'text-muted-foreground group-hover:text-foreground'
                         }`}
@@ -141,18 +145,20 @@ function FilterSidebar({
         ))}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-border/40">
-        <div className="bg-muted/30 rounded-xl p-4 text-center border border-border/50 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative z-10">
-            <p className="text-[11px] tracking-widest uppercase text-foreground font-bold mb-1.5 flex items-center justify-center gap-1.5">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
-              Free Shipping
-            </p>
-            <p className="text-xs text-muted-foreground">On all orders above ₹999</p>
+      {!isMobile && (
+        <div className="mt-8 pt-6 border-t border-border/40">
+          <div className="bg-muted/30 rounded-xl p-4 text-center border border-border/50 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative z-10">
+              <p className="text-[11px] tracking-widest uppercase text-foreground font-bold mb-1.5 flex items-center justify-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+                Free Shipping
+              </p>
+              <p className="text-xs text-muted-foreground">On all orders above ₹999</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -271,32 +277,8 @@ export default function Collection() {
   return (
     <div className="min-h-screen text-foreground">
 
-      {/* HERO (unchanged structure, just palette) */}
-      <div className="relative bg-neutral-950 overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/60 dark:bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400/60 dark:bg-neutral-700/40 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-neutral-400 mb-3">
-            ✦ Handpicked & Energised ✦
-          </p>
-
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-            {collection.title}
-          </h1>
-
-          {collection.description && (
-            <p className="text-sm text-neutral-400 max-w-xl mx-auto leading-relaxed">
-              {collection.description}
-            </p>
-          )}
-        </div>
-      </div>
-
       {/* BODY */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-12">
         <div className="flex gap-8 items-start">
 
           <aside className="hidden lg:block w-56 xl:w-64 flex-shrink-0">
@@ -309,14 +291,39 @@ export default function Collection() {
           <div className="flex-1 min-w-0">
 
             <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 relative">
                 <button
-                  onClick={() => setMobileFiltersOpen(true)}
-                  className="lg:hidden flex items-center gap-2 px-3 py-2 border border-border rounded-xl text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+                  className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-border rounded-xl text-xs text-foreground bg-card shadow-sm hover:bg-muted transition-colors focus:outline-none focus:ring-1 focus:ring-ring select-none"
                 >
-                  Filters
+                  <span className="font-medium">Filters</span>
+                  {activeFilters.length > 0 && (
+                    <span className="bg-foreground text-background w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold">
+                      {activeFilters.length}
+                    </span>
+                  )}
+                  <svg
+                    className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ml-1 ${mobileFiltersOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  </svg>
                 </button>
-                <p className="text-xs text-muted-foreground tracking-wide">Browsing {collection.title}</p>
+                <p className="hidden lg:block text-xs text-muted-foreground tracking-wide">Browsing {collection.title}</p>
+
+                {/* Mobile Filters Dropdown */}
+                {mobileFiltersOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-[280px] sm:w-[320px] max-h-[70vh] overflow-y-auto bg-card border border-border rounded-2xl shadow-xl z-50 lg:hidden ring-1 ring-black ring-opacity-5">
+                    <FilterSidebar
+                      activeFilters={activeFilters}
+                      onToggleFilter={toggleFilter}
+                      isMobile={true}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-3">

@@ -59,7 +59,7 @@ function AddToCartButton({ product }: { product: ProductNode }) {
 
   if (!firstVariant || !isAvailable) {
     return (
-      <div className="mt-3 w-full py-2.5 text-center text-[10px] font-medium tracking-widest uppercase text-muted-foreground border border-border rounded-full select-none">
+      <div className="mt-2.5 w-full py-2 text-center text-[9px] font-medium tracking-widest uppercase text-muted-foreground border border-border rounded-full select-none">
         Sold Out
       </div>
     );
@@ -72,13 +72,11 @@ function AddToCartButton({ product }: { product: ProductNode }) {
       inputs={{
         lines: [{ merchandiseId: firstVariant.id, quantity: 1 }],
       }}
-      // Unique key per product so multiple cards don't share fetcher state
       fetcherKey={`add-to-cart-${product.id}`}
     >
       {(fetcher) => {
         const isAdding = fetcher.state !== 'idle';
 
-        // After fetcher returns to idle with data, flash "Added" for 1.8s
         if (!isAdding && fetcher.data && !justAdded) {
           // no-op: justAdded is set on click, cleared by timeout
         }
@@ -92,8 +90,8 @@ function AddToCartButton({ product }: { product: ProductNode }) {
               setTimeout(() => setJustAdded(false), 1800);
             }}
             className={[
-              'mt-3 w-full py-2.5 rounded-full',
-              'text-[10px] font-medium tracking-widest uppercase',
+              'mt-2.5 w-full py-2 rounded-full',
+              'text-[9px] font-medium tracking-widest uppercase',
               'flex items-center justify-center gap-1.5',
               'border transition-all duration-300 cursor-pointer select-none',
               isAdding
@@ -107,7 +105,7 @@ function AddToCartButton({ product }: { product: ProductNode }) {
               <>
                 <svg
                   className="animate-spin"
-                  width="11" height="11" viewBox="0 0 24 24"
+                  width="10" height="10" viewBox="0 0 24 24"
                   fill="none" stroke="currentColor" strokeWidth="2.5"
                 >
                   <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
@@ -117,7 +115,7 @@ function AddToCartButton({ product }: { product: ProductNode }) {
             ) : justAdded ? (
               <>
                 <svg
-                  width="11" height="11" viewBox="0 0 24 24"
+                  width="10" height="10" viewBox="0 0 24 24"
                   fill="none" stroke="currentColor" strokeWidth="2.5"
                   strokeLinecap="round"
                 >
@@ -194,22 +192,20 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
     <div className="relative bg-background text-foreground flex flex-col lg:h-full lg:overflow-hidden">
 
       {/* ── HEADER ── */}
-      <div className="px-6 md:px-10 lg:px-14 pt-16 pb-6 border-b border-border flex-shrink-0">
-        <h2
-          className="text-4xl md:text-5xl lg:text-5xl font-medium leading-tight tracking-tight mb-3 font-heading"
-        >
+      <div className="px-4 sm:px-6 md:px-10 lg:px-14 pt-12 pb-5 border-b border-border flex-shrink-0">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium leading-tight tracking-tight mb-3 font-heading">
           {collection.title}
         </h2>
 
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <span className="text-xl uppercase font-light tracking-wider">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <span className="text-base sm:text-xl uppercase font-light tracking-wider text-muted-foreground">
             Top Picks This Season
           </span>
 
           <button
             ref={sortButtonRef}
             onClick={handleSortToggle}
-            className="flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-medium tracking-wider uppercase text-foreground bg-transparent border border-border hover:bg-foreground hover:text-background transition-all duration-200 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-medium tracking-wider uppercase text-foreground bg-transparent border border-border hover:bg-foreground hover:text-background transition-all duration-200 cursor-pointer"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M3 6h18M7 12h10M11 18h2" />
@@ -227,8 +223,13 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
       </div>
 
       {/* ── GRID ── */}
-      <div className="px-6 md:px-10 lg:px-14 py-8 flex-1 lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:snap-none md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="px-4 sm:px-6 md:px-10 lg:px-14 py-6 sm:py-8 flex-1 lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {/*
+          Mobile:  2 columns, compact cards, no horizontal scroll
+          Tablet:  2 columns
+          Desktop: 3 columns
+        */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-3">
           {visibleProducts.map((product) => {
             const isHovered = hoveredId === product.id;
             const isUnavailable = product.availableForSale === false;
@@ -247,13 +248,13 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
             return (
               <div
                 key={product.id}
-                className="relative bg-card text-card-foreground rounded-2xl overflow-hidden flex flex-col border border-border shadow-sm hover:shadow-md transition-shadow duration-300 min-w-[280px] w-[80vw] flex-shrink-0 snap-center md:w-auto md:min-w-0"
+                className="relative bg-card text-card-foreground rounded-xl sm:rounded-2xl overflow-hidden flex flex-col border border-border shadow-sm hover:shadow-md transition-shadow duration-300"
                 onMouseEnter={() => setHoveredId(product.id)}
                 onMouseLeave={() => setHoveredId(null)}
               >
                 {/* ── IMAGE ── */}
                 <Link to={`/products/${product.handle}`} className="block">
-                  <div className="relative aspect-[1/1] overflow-hidden bg-stone-100">
+                  <div className="relative aspect-square overflow-hidden bg-stone-100">
 
                     {/* Primary image — fades out when hovered + secondary exists */}
                     {product.featuredImage && (
@@ -298,7 +299,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                     {/* Sold out badge */}
                     {isUnavailable && (
                       <span
-                        className="absolute top-3 left-3 text-[9px] font-medium tracking-wider uppercase px-3 py-1 bg-card/90 text-muted-foreground border border-border rounded-full backdrop-blur-sm"
+                        className="absolute top-2 left-2 text-[8px] sm:text-[9px] font-medium tracking-wider uppercase px-2 py-0.5 sm:px-3 sm:py-1 bg-card/90 text-muted-foreground border border-border rounded-full backdrop-blur-sm"
                         style={{ zIndex: 4 }}
                       >
                         Sold Out
@@ -315,7 +316,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                           setQuickViewProduct(product);
                         }}
                         aria-label="Quick view"
-                        className="absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center border border-border bg-card/85 hover:bg-foreground hover:text-background backdrop-blur-sm group/eye"
+                        className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border border-border bg-card/85 hover:bg-foreground hover:text-background backdrop-blur-sm group/eye"
                         style={{
                           opacity: isHovered ? 1 : 0,
                           transform: isHovered ? 'translateY(0px)' : 'translateY(8px)',
@@ -324,7 +325,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                         }}
                       >
                         <svg
-                          width="16" height="16" viewBox="0 0 24 24"
+                          width="14" height="14" viewBox="0 0 24 24"
                           fill="none" strokeWidth="1.8"
                           strokeLinecap="round" strokeLinejoin="round"
                           className="stroke-stone-800 dark:stroke-stone-200 group-hover/eye:stroke-white dark:group-hover/eye:stroke-stone-900 transition-colors duration-150"
@@ -338,14 +339,12 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                 </Link>
 
                 {/* ── INFO + ADD TO CART ── */}
-                <div className="px-4 pt-3 pb-5 flex flex-col">
+                <div className="px-3 pt-2.5 pb-4 sm:px-4 sm:pt-3 sm:pb-5 flex flex-col flex-1">
                   <Link to={`/products/${product.handle}`} className="flex flex-col gap-0.5">
-                    <p
-                      className="text-[1rem] font-normal leading-snug text-foreground tracking-wide"
-                    >
+                    <p className="text-[0.8rem] sm:text-[0.9rem] font-normal leading-snug text-foreground tracking-wide line-clamp-2">
                       {product.title}
                     </p>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs text-muted-foreground mt-0.5">
                       <Money data={product.priceRange.minVariantPrice as any} />
                     </span>
                   </Link>
@@ -359,18 +358,18 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
 
         {/* ── VIEW MORE BUTTON ── */}
         {visibleCount < sortedProducts.length && (
-          <div className="mt-10 flex justify-center">
+          <div className="mt-8 sm:mt-10 flex justify-center">
             <button
-              onClick={() => setVisibleCount((prev) => prev + 6)}
+              onClick={() => setVisibleCount(sortedProducts.length)}
               className="px-8 py-3 w-full sm:w-auto rounded-full text-[10px] font-medium tracking-widest uppercase text-foreground bg-transparent border border-border hover:bg-foreground hover:text-background transition-all duration-300 cursor-pointer"
             >
-              View More
+              View More ({sortedProducts.length - visibleCount} remaining)
             </button>
           </div>
         )}
 
         {/* ── FOOTER ── */}
-        <div className="mt-10 pt-6 flex items-center justify-between border-t border-border">
+        <div className="mt-8 sm:mt-10 pt-5 flex items-center justify-between border-t border-border">
           <span className="text-[10px] tracking-widest uppercase text-muted-foreground">
             {sortedProducts.length} products
           </span>
@@ -387,7 +386,6 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
       </div>
 
       {/* ── SORT DROPDOWN ── */}
-      {/* ── SORT DROPDOWN ── */}
       {isSortOpen && (
         <>
           <button
@@ -398,19 +396,10 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
           />
 
           <div
-            className="
-        fixed z-50 w-52 rounded-xl overflow-hidden
-        bg-card
-        border border-border
-        shadow-xl
-      "
+            className="fixed z-50 w-52 rounded-xl overflow-hidden bg-card border border-border shadow-xl"
             style={{ top: sortDropdownPos.top, right: sortDropdownPos.right }}
           >
-            <p className="
-        px-5 pt-3 pb-2 text-[9px] tracking-widest uppercase font-medium
-        text-muted-foreground
-        border-b border-border
-      ">
+            <p className="px-5 pt-3 pb-2 text-[9px] tracking-widest uppercase font-medium text-muted-foreground border-b border-border">
               Sort By
             </p>
 
@@ -423,25 +412,17 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                   setIsSortOpen(false);
                 }}
                 className={`
-            w-full text-left px-5 py-2.5 text-xs flex items-center justify-between
-            transition-colors duration-150 cursor-pointer
-            hover:bg-muted
-            ${sortKey === option.value
-                    ? "text-foreground font-medium"
-                    : "text-muted-foreground"
-                  }
-          `}
+                  w-full text-left px-5 py-2.5 text-xs flex items-center justify-between
+                  transition-colors duration-150 cursor-pointer hover:bg-muted
+                  ${sortKey === option.value ? 'text-foreground font-medium' : 'text-muted-foreground'}
+                `}
               >
                 {option.label}
 
                 {sortKey === option.value && (
                   <svg
-                    width="11"
-                    height="11"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
+                    width="11" height="11" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" strokeWidth="2.5"
                     className="text-foreground"
                   >
                     <path d="M5 13l4 4L19 7" />
