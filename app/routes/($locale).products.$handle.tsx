@@ -164,60 +164,62 @@ export default function Product() {
 
       {/* Lightbox Modal for Customer Uploaded Product Images */}
       {expandedImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md transition-opacity duration-300 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md transition-opacity duration-300">
           <button
             type="button"
             aria-label="Close image"
             className="absolute inset-0 border-0 p-0 bg-transparent"
             onClick={() => setExpandedImage(null)}
           />
-          <div className="relative z-10 max-w-5xl w-full max-h-[95vh] flex flex-col items-center justify-center gap-6">
+          <div className="relative z-10 w-full max-w-5xl max-h-[95vh] flex items-center justify-center">
             <button
               onClick={() => setExpandedImage(null)}
-              className="absolute -top-12 right-0 sm:-right-8 sm:-top-8 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all backdrop-blur-sm"
+              className="absolute -top-12 right-0 sm:-right-8 sm:-top-8 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all backdrop-blur-sm z-20"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <Image
-              data={expandedImage.customer_product_image}
-              className="w-auto h-auto max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl border border-white/10"
-              sizes="100vw"
-            />
+            <div className="relative flex justify-center items-center w-full max-h-[95vh]">
+              <Image
+                data={expandedImage.customer_product_image}
+                className="w-auto h-auto max-w-full max-h-[95vh] object-contain rounded-xl shadow-2xl border border-white/10"
+                sizes="100vw"
+              />
 
-            {/* Reviewer Details in Modal */}
-            <div className="bg-stone-900/80 backdrop-blur-md border border-white/10 rounded-2xl p-5 w-full max-w-md shadow-2xl flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {expandedImage.customer_image ? (
-                    <Image data={expandedImage.customer_image} className="w-10 h-10 rounded-full object-cover border border-white/20" width={40} height={40} />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-stone-800 border border-white/10 flex items-center justify-center">
-                      <span className="text-stone-300 text-lg font-light" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>{expandedImage.name.charAt(0)}</span>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm font-bold tracking-widest text-white uppercase">{expandedImage.name}</p>
-                    <div className="flex gap-0.5 mt-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className={`w-3.5 h-3.5 ${i < expandedImage.rating ? 'text-amber-400 drop-shadow-sm' : 'text-stone-600'}`} fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
-                        </svg>
-                      ))}
+              {/* Reviewer Details in Modal */}
+              <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 bg-stone-900/80 backdrop-blur-md border border-white/10 rounded-2xl p-5 w-[calc(100%-2rem)] max-w-md shadow-2xl flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {expandedImage.customer_image ? (
+                      <Image data={expandedImage.customer_image} className="w-10 h-10 rounded-full object-cover border border-white/20" width={40} height={40} />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-stone-800 border border-white/10 flex items-center justify-center">
+                        <span className="text-stone-300 text-lg font-light" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>{expandedImage.name.charAt(0)}</span>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-sm font-bold tracking-widest text-white uppercase">{expandedImage.name}</p>
+                      <div className="flex gap-0.5 mt-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <svg key={i} className={`w-3.5 h-3.5 ${i < expandedImage.rating ? 'text-amber-400 drop-shadow-sm' : 'text-stone-600'}`} fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
+                          </svg>
+                        ))}
+                      </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-1 rounded-full shrink-0">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span className="text-[9px] font-bold tracking-widest uppercase mt-0.5">Verified</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-1 rounded-full shrink-0">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                  </svg>
-                  <span className="text-[9px] font-bold tracking-widest uppercase mt-0.5">Verified</span>
-                </div>
+                <p className="text-stone-300 text-sm italic font-medium">
+                  &ldquo;{expandedImage.review}&rdquo;
+                </p>
               </div>
-              <p className="text-stone-300 text-sm italic font-medium">
-                &ldquo;{expandedImage.review}&rdquo;
-              </p>
             </div>
           </div>
         </div>

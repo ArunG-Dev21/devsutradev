@@ -88,60 +88,64 @@ export function ProductForm({
       })}
 
       {/* Action Buttons */}
-      <div className="flex flex-col gap-3 pt-2">
-        <AddToCartButton
-          disabled={!selectedVariant || !selectedVariant.availableForSale}
-          onClick={() => {
-            open('cart');
-          }}
-          lines={
-            selectedVariant
-              ? [
-                {
-                  merchandiseId: selectedVariant.id,
-                  quantity: 1,
-                  selectedVariant,
-                },
-              ]
-              : []
-          }
-        >
-          {selectedVariant?.availableForSale ? (
-            <span className="flex items-center justify-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                />
-              </svg>
-              Add to Cart
-            </span>
-          ) : (
-            'Sold Out'
-          )}
-        </AddToCartButton>
+      <div className="flex flex-col xl:flex-row gap-3 pt-2">
+        <div className="flex-1 w-full flex [&>form]:w-full">
+          <AddToCartButton
+            disabled={!selectedVariant || !selectedVariant.availableForSale}
+            onClick={() => {
+              open('cart');
+            }}
+            lines={
+              selectedVariant
+                ? [
+                  {
+                    merchandiseId: selectedVariant.id,
+                    quantity: 1,
+                    selectedVariant,
+                  },
+                ]
+                : []
+            }
+          >
+            {selectedVariant?.availableForSale ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                  />
+                </svg>
+                Add to Cart
+              </span>
+            ) : (
+              'Sold Out'
+            )}
+          </AddToCartButton>
+        </div>
 
         {/* Buy Now — directly goes to Shopify checkout */}
         {selectedVariant?.availableForSale && (() => {
           const numericId = selectedVariant.id.split('/').pop();
           return (
-            <a
-              href={`/cart/${numericId}:1`}
-              className="w-full py-3.5 text-[11px] tracking-[0.2em] uppercase font-medium rounded-full border border-stone-300 text-stone-700 hover:border-stone-900 hover:bg-stone-900 hover:text-white transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2 no-underline"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-              </svg>
-              Buy Now
-            </a>
+            <div className="flex-1 w-full flex">
+              <a
+                href={`/cart/${numericId}:1`}
+                className="w-full py-3.5 text-[11px] tracking-[0.2em] uppercase font-medium rounded-full border border-stone-300 text-stone-700 hover:border-stone-900 hover:bg-stone-900 hover:text-white transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2 no-underline"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                </svg>
+                Buy Now
+              </a>
+            </div>
           );
         })()}
       </div>

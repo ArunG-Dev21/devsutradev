@@ -96,6 +96,7 @@ export function Header({
       {/* Floating Sub-Nav Island — desktop only, loops through Shopify menu links */}
       <SubNavIsland
         menu={menu}
+        collections={(header as any).collections}
         primaryDomainUrl={header.shop.primaryDomain.url}
         publicStoreDomain={publicStoreDomain}
       />
@@ -106,10 +107,12 @@ export function Header({
 /** Floating pill-shaped sub-navigation bar — uses Shopify menu links */
 function SubNavIsland({
   menu,
+  collections,
   primaryDomainUrl,
   publicStoreDomain,
 }: {
   menu: HeaderProps['header']['menu'];
+  collections: any;
   primaryDomainUrl: string;
   publicStoreDomain: string;
 }) {
@@ -121,6 +124,13 @@ function SubNavIsland({
     (item) =>
       !['About', 'Contact'].includes(item.title)
   );
+
+  const getCollectionImage = (url: string) => {
+    if (!collections?.nodes || !url) return null;
+    const handle = url.split('/').filter(Boolean).pop();
+    const collection = collections.nodes.find((c: any) => c.handle === handle);
+    return collection?.image?.url || null;
+  };
 
   return (
     <>
@@ -147,6 +157,8 @@ function SubNavIsland({
                   ? new URL(item.url).pathname
                   : item.url;
 
+              const imageUrl = getCollectionImage(url);
+
               return (
                 <NavLink
                   key={item.id}
@@ -155,10 +167,19 @@ function SubNavIsland({
                   prefetch="intent"
                   onClick={() => setIsOpen(false)}
                   className={({ isActive }) =>
-                    `px-6 py-3 text-[11px] tracking-[0.15em] uppercase font-semibold transition-colors border-b border-border last:border-0 ${isActive ? 'text-accent bg-muted' : 'text-foreground hover:bg-muted'}`
+                    `px-6 py-3 text-[11px] tracking-[0.15em] uppercase font-semibold transition-colors border-b border-border last:border-0 flex items-center gap-3 ${isActive ? 'text-accent bg-muted' : 'text-foreground hover:bg-muted'}`
                   }
                 >
-                  {item.title}
+                  {imageUrl && (
+                    <Image
+                      src={imageUrl}
+                      alt={item.title}
+                      width={24}
+                      height={24}
+                      className="rounded-full object-cover w-6 h-6 shrink-0"
+                    />
+                  )}
+                  <span>{item.title}</span>
                 </NavLink>
               );
             })}
@@ -190,6 +211,8 @@ function SubNavIsland({
                   ? new URL(item.url).pathname
                   : item.url;
 
+              const imageUrl = getCollectionImage(url);
+
               return (
                 <NavLink
                   key={item.id}
@@ -203,6 +226,7 @@ function SubNavIsland({
                   uppercase
                   font-semibold
                   rounded-full
+                  flex items-center gap-2
                   transition-all duration-300
                   ${isActive
                       ? 'bg-gold text-white shadow-lg'
@@ -211,7 +235,16 @@ function SubNavIsland({
                   `
                   }
                 >
-                  {item.title}
+                  {imageUrl && (
+                    <Image
+                      src={imageUrl}
+                      alt={item.title}
+                      width={20}
+                      height={20}
+                      className="rounded-full object-cover w-5 h-5 shrink-0"
+                    />
+                  )}
+                  <span>{item.title}</span>
                 </NavLink>
               );
             })}
@@ -495,8 +528,28 @@ function HeaderCtas({
         </svg>
       </NavLink>
 
-      {/* Search icon — mobile only */}
-      <SearchToggle />
+      {/* Account — mobile only */}
+      <NavLink
+        to="/account"
+        prefetch="intent"
+        className="text-foreground transition md:hidden"
+        aria-label="Account"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-5 h-5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+          />
+        </svg>
+      </NavLink>
 
       {/* Cart */}
       <CartToggle cart={cart} />
