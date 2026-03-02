@@ -34,11 +34,11 @@ export function CartLineItem({
       key={id}
       className={
         layout === 'page'
-          ? 'p-4 mb-4 rounded-2xl border border-border bg-card shadow-sm last:mb-0 transition-shadow hover:shadow-md'
-          : 'py-5 border-b border-border last:border-b-0'
+          ? 'p-3 sm:p-4 mb-3 sm:mb-4 rounded-xl sm:rounded-2xl border border-border bg-card shadow-sm last:mb-0 transition-shadow hover:shadow-md'
+          : 'py-4 sm:py-5 border-b border-border last:border-b-0'
       }
     >
-      <div className="flex gap-4">
+      <div className="flex gap-3 sm:gap-4">
 
         {/* Product Image */}
         {image && (
@@ -47,7 +47,7 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="flex-shrink-0"
           >
-            <div className="w-20 h-20 rounded-xl overflow-hidden bg-muted border border-border">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl overflow-hidden bg-muted border border-border">
               <Image
                 alt={title}
                 aspectRatio="1/1"
@@ -69,7 +69,7 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="no-underline block"
           >
-            <p className="text-sm font-semibold text-foreground leading-snug truncate hover:text-muted-foreground transition-colors">
+            <p className="text-xs sm:text-sm font-semibold text-foreground leading-snug truncate hover:text-muted-foreground transition-colors">
               {product.title}
             </p>
           </Link>
@@ -91,7 +91,7 @@ export function CartLineItem({
           )}
 
           {/* Price */}
-          <div className="mt-2 text-sm font-bold text-foreground">
+          <div className="mt-1.5 sm:mt-2 text-xs sm:text-sm font-bold text-foreground">
             <ProductPrice price={line?.cost?.totalAmount} />
           </div>
 
@@ -107,7 +107,7 @@ export function CartLineItem({
 
       {/* Child line items */}
       {lineItemChildren ? (
-        <div className="ml-24 mt-3 pl-3 border-l-2 border-border">
+        <div className="ml-[76px] sm:ml-24 mt-2 sm:mt-3 pl-2 sm:pl-3 border-l-2 border-border">
           <p id={childrenLabelId} className="sr-only">
             Line items with {product.title}
           </p>
@@ -134,7 +134,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="flex items-center gap-0 mt-3 w-fit border border-border rounded-lg overflow-hidden">
+    <div className="flex items-center gap-0 mt-2 sm:mt-3 w-fit border border-border rounded-lg overflow-hidden">
       <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
         <button
           aria-label="Decrease quantity"

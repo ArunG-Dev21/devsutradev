@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState, useEffect, useCallback } from 'react';
+import { Suspense, useRef, useState, useEffect, useCallback, useId } from 'react';
 import { Await, NavLink, useAsyncValue, Link, useFetcher, useNavigate } from 'react-router';
 import {
   type CartViewPayload,
@@ -10,7 +10,8 @@ import {
 import type { HeaderQuery, CartApiQueryFragment } from 'storefrontapi.generated';
 import { useAside } from '~/components/Aside';
 import { SUB_NAV_ITEMS } from '~/lib/constants';
-import { SEARCH_ENDPOINT } from '~/components/SearchFormPredictive';
+import { SEARCH_ENDPOINT, SearchFormPredictive } from '~/components/SearchFormPredictive';
+import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
 import { BrandLogo } from '~/components/BrandLogo';
 import {
   getEmptyPredictiveSearchResult,
@@ -50,13 +51,13 @@ export function Header({
           to="/"
           end
           prefetch="intent"
-          className="md:absolute md:left-1/2 md:-translate-x-1/2 -mt-7 shrink-0"
+          className="absolute left-1/2 -translate-x-1/2 -mt-1 md:-mt-7 shrink-0"
         >
           <BrandLogo
             lightSrc={BRAND_LOGO_LIGHT_SRC}
             darkSrc={BRAND_LOGO_DARK_SRC}
             alt={shop.name}
-            className="h-6 md:h-12 w-auto object-contain"
+            className="h-8 md:h-12 w-auto object-contain"
           />
         </NavLink>
 
@@ -112,6 +113,7 @@ function SubNavIsland({
   primaryDomainUrl: string;
   publicStoreDomain: string;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
   const rawItems = menu?.items?.length ? menu.items : FALLBACK_HEADER_MENU.items;
 
   // Filter out About + Contact
@@ -121,57 +123,102 @@ function SubNavIsland({
   );
 
   return (
-    <div className="hidden md:flex justify-center absolute top-28 left-1/2 -translate-x-1/2 -translate-y-1/2">
-      <nav
-        className="
-        bg-card
-        shadow-inner
-        rounded-full
-        px-2.5 py-2
-        flex items-center gap-2
-        relative z-50
-        -translate-y-1
-        border-1
-        border-border
-      "
-      >
-        {items.map((item) => {
-          if (!item.url) return null;
+    <>
+      {/* Mobile Dropdown (sub-nav) */}
+      <div className="md:hidden absolute left-4 right-4 top-[70px] z-50">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full bg-card shadow-sm rounded-full px-6 py-3 border border-border flex justify-between items-center text-sm uppercase tracking-widest font-semibold text-foreground transition active:scale-95"
+        >
+          <span>Collections</span>
+          <svg className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m19 9-7 7-7-7" />
+          </svg>
+        </button>
+        <div className={`absolute left-0 right-0 top-full z-[60] overflow-hidden transition-all duration-500 origin-top bg-card rounded-2xl ${isOpen ? 'max-h-[800px] opacity-100 border border-border mt-2 shadow-xl' : 'max-h-0 opacity-0 border-transparent shadow-none'}`}>
+          <nav className="flex flex-col py-2 w-full">
+            {items.map((item) => {
+              if (!item.url) return null;
 
-          const url =
-            item.url.includes('myshopify.com') ||
-              item.url.includes(publicStoreDomain) ||
-              item.url.includes(primaryDomainUrl)
-              ? new URL(item.url).pathname
-              : item.url;
+              const url =
+                item.url.includes('myshopify.com') ||
+                  item.url.includes(publicStoreDomain) ||
+                  item.url.includes(primaryDomainUrl)
+                  ? new URL(item.url).pathname
+                  : item.url;
 
-          return (
-            <NavLink
-              key={item.id}
-              to={url}
-              end
-              prefetch="intent"
-              className={({ isActive }) =>
-                `
-              px-8 py-3
-              text-sm tracking-[0.15em]
-              uppercase
-              font-semibold
-              rounded-full
-              transition-all duration-300
-              ${isActive
-                  ? 'bg-gold text-white shadow-lg'
-                  : 'text-foreground bg-card border border-border'
-                }
-              `
-              }
-            >
-              {item.title}
-            </NavLink>
-          );
-        })}
-      </nav>
-    </div>
+              return (
+                <NavLink
+                  key={item.id}
+                  to={url}
+                  end
+                  prefetch="intent"
+                  onClick={() => setIsOpen(false)}
+                  className={({ isActive }) =>
+                    `px-6 py-3 text-[11px] tracking-[0.15em] uppercase font-semibold transition-colors border-b border-border last:border-0 ${isActive ? 'text-accent bg-muted' : 'text-foreground hover:bg-muted'}`
+                  }
+                >
+                  {item.title}
+                </NavLink>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
+      {/* Desktop Horizontal List */}
+      <div className="hidden md:flex justify-center absolute mt-2 pb-3 md:pb-0 md:mt-0 md:top-28 md:left-1/2 w-full px-2 md:px-0 md:-translate-x-1/2 md:-translate-y-1/2 z-50">
+        <div className="w-full max-w-[95vw] md:w-auto overflow-x-auto no-scrollbar flex justify-start md:justify-center">
+          <nav
+            className="
+            bg-card
+            shadow-inner
+            rounded-full
+            px-2.5 py-2
+            flex items-center gap-2
+            border border-border
+            min-w-max
+          "
+          >
+            {items.map((item) => {
+              if (!item.url) return null;
+
+              const url =
+                item.url.includes('myshopify.com') ||
+                  item.url.includes(publicStoreDomain) ||
+                  item.url.includes(primaryDomainUrl)
+                  ? new URL(item.url).pathname
+                  : item.url;
+
+              return (
+                <NavLink
+                  key={item.id}
+                  to={url}
+                  end
+                  prefetch="intent"
+                  className={({ isActive }) =>
+                    `
+                  px-8 py-3
+                  text-sm tracking-[0.15em]
+                  uppercase
+                  font-semibold
+                  rounded-full
+                  transition-all duration-300
+                  ${isActive
+                      ? 'bg-gold text-white shadow-lg'
+                      : 'text-foreground bg-card border border-border hover:bg-muted'
+                    }
+                  `
+                  }
+                >
+                  {item.title}
+                </NavLink>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -187,63 +234,231 @@ export function HeaderMenu({
   publicStoreDomain: HeaderProps['publicStoreDomain'];
 }) {
   const { close } = useAside();
-  const items = menu?.items?.length ? menu.items : FALLBACK_HEADER_MENU.items;
+  const navigate = useNavigate();
+  const queriesDatalistId = useId();
 
   return (
     <nav
       role="navigation"
-      className="flex flex-col gap-4 text-base uppercase font-medium tracking-wide text-text-main"
+      className="flex flex-col gap-5 pt-2"
     >
-      <NavLink
-        to="/"
-        end
-        onClick={close}
-        className="py-3 border-b border-border hover:text-accent transition-colors duration-300"
-      >
-        Home
-      </NavLink>
+      {/* ── Search ── */}
+      <div className="px-5 pb-1">
+        <div className="predictive-search">
+          <SearchFormPredictive>
+            {({ fetchResults, goToSearch, inputRef }) => (
+              <div className="flex items-center bg-muted/60 backdrop-blur-sm rounded-2xl pl-4 pr-1.5 py-1.5 gap-2 border border-border/50 focus-within:border-foreground/20 focus-within:bg-muted transition-all duration-300 w-full">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 text-muted-foreground flex-shrink-0"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                  />
+                </svg>
+                <input
+                  name="q"
+                  onChange={fetchResults}
+                  onFocus={fetchResults}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      goToSearch();
+                    }
+                  }}
+                  placeholder="Search sacred items…"
+                  ref={inputRef}
+                  type="search"
+                  list={queriesDatalistId}
+                  autoComplete="off"
+                  className="flex-1 text-[13px] bg-transparent outline-none placeholder:text-muted-foreground/60 font-body [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                />
+                <button
+                  type="button"
+                  onClick={goToSearch}
+                  className="bg-foreground text-background text-[10px] font-semibold px-4 py-2 rounded-xl tracking-[0.12em] uppercase shrink-0 hover:opacity-90 active:scale-95 transition-all duration-200"
+                >
+                  Go
+                </button>
+              </div>
+            )}
+          </SearchFormPredictive>
+          <SearchResultsPredictive>
+            {({ items, total, term, state, closeSearch }) => {
+              const { articles, collections, pages, products, queries } = items;
 
-      {items.map((item) => {
-        if (!item.url) return null;
+              if (state === 'loading' && term.current) {
+                return (
+                  <div className="mt-4">
+                    <div className="p-4 text-sm opacity-60">Searching…</div>
+                  </div>
+                );
+              }
 
-        const url =
-          item.url.includes('myshopify.com') ||
-            item.url.includes(publicStoreDomain) ||
-            item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
+              if (!term.current) {
+                return null;
+              }
 
-        return (
-          <NavLink
-            key={item.id}
-            to={url}
-            end
-            prefetch="intent"
-            onClick={close}
-            className={({ isActive }) =>
-              `py-3 border-b border-border transition-colors duration-300 hover:text-accent ${isActive ? 'text-accent' : ''
-              }`
-            }
-          >
-            {item.title}
-          </NavLink>
-        );
-      })}
+              if (!total) {
+                return (
+                  <div className="mt-4">
+                    <SearchResultsPredictive.Empty term={term} />
+                  </div>
+                );
+              }
 
-      {/* Mobile-only: sub-nav / collection items from constants */}
-      <p className="text-xs text-text-muted uppercase tracking-widest mt-4 mb-1">
-        Collections
-      </p>
-      {SUB_NAV_ITEMS.map((item) => (
+              return (
+                <div className="mt-4">
+                  <div className="flex flex-col gap-4 pb-4">
+                    <SearchResultsPredictive.Queries
+                      queries={queries}
+                      queriesDatalistId={queriesDatalistId}
+                    />
+                    <SearchResultsPredictive.Products
+                      products={products}
+                      closeSearch={closeSearch}
+                      term={term}
+                    />
+                    <SearchResultsPredictive.Collections
+                      collections={collections}
+                      closeSearch={closeSearch}
+                      term={term}
+                    />
+                    <SearchResultsPredictive.Pages
+                      pages={pages}
+                      closeSearch={closeSearch}
+                      term={term}
+                    />
+                    <SearchResultsPredictive.Articles
+                      articles={articles}
+                      closeSearch={closeSearch}
+                      term={term}
+                    />
+                    {total ? (
+                      <Link
+                        onClick={closeSearch}
+                        to={`${SEARCH_ENDPOINT}?q=${term.current}`}
+                        className="block text-center p-3 mt-2 border-t border-border text-[11px] tracking-widest uppercase font-semibold text-foreground hover:underline"
+                      >
+                        View all {total} results →
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            }}
+          </SearchResultsPredictive>
+        </div>
+      </div>
+
+      {/* ── Navigation Links Grid ── */}
+      <div className="grid grid-cols-2 gap-2.5 px-5">
         <NavLink
-          key={item.title}
-          to={item.link}
+          to="/"
+          end
           onClick={close}
-          className="py-2 border-b border-border hover:text-accent transition"
+          className={({ isActive }) =>
+            `group relative overflow-hidden rounded-2xl py-4 text-center text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 flex items-center justify-center ${isActive
+              ? 'bg-foreground text-background shadow-lg scale-[1.02]'
+              : 'bg-muted/50 text-foreground border border-border/40 hover:bg-muted hover:border-border hover:shadow-md active:scale-95'
+            }`
+          }
         >
-          {item.title}
+          Home
         </NavLink>
-      ))}
+        <NavLink
+          to="/pages/about"
+          onClick={close}
+          className={({ isActive }) =>
+            `group relative overflow-hidden rounded-2xl py-4 text-center text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 flex items-center justify-center ${isActive
+              ? 'bg-foreground text-background shadow-lg scale-[1.02]'
+              : 'bg-muted/50 text-foreground border border-border/40 hover:bg-muted hover:border-border hover:shadow-md active:scale-95'
+            }`
+          }
+        >
+          About
+        </NavLink>
+        <NavLink
+          to="/pages/contact"
+          onClick={close}
+          className={({ isActive }) =>
+            `group relative overflow-hidden rounded-2xl py-4 text-center text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 flex items-center justify-center ${isActive
+              ? 'bg-foreground text-background shadow-lg scale-[1.02]'
+              : 'bg-muted/50 text-foreground border border-border/40 hover:bg-muted hover:border-border hover:shadow-md active:scale-95'
+            }`
+          }
+        >
+          Contact
+        </NavLink>
+        <NavLink
+          to="/blogs"
+          onClick={close}
+          className={({ isActive }) =>
+            `group relative overflow-hidden rounded-2xl py-4 text-center text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 flex items-center justify-center ${isActive
+              ? 'bg-foreground text-background shadow-lg scale-[1.02]'
+              : 'bg-muted/50 text-foreground border border-border/40 hover:bg-muted hover:border-border hover:shadow-md active:scale-95'
+            }`
+          }
+        >
+          Blog
+        </NavLink>
+      </div>
+
+      {/* ── Divider ── */}
+      <div className="mx-5 border-t border-border/30" />
+
+      {/* ── Quick Links / Promotions ── */}
+      <div className="flex flex-col gap-2 px-5">
+        <p className="text-[9px] font-semibold tracking-[0.25em] uppercase text-muted-foreground px-1 mb-0.5">Quick Links</p>
+        <NavLink
+          to="/collections/all"
+          onClick={close}
+          className="group flex items-center gap-3.5 px-4 py-3.5 bg-muted/30 hover:bg-muted/70 rounded-2xl transition-all duration-300 active:scale-[0.98]"
+        >
+          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white text-sm shadow-sm">🔥</span>
+          <div className="flex flex-col">
+            <span className="text-[12px] font-semibold tracking-[0.08em] text-foreground">Best Sellers</span>
+            <span className="text-[10px] text-muted-foreground leading-tight">Our most loved items</span>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 ml-auto text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
+        </NavLink>
+        <NavLink
+          to="/collections/new-arrivals"
+          onClick={close}
+          className="group flex items-center gap-3.5 px-4 py-3.5 bg-muted/30 hover:bg-muted/70 rounded-2xl transition-all duration-300 active:scale-[0.98]"
+        >
+          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-teal-400 to-emerald-500 text-white text-sm shadow-sm">✨</span>
+          <div className="flex flex-col">
+            <span className="text-[12px] font-semibold tracking-[0.08em] text-foreground">New Arrivals</span>
+            <span className="text-[10px] text-muted-foreground leading-tight">Fresh additions</span>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 ml-auto text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
+        </NavLink>
+        <NavLink
+          to="/collections/sale"
+          onClick={close}
+          className="group flex items-center gap-3.5 px-4 py-3.5 bg-muted/30 hover:bg-muted/70 rounded-2xl transition-all duration-300 active:scale-[0.98]"
+        >
+          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-rose-400 to-pink-600 text-white text-sm shadow-sm">🛍️</span>
+          <div className="flex flex-col">
+            <span className="text-[12px] font-semibold tracking-[0.08em] text-foreground">Sale</span>
+            <span className="text-[10px] text-muted-foreground leading-tight">Up to 40% off</span>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 ml-auto text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
+        </NavLink>
+      </div>
     </nav>
   );
 }

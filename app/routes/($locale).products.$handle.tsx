@@ -1,4 +1,4 @@
-import { redirect, useLoaderData } from 'react-router';
+import { redirect, useLoaderData, Link } from 'react-router';
 import type { Route } from './+types/($locale).products.$handle';
 import {
   getSelectedProductOptions,
@@ -8,6 +8,7 @@ import {
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
   Image,
+  Money,
 } from '@shopify/hydrogen';
 import { ProductPrice } from '~/components/ProductPrice';
 import { ProductForm } from '~/components/ProductForm';
@@ -30,9 +31,8 @@ export const meta: Route.MetaFunction = ({ data }) => {
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return { ...deferredData, ...criticalData };
+  return criticalData;
 }
 
 async function loadCriticalData({ context, params, request }: Route.LoaderArgs) {
@@ -55,17 +55,24 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
 
   redirectIfHandleIsLocalized(request, { handle, data: product });
 
-  return { product };
-}
+  // Fetch recommended products (non-blocking — if it fails, we just show nothing)
+  let recommendedProducts: any[] = [];
+  try {
+    const recData = await storefront.query(RECOMMENDED_PRODUCTS_QUERY, {
+      variables: { productId: product.id },
+    });
+    recommendedProducts = recData?.productRecommendations ?? [];
+  } catch {
+    // Silently fail — the section will just be hidden
+  }
 
-function loadDeferredData({ context, params }: Route.LoaderArgs) {
-  return {};
+  return { product, recommendedProducts };
 }
 
 // ─── Main Product Component ───────────────────────────────────────────────────
 
 export default function Product() {
-  const { product } = useLoaderData<typeof loader>();
+  const { product, recommendedProducts } = useLoaderData<typeof loader>();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const selectedVariant = useOptimisticVariant(
@@ -618,36 +625,8 @@ export default function Product() {
           </div>
         </div>
 
-        {/* ── "You May Also Like" placeholder ── */}
-        <section className="mt-20 md:mt-32 border-t border-stone-200 dark:border-border pt-16">
-          <div className="text-center mb-12">
-            <p className="text-[10px] tracking-widest uppercase text-stone-400 mb-3">Handpicked For You</p>
-            <h2 className="text-3xl md:text-4xl font-light text-stone-900 dark:text-foreground" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              You May Also Like
-            </h2>
-          </div>
-
-          {/* Placeholder cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-card border border-stone-100 dark:border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 group cursor-pointer flex flex-col">
-                <div className="aspect-square bg-stone-50 relative overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center text-stone-200 transition-transform duration-700 group-hover:scale-105">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                      <polyline points="21 15 16 10 5 21" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="p-5 flex flex-col gap-3">
-                  <div className="h-3.5 bg-stone-100 rounded-md w-3/4" />
-                  <div className="h-3.5 bg-stone-100 rounded-md w-1/3" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* ── "You May Also Like" ── */}
+        <RecommendedProducts products={recommendedProducts} />
       </main>
 
       {/* Analytics */}
@@ -667,6 +646,73 @@ export default function Product() {
         }}
       />
     </div>
+  );
+}
+
+// ─── Recommended Products ─────────────────────────────────────────────────────
+
+function RecommendedProducts({ products }: { products: any[] }) {
+  const displayProducts = products?.slice(0, 4) ?? [];
+
+  if (displayProducts.length === 0) return null;
+
+  return (
+    <section className="mt-20 md:mt-32 border-t border-stone-200 dark:border-border pt-16">
+      <div className="text-center mb-12">
+        <p className="text-[10px] tracking-widest uppercase text-stone-400 mb-3">
+          Handpicked For You
+        </p>
+        <h2
+          className="text-3xl md:text-4xl font-light text-stone-900 dark:text-foreground"
+          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+        >
+          You May Also Like
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        {displayProducts.map((product: any, index: number) => (
+          <Link
+            key={product.id}
+            to={`/products/${product.handle}`}
+            prefetch="intent"
+            className="group bg-white dark:bg-card border border-stone-100 dark:border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col no-underline"
+          >
+            <div className="aspect-square bg-stone-50 dark:bg-muted relative overflow-hidden">
+              {product.featuredImage ? (
+                <Image
+                  data={product.featuredImage}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  sizes="(min-width: 1024px) 25vw, 50vw"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-5xl opacity-20 text-stone-300 dark:text-muted-foreground">
+                    ✦
+                  </span>
+                </div>
+              )}
+              {/* Corner ornaments on hover */}
+              <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-stone-200 dark:border-border rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-stone-200 dark:border-border rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
+
+            <div className="p-4 flex flex-col flex-1">
+              <p className="text-[10px] tracking-[0.15em] uppercase text-stone-400 dark:text-muted-foreground mb-1">
+                Devasutra
+              </p>
+              <h3 className="text-sm font-semibold text-stone-900 dark:text-foreground mb-2 leading-snug line-clamp-2 group-hover:underline underline-offset-4 transition-all">
+                {product.title}
+              </h3>
+              <div className="mt-auto text-sm font-bold text-stone-900 dark:text-foreground">
+                <Money data={product.priceRange.minVariantPrice} />
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -800,4 +846,37 @@ const PRODUCT_QUERY = `#graphql
     }
   }
   ${PRODUCT_FRAGMENT}
+` as const;
+
+const RECOMMENDED_PRODUCTS_QUERY = `#graphql
+  query RecommendedProducts(
+    $productId: ID!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
+    productRecommendations(productId: $productId) {
+      id
+      title
+      handle
+      featuredImage {
+        id
+        altText
+        url
+        width
+        height
+      }
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      variants(first: 1) {
+        nodes {
+          id
+          availableForSale
+        }
+      }
+    }
+  }
 ` as const;

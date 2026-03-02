@@ -136,24 +136,24 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
 
                 {/* Content */}
                 <div className="relative h-full flex items-center lg:items-end">
-                  <div className="w-full px-8 lg:px-12 xl:px-20 pb-16 lg:pb-24">
+                  <div className="w-full px-4 md:px-8 lg:px-12 xl:px-20 pb-12 md:pb-16 lg:pb-24">
 
                     <div className="max-w-2xl">
                       {/* Heading */}
                       <h2
-                        className="text-4xl md:text-5xl lg:text-6xl xl:text-5xl font-semibold text-white leading-[1.05] mb-8 font-heading"
+                        className="text-2xl md:text-5xl lg:text-6xl xl:text-5xl font-semibold text-white leading-[1.05] mb-4 md:mb-8 font-heading"
                       >
                         {slide.heading}
                       </h2>
                       {/* Subheading */}
-                      <span className="block text-2xl text-neutral-300 mb-6">
+                      <span className="block text-sm md:text-lg lg:text-2xl text-neutral-300 mb-4 md:mb-6">
                         {slide.subheading}
                       </span>
 
                       {/* CTA Button */}
                       <Link
                         to={slide.ctaLink}
-                        className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black text-lg uppercase font-medium rounded-full border border-white transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
+                        className="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 bg-white text-black text-sm md:text-lg uppercase font-medium rounded-full border border-white transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
                       >
                         {slide.ctaText}
                         <svg

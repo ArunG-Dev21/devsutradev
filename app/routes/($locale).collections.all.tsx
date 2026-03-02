@@ -338,12 +338,12 @@ export default function Collection() {
     [activeCategoryIds],
   );
 
-  const filteredConnection = useMemo(() => {
+  const productFilterFn = useMemo(() => {
     const hasCategory = activeCategoryHandles.length > 0;
     const hasPrice = activePriceFilters.length > 0;
-    if (!hasCategory && !hasPrice) return products;
+    if (!hasCategory && !hasPrice) return undefined;
 
-    const filteredNodes = (products?.nodes ?? []).filter((product: any) => {
+    return (product: any): boolean => {
       if (hasCategory) {
         const productCollections: string[] =
           product.collections?.nodes?.map((c: any) => c.handle) ?? [];
@@ -358,13 +358,8 @@ export default function Collection() {
           return false;
       }
       return true;
-    });
-
-    return {
-      ...products,
-      nodes: filteredNodes,
     };
-  }, [activeCategoryHandles, activePriceFilters, products]);
+  }, [activeCategoryHandles, activePriceFilters]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -470,8 +465,9 @@ export default function Collection() {
             )}
 
             <PaginatedResourceSection
-              connection={filteredConnection}
+              connection={products}
               resourcesClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"
+              filterFn={productFilterFn}
             >
               {({ node: product, index }) => (
                 <a
@@ -529,7 +525,7 @@ export default function Collection() {
               )}
             </PaginatedResourceSection>
 
-            {!(filteredConnection?.nodes?.length > 0) && (
+            {productFilterFn && !(products?.nodes ?? []).some(productFilterFn) && (
               <div className="text-center py-24">
                 <span className="text-6xl text-muted-foreground/30 block mb-4">*</span>
                 <h3 className="text-xl font-bold text-foreground mb-2">No products found</h3>

@@ -25,8 +25,8 @@ export function Footer({
               <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 mb-16">
 
                 {/* LEFT — Branding */}
-                <div className="w-full">
-                  <div className="w-fit mr-auto">
+                <div className="w-full flex justify-center lg:justify-start lg:block text-center lg:text-left">
+                  <div className="w-fit mx-auto lg:mr-auto lg:mx-0 mb-8 lg:mb-0">
                     <img
                       src="/icons/hindi-logo.png"
                       alt="Brand Logo"

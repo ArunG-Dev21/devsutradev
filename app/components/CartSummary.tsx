@@ -15,13 +15,13 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
     <div
       className={`bg-card text-card-foreground ${layout === 'aside'
         ? 'border-t border-border px-4 py-4'
-        : 'p-6 md:p-8 rounded-3xl border border-border shadow-sm'
+        : 'p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-border shadow-sm'
         }`}
     >
       {/* Subtotal */}
       <div className="flex items-center justify-between mb-2">
-        <span className="text-base font-semibold text-foreground">Subtotal</span>
-        <span className="text-base font-bold text-foreground">
+        <span className="text-sm sm:text-base font-semibold text-foreground">Subtotal</span>
+        <span className="text-sm sm:text-base font-bold text-foreground">
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money data={cart.cost.subtotalAmount} />
           ) : (
@@ -31,13 +31,13 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
       </div>
 
       {/* Shipping note */}
-      <p className="text-[11px] text-muted-foreground mb-6">
+      <p className="text-[10px] sm:text-[11px] text-muted-foreground mb-4 sm:mb-6">
         Taxes and shipping calculated at checkout
       </p>
 
       {/* Terms checkbox — page layout only */}
       {layout === 'page' && (
-        <div className="mb-6 border-y border-border py-6">
+        <div className="mb-4 sm:mb-6 border-y border-border py-4 sm:py-6">
           <div className="flex items-start gap-2.5">
             <input type="checkbox" id="terms" className="mt-0.5 rounded border-border text-foreground focus:ring-ring h-3.5 w-3.5 cursor-pointer" />
             <label htmlFor="terms" className="text-[11px] text-muted-foreground leading-relaxed cursor-pointer select-none">
@@ -67,7 +67,7 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
 
       {/* Trust Badges for Page Layout */}
       {layout === 'page' && (
-        <div className="mt-8 pt-6 border-t border-border flex flex-col items-center">
+        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-border flex flex-col items-center">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-4">Secure Checkout</p>
           <div className="flex items-center justify-center gap-3 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
             <svg className="w-8 h-8" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" width="38" height="24" aria-labelledby="pi-visa"><title id="pi-visa">Visa</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" /><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" /><path d="M28.3 10.1H28c-.4 1-.7 1.5-1 3h1.9c-.3-1.5-.3-2.2-.6-3zm2.9 5.9h-1.7c-.1 0-.1 0-.2-.1l-.2-.9-.1-.2h-2.4c-.1 0-.2 0-.2.2l-.3.9c0 .1-.1.1-.1.1h-2.1l.2-.5L27 8.7c0-.5.3-.7.8-.7h1.5c.1 0 .2 0 .2.2l1.4 6.5c.1.4.2.7.2.9.1.1.1.1.1.1m-10.3-6h-1.6l-.3 1.1-1.3 4.9c-.1.3-.2.4-.5.4h-2.6l-1.3-4.9c-.1-.3-.2-.4-.5-.4h-1.6l1.9 6h1.7l1.5-6h1.6l-1-6m8.8.1h-1.6l-.1.1c-1 0-1.2.6-1.5 1.5h1.9l-.1.3c-.6.8-1.5 1-2.5 1-.9 0-1.6-.3-1.6-.9 0-.4.3-.8 1.1-1.1s2-.6 2-1c0-.4-.4-.8-1.2-.8-1.2 0-2 .4-2.4.9l-.3.3.4 1.4c.5-.4 1.2-.7 1.8-.7.6 0 1.1.2 1.1.7 0 .3-.2.6-.9.9s-2.1.8-2.1 1.6c0 1 .8 1.5 2 1.5 1.5 0 2.6-.6 3.1-1.3l.3.2z" fill="#142688" /></svg>
@@ -91,7 +91,7 @@ function CartCheckoutActions({ checkoutUrl, layout }: { checkoutUrl?: string, la
       <a
         href={checkoutUrl}
         target="_self"
-        className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
+        className="block w-full py-2.5 sm:py-3 text-center text-xs sm:text-sm tracking-[0.15em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
       >
         Checkout →
       </a>
@@ -100,7 +100,7 @@ function CartCheckoutActions({ checkoutUrl, layout }: { checkoutUrl?: string, la
           to="/cart"
           onClick={close}
           prefetch="viewport"
-          className="block w-full py-3 text-center text-sm tracking-[0.15em] uppercase font-semibold rounded-lg border border-border text-foreground transition-all duration-300 hover:bg-muted"
+          className="block w-full py-2.5 sm:py-3 text-center text-xs sm:text-sm tracking-[0.15em] uppercase font-semibold rounded-lg border border-border text-foreground transition-all duration-300 hover:bg-muted"
         >
           View Cart
         </Link>

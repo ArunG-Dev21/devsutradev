@@ -196,7 +196,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
       {/* ── HEADER ── */}
       <div className="px-6 md:px-10 lg:px-14 pt-16 pb-6 border-b border-border flex-shrink-0">
         <h2
-          className="text-5xl md:text-6xl lg:text-5xl font-medium leading-tight tracking-tight mb-3 font-heading"
+          className="text-4xl md:text-5xl lg:text-5xl font-medium leading-tight tracking-tight mb-3 font-heading"
         >
           {collection.title}
         </h2>

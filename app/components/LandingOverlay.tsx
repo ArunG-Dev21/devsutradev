@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import { init, unlock } from '~/lib/audioController';
 
 const OVERLAY_BG = '/overlay-bg.jpeg';
+const SESSION_KEY = 'devasutra-overlay-shown';
 
 /**
  * Cinematic full-screen intro overlay shown once per session.
  *
+ * - Only appears on the homepage (/)
+ * - Uses sessionStorage so it's shown at most once per browser session
  * - Mobile: circle clip-path shrink exit
  * - Desktop: 5 vertical columns slide alternately up/down
  * - Audio: unlocks + fades in on enter click
@@ -13,19 +17,31 @@ const OVERLAY_BG = '/overlay-bg.jpeg';
 export function LandingOverlay() {
     const [show, setShow] = useState(false);
     const [exiting, setExiting] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        // Always show overlay on every page load
+
+        // Only show on the homepage
+        const isHomepage =
+            location.pathname === '/' ||
+            location.pathname.match(/^\/[a-z]{2}-[a-z]{2}\/?$/i); // e.g. /en-us
+
+        if (!isHomepage) return;
+
+        // Only show once per session
+        if (sessionStorage.getItem(SESSION_KEY)) return;
+
         setShow(true);
-    }, []);
+    }, [location.pathname]);
 
     const handleEnter = () => {
         // Unlock audio directly in the click handler (browser trusts this as a user gesture)
         init();
         unlock();
 
-
+        // Mark as shown so it won't appear again this session
+        sessionStorage.setItem(SESSION_KEY, '1');
 
         setExiting(true);
 

@@ -68,18 +68,20 @@ export function Aside({
 
       {/* Aside Panel */}
       <aside
-        className={`absolute top-0 right-0 w-[min(420px,100vw)] h-[100dvh] bg-card text-card-foreground shadow-2xl flex flex-col transition-transform duration-300 ease-out ${expanded ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`absolute top-0 right-0 w-[min(400px,100vw)] h-[100dvh] bg-card text-card-foreground shadow-2xl flex flex-col transition-transform duration-300 ease-out ${expanded ? 'translate-x-0' : 'translate-x-full'}`}
       >
-        <header className="flex items-center justify-between h-16 px-6 border-b border-border shrink-0">
-          <h3 className="m-0 text-[0.75rem] font-semibold tracking-[0.15em] uppercase">
+        <header className="flex items-center justify-between h-14 px-5 border-b border-border/40 shrink-0">
+          <h3 className="m-0 text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-muted-foreground">
             {heading}
           </h3>
           <button
-            className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer flex items-center justify-center hover:no-underline"
+            className="w-8 h-8 -mr-1 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200 bg-transparent border-none cursor-pointer"
             onClick={close}
             aria-label="Close"
           >
-            <span className="text-3xl leading-none font-light">&times;</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4.5 h-4.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
           </button>
         </header>
         <main className="flex-1 overflow-y-auto bg-card flex flex-col m-0">

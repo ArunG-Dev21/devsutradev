@@ -108,19 +108,19 @@ export default function Cart() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header Area */}
       <div className="bg-card border-b border-border">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 md:py-12">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground tracking-tight">
             Your Cart
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
             Review your sacred items before proceeding to checkout.
           </p>
         </div>
       </div>
 
       {/* Main Cart Content */}
-      <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
-        <div className="bg-card text-card-foreground rounded-3xl shadow-sm border border-border p-6 md:p-8 lg:p-10">
+      <div className="flex-1 container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 md:py-12 w-full">
+        <div className="bg-card text-card-foreground rounded-2xl sm:rounded-3xl shadow-sm border border-border p-3 sm:p-6 md:p-8 lg:p-10">
           <CartMain layout="page" cart={cart} />
         </div>
       </div>

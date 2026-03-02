@@ -8,15 +8,18 @@ export function PaginatedResourceSection<NodesType>({
   connection,
   children,
   resourcesClassName,
+  filterFn,
 }: {
   connection: React.ComponentProps<typeof Pagination<NodesType>>['connection'];
   children: React.FunctionComponent<{ node: NodesType; index: number }>;
   resourcesClassName?: string;
+  filterFn?: (node: NodesType) => boolean;
 }) {
   return (
     <Pagination connection={connection}>
       {({ nodes, isLoading, PreviousLink, NextLink }) => {
-        const resourcesMarkup = nodes.map((node, index) =>
+        const visibleNodes = filterFn ? nodes.filter(filterFn) : nodes;
+        const resourcesMarkup = visibleNodes.map((node, index) =>
           children({ node, index }),
         );
 
