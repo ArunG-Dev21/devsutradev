@@ -448,6 +448,108 @@ export type FeaturedCollectionWithProductsQuery = {
       };
     }
   >;
+  karungaliMaala?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
+      image?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+      >;
+      products: {
+        nodes: Array<
+          Pick<
+            StorefrontAPI.Product,
+            'id' | 'title' | 'handle' | 'availableForSale'
+          > & {
+            priceRange: {
+              minVariantPrice: Pick<
+                StorefrontAPI.MoneyV2,
+                'amount' | 'currencyCode'
+              >;
+            };
+            featuredImage?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+            >;
+          }
+        >;
+      };
+    }
+  >;
+  karungaliBracelets?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
+      image?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+      >;
+      products: {
+        nodes: Array<
+          Pick<
+            StorefrontAPI.Product,
+            'id' | 'title' | 'handle' | 'availableForSale'
+          > & {
+            priceRange: {
+              minVariantPrice: Pick<
+                StorefrontAPI.MoneyV2,
+                'amount' | 'currencyCode'
+              >;
+            };
+            featuredImage?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+            >;
+          }
+        >;
+      };
+    }
+  >;
+  samayogaMaala?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
+      image?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+      >;
+      products: {
+        nodes: Array<
+          Pick<
+            StorefrontAPI.Product,
+            'id' | 'title' | 'handle' | 'availableForSale'
+          > & {
+            priceRange: {
+              minVariantPrice: Pick<
+                StorefrontAPI.MoneyV2,
+                'amount' | 'currencyCode'
+              >;
+            };
+            featuredImage?: StorefrontAPI.Maybe<
+              Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+            >;
+          }
+        >;
+      };
+    }
+  >;
+};
+
+export type CollectionPreviewFragment = Pick<
+  StorefrontAPI.Collection,
+  'id' | 'title' | 'handle'
+> & {
+  image?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+  >;
+  products: {
+    nodes: Array<
+      Pick<
+        StorefrontAPI.Product,
+        'id' | 'title' | 'handle' | 'availableForSale'
+      > & {
+        priceRange: {
+          minVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+        };
+        featuredImage?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
+        >;
+      }
+    >;
+  };
 };
 
 export type HomepageSlidesQueryVariables = StorefrontAPI.Exact<{
@@ -485,14 +587,39 @@ export type TestimonialsQuery = {
       Pick<StorefrontAPI.Metaobject, 'id' | 'handle'> & {
         fields: Array<
           Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'> & {
-            reference?: StorefrontAPI.Maybe<{
-              image?: StorefrontAPI.Maybe<
-                Pick<
-                  StorefrontAPI.Image,
-                  'url' | 'altText' | 'width' | 'height'
-                >
-              >;
-            }>;
+            reference?: StorefrontAPI.Maybe<
+              | Pick<StorefrontAPI.GenericFile, 'id' | 'url' | 'mimeType'>
+              | {
+                  image?: StorefrontAPI.Maybe<
+                    Pick<
+                      StorefrontAPI.Image,
+                      'url' | 'altText' | 'width' | 'height'
+                    >
+                  >;
+                }
+              | (Pick<StorefrontAPI.Product, 'id' | 'handle' | 'title'> & {
+                  featuredImage?: StorefrontAPI.Maybe<
+                    Pick<
+                      StorefrontAPI.Image,
+                      'url' | 'altText' | 'width' | 'height'
+                    >
+                  >;
+                  priceRange: {
+                    minVariantPrice: Pick<
+                      StorefrontAPI.MoneyV2,
+                      'amount' | 'currencyCode'
+                    >;
+                  };
+                })
+              | (Pick<StorefrontAPI.Video, 'id'> & {
+                  sources: Array<
+                    Pick<
+                      StorefrontAPI.VideoSource,
+                      'url' | 'mimeType' | 'format' | 'height' | 'width'
+                    >
+                  >;
+                })
+            >;
           }
         >;
       }
@@ -1572,15 +1699,15 @@ interface GeneratedQueryTypes {
     return: FooterQuery;
     variables: FooterQueryVariables;
   };
-  '#graphql\n  query FeaturedCollectionWithProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int!\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: "featured") {\n      id\n      title\n      handle\n      description\n      image {\n        url\n        altText\n        width\n        height\n      }\n      products(first: $first, sortKey: BEST_SELLING) {\n        nodes {\n          id\n          title\n          handle\n          availableForSale\n          priceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n          compareAtPriceRange {\n            minVariantPrice {\n              amount\n              currencyCode\n            }\n          }\n          featuredImage {\n            url\n            altText\n            width\n            height\n          }\n\n          # ── ADDED: second image for hover swap ──────────────────────────────\n          # images.nodes[0] = same as featuredImage (primary)\n          # images.nodes[1] = second Shopify media image (shown on hover)\n          images(first: 2) {\n            nodes {\n              url\n              altText\n              width\n              height\n            }\n          }\n\n          # ── ADDED: first variant needed for Add to Cart ──────────────────────\n          variants(first: 1) {\n            nodes {\n              id\n              availableForSale\n              price {\n                amount\n                currencyCode\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query FeaturedCollectionWithProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int!\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: "featured") {\n      id title handle description\n      image { url altText width height }\n      products(first: $first, sortKey: BEST_SELLING) {\n        nodes {\n          id title handle availableForSale\n          priceRange { minVariantPrice { amount currencyCode } }\n          compareAtPriceRange { minVariantPrice { amount currencyCode } }\n          featuredImage { url altText width height }\n          images(first: 2) { nodes { url altText width height } }\n          variants(first: 1) {\n            nodes { id availableForSale price { amount currencyCode } }\n          }\n        }\n      }\n    }\n    karungaliMaala: collection(handle: "karungali-maala") { ...CollectionPreview }\n    karungaliBracelets: collection(handle: "karungali-bracelets") { ...CollectionPreview }\n    samayogaMaala: collection(handle: "samayoga-maala") { ...CollectionPreview }\n  }\n\n  fragment CollectionPreview on Collection {\n    id\n    title\n    handle\n    image { url altText width height }\n    products(first: 8, sortKey: BEST_SELLING) {\n      nodes {\n        id title handle availableForSale\n        priceRange { minVariantPrice { amount currencyCode } }\n        featuredImage { url altText width height }\n      }\n    }\n  }\n': {
     return: FeaturedCollectionWithProductsQuery;
     variables: FeaturedCollectionWithProductsQueryVariables;
   };
-  '#graphql\n  query HomepageSlides {\n    metaobjects(type: "homepage_slides", first: 10) {\n      nodes {\n        id\n        handle\n        fields {\n          key\n          value\n          reference {\n            ... on MediaImage {\n              image {\n                url\n                altText\n                width\n                height\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query HomepageSlides {\n    metaobjects(type: "homepage_slides", first: 10) {\n      nodes {\n        id handle\n        fields {\n          key value\n          reference {\n            ... on MediaImage { image { url altText width height } }\n          }\n        }\n      }\n    }\n  }\n': {
     return: HomepageSlidesQuery;
     variables: HomepageSlidesQueryVariables;
   };
-  '#graphql\n  query Testimonials {\n    metaobjects(type: "testimonials", first: 20) {\n      nodes {\n        id\n        handle\n        fields {\n          key\n          value\n          reference {\n            ... on MediaImage {\n              image {\n                url\n                altText\n                width\n                height\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query Testimonials {\n    metaobjects(type: "testimonials", first: 20) {\n      nodes {\n        id\n        handle\n        fields {\n          key\n          value\n          reference {\n            # ── Customer photo ──────────────────────────────────────────────\n            ... on MediaImage {\n              image { url altText width height }\n            }\n\n            # ── Linked product (product_reference field) ─────────────────\n            ... on Product {\n              id\n              handle\n              title\n              featuredImage { url altText width height }\n              priceRange {\n                minVariantPrice { amount currencyCode }\n              }\n            }\n\n            # ── Video uploaded to Shopify Files (customer_product_image) ──\n            ... on Video {\n              id\n              sources {\n                url\n                mimeType\n                format\n                height\n                width\n              }\n            }\n\n            # ── Fallback: non-transcoded upload stored as GenericFile ─────\n            ... on GenericFile {\n              id\n              url\n              mimeType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: TestimonialsQuery;
     variables: TestimonialsQueryVariables;
   };

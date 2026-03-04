@@ -277,8 +277,34 @@ export default function Collection() {
   return (
     <div className="min-h-screen text-foreground">
 
+      {/* BANNER */}
+      <div className="relative bg-background border-b border-border overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-foreground rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-foreground rounded-full blur-3xl" />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
+          <div className="w-[500px] h-[500px] border border-foreground rounded-full" />
+          <div className="absolute w-[320px] h-[320px] border border-foreground rounded-full" />
+          <div className="absolute w-[160px] h-[160px] border border-foreground rounded-full" />
+        </div>
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground mb-3">
+            Handpicked and Energised
+          </p>
+          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 leading-tight">
+            {collection.title}
+          </h1>
+          {collection.description && (
+            <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
+              {collection.description}
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* BODY */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="flex gap-8 items-start">
 
           <aside className="hidden lg:block w-56 xl:w-64 flex-shrink-0">

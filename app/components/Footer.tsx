@@ -22,11 +22,11 @@ export function Footer({
             <div className="container mx-auto px-6 sm:px-10 lg:px-16 pt-10 pb-10">
 
               {/* ───────────── Main Section ───────────── */}
-              <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 mb-16">
+              <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 mb-16">
 
                 {/* LEFT — Branding & About */}
-                <div className="w-full lg:w-[40%] flex flex-col items-center lg:items-start text-center lg:text-left mb-12 lg:mb-0">
-                  <div className="w-fit mb-8 lg:mb-10">
+                <div className="w-full lg:w-[40%] flex flex-col items-start text-left mb-10 lg:mb-0">
+                  <div className="w-fit mb-6 lg:mb-8">
                     <img
                       src="/logo-branding.png"
                       alt="Brand Logo"
@@ -81,10 +81,10 @@ export function Footer({
                             <NavLink
                               to={link.url}
                               prefetch="intent"
-                              className="text-text-muted hover:text-text-main text-[13px] transition-colors duration-300 relative group"
+                              className="text-text-muted hover:text-text-main text-[13px] transition-colors duration-300 relative group flex items-center w-fit"
                             >
-                              <span className="absolute -left-3 opacity-0 group-hover:opacity-100 group-hover:left-0 transition-all duration-300 text-[10px]">&#8227;</span>
-                              <span className="group-hover:pl-4 transition-all duration-300 inline-block">{link.title}</span>
+                              <span className="absolute -left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[14px] leading-none mt-[1px]">&#8227;</span>
+                              <span className="group-hover:translate-x-1.5 transition-transform duration-300 block">{link.title}</span>
                             </NavLink>
                           </li>
                         ))}
@@ -116,10 +116,10 @@ export function Footer({
                                 <NavLink
                                   to={url}
                                   prefetch="intent"
-                                  className="text-text-muted hover:text-text-main text-[13px] transition-colors duration-300 relative group"
+                                  className="text-text-muted hover:text-text-main text-[13px] transition-colors duration-300 relative group flex items-center w-fit"
                                 >
-                                  <span className="absolute -left-3 opacity-0 group-hover:opacity-100 group-hover:left-0 transition-all duration-300 text-[10px]">&#8227;</span>
-                                  <span className="group-hover:pl-4 transition-all duration-300 inline-block">{item.title}</span>
+                                  <span className="absolute -left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[14px] leading-none mt-[1px]">&#8227;</span>
+                                  <span className="group-hover:translate-x-1.5 transition-transform duration-300 block">{item.title}</span>
                                 </NavLink>
                               </li>
                             );
@@ -128,10 +128,10 @@ export function Footer({
                             <li key={link.title}>
                               <NavLink
                                 to={link.url}
-                                className="text-text-muted hover:text-text-main text-[13px] transition-colors duration-300 relative group"
+                                className="text-text-muted hover:text-text-main text-[13px] transition-colors duration-300 relative group flex items-center w-fit"
                               >
-                                <span className="absolute -left-3 opacity-0 group-hover:opacity-100 group-hover:left-0 transition-all duration-300 text-[10px]">&#8227;</span>
-                                <span className="group-hover:pl-4 transition-all duration-300 inline-block">{link.title}</span>
+                                <span className="absolute -left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[14px] leading-none mt-[1px]">&#8227;</span>
+                                <span className="group-hover:translate-x-1.5 transition-transform duration-300 block">{link.title}</span>
                               </NavLink>
                             </li>
                           ))}
@@ -144,7 +144,7 @@ export function Footer({
               </div>
 
               {/* ───────────── Bottom Bar ───────────── */}
-              <div className="border-t border-primary-border pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-text-muted">
+              <div className="border-t border-primary-border pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-text-muted">
                 <div>
                   © {new Date().getFullYear()} {header.shop.name || SITE_NAME}
                 </div>

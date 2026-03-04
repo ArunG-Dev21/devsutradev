@@ -154,13 +154,13 @@ function SubNavIsland({
     <img
       src="/icons/collections.png"
       alt=""
-      className={`w-7 h-7 object-contain transition-all duration-300
+      className={`w-10 h-10 object-contain transition-all duration-300
         ${isOpen ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`}
     />
 
     {/* X — fades in when open */}
     <svg
-      width="14" height="14" viewBox="0 0 24 24"
+      width="20" height="20" viewBox="0 0 24 24"
       fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
       className={`absolute transition-all duration-300 text-foreground
         ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}

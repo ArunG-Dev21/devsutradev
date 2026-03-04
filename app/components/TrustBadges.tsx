@@ -1,5 +1,4 @@
 import React from 'react';
-import ContactForm from '~/components/ContactForm';
 
 export function TrustBadges() {
   return (
@@ -7,8 +6,8 @@ export function TrustBadges() {
       {/* Trust Badges */}
       <section className="bg-black border-t border-gold-muted/8 py-6 lg:py-8 xl:py-10">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 scroll-reveal">
-            <div className="trust-badge flex items-center justify-center sm:justify-start lg:justify-center gap-4 lg:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 lg:gap-8 scroll-reveal">
+            <div className="trust-badge w-full flex items-center justify-center sm:justify-start lg:justify-center gap-4 lg:gap-5">
               <svg
                 className="w-8 h-8 md:w-11 md:h-11 lg:w-12 lg:h-12 text-white flex-shrink-0"
                 fill="none"
@@ -22,12 +21,12 @@ export function TrustBadges() {
                   d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
                 ></path>
               </svg>
-              <div>
+              <div className="flex-1">
                 <p className="text-base md:text-lg font-medium text-white tracking-wide">Secure Checkout</p>
                 <p className="text-sm text-gray-300 mt-0.5">SSL encrypted payment</p>
               </div>
             </div>
-            <div className="trust-badge flex items-center justify-center sm:justify-start lg:justify-center gap-4 lg:gap-5">
+            <div className="trust-badge w-full flex items-center justify-center sm:justify-start lg:justify-center gap-4 lg:gap-5">
               <svg
                 className="w-8 h-8 md:w-11 md:h-11 lg:w-12 lg:h-12 text-white flex-shrink-0"
                 fill="none"
@@ -41,12 +40,12 @@ export function TrustBadges() {
                   d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"
                 ></path>
               </svg>
-              <div>
+              <div className="flex-1">
                 <p className="text-base md:text-lg font-medium text-white tracking-wide">Free Returns</p>
                 <p className="text-sm text-gray-300 mt-0.5">30-day hassle-free returns</p>
               </div>
             </div>
-            <div className="trust-badge flex items-center justify-center sm:justify-start lg:justify-center gap-4 lg:gap-5">
+            <div className="trust-badge w-full flex items-center justify-center sm:justify-start lg:justify-center gap-4 lg:gap-5">
               <svg
                 className="w-8 h-8 md:w-11 md:h-11 lg:w-12 lg:h-12 text-white flex-shrink-0"
                 fill="none"
@@ -60,9 +59,28 @@ export function TrustBadges() {
                   d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"
                 ></path>
               </svg>
-              <div>
+              <div className="flex-1">
                 <p className="text-base md:text-lg font-medium text-white tracking-wide">Fast Shipping</p>
                 <p className="text-sm text-gray-300 mt-0.5">Delivered in 5-7 business days</p>
+              </div>
+            </div>
+            <div className="trust-badge w-full flex items-center justify-center sm:justify-start lg:justify-center gap-4 lg:gap-5">
+              <svg
+                className="w-8 h-8 md:w-11 md:h-11 lg:w-12 lg:h-12 text-white flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
+                ></path>
+              </svg>
+              <div className="flex-1">
+                <p className="text-base md:text-lg font-medium text-white tracking-wide">Lab Certified</p>
+                <p className="text-sm text-gray-300 mt-0.5">Gemological authenticity report</p>
               </div>
             </div>
           </div>
@@ -170,94 +188,6 @@ export function TrustBadges() {
                 Designed to enhance meditation, promote healing, and offer
                 protection.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section
-        id="contact"
-        className="relative bg-background py-20 lg:py-28 overflow-hidden"
-      >
-        {/* Decorative gradient orb */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-gold/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-gold/5 to-transparent rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none"></div>
-
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-20 items-start">
-            {/* Left: Info */}
-            <div className="lg:col-span-2 scroll-reveal-left">
-              <span className="text-xs font-medium tracking-[0.25em] uppercase text-muted-foreground">
-                Get in Touch
-              </span>
-              <h2 className="text-3xl lg:text-4xl font-heading font-medium text-foreground mt-3 mb-4">
-                We&apos;re Here to Help
-              </h2>
-              <p className="text-muted-foreground text-base leading-relaxed mb-8">
-                Have a question about our bracelets, need sizing help, or want
-                guidance choosing the right piece? Our team is happy to assist
-                you on your spiritual journey.
-              </p>
-
-              {/* Quick contact hints */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg
-                      className="w-4 h-4 text-gold"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Response Time
-                    </p>
-                    <p className="text-xs text-muted-foreground">Usually within 24 hours</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg
-                      className="w-4 h-4 text-gold"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Expert Guidance
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Personalized bracelet recommendations
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Form */}
-            <div className="lg:col-span-3 relative scroll-reveal-right">
-              <div className="bg-card backdrop-blur-sm border border-border rounded-2xl p-6 lg:p-8 shadow-sm">
-                <ContactForm />
-              </div>
             </div>
           </div>
         </div>

@@ -15,25 +15,35 @@ export default async function handleRequest(
   context: HydrogenRouterContextProvider,
 ) {
   const { nonce, header, NonceProvider } = createContentSecurityPolicy({
-    shop: {
-      checkoutDomain:
-        context.env.PUBLIC_CHECKOUT_DOMAIN || context.env.PUBLIC_STORE_DOMAIN,
-      storeDomain: context.env.PUBLIC_STORE_DOMAIN,
-    },
-    styleSrc: [
-      "'self'",
-      'https://cdn.shopify.com',
-      'https://fonts.googleapis.com',
-      'unsafe-inline',
-    ],
-    fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
-    imgSrc: [
-      "'self'",
-      'data:',
-      'https://cdn.shopify.com',
-      'https://images.unsplash.com',
-    ],
-  });
+  shop: {
+    checkoutDomain:
+      context.env.PUBLIC_CHECKOUT_DOMAIN || context.env.PUBLIC_STORE_DOMAIN,
+    storeDomain: context.env.PUBLIC_STORE_DOMAIN,
+  },
+
+  styleSrc: [
+    "'self'",
+    'https://cdn.shopify.com',
+    'https://fonts.googleapis.com',
+    "'unsafe-inline'",
+  ],
+
+  fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+
+  imgSrc: [
+    "'self'",
+    'data:',
+    'https://cdn.shopify.com',
+    'https://images.unsplash.com',
+    'https://*.myshopify.com', // ✅ ADD THIS
+  ],
+
+  mediaSrc: [
+    "'self'",
+    'https://cdn.shopify.com',
+    'https://*.myshopify.com', // ✅ THIS FIXES VIDEO
+  ],
+});
 
   const body = await renderToReadableStream(
     <NonceProvider>
