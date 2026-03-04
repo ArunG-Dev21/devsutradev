@@ -67,7 +67,7 @@ export function SearchFormPredictive({
   }
 
   return (
-    <fetcher.Form {...props} className={className} onSubmit={resetInput}>
+    <fetcher.Form {...props} className={`${className} outline-none`} onSubmit={resetInput}>
       {children({ inputRef, fetcher, fetchResults, goToSearch })}
     </fetcher.Form>
   );

@@ -106,6 +106,7 @@ export function Header({
 
 /** Floating pill-shaped sub-navigation bar — uses Shopify menu links */
 function SubNavIsland({
+
   menu,
   collections,
   primaryDomainUrl,
@@ -134,13 +135,13 @@ function SubNavIsland({
 
   return (
     <>
-{/* Animated trigger button — fixed to top-right of the header */}
-<div className="md:hidden">
-  {/* ── TRIGGER BUTTON ── */}
-  <button
-    onClick={() => setIsOpen(!isOpen)}
-    aria-label="Browse collections"
-    className={`
+      {/* Animated trigger button — fixed to top-right of the header */}
+      <div className="md:hidden">
+        {/* ── TRIGGER BUTTON ── */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Browse collections"
+          className={`
       group absolute top-20 right-4 z-50
       w-12 h-12 rounded-full
       flex items-center justify-center
@@ -149,137 +150,265 @@ function SubNavIsland({
       transition-all duration-300 ease-out
       ${isOpen ? 'scale-90 ring-2 ring-foreground/20' : ''}
     `}
-  >
-    {/* PNG icon — fades + shrinks when open */}
-    <img
-      src="/icons/collections.png"
-      alt=""
-      className={`w-10 h-10 object-contain transition-all duration-300
+        >
+          {/* Search icon — fades + shrinks when open */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.8}
+            stroke="currentColor"
+            className={`w-5 h-5 transition-all duration-300
         ${isOpen ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`}
-    />
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            />
+          </svg>
 
-    {/* X — fades in when open */}
-    <svg
-      width="20" height="20" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
-      className={`absolute transition-all duration-300 text-foreground
+          {/* X — fades in when open */}
+          <svg
+            width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+            className={`absolute transition-all duration-300 text-foreground
         ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
-    >
-      <path d="M18 6L6 18M6 6l12 12" />
-    </svg>
+          >
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
 
-    {/* Pulse ring — only when closed, invites interaction */}
-    {!isOpen && (
-      <span className="absolute inset-0 rounded-full border border-foreground/25 animate-ping pointer-events-none" />
-    )}
-  </button>
+          {/* Pulse ring — only when closed, invites interaction */}
+          {!isOpen && (
+            <span className="absolute inset-0 rounded-full border border-foreground/25 animate-ping pointer-events-none" />
+          )}
+        </button>
 
-  {/* ── BACKDROP ── */}
-  <div
-    onClick={() => setIsOpen(false)}
-    className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-400
+        {/* ── BACKDROP ── */}
+        <div
+          onClick={() => setIsOpen(false)}
+          className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-400
       ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-  />
+        />
 
-  {/* ── SLIDE-UP MODAL PANEL ── */}
-  <div
-    className={`
+        {/* ── SLIDE-UP MODAL PANEL ── */}
+        <div
+          className={`
       fixed left-3 right-3 bottom-4 z-50
       bg-card rounded-3xl border border-border shadow-2xl
+      max-h-[92dvh] flex flex-col overflow-hidden
       transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
       ${isOpen
-        ? 'translate-y-0 opacity-100'
-        : 'translate-y-[110%] opacity-0 pointer-events-none'}
+              ? 'translate-y-0 opacity-100'
+              : 'translate-y-[110%] opacity-0 pointer-events-none'}
     `}
-  >
-    {/* Handle bar */}
-    <div className="flex justify-center pt-3 pb-1">
-      <div className="w-10 h-1 rounded-full bg-border" />
-    </div>
+        >
+          {/* Handle bar */}
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 rounded-full bg-border" />
+          </div>
 
-    {/* Header row */}
-    <div className="flex items-center justify-between px-5 pt-2 pb-4 border-b border-border">
-      <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-muted-foreground">
-        Browse Collections
-      </p>
-      <button
-        onClick={() => setIsOpen(false)}
-        className="w-7 h-7 rounded-full flex items-center justify-center bg-muted text-muted-foreground hover:bg-foreground hover:text-background transition-all duration-200 active:scale-90"
-      >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
+          {/* Header row */}
+          <div className="flex items-center justify-between px-5 pt-2 pb-4 border-b border-border">
+            <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-muted-foreground">
+              Search & Browse
+            </p>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-7 h-7 rounded-full flex items-center justify-center bg-muted text-muted-foreground hover:bg-foreground hover:text-background transition-all duration-200 active:scale-90"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-    {/* Collection cards grid */}
-    <nav className="p-4 grid grid-cols-2 gap-3 max-h-[65vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      {items.map((item, index) => {
-        if (!item.url) return null;
+          {/* Scrollable body */}
+          <div className="flex-1 overflow-y-auto px-px [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 
-        const url =
-          item.url.includes('myshopify.com') ||
-            item.url.includes(publicStoreDomain) ||
-            item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
+          {/* Search bar */}
+          <div className="px-4 pt-4 pb-2">
+            <div className="predictive-search">
+              <SearchFormPredictive>
+                {({ fetchResults, goToSearch, inputRef }) => (
+                  <div className="flex items-center bg-muted/60 backdrop-blur-sm rounded-2xl pl-4 pr-1.5 py-1.5 gap-2 transition-all duration-300 w-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-4 h-4 text-muted-foreground flex-shrink-0"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                      />
+                    </svg>
+                    <input
+                      name="q"
+                      onChange={fetchResults}
+                      onFocus={fetchResults}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          goToSearch();
+                          setIsOpen(false);
+                        }
+                      }}
+                      placeholder="Search sacred items…"
+                      ref={inputRef}
+                      type="search"
+                      autoComplete="off"
+                      className="flex-1 text-[13px] bg-transparent outline-none placeholder:text-muted-foreground/60 font-body [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { goToSearch(); setIsOpen(false); }}
+                      className="bg-foreground text-background text-[10px] font-semibold px-4 py-2 rounded-xl tracking-[0.12em] uppercase shrink-0 hover:opacity-90 active:scale-95 transition-all duration-200"
+                    >
+                      Go
+                    </button>
+                  </div>
+                )}
+              </SearchFormPredictive>
+              <SearchResultsPredictive>
+                {({ items, total, term, state, closeSearch }) => {
+                  const { articles, collections: searchCollections, pages, products, queries } = items;
 
-        const imageUrl = getCollectionImage(url);
+                  if (state === 'loading' && term.current) {
+                    return (
+                      <div className="mt-3">
+                        <div className="p-3 text-sm opacity-60">Searching…</div>
+                      </div>
+                    );
+                  }
 
-        return (
-          <NavLink
-            key={item.id}
-            to={url}
-            end
-            prefetch="intent"
-            onClick={() => setIsOpen(false)}
-            className={({ isActive }) =>
-              `group relative rounded-2xl overflow-hidden aspect-[3/4] flex items-end
+                  if (!term.current) return null;
+
+                  if (!total) {
+                    return (
+                      <div className="mt-3">
+                        <SearchResultsPredictive.Empty term={term} />
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="mt-3 border-t border-border pt-2">
+                      <div className="flex flex-col gap-3 pb-2 max-h-[45vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                        <SearchResultsPredictive.Queries
+                          queries={queries}
+                          queriesDatalistId="modal-search-queries"
+                        />
+                        <SearchResultsPredictive.Products
+                          products={products}
+                          closeSearch={() => { closeSearch(); setIsOpen(false); }}
+                          term={term}
+                        />
+                        <SearchResultsPredictive.Collections
+                          collections={searchCollections}
+                          closeSearch={() => { closeSearch(); setIsOpen(false); }}
+                          term={term}
+                        />
+                        <SearchResultsPredictive.Pages
+                          pages={pages}
+                          closeSearch={() => { closeSearch(); setIsOpen(false); }}
+                          term={term}
+                        />
+                        <SearchResultsPredictive.Articles
+                          articles={articles}
+                          closeSearch={() => { closeSearch(); setIsOpen(false); }}
+                          term={term}
+                        />
+                        {total ? (
+                          <Link
+                            onClick={() => { closeSearch(); setIsOpen(false); }}
+                            to={`${SEARCH_ENDPOINT}?q=${term.current}`}
+                            className="block text-center p-3 mt-1 border-t border-border text-[11px] tracking-widest uppercase font-semibold text-foreground hover:underline"
+                          >
+                            View all {total} results →
+                          </Link>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                }}
+              </SearchResultsPredictive>
+            </div>
+          </div>
+
+          {/* Collection cards grid */}
+          <nav className="p-4 grid grid-cols-2 gap-3 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {items.map((item, index) => {
+              if (!item.url) return null;
+
+              const url =
+                item.url.includes('myshopify.com') ||
+                  item.url.includes(publicStoreDomain) ||
+                  item.url.includes(primaryDomainUrl)
+                  ? new URL(item.url).pathname
+                  : item.url;
+
+              const imageUrl = getCollectionImage(url);
+
+              return (
+                <NavLink
+                  key={item.id}
+                  to={url}
+                  end
+                  prefetch="intent"
+                  onClick={() => setIsOpen(false)}
+                  className={({ isActive }) =>
+                    `group relative rounded-2xl overflow-hidden aspect-[3/4] flex items-end
                transition-all duration-300 active:scale-95
                ${isActive ? 'ring-2 ring-foreground ring-offset-2 ring-offset-card' : ''}
                ${index === 0 && items.length % 2 !== 0 ? 'col-span-2 aspect-[16/7]' : ''}`
-            }
-            style={{
-              animationDelay: `${index * 60}ms`,
-            }}
-          >
-            {/* Background image */}
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={item.title}
-                width={400}
-                height={500}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-active:scale-105"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
-            )}
+                  }
+                  style={{
+                    animationDelay: `${index * 60}ms`,
+                  }}
+                >
+                  {/* Background image */}
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={item.title}
+                      width={400}
+                      height={500}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-active:scale-105"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
+                  )}
 
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/20 to-transparent" />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/20 to-transparent" />
 
-            {/* Collection name */}
-            <div className="relative w-full px-3.5 pb-3.5">
-              <p className="text-white text-[11px] font-semibold tracking-[0.12em] uppercase leading-tight drop-shadow-sm line-clamp-2">
-                {item.title}
-              </p>
-              <div className="mt-1.5 flex items-center gap-1 opacity-70">
-                <span className="text-white/80 text-[9px] tracking-wider uppercase font-medium">Shop</span>
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </NavLink>
-        );
-      })}
-    </nav>
+                  {/* Collection name */}
+                  <div className="relative w-full px-3.5 pb-3.5">
+                    <p className="text-white text-[11px] font-semibold tracking-[0.12em] uppercase leading-tight drop-shadow-sm line-clamp-2">
+                      {item.title}
+                    </p>
+                    <div className="mt-1.5 flex items-center gap-1 opacity-70">
+                      <span className="text-white/80 text-[9px] tracking-wider uppercase font-medium">Shop</span>
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </NavLink>
+              );
+            })}
+          </nav>
 
-    <div className="h-2" />
-  </div>
-</div>
+          <div className="h-2" />
+
+          </div>{/* end scrollable body */}
+        </div>
+      </div>
 
       {/* Desktop Horizontal List */}
       <div className="hidden md:flex justify-center absolute mt-2 pb-3 md:pb-0 md:mt-0 md:top-28 md:left-1/2 w-full px-2 md:px-0 md:-translate-x-1/2 md:-translate-y-1/2 z-50">
@@ -361,129 +490,12 @@ export function HeaderMenu({
   publicStoreDomain: HeaderProps['publicStoreDomain'];
 }) {
   const { close } = useAside();
-  const navigate = useNavigate();
-  const queriesDatalistId = useId();
 
   return (
     <nav
       role="navigation"
       className="flex flex-col gap-5 pt-2"
     >
-      {/* ── Search ── */}
-      <div className="px-5 pb-1">
-        <div className="predictive-search">
-          <SearchFormPredictive>
-            {({ fetchResults, goToSearch, inputRef }) => (
-              <div className="flex items-center bg-muted/60 backdrop-blur-sm rounded-2xl pl-4 pr-1.5 py-1.5 gap-2 border border-border/50 focus-within:border-foreground/20 focus-within:bg-muted transition-all duration-300 w-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 text-muted-foreground flex-shrink-0"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                  />
-                </svg>
-                <input
-                  name="q"
-                  onChange={fetchResults}
-                  onFocus={fetchResults}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      goToSearch();
-                    }
-                  }}
-                  placeholder="Search sacred items…"
-                  ref={inputRef}
-                  type="search"
-                  list={queriesDatalistId}
-                  autoComplete="off"
-                  className="flex-1 text-[13px] bg-transparent outline-none placeholder:text-muted-foreground/60 font-body [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
-                />
-                <button
-                  type="button"
-                  onClick={goToSearch}
-                  className="bg-foreground text-background text-[10px] font-semibold px-4 py-2 rounded-xl tracking-[0.12em] uppercase shrink-0 hover:opacity-90 active:scale-95 transition-all duration-200"
-                >
-                  Go
-                </button>
-              </div>
-            )}
-          </SearchFormPredictive>
-          <SearchResultsPredictive>
-            {({ items, total, term, state, closeSearch }) => {
-              const { articles, collections, pages, products, queries } = items;
-
-              if (state === 'loading' && term.current) {
-                return (
-                  <div className="mt-4">
-                    <div className="p-4 text-sm opacity-60">Searching…</div>
-                  </div>
-                );
-              }
-
-              if (!term.current) {
-                return null;
-              }
-
-              if (!total) {
-                return (
-                  <div className="mt-4">
-                    <SearchResultsPredictive.Empty term={term} />
-                  </div>
-                );
-              }
-
-              return (
-                <div className="mt-4">
-                  <div className="flex flex-col gap-4 pb-4">
-                    <SearchResultsPredictive.Queries
-                      queries={queries}
-                      queriesDatalistId={queriesDatalistId}
-                    />
-                    <SearchResultsPredictive.Products
-                      products={products}
-                      closeSearch={closeSearch}
-                      term={term}
-                    />
-                    <SearchResultsPredictive.Collections
-                      collections={collections}
-                      closeSearch={closeSearch}
-                      term={term}
-                    />
-                    <SearchResultsPredictive.Pages
-                      pages={pages}
-                      closeSearch={closeSearch}
-                      term={term}
-                    />
-                    <SearchResultsPredictive.Articles
-                      articles={articles}
-                      closeSearch={closeSearch}
-                      term={term}
-                    />
-                    {total ? (
-                      <Link
-                        onClick={closeSearch}
-                        to={`${SEARCH_ENDPOINT}?q=${term.current}`}
-                        className="block text-center p-3 mt-2 border-t border-border text-[11px] tracking-widest uppercase font-semibold text-foreground hover:underline"
-                      >
-                        View all {total} results →
-                      </Link>
-                    ) : null}
-                  </div>
-                </div>
-              );
-            }}
-          </SearchResultsPredictive>
-        </div>
-      </div>
-
       {/* ── Navigation Links Grid ── */}
       <div className="grid grid-cols-2 gap-2.5 px-5">
         <NavLink

@@ -13,8 +13,10 @@ import {
 import { ProductPrice } from '~/components/ProductPrice';
 import { ProductForm } from '~/components/ProductForm';
 import { ProductShare } from '~/components/ProductShare';
+import { StickyAddToCart } from '~/components/StickyAddToCart';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useAside } from '~/components/Aside';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   return [
@@ -74,6 +76,8 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
 export default function Product() {
   const { product, recommendedProducts } = useLoaderData<typeof loader>();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const productFormRef = useRef<HTMLDivElement>(null);
+  const { open } = useAside();
 
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -354,10 +358,12 @@ export default function Product() {
 
 
             {/* Product Form */}
-            <ProductForm
-              productOptions={productOptions}
-              selectedVariant={selectedVariant}
-            />
+            <div ref={productFormRef}>
+              <ProductForm
+                productOptions={productOptions}
+                selectedVariant={selectedVariant}
+              />
+            </div>
 
             {/* Stock count — plain text below size buttons */}
             {(() => {
@@ -646,6 +652,17 @@ export default function Product() {
             },
           ],
         }}
+      />
+
+      {/* Sticky Add-to-Cart Bar */}
+      <StickyAddToCart
+        selectedVariant={selectedVariant}
+        product={{
+          title: product.title,
+          featuredImage: images[0] ?? null,
+        }}
+        triggerRef={productFormRef}
+        onAddToCartClick={() => open('cart')}
       />
     </div>
   );

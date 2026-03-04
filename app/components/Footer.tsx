@@ -60,16 +60,15 @@ export function Footer({
                 </div>
 
                 {/* RIGHT — Links */}
-                <div className="w-full lg:w-[60%] lg:pl-16">
-                  <div className="grid grid-cols-2 gap-10 lg:gap-14">
+                <div className="w-full lg:w-[60%] lg:pl-16 text-left">
+                  <div className="grid grid-cols-2 gap-8 lg:gap-14">
 
                     {/* Quick Links */}
                     <div>
-                      <h4 className="text-xs uppercase tracking-widest font-semibold mb-6 flex items-center gap-2">
-                        <span className="w-4 h-px bg-primary-border/50"></span>
+                      <h4 className="text-sm font-bold uppercase tracking-wider mb-5 text-text-main">
                         Quick Links
                       </h4>
-                      <ul className="space-y-4">
+                      <ul className="space-y-3">
                         {[
                           { title: 'Home', url: '/' },
                           { title: 'Shop All', url: '/collections/all' },
@@ -93,11 +92,10 @@ export function Footer({
 
                     {/* Policies */}
                     <div>
-                      <h4 className="text-xs uppercase tracking-widest font-semibold mb-6 flex items-center gap-2">
-                        <span className="w-4 h-px bg-primary-border/50"></span>
+                      <h4 className="text-sm font-bold uppercase tracking-wider mb-5 text-text-main">
                         Policies
                       </h4>
-                      <ul className="space-y-4">
+                      <ul className="space-y-3">
                         {footer?.menu
                           ? footer.menu.items.map((item) => {
                             if (!item.url) return null;
