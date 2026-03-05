@@ -1,6 +1,6 @@
 import type { Route } from './+types/($locale).collections.all';
 import { useLoaderData, useSearchParams } from 'react-router';
-import { getPaginationVariables, Image, Money } from '@shopify/hydrogen';
+import { getPaginationVariables, Image, Money, CartForm } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 
 import { useMemo, useState, useRef, useEffect } from 'react'; type CategoryFilter = {
@@ -107,14 +107,16 @@ function FilterSidebar({
   activeFilterIds,
   onToggleFilter,
   onClearAll,
+  isMobile = false,
 }: {
   activeFilterIds: string[];
   onToggleFilter: (filterId: string) => void;
   onClearAll: () => void;
+  isMobile?: boolean;
 }) {
   return (
-    <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm sticky top-6">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/40">
+    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'border border-border rounded-2xl p-6 shadow-sm sticky top-6'}`}>
+      <div className="flex items-center justify-between mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border/40">
         <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
         </h2>
@@ -396,45 +398,42 @@ export default function Collection() {
             />
           </aside>
 
-          {mobileFiltersOpen && (
-            <div className="fixed inset-0 z-50 lg:hidden">
-              <button
-                type="button"
-                aria-label="Close filters"
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm border-0 p-0"
-                onClick={() => setMobileFiltersOpen(false)}
-              />
-              <div className="absolute left-0 top-0 h-full w-72 bg-card text-card-foreground shadow-xl overflow-y-auto p-5 border-r border-border">
-                <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-muted-foreground">
-                    Filters
-                  </h2>
-                  <button
-                    onClick={() => setMobileFiltersOpen(false)}
-                    className="text-muted-foreground hover:text-foreground text-2xl leading-none"
-                  >
-                    x
-                  </button>
-                </div>
-                <FilterSidebar
-                  activeFilterIds={activeFilterIds}
-                  onToggleFilter={toggleFilter}
-                  onClearAll={clearAllFilters}
-                />
-              </div>
-            </div>
-          )}
-
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 relative">
                 <button
-                  onClick={() => setMobileFiltersOpen(true)}
-                  className="lg:hidden flex items-center gap-2 px-3 py-2 border border-border rounded-xl text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+                  className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-border rounded-xl text-xs text-foreground bg-card shadow-sm hover:bg-muted transition-colors focus:outline-none focus:ring-1 focus:ring-ring select-none"
                 >
-                  Filters
+                  <span className="font-medium">Filters</span>
+                  {activeFilterIds.length > 0 && (
+                    <span className="bg-foreground text-background w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold">
+                      {activeFilterIds.length}
+                    </span>
+                  )}
+                  <svg
+                    className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ml-1 ${mobileFiltersOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  </svg>
                 </button>
-                <p className="text-xs text-muted-foreground tracking-wide">Browsing all products</p>
+                <p className="hidden lg:block text-xs text-muted-foreground tracking-wide">Browsing all products</p>
+
+                {/* Mobile Filters Dropdown */}
+                {mobileFiltersOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-[280px] sm:w-[320px] max-h-[70vh] overflow-y-auto bg-card border border-border rounded-2xl shadow-xl z-50 lg:hidden ring-1 ring-black ring-opacity-5">
+                    <FilterSidebar
+                      activeFilterIds={activeFilterIds}
+                      onToggleFilter={toggleFilter}
+                      onClearAll={clearAllFilters}
+                      isMobile={true}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-3">
@@ -470,12 +469,11 @@ export default function Collection() {
               filterFn={productFilterFn}
             >
               {({ node: product, index }) => (
-                <a
+                <div
                   key={product.id}
-                  href={`/products/${product.handle}`}
                   className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-border"
                 >
-                  <div className="aspect-square bg-neutral-100 overflow-hidden relative">
+                  <a href={`/products/${product.handle}`} className="aspect-square bg-neutral-100 overflow-hidden relative block">
                     {product.featuredImage ? (
                       <Image
                         data={product.featuredImage}
@@ -495,33 +493,69 @@ export default function Collection() {
                         Certified
                       </span>
                     </div>
-                  </div>
+                  </a>
 
                   <div className="p-3.5 flex flex-col flex-1">
                     <p className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground mb-1">
                       Devasutra
                     </p>
-                    <h3 className="text-base font-semibold text-foreground mb-2 leading-snug line-clamp-2">
-                      {product.title}
-                    </h3>
+                    <a href={`/products/${product.handle}`} className="block">
+                      <h3 className="text-base font-semibold text-foreground mb-2 leading-snug line-clamp-2 hover:underline">
+                        {product.title}
+                      </h3>
+                    </a>
 
                     <div className="mt-auto flex items-center justify-between">
                       <div>
                         <Money
                           data={product.priceRange.minVariantPrice}
-                          className="text-sm font-bold text-foreground"
+                          className="text-sm font-bold text-foreground block"
                         />
                         {product.priceRange.maxVariantPrice.amount !==
                           product.priceRange.minVariantPrice.amount && (
-                            <span className="text-[10px] text-muted-foreground ml-1">onwards</span>
+                            <span className="text-[10px] text-muted-foreground mt-0.5 block">onwards</span>
                           )}
                       </div>
-                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors group-hover:bg-neutral-800">
-                        Add
-                      </span>
+
+                      <CartForm
+                        route="/cart"
+                        inputs={{
+                          lines: [
+                            {
+                              merchandiseId: product.variants?.nodes?.[0]?.id,
+                              quantity: 1,
+                            },
+                          ],
+                        }}
+                        action={CartForm.ACTIONS.LinesAdd}
+                      >
+                        {(fetcher) => (
+                          <button
+                            type="submit"
+                            disabled={!product.variants?.nodes?.[0]?.availableForSale || fetcher.state !== 'idle'}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+                            aria-label="Add to cart"
+                          >
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5h.008v.008h-.008v-.008Zm5.375 0h.008v.008h-.008v-.008Z"
+                              />
+                            </svg>
+                            {product.variants?.nodes?.[0]?.availableForSale ? 'Add' : 'Sold Out'}
+                          </button>
+                        )}
+                      </CartForm>
                     </div>
                   </div>
-                </a>
+                </div>
               )}
             </PaginatedResourceSection>
 
@@ -577,6 +611,12 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
       nodes {
         handle
         title
+      }
+    }
+    variants(first: 1) {
+      nodes {
+        id
+        availableForSale
       }
     }
   }

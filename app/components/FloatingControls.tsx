@@ -58,7 +58,7 @@ export function FloatingControls() {
     return (
         <div
             className="
-        fixed bottom-6 left-1/2 -translate-x-1/2 z-[100]
+        fixed bottom-6 left-1/2 -translate-x-1/2 z-[40]
         flex items-center gap-2
       "
         >

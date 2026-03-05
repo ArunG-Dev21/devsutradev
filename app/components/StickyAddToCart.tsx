@@ -46,7 +46,7 @@ export function StickyAddToCart({
         <>
             {/* ── Mobile: bottom sticky (below xl) ── */}
             <div
-                className={`xl:hidden fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${isVisible ? 'translate-y-0' : 'translate-y-full'
+                className={`xl:hidden fixed bottom-0 left-0 right-0 z-50 transition-transform duration-300 ease-out ${isVisible ? 'translate-y-0' : 'translate-y-full'
                     }`}
             >
                 <div className="bg-white/95 dark:bg-card/95 backdrop-blur-xl border-t border-stone-200 dark:border-border shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-3 safe-bottom">

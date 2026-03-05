@@ -12,7 +12,7 @@ export default function About() {
 
           <img src='/icons/hindi-logo.png' alt='' className='w-40 sm:w-60 md:w-80 lg:w-130 absolute left-1/2 top-10 sm:top-16 md:top-20 lg:top-24 -translate-x-1/2' />
           <img
-            src='/public/Album cover-01.svg'
+            src='/public/Albumcover-01.svg'
             alt='About Us'
             className='w-full h-full object-cover object-bottom'
           />
@@ -48,8 +48,8 @@ export default function About() {
             <img src="/icons/icon_2.png" alt="" className="absolute bottom-12 sm:bottom-16 md:bottom-20 lg:bottom-24 right-2 sm:right-4 md:right-6 lg:right-8 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 pointer-events-none opacity-60 md:opacity-100" />
           </div>
 
-          {/* 3rd black card */}
-          <div className='aspect-auto md:aspect-square bg-black p-8 sm:p-12 md:p-16 lg:p-20 text-white space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 relative border-y border-neutral-800'>
+          {/* 3rd card — white on mobile, black on md+ */}
+          <div className='aspect-auto md:aspect-square bg-white md:bg-black p-8 sm:p-12 md:p-16 lg:p-20 text-black md:text-white space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 relative border-y border-neutral-100 md:border-neutral-800'>
             <div className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-semibold font-heading leading-14 sm:leading-18 md:leading-22 lg:leading-28">On<br />Making</div>
             <div className='text-lg sm:text-xl md:text-2xl lg:text-3xl font-subheading'>(The Hand)</div>
             <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light font-body">Creation here is not<br className="hidden lg:inline" /> manufacture.</div>
@@ -64,8 +64,8 @@ export default function About() {
           </div>
 
 
-          {/* 4th white card */}
-          <div className='aspect-auto md:aspect-square bg-white p-8 sm:p-12 md:p-16 lg:p-20 text-black space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 relative border-y border-neutral-100'>
+          {/* 4th card — black on mobile, white on md+ */}
+          <div className='aspect-auto md:aspect-square bg-black md:bg-white p-8 sm:p-12 md:p-16 lg:p-20 text-white md:text-black space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 relative border-y border-neutral-800 md:border-neutral-100'>
             <div className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-semibold font-heading leading-14 sm:leading-18 md:leading-22 lg:leading-28">On<br />Materials</div>
             <div className='text-lg sm:text-xl md:text-2xl lg:text-3xl font-subheading'>(The Earth)</div>
             <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-body">
@@ -112,13 +112,13 @@ export default function About() {
             <img src="/icons/icon_6.png" alt="" className="absolute bottom-12 sm:bottom-16 md:bottom-20 lg:bottom-24 right-4 sm:right-8 md:right-12 lg:right-16 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-84 lg:h-84 pointer-events-none opacity-60 md:opacity-100" />
           </div>
 
-          {/* 7th black card */}
-          <div className='aspect-square bg-black space-y-10 relative border-y border-neutral-800'>
+          {/* 7th card — image (pushed to bottom on mobile) */}
+          <div className='order-2 md:order-none aspect-square bg-black space-y-10 relative border-y border-neutral-800'>
             <img src='/abt-last-img.jpeg' alt='' className='absolute inset-0 w-full h-full object-cover' />
           </div>
 
-          {/* 8th white card */}
-          <div className='aspect-auto md:aspect-square bg-white p-8 sm:p-12 md:p-16 lg:p-20 text-black space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 relative border-y border-neutral-100'>
+          {/* 8th white card (moved above image on mobile) */}
+          <div className='order-1 md:order-none aspect-auto md:aspect-square bg-white p-8 sm:p-12 md:p-16 lg:p-20 text-black space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 relative border-y border-neutral-100'>
             <div className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-semibold font-heading leading-14 sm:leading-18 md:leading-22 lg:leading-28">On<br />Presence</div>
             <div className='text-lg sm:text-xl md:text-2xl lg:text-3xl font-subheading'>(The Life)</div>
             <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-body">There is no fixed rule<br className="hidden lg:inline" /> No forced ritual. Only constancy</div>

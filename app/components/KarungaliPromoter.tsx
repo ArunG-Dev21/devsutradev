@@ -75,10 +75,10 @@ export function KarungaliPromoter({
             <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
                 {/* ── Section Header ────────────────────────────────── */}
                 <div className="text-center mb-10 md:mb-14">
-                    <p className="text-[10px] tracking-[0.45em] uppercase text-muted-foreground mb-3 font-medium">
+                    <p className="text-xs text-gold-muted tracking-[0.45em] uppercase mb-3 font-medium">
                         Handcrafted Heritage
                     </p>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
+                    <h2 className="text-3xl md:text-4xl uppercase font-medium lg:text-5xl font-heading leading-tight">
                         Karungali Collection
                     </h2>
                 </div>
@@ -103,10 +103,10 @@ export function KarungaliPromoter({
 
                         {/* Text content */}
                         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 z-10">
-                            <h3 className="text-white text-xl md:text-2xl lg:text-[1.7rem] font-bold leading-snug mb-3 drop-shadow-lg">
+                            <h3 className="text-white font-heading text-xl md:text-2xl lg:text-4xl uppercase font-medium leading-snug mb-3 drop-shadow-lg">
                                 {introTitle}
                             </h3>
-                            <p className="text-white/80 text-sm leading-relaxed mb-6 max-w-md drop-shadow-md">
+                            <p className="text-white/80 text-base leading-relaxed mb-6 max-w-md drop-shadow-md">
                                 {introText}
                             </p>
 

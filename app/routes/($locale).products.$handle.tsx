@@ -9,6 +9,7 @@ import {
   useSelectedOptionInUrlParam,
   Image,
   Money,
+  CartForm,
 } from '@shopify/hydrogen';
 import { ProductPrice } from '~/components/ProductPrice';
 import { ProductForm } from '~/components/ProductForm';
@@ -387,21 +388,26 @@ export default function Product() {
             <div className="h-px bg-stone-200 my-8" />
 
             {/* Trust mini-badges */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
               {[
-                { icon: '✓', text: '100% Authentic', sub: 'Ethically sourced' },
-                { icon: '✦', text: 'Lab Certified', sub: 'Certificate included' },
-                { icon: '→', text: 'Free Shipping', sub: 'Above ₹999' },
-                { icon: '↺', text: 'Easy Returns', sub: '7-day policy' },
+                { id: 'auth', img: '/icons/Authentic.png', text: '100% Authentic', sub: 'Ethically sourced', color: 'from-amber-50 to-amber-100/50 dark:from-amber-900/10 dark:to-amber-900/5' },
+                { id: 'lab', img: '/icons/lab-tested.png', text: 'Lab Certified', sub: 'Certificate included', color: 'from-blue-50 to-blue-100/50 dark:from-blue-900/10 dark:to-blue-900/5' },
+                { id: 'ship', img: '/icons/shipping.png', text: 'Free Shipping', sub: 'Above ₹999', color: 'from-emerald-50 to-emerald-100/50 dark:from-emerald-900/10 dark:to-emerald-900/5' },
+                { id: 'ret', img: '/icons/Returns.png', text: 'Easy Returns', sub: '7-day policy', color: 'from-purple-50 to-purple-100/50 dark:from-purple-900/10 dark:to-purple-900/5' },
               ].map((badge) => (
                 <div
-                  key={badge.text}
-                  className="flex items-center gap-3 bg-white dark:bg-card border border-stone-200 dark:border-border rounded-xl px-4 py-3 shadow-sm hover:border-stone-300 dark:hover:border-ring transition-colors"
+                  key={badge.id}
+                  className="group relative flex items-center gap-3.5 bg-white dark:bg-card border border-stone-200/80 dark:border-border rounded-2xl p-3 sm:p-4 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
                 >
-                  <span className="text-lg text-stone-900 dark:text-foreground opacity-80">{badge.icon}</span>
-                  <div>
-                    <p className="text-[10px] font-semibold tracking-widest uppercase text-stone-900 dark:text-foreground mb-0.5">{badge.text}</p>
-                    <p className="text-[10px] text-stone-500">{badge.sub}</p>
+                  {/* Subtle Background Gradient on Hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${badge.color} opacity-0 group-hover:opacity-100 transition-opacity duration-400`} />
+
+                  <div className="relative z-10 flex shrink-0 items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <img src={badge.img} alt={badge.text} className="w-8 h-8 sm:w-10 sm:h-10 object-contain opacity-85 group-hover:opacity-100 transition-opacity dark:invert dark:opacity-75 dark:group-hover:opacity-95" />
+                  </div>
+                  <div className="relative z-10 flex flex-col justify-center">
+                    <p className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-stone-900 dark:text-foreground mb-0.5 leading-tight">{badge.text}</p>
+                    <p className="text-[10px] text-stone-500 dark:text-muted-foreground leading-tight">{badge.sub}</p>
                   </div>
                 </div>
               ))}
@@ -691,13 +697,15 @@ function RecommendedProducts({ products }: { products: any[] }) {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         {displayProducts.map((product: any, index: number) => (
-          <Link
+          <div
             key={product.id}
-            to={`/products/${product.handle}`}
-            prefetch="intent"
-            className="group bg-white dark:bg-card border border-stone-100 dark:border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col no-underline"
+            className="group bg-white dark:bg-card border border-stone-100 dark:border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col"
           >
-            <div className="aspect-square bg-stone-50 dark:bg-muted relative overflow-hidden">
+            <Link
+              to={`/products/${product.handle}`}
+              prefetch="intent"
+              className="no-underline block aspect-square bg-stone-50 dark:bg-muted relative overflow-hidden"
+            >
               {product.featuredImage ? (
                 <Image
                   data={product.featuredImage}
@@ -715,20 +723,77 @@ function RecommendedProducts({ products }: { products: any[] }) {
               {/* Corner ornaments on hover */}
               <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-stone-200 dark:border-border rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-stone-200 dark:border-border rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
+
+              {/* certified badge */}
+              {product.tags?.[0] && (
+                <div className="absolute top-2.5 right-2.5">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-background border border-border text-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
+                    ✓ Certified
+                  </span>
+                </div>
+              )}
+            </Link>
 
             <div className="p-4 flex flex-col flex-1">
               <p className="text-[10px] tracking-[0.15em] uppercase text-stone-400 dark:text-muted-foreground mb-1">
                 Devasutra
               </p>
-              <h3 className="text-sm font-semibold text-stone-900 dark:text-foreground mb-2 leading-snug line-clamp-2 group-hover:underline underline-offset-4 transition-all">
-                {product.title}
-              </h3>
-              <div className="mt-auto text-sm font-bold text-stone-900 dark:text-foreground">
-                <Money data={product.priceRange.minVariantPrice} />
+              <Link
+                to={`/products/${product.handle}`}
+                prefetch="intent"
+                className="no-underline block"
+              >
+                <h3 className="text-sm font-semibold text-stone-900 dark:text-foreground mb-2 leading-snug line-clamp-2 hover:underline underline-offset-4 transition-all">
+                  {product.title}
+                </h3>
+              </Link>
+              <div className="mt-auto flex items-center justify-between">
+                <div className="text-sm font-bold text-stone-900 dark:text-foreground">
+                  <Money data={product.priceRange.minVariantPrice} />
+                </div>
+
+                <CartForm
+                  route="/cart"
+                  inputs={{
+                    lines: [
+                      {
+                        merchandiseId: product.variants?.nodes?.[0]?.id,
+                        quantity: 1,
+                      },
+                    ],
+                  }}
+                  action={CartForm.ACTIONS.LinesAdd}
+                >
+                  {(fetcher) => {
+                    const availableForSale = product.variants?.nodes?.[0]?.availableForSale;
+                    return (
+                      <button
+                        type="submit"
+                        disabled={!availableForSale || fetcher.state !== 'idle'}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white dark:bg-white dark:text-black text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-stone-800 dark:hover:bg-stone-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+                        aria-label="Add to cart"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5h.008v.008h-.008v-.008Zm5.375 0h.008v.008h-.008v-.008Z"
+                          />
+                        </svg>
+                        {availableForSale ? 'Add' : 'Sold Out'}
+                      </button>
+                    );
+                  }}
+                </CartForm>
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </section>

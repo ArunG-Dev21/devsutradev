@@ -226,7 +226,7 @@ function CartRecommendations({
       {layout === 'aside' ? (
         <Swiper
           modules={[Navigation]}
-          slidesPerView={1.25}
+          slidesPerView={2.2}
           spaceBetween={10}
           onSwiper={(instance) => {
             setSwiper(instance);
@@ -238,8 +238,8 @@ function CartRecommendations({
             setIsEnd(instance.isEnd);
           }}
           breakpoints={{
-            540: { slidesPerView: 1.5, spaceBetween: 12 },
-            700: { slidesPerView: 2, spaceBetween: 12 },
+            540: { slidesPerView: 2.8, spaceBetween: 12 },
+            700: { slidesPerView: 3.2, spaceBetween: 12 },
           }}
           className="pb-1"
         >
