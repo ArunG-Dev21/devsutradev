@@ -226,7 +226,7 @@ function CartRecommendations({
       {layout === 'aside' ? (
         <Swiper
           modules={[Navigation]}
-          slidesPerView={2.2}
+          slidesPerView={2.1}
           spaceBetween={10}
           onSwiper={(instance) => {
             setSwiper(instance);
@@ -236,10 +236,6 @@ function CartRecommendations({
           onSlideChange={(instance) => {
             setIsBeginning(instance.isBeginning);
             setIsEnd(instance.isEnd);
-          }}
-          breakpoints={{
-            540: { slidesPerView: 2.8, spaceBetween: 12 },
-            700: { slidesPerView: 3.2, spaceBetween: 12 },
           }}
           className="pb-1"
         >
@@ -324,24 +320,7 @@ function RecommendationCard({
               </span>
             )}
 
-            {canAdd ? (
-              <CartForm
-                route="/cart"
-                action={CartForm.ACTIONS.LinesAdd}
-                inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1 }] }}
-              >
-                <button
-                  type="submit"
-                  title="Add to Cart"
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-black/80 dark:bg-white/90 text-white dark:text-black hover:bg-black dark:hover:bg-white backdrop-blur-sm border border-stone-800/20 dark:border-white/20 shadow-md transition-all cursor-pointer opacity-90 hover:opacity-100 hover:scale-105"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                </button>
-              </CartForm>
-            ) : (
+            {!canAdd && (
               <span className="inline-flex items-center justify-center px-2.5 py-1 bg-muted/90 backdrop-blur-sm border border-border/50 text-muted-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
                 Sold Out
               </span>
@@ -350,16 +329,8 @@ function RecommendationCard({
         </div>
       </Link>
 
-      <div className="p-3.5 flex flex-col flex-1">
-        {badgeTag ? (
-          <p className="text-[10px] tracking-[0.15em] uppercase text-neutral-500 mb-1">
-            {badgeTag}
-          </p>
-        ) : (
-          <p className="text-[10px] tracking-[0.15em] uppercase text-neutral-500 mb-1">
-            Devasutra
-          </p>
-        )}
+      <div className={`flex flex-col flex-1 ${compact ? 'p-2.5' : 'p-3.5'}`}>
+
 
         <Link
           to={`/products/${product.handle}`}
@@ -367,16 +338,36 @@ function RecommendationCard({
           className="no-underline group-hover/title:underline"
           prefetch="intent"
         >
-          <h3 className={`${compact ? 'text-sm' : 'text-base font-medium'} text-foreground mb-2 leading-snug line-clamp-2`}>
+          <h3 className={`${compact ? 'text-[13px]' : 'text-base font-medium'} text-foreground mb-2 leading-snug line-clamp-2`}>
             {product.title}
           </h3>
         </Link>
 
-        <div className="mt-auto">
+        <div className="mt-auto flex flex-col gap-2.5">
           <Money
             data={product.priceRange.minVariantPrice}
             className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-foreground`}
           />
+
+          {canAdd && (
+            <CartForm
+              route="/cart"
+              action={CartForm.ACTIONS.LinesAdd}
+              inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1 }] }}
+            >
+              <button
+                type="submit"
+                className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 rounded-lg text-[11px] uppercase tracking-wider font-bold transition-colors cursor-pointer"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                Add
+              </button>
+            </CartForm>
+          )}
         </div>
       </div>
     </div>

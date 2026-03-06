@@ -36,15 +36,15 @@ function loadDeferredData({ context }: Route.LoaderArgs) {
 interface BlogNode {
   title: string;
   handle: string;
-  seo: { title: string | null; description: string | null };
+  seo?: { title?: string | null; description?: string | null } | null;
   articles: {
     nodes: Array<{
       id: string;
       title: string;
       handle: string;
       publishedAt: string;
-      image: { id: string; altText: string | null; url: string; width: number; height: number } | null;
-      excerpt: string | null;
+      image?: { id?: string | null; altText?: string | null; url: string; width?: number | null; height?: number | null } | null;
+      excerpt?: string | null;
       blog: { handle: string };
     }>;
   };
@@ -58,7 +58,7 @@ export default function Blogs() {
       {/* Hero Header */}
       <div className="blog-hero">
         <div className="blog-hero-content">
-          <h1 className="blog-hero-title">Our Blog</h1>
+          <h1 className="blog-hero-title text-heading">Our Blog</h1>
           <p className="blog-hero-subtitle">
             Insights, stories, and wisdom from the world of sacred traditions
           </p>
@@ -111,7 +111,10 @@ export default function Blogs() {
                           <time className="blog-card-date">{publishedAt}</time>
                           <h3 className="blog-card-title">{article.title}</h3>
                           {article.excerpt && (
-                            <p className="blog-card-excerpt">{article.excerpt}</p>
+                            <div 
+                              className="blog-card-excerpt" 
+                              dangerouslySetInnerHTML={{ __html: article.excerpt }} 
+                            />
                           )}
                           <span className="blog-card-read-more">Read more →</span>
                         </div>

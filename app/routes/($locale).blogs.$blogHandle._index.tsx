@@ -117,7 +117,7 @@ function ArticleCard({
           />
         </div>
       )}
-      <div className="blog-card-body">
+      <div className="blog-card-body ">
         <div className="blog-card-meta">
           <time className="blog-card-date">{publishedAt}</time>
           {article.author?.name && (

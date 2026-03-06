@@ -84,7 +84,7 @@ export function TrustBadges() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-14">
             <div
-              className="flex flex-col items-center scroll-reveal"
+              className="flex flex-col items-center scroll-reveal max-w-sm mx-auto"
               style={{ transitionDelay: '100ms' }}
             >
               <div className="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center mb-4">
@@ -112,7 +112,7 @@ export function TrustBadges() {
             </div>
 
             <div
-              className="flex flex-col items-center scroll-reveal"
+              className="flex flex-col items-center scroll-reveal max-w-sm mx-auto"
               style={{ transitionDelay: '200ms' }}
             >
               <div className="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center mb-4">
@@ -141,7 +141,7 @@ export function TrustBadges() {
             </div>
 
             <div
-              className="flex flex-col items-center scroll-reveal"
+              className="flex flex-col items-center scroll-reveal max-w-sm mx-auto"
               style={{ transitionDelay: '300ms' }}
             >
               <div className="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center mb-4">

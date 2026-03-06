@@ -77,7 +77,13 @@ function buildBreadcrumbs(
   for (let index = offset; index < segments.length; index++) {
     const segment = segments[index];
     if (HIDDEN_SEGMENTS.has(segment)) continue;
-    const to = `${base}/${segments.slice(offset, index + 1).join('/')}`;
+    let to = `${base}/${segments.slice(offset, index + 1).join('/')}`;
+
+    // Redirect /products breadcrumb to /collections/all
+    if (segment === 'products') {
+      to = `${base}/collections/all`;
+    }
+
     const isCurrent = index === segments.length - 1;
 
     let label = STATIC_LABELS[segment] || titleCaseFromSegment(segment);
@@ -102,7 +108,7 @@ export function RouteBreadcrumbBanner() {
 
   return (
     <div
-      className="mx-auto container py-4 px-6 md:py-8 md:px-10"
+      className="mx-auto container et py-4 px-6 md:py-8 md:px-10"
       style={{ color: '#ffffff', mixBlendMode: 'difference', borderColor: '#ffffff', }}
     >
       <nav

@@ -47,7 +47,7 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="flex-shrink-0"
           >
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl overflow-hidden bg-muted border border-border">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg sm:rounded-xl overflow-hidden">
               <Image
                 alt={title}
                 aspectRatio="1/1"
@@ -69,7 +69,7 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="no-underline block"
           >
-            <p className="text-xs sm:text-sm font-semibold text-foreground leading-snug truncate hover:text-muted-foreground transition-colors">
+            <p className="text-xs sm:text-lg leading-snug truncate">
               {product.title}
             </p>
           </Link>

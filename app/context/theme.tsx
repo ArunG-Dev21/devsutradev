@@ -91,6 +91,7 @@ export function ThemeScript({ nonce }: { nonce?: string }) {
   return (
     <script
       nonce={nonce}
+      suppressHydrationWarning
       dangerouslySetInnerHTML={{ __html: getThemeInitScript() }}
     />
   );

@@ -444,30 +444,39 @@ function SubNavIsland({
                   prefetch="intent"
                   className={({ isActive }) =>
                     `
+                  group relative
                   px-8 py-3
                   text-sm tracking-[0.15em]
                   uppercase
                   font-semibold
                   rounded-full
-                  flex items-center gap-2
+                  flex items-center gap-1
                   transition-all duration-300
+                  overflow-hidden
                   ${isActive
                       ? 'bg-gold text-white shadow-lg'
-                      : 'text-foreground bg-card border border-border hover:bg-muted'
+                      : 'text-foreground bg-card border border-border hover:text-white'
                     }
                   `
                   }
                 >
                   {imageUrl && (
-                    <Image
-                      src={imageUrl}
-                      alt={item.title}
-                      width={20}
-                      height={20}
-                      className="rounded-full object-cover w-5 h-5 shrink-0"
-                    />
+                    <>
+                      {/* Spacer to maintain gap in static state */}
+                      <span className="w-4 shrink-0 group-hover:w-0 transition-all duration-500" />
+                      {/* Circle image that expands to fill the pill on hover */}
+                      <Image
+                        src={imageUrl}
+                        alt={item.title}
+                        width={200}
+                        height={200}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full object-cover transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:w-full group-hover:h-full group-hover:rounded-none z-0"
+                      />
+                      {/* Dark overlay for text readability on hover */}
+                      <span className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-500 z-[1] pointer-events-none rounded-full" />
+                    </>
                   )}
-                  <span>{item.title}</span>
+                  <span className="relative z-[2]">{item.title}</span>
                 </NavLink>
               );
             })}

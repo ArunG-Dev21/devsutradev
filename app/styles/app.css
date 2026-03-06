@@ -6,6 +6,7 @@
   --color-dark: var(--color-bg-dark);
   --color-light: var(--color-bg-light);
   --color-accent: var(--color-accent);
+  --color-primary-border: #e5e7eb;
 }
 
 /*
@@ -153,8 +154,8 @@ input[type="text"] {
 
 /* ── Blog Hero ── */
 .blog-hero {
-  background: var(--color-bg-dark);
-  color: var(--color-text-inverse, #fff);
+  background: var(--background);
+  color: var(--foreground);
   padding: 4rem 1.5rem 3rem;
   text-align: center;
   position: relative;

@@ -43,7 +43,6 @@ function loadDeferredData(_args: Route.LoaderArgs) {
 }
 
 const SORT_OPTIONS = [
-  { label: 'Featured', value: 'featured' },
   { label: 'Price: Low to High', value: 'price-asc' },
   { label: 'Price: High to Low', value: 'price-desc' },
   { label: 'Newest First', value: 'newest' },
@@ -185,14 +184,18 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-[180px] text-left text-xs border border-border rounded-xl px-4 py-2.5 bg-card text-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring cursor-pointer hover:bg-muted/50 transition-colors shadow-sm"
+        className={`group flex items-center justify-between w-[190px] text-left text-[13px] border rounded-full px-5 py-3 bg-card text-foreground focus:outline-none cursor-pointer transition-all duration-200 select-none ${
+          isOpen
+            ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
+            : 'border-border hover:border-foreground/15 hover:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)]'
+        }`}
       >
-        <span className="truncate block font-medium">{activeOption.label}</span>
+        <span className="truncate block font-medium tracking-wide">Sort by</span>
         <svg
-          className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ml-2 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-300 ml-2 flex-shrink-0 ${isOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
           fill="none"
           stroke="currentColor"
-          strokeWidth={2}
+          strokeWidth={2.5}
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -200,8 +203,8 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 right-0 w-[180px] mt-2 bg-card border border-border rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
-          <div className="py-1.5 max-h-60 overflow-auto">
+        <div className="absolute z-50 right-0 w-[210px] mt-2.5 bg-card/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="py-2 max-h-60 overflow-auto">
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option.value}
@@ -209,13 +212,15 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
                   onSortChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-4 py-2.5 text-xs transition-colors hover:bg-muted ${sort === option.value ? 'bg-muted/50 font-medium text-foreground' : 'text-muted-foreground'
+                className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] transition-all duration-150 ${sort === option.value
+                  ? 'bg-foreground/5 font-semibold text-foreground'
+                  : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
                   }`}
               >
                 <span>{option.label}</span>
                 {sort === option.value && (
                   <svg className="w-3.5 h-3.5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m4.5 12.75 6 6 9-13.5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="m4.5 12.75 6 6 9-13.5" />
                   </svg>
                 )}
               </button>
@@ -320,19 +325,26 @@ export default function Collection() {
               <div className="flex items-center gap-3 relative">
                 <button
                   onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-border rounded-xl text-xs text-foreground bg-card shadow-sm hover:bg-muted transition-colors focus:outline-none focus:ring-1 focus:ring-ring select-none"
+                  className={`lg:hidden group flex items-center gap-2 px-5 py-3 border rounded-full text-[13px] text-foreground bg-card cursor-pointer transition-all duration-200 select-none ${
+                    mobileFiltersOpen
+                      ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
+                      : 'border-border hover:border-foreground/15 hover:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)]'
+                  }`}
                 >
-                  <span className="font-medium">Filters</span>
+                  <svg className="w-4 h-4 text-muted-foreground/70" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                  </svg>
+                  <span className="font-medium tracking-wide">Filters</span>
                   {activeFilters.length > 0 && (
-                    <span className="bg-foreground text-background w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold">
+                    <span className="bg-foreground text-background w-[18px] h-[18px] rounded-full flex items-center justify-center text-[9px] font-bold">
                       {activeFilters.length}
                     </span>
                   )}
                   <svg
-                    className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ml-1 ${mobileFiltersOpen ? 'rotate-180' : ''}`}
+                    className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-300 ml-0.5 ${mobileFiltersOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -397,9 +409,6 @@ export default function Collection() {
                   </a>
 
                   <div className="p-3.5 flex flex-col flex-1">
-                    <p className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground mb-1">
-                      Devasutra
-                    </p>
 
                     <a href={`/products/${product.handle}`} className="block">
                       <h3 className="text-base font-semibold text-foreground mb-2 leading-snug line-clamp-2 hover:underline">

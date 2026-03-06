@@ -17,11 +17,6 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
-  const tags =
-    'tags' in product && Array.isArray((product as any).tags)
-      ? ((product as any).tags as string[]).filter(Boolean)
-      : [];
-  const primaryTag = tags[0];
   return (
     <Link
       className="product-item group relative flex flex-col h-full animate-fade-up no-underline"
@@ -44,11 +39,6 @@ export function ProductItem({
       </div>
 
       <div className="flex flex-col items-center text-center mt-auto px-2 pb-2">
-        {primaryTag ? (
-          <span className="text-[10px] tracking-[0.2em] uppercase text-text-muted mb-2">
-            {primaryTag}
-          </span>
-        ) : null}
         <h3 className="text-[13px] md:text-sm font-medium text-text-main mb-1.5 transition-colors duration-300 group-hover:text-accent line-clamp-2 leading-relaxed">
           {product.title}
         </h3>
