@@ -133,7 +133,7 @@ function SearchResultsProducts({
                     {product.title}
                   </h3>
                   <div className="text-[13px] tracking-wide text-muted-foreground font-medium">
-                    {price && <Money data={price} />}
+                    {price && <Money withoutTrailingZeros data={price} />}
                   </div>
                 </div>
               </Link>

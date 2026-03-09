@@ -1,7 +1,8 @@
 import { Image, Money, CartForm } from '@shopify/hydrogen';
 import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { Link, useFetcher } from 'react-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { useCartNotification } from '~/components/CartNotification';
 
 interface QuickViewModalProps {
     product: {
@@ -46,13 +47,17 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
     // then close the modal automatically.
     const fetcher = useFetcher();
     const isAdding = fetcher.state !== 'idle';
+    const { showNotification } = useCartNotification();
+    const prevFetcherState = useRef(fetcher.state);
 
     useEffect(() => {
-        // Close modal after the cart add completes (fetcher goes idle after submitting)
-        if (fetcher.state === 'idle' && fetcher.data) {
+        // Close modal and show notification after the cart add completes
+        if (prevFetcherState.current !== 'idle' && fetcher.state === 'idle' && fetcher.data) {
+            showNotification(product.title);
             onClose();
         }
-    }, [fetcher.state, fetcher.data, onClose]);
+        prevFetcherState.current = fetcher.state;
+    }, [fetcher.state, fetcher.data, onClose, showNotification, product.title]);
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">
@@ -108,7 +113,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                     </h3>
 
                     <div className="text-lg font-normal mb-8 text-muted-foreground">
-                        <Money data={product.priceRange.minVariantPrice} />
+                        <Money withoutTrailingZeros data={product.priceRange.minVariantPrice} />
                     </div>
 
                     <div className="w-8 h-px bg-border mb-8" />

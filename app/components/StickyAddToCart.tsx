@@ -67,7 +67,7 @@ export function StickyAddToCart({
                             </p>
                             {selectedVariant.price && (
                                 <div className="text-xs text-stone-600 dark:text-muted-foreground mt-0.5">
-                                    <Money data={selectedVariant.price} />
+                                    <Money withoutTrailingZeros data={selectedVariant.price} />
                                 </div>
                             )}
                         </div>
@@ -141,10 +141,10 @@ export function StickyAddToCart({
                                 </p>
                                 {selectedVariant.price && (
                                     <div className="text-xs text-stone-500 dark:text-muted-foreground mt-0.5 flex items-center gap-2">
-                                        <Money data={selectedVariant.price} />
+                                        <Money withoutTrailingZeros data={selectedVariant.price} />
                                         {selectedVariant.compareAtPrice && (
                                             <s className="text-stone-400 text-[11px]">
-                                                <Money data={selectedVariant.compareAtPrice} />
+                                                <Money withoutTrailingZeros data={selectedVariant.compareAtPrice} />
                                             </s>
                                         )}
                                     </div>

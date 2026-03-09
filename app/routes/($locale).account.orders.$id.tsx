@@ -141,22 +141,22 @@ export default function OrderRoute() {
                       {discountPercentage ? (
                         <span>-{discountPercentage}% OFF</span>
                       ) : (
-                        discountValue && <Money data={discountValue!} />
+                        discountValue && <Money withoutTrailingZeros data={discountValue!} />
                       )}
                     </p>
                   </div>
                 )}
                 <div className="flex justify-between text-muted-foreground">
                   <p>Subtotal</p>
-                  <p><Money data={order.subtotal!} /></p>
+                  <p><Money withoutTrailingZeros data={order.subtotal!} /></p>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <p>Tax</p>
-                  <p><Money data={order.totalTax!} /></p>
+                  <p><Money withoutTrailingZeros data={order.totalTax!} /></p>
                 </div>
                 <div className="pt-4 mt-4 border-t border-border flex justify-between items-center">
                   <p className="text-base font-bold text-foreground">Total</p>
-                  <p className="text-xl font-bold text-foreground"><Money data={order.totalPrice!} /></p>
+                  <p className="text-xl font-bold text-foreground"><Money withoutTrailingZeros data={order.totalPrice!} /></p>
                 </div>
               </div>
             </div>
@@ -238,11 +238,11 @@ function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
 
       <div className="sm:text-right flex flex-col justify-center">
         <p className="font-bold text-foreground text-lg">
-          {totalMoney ? <Money data={totalMoney} /> : null}
+          {totalMoney ? <Money withoutTrailingZeros data={totalMoney} /> : null}
         </p>
         {totalDiscountAmount > 0 && beforeMoney ? (
           <p className="text-xs text-stone-400 line-through mt-1">
-            <Money data={beforeMoney} />
+            <Money withoutTrailingZeros data={beforeMoney} />
           </p>
         ) : null}
       </div>

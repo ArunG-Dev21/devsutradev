@@ -50,6 +50,12 @@ interface BlogNode {
   };
 }
 
+function getCollectionHrefFromHandle(handle: string) {
+  return handle.toLowerCase().includes('rudraksha')
+    ? '/collections/rudraksha'
+    : '/collections/all';
+}
+
 export default function Blogs() {
   const { blogs } = useLoaderData<typeof loader>();
 
@@ -62,6 +68,14 @@ export default function Blogs() {
           <p className="blog-hero-subtitle">
             Insights, stories, and wisdom from the world of sacred traditions
           </p>
+          <div className="mt-6">
+            <Link
+              to="/collections/rudraksha"
+              className="inline-flex items-center px-5 py-2.5 rounded-full border border-border text-[11px] tracking-[0.18em] uppercase text-foreground hover:bg-foreground hover:text-background transition-colors"
+            >
+              Shop Rudraksha Collection
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -72,13 +86,22 @@ export default function Blogs() {
             <div key={blog.handle} className="blog-section">
               <div className="blog-section-header">
                 <h2 className="blog-section-title">{blog.title}</h2>
-                <Link
-                  to={`/blogs/${blog.handle}`}
-                  className="blog-section-link"
-                  prefetch="intent"
-                >
-                  View all →
-                </Link>
+                <div className="flex items-center gap-4">
+                  <Link
+                    to={getCollectionHrefFromHandle(blog.handle)}
+                    className="blog-section-link"
+                    prefetch="intent"
+                  >
+                    Shop products →
+                  </Link>
+                  <Link
+                    to={`/blogs/${blog.handle}`}
+                    className="blog-section-link"
+                    prefetch="intent"
+                  >
+                    View all →
+                  </Link>
+                </div>
               </div>
 
               {blog.articles.nodes.length > 0 ? (

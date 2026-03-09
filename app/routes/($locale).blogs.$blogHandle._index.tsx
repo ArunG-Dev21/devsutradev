@@ -46,9 +46,16 @@ function loadDeferredData({ context }: Route.LoaderArgs) {
   return {};
 }
 
+function getCollectionHrefFromHandle(handle: string) {
+  return handle.toLowerCase().includes('rudraksha')
+    ? '/collections/rudraksha'
+    : '/collections/all';
+}
+
 export default function Blog() {
   const { blog } = useLoaderData<typeof loader>();
   const { articles } = blog;
+  const collectionHref = getCollectionHrefFromHandle(blog.handle || '');
 
   return (
     <div className="blog-listing-page">
@@ -59,6 +66,14 @@ export default function Blog() {
             ← All Blogs
           </Link>
           <h1 className="blog-hero-title">{blog.title}</h1>
+          <div className="mt-4">
+            <Link
+              to={collectionHref}
+              className="inline-flex items-center px-5 py-2.5 rounded-full border border-border text-[11px] tracking-[0.18em] uppercase text-foreground hover:bg-foreground hover:text-background transition-colors"
+            >
+              Explore related products
+            </Link>
+          </div>
         </div>
       </div>
 

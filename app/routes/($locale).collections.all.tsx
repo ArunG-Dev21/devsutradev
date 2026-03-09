@@ -3,7 +3,8 @@ import { useLoaderData, useSearchParams } from 'react-router';
 import { getPaginationVariables, Image, Money, CartForm } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 
-import { useMemo, useState, useRef, useEffect } from 'react'; type CategoryFilter = {
+import { useMemo, useState, useRef, useEffect } from 'react';
+import { useCartNotification } from '~/components/CartNotification'; type CategoryFilter = {
   id: string;
   label: string;
   handle: string;
@@ -114,7 +115,7 @@ function FilterSidebar({
   isMobile?: boolean;
 }) {
   return (
-    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'border border-border rounded-2xl p-6 shadow-sm sticky top-6'}`}>
+    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'border border-border rounded-2xl p-6 shadow-sm'}`}>
       <div className="flex items-center justify-between mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border/40">
         <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
@@ -393,9 +394,9 @@ export default function Collection() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="flex gap-8 items-start">
-          <aside className="hidden lg:block w-56 xl:w-64 flex-shrink-0">
+          <aside className="hidden lg:block w-56 xl:w-64 flex-shrink-0 sticky top-6 self-start">
             <FilterSidebar
               activeFilterIds={activeFilterIds}
               onToggleFilter={toggleFilter}
@@ -485,7 +486,7 @@ export default function Collection() {
                   key={product.id}
                   className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-border"
                 >
-                  <a href={`/products/${product.handle}`} className="aspect-square bg-neutral-100 overflow-hidden relative block">
+                  <a href={`/products/${product.handle}`} className="aspect-square bg-muted overflow-hidden relative block">
                     {product.featuredImage ? (
                       <Image
                         data={product.featuredImage}
@@ -494,35 +495,29 @@ export default function Collection() {
                         loading={index < 8 ? 'eager' : 'lazy'}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-neutral-100">
-                        <span className="text-5xl opacity-20 text-muted-foreground">*</span>
+                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                        <span className="text-5xl opacity-20 text-muted-foreground">✦</span>
                       </div>
                     )}
-                    <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-border rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-border rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute top-2.5 right-2.5">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-background border border-border text-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
-                        Certified
-                      </span>
-                    </div>
                   </a>
 
-                  <div className="p-3.5 flex flex-col flex-1">
+                  <div className="p-3 sm:p-3.5 flex flex-col flex-1 gap-1.5">
                     <a href={`/products/${product.handle}`} className="block">
-                      <h3 className="text-base font-semibold text-foreground mb-2 leading-snug line-clamp-2 hover:underline">
+                      <h3 className="text-sm sm:text-[15px] font-medium text-foreground leading-snug line-clamp-2 hover:underline">
                         {product.title}
                       </h3>
                     </a>
 
-                    <div className="mt-auto flex items-center justify-between">
+                    <div className="mt-auto flex items-center justify-between gap-2 pt-1">
                       <div>
                         <Money
                           data={product.priceRange.minVariantPrice}
-                          className="text-sm font-bold text-foreground block"
+                          withoutTrailingZeros
+                          className="text-base sm:text-lg font-semibold text-foreground block"
                         />
                         {product.priceRange.maxVariantPrice.amount !==
                           product.priceRange.minVariantPrice.amount && (
-                            <span className="text-[10px] text-muted-foreground mt-0.5 block">onwards</span>
+                            <span className="text-[10px] text-muted-foreground block">onwards</span>
                           )}
                       </div>
 
@@ -539,27 +534,11 @@ export default function Collection() {
                         action={CartForm.ACTIONS.LinesAdd}
                       >
                         {(fetcher) => (
-                          <button
-                            type="submit"
-                            disabled={!product.variants?.nodes?.[0]?.availableForSale || fetcher.state !== 'idle'}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
-                            aria-label="Add to cart"
-                          >
-                            <svg
-                              className="w-3.5 h-3.5"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5h.008v.008h-.008v-.008Zm5.375 0h.008v.008h-.008v-.008Z"
-                              />
-                            </svg>
-                            {product.variants?.nodes?.[0]?.availableForSale ? 'Add' : 'Sold Out'}
-                          </button>
+                          <CollectionAllAddButton
+                            fetcher={fetcher}
+                            availableForSale={product.variants?.nodes?.[0]?.availableForSale}
+                            productTitle={product.title}
+                          />
                         )}
                       </CartForm>
                     </div>
@@ -587,6 +566,50 @@ export default function Collection() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CollectionAllAddButton({
+  fetcher,
+  availableForSale,
+  productTitle,
+}: {
+  fetcher: any;
+  availableForSale?: boolean;
+  productTitle: string;
+}) {
+  const { showNotification } = useCartNotification();
+  const prevState = useRef(fetcher.state);
+
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+      showNotification(productTitle);
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, showNotification, productTitle]);
+
+  return (
+    <button
+      type="submit"
+      disabled={!availableForSale || fetcher.state !== 'idle'}
+      className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+      aria-label="Add to cart"
+    >
+      <svg
+        className="w-3.5 h-3.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5h.008v.008h-.008v-.008Zm5.375 0h.008v.008h-.008v-.008Z"
+        />
+      </svg>
+      {availableForSale ? 'Add' : 'Sold Out'}
+    </button>
   );
 }
 

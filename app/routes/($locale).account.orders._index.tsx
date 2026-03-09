@@ -251,7 +251,7 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
           </p>
 
           <p className="font-semibold text-stone-900 border-l border-stone-200 pl-6">
-            <Money data={order.totalPrice} />
+            <Money withoutTrailingZeros data={order.totalPrice} />
           </p>
 
           {fulfillmentStatus && (

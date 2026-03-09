@@ -108,19 +108,19 @@ export function RouteBreadcrumbBanner() {
 
   return (
     <div
-      className="mx-auto container et py-4 px-6 md:py-8 md:px-10"
+      className="mx-auto container et py-2 px-4 md:py-8 md:px-10"
       style={{ color: '#ffffff', mixBlendMode: 'difference', borderColor: '#ffffff', }}
     >
       <nav
         aria-label="Breadcrumb"
-        className="flex w-fit items-center gap-2 text-xs tracking-[0.2em] uppercase flex-wrap"
+        className="flex w-full items-center gap-1.5 text-[10px] tracking-[0.14em] uppercase overflow-x-auto whitespace-nowrap md:w-fit md:gap-2 md:text-xs md:tracking-[0.2em]"
       >
         {crumbs.map((crumb, idx) => (
-          <span key={crumb.to} className="inline-flex items-center gap-2">
+          <span key={crumb.to} className="inline-flex items-center gap-1.5 md:gap-2">
             {idx > 0 ? (
               <svg
                 aria-hidden="true"
-                className="w-3 h-3"
+                className="w-2.5 h-2.5 md:w-3 md:h-3"
                 viewBox="0 0 20 20"
                 fill="none"
                 stroke="currentColor"

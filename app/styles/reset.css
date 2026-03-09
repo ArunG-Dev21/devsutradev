@@ -16,13 +16,23 @@
 .swiper-pagination-bullet {
   background: rgba(255, 255, 255, 0.5) !important;
   opacity: 1 !important;
-  width: 10px !important;
-  height: 10px !important;
+  width: 8px !important;
+  height: 8px !important;
   transition: all 0.3s !important;
 }
 
 .swiper-pagination-bullet-active {
   background: rgba(255, 255, 255, 0.5) !important;
-  width: 30px !important;
+  width: 24px !important;
   border-radius: 4px !important;
+}
+
+@media (min-width: 768px) {
+  .swiper-pagination-bullet {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  .swiper-pagination-bullet-active {
+    width: 30px !important;
+  }
 }

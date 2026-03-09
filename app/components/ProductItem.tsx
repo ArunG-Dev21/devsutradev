@@ -38,12 +38,12 @@ export function ProductItem({
         <div className="absolute inset-0 bg-black/0 group-hover:bg-white/5 transition-colors duration-500" />
       </div>
 
-      <div className="flex flex-col items-center text-center mt-auto px-2 pb-2">
-        <h3 className="text-[13px] md:text-sm font-medium text-text-main mb-1.5 transition-colors duration-300 group-hover:text-accent line-clamp-2 leading-relaxed">
+      <div className="flex flex-col items-center text-center mt-auto px-2 pb-3">
+        <h3 className="text-sm md:text-[15px] font-medium text-text-main mb-1 transition-colors duration-300 group-hover:text-accent line-clamp-2 leading-snug">
           {product.title}
         </h3>
-        <div className="text-[13px] tracking-wide text-text-muted font-medium">
-          <Money data={product.priceRange.minVariantPrice} />
+        <div className="text-base md:text-lg font-semibold tracking-wide text-text-main">
+          <Money withoutTrailingZeros data={product.priceRange.minVariantPrice} />
         </div>
       </div>
     </Link>

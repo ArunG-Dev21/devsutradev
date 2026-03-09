@@ -1,11 +1,29 @@
-node_modules
-/.cache
+# dependencies
+node_modules/
+
+# build outputs
 /build
 /dist
 /public/build
-/.mf
+
+# caches
+.cache/
+.mf/
+.react-router/
+
+# environment variables
 .env
-.shopify
-.react-router
+.env.*
+
+# shopify cli files
+.shopify/
+
+# typescript
 *.tsbuildinfo
+
+# lint
 lint_results.json
+
+# OS files
+.DS_Store
+Thumbs.db

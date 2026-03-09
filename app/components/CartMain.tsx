@@ -6,7 +6,8 @@ import {
 } from '@shopify/hydrogen';
 import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useFetcher } from 'react-router';
+import { Link, useFetcher, type FetcherWithComponents } from 'react-router';
+import { useCartNotification } from '~/components/CartNotification';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper/types';
@@ -311,21 +312,13 @@ function RecommendationCard({
               <span className="text-5xl opacity-20 text-muted-foreground">*</span>
             </div>
           )}
-          <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-border rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-border rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute top-2.5 right-2.5 flex items-center gap-2">
-            {badgeTag && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-background border border-border text-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
-                Certified
-              </span>
-            )}
-
-            {!canAdd && (
+          {!canAdd && (
+            <div className="absolute top-2.5 right-2.5">
               <span className="inline-flex items-center justify-center px-2.5 py-1 bg-muted/90 backdrop-blur-sm border border-border/50 text-muted-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
                 Sold Out
               </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </Link>
 
@@ -345,6 +338,7 @@ function RecommendationCard({
 
         <div className="mt-auto flex flex-col gap-2.5">
           <Money
+            withoutTrailingZeros
             data={product.priceRange.minVariantPrice}
             className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-foreground`}
           />
@@ -355,22 +349,47 @@ function RecommendationCard({
               action={CartForm.ACTIONS.LinesAdd}
               inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1 }] }}
             >
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 rounded-lg text-[11px] uppercase tracking-wider font-bold transition-colors cursor-pointer"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <path d="M16 10a4 4 0 0 1-8 0"></path>
-                </svg>
-                Add
-              </button>
+              {(fetcher: FetcherWithComponents<any>) => (
+                <RecommendationAddButton fetcher={fetcher} productTitle={product.title} />
+              )}
             </CartForm>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+function RecommendationAddButton({
+  fetcher,
+  productTitle,
+}: {
+  fetcher: FetcherWithComponents<any>;
+  productTitle: string;
+}) {
+  const { showNotification } = useCartNotification();
+  const prevState = useRef(fetcher.state);
+
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+      showNotification(productTitle);
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, showNotification, productTitle]);
+
+  return (
+    <button
+      type="submit"
+      disabled={fetcher.state !== 'idle'}
+      className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 rounded-lg text-[11px] uppercase tracking-wider font-bold transition-colors cursor-pointer"
+    >
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <path d="M16 10a4 4 0 0 1-8 0"></path>
+      </svg>
+      Add
+    </button>
   );
 }
 

@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Image, Money, CartForm } from '@shopify/hydrogen';
 import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { Link } from 'react-router';
 import { QuickViewModal } from '~/components/QuickViewModal';
+import { useCartNotification } from '~/components/CartNotification';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,8 +52,6 @@ interface FeaturedCollectionProps {
  * action internally via Hydrogen's cart handler, not the current page action.
  */
 function AddToCartButton({ product }: { product: ProductNode }) {
-  const [justAdded, setJustAdded] = useState(false);
-
   const firstVariant = product.variants?.nodes?.[0];
   const isAvailable =
     firstVariant?.availableForSale ?? product.availableForSale !== false;
@@ -74,31 +73,51 @@ function AddToCartButton({ product }: { product: ProductNode }) {
       }}
       fetcherKey={`add-to-cart-${product.id}`}
     >
-      {(fetcher) => {
-        const isAdding = fetcher.state !== 'idle';
+      {(fetcher) => (
+        <AddToCartInner fetcher={fetcher} productTitle={product.title} />
+      )}
+    </CartForm>
+  );
+}
 
-        if (!isAdding && fetcher.data && !justAdded) {
-          // no-op: justAdded is set on click, cleared by timeout
-        }
+function AddToCartInner({
+  fetcher,
+  productTitle,
+}: {
+  fetcher: any;
+  productTitle: string;
+}) {
+  const [justAdded, setJustAdded] = useState(false);
+  const { showNotification } = useCartNotification();
+  const prevState = useRef(fetcher.state);
 
-        return (
-          <button
-            type="submit"
-            disabled={isAdding}
-            onClick={() => {
-              setJustAdded(true);
-              setTimeout(() => setJustAdded(false), 1800);
-            }}
-            className={[
-              'mt-2.5 w-full py-2 rounded-full',
-              'text-[9px] font-medium tracking-widest uppercase',
-              'flex items-center justify-center gap-1.5',
-              'border transition-all duration-300 cursor-pointer select-none',
-              isAdding
-                ? 'bg-muted border-border text-muted-foreground scale-[0.97] cursor-not-allowed'
-                : justAdded
-                  ? 'bg-foreground border-foreground text-background scale-[0.97]'
-                  : 'bg-foreground border-foreground text-background hover:bg-background hover:border-foreground hover:text-foreground active:scale-[0.96]',
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+      showNotification(productTitle);
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, showNotification, productTitle]);
+
+  const isAdding = fetcher.state !== 'idle';
+
+  return (
+    <button
+      type="submit"
+      disabled={isAdding}
+      onClick={() => {
+        setJustAdded(true);
+        setTimeout(() => setJustAdded(false), 1800);
+      }}
+      className={[
+        'mt-2.5 w-full py-2 rounded-full',
+        'text-[9px] font-medium tracking-widest uppercase',
+        'flex items-center justify-center gap-1.5',
+        'border transition-all duration-300 cursor-pointer select-none',
+        isAdding
+          ? 'bg-muted border-border text-muted-foreground scale-[0.97] cursor-not-allowed'
+          : justAdded
+            ? 'bg-foreground border-foreground text-background scale-[0.97]'
+            : 'bg-foreground border-foreground text-background hover:bg-background hover:border-foreground hover:text-foreground active:scale-[0.96]',
             ].join(' ')}
           >
             {isAdding ? (
@@ -127,13 +146,8 @@ function AddToCartButton({ product }: { product: ProductNode }) {
               'Add to Cart'
             )}
           </button>
-        );
-      }}
-    </CartForm>
   );
 }
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 export function FeaturedCollectionComponent({ collection }: FeaturedCollectionProps) {
   const [sortKey, setSortKey] = useState('price-asc');
@@ -375,13 +389,13 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                 </Link>
 
                 {/* ── INFO + ADD TO CART ── */}
-                <div className="px-3 pt-2.5 pb-4 sm:px-4 sm:pt-3 sm:pb-5 flex flex-col flex-1">
-                  <Link to={`/products/${product.handle}`} className="flex flex-col gap-0.5">
-                    <p className="text-[0.8rem] sm:text-[0.9rem] font-normal leading-snug text-foreground tracking-wide line-clamp-2">
+                <div className="px-3 pt-3 pb-4 sm:px-4 sm:pt-3.5 sm:pb-5 flex flex-col flex-1">
+                  <Link to={`/products/${product.handle}`} className="flex flex-col gap-1">
+                    <p className="text-[0.82rem] sm:text-[0.92rem] font-medium leading-snug text-foreground line-clamp-2">
                       {product.title}
                     </p>
-                    <span className="text-xs text-muted-foreground mt-0.5">
-                      <Money data={product.priceRange.minVariantPrice as any} />
+                    <span className="text-base sm:text-lg font-semibold text-foreground">
+                      <Money withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
                     </span>
                   </Link>
 

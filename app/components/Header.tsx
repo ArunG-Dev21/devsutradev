@@ -500,111 +500,96 @@ export function HeaderMenu({
 }) {
   const { close } = useAside();
 
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `group flex items-center gap-4 py-3.5 transition-colors duration-200 ${
+      isActive
+        ? 'text-foreground'
+        : 'text-muted-foreground hover:text-foreground'
+    }`;
+
+  const chevron = (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 ml-auto text-muted-foreground/50 group-hover:text-foreground/60 transition-colors">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+    </svg>
+  );
+
   return (
     <nav
       role="navigation"
-      className="flex flex-col gap-5 pt-2"
+      className="flex flex-col pt-2"
     >
-      {/* ── Navigation Links Grid ── */}
-      <div className="grid grid-cols-2 gap-2.5 px-5">
-        <NavLink
-          to="/"
-          end
-          onClick={close}
-          className={({ isActive }) =>
-            `group relative overflow-hidden rounded-2xl py-4 text-center text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 flex items-center justify-center ${isActive
-              ? 'bg-foreground text-background shadow-lg scale-[1.02]'
-              : 'bg-muted/50 text-foreground border border-border/40 hover:bg-muted hover:border-border hover:shadow-md active:scale-95'
-            }`
-          }
-        >
-          Home
+      {/* ── Main Navigation ── */}
+      <div className="flex flex-col px-6">
+        <NavLink to="/" end onClick={close} className={navLinkClass}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+          <span className="text-base font-medium">Home</span>
+          {chevron}
         </NavLink>
-        <NavLink
-          to="/pages/about"
-          onClick={close}
-          className={({ isActive }) =>
-            `group relative overflow-hidden rounded-2xl py-4 text-center text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 flex items-center justify-center ${isActive
-              ? 'bg-foreground text-background shadow-lg scale-[1.02]'
-              : 'bg-muted/50 text-foreground border border-border/40 hover:bg-muted hover:border-border hover:shadow-md active:scale-95'
-            }`
-          }
-        >
-          About
+        <NavLink to="/pages/about" onClick={close} className={navLinkClass}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+          </svg>
+          <span className="text-base font-medium">About</span>
+          {chevron}
         </NavLink>
-        <NavLink
-          to="/pages/contact"
-          onClick={close}
-          className={({ isActive }) =>
-            `group relative overflow-hidden rounded-2xl py-4 text-center text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 flex items-center justify-center ${isActive
-              ? 'bg-foreground text-background shadow-lg scale-[1.02]'
-              : 'bg-muted/50 text-foreground border border-border/40 hover:bg-muted hover:border-border hover:shadow-md active:scale-95'
-            }`
-          }
-        >
-          Contact
+        <NavLink to="/pages/contact" onClick={close} className={navLinkClass}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+          </svg>
+          <span className="text-base font-medium">Contact</span>
+          {chevron}
         </NavLink>
-        <NavLink
-          to="/blogs"
-          onClick={close}
-          className={({ isActive }) =>
-            `group relative overflow-hidden rounded-2xl py-4 text-center text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-300 flex items-center justify-center ${isActive
-              ? 'bg-foreground text-background shadow-lg scale-[1.02]'
-              : 'bg-muted/50 text-foreground border border-border/40 hover:bg-muted hover:border-border hover:shadow-md active:scale-95'
-            }`
-          }
-        >
-          Blog
+        <NavLink to="/blogs" onClick={close} className={navLinkClass}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+          </svg>
+          <span className="text-base font-medium">Blog</span>
+          {chevron}
         </NavLink>
       </div>
 
       {/* ── Divider ── */}
-      <div className="mx-5 border-t border-border/30" />
+      <div className="mx-6 my-3 border-t border-border/30" />
 
-      {/* ── Quick Links / Promotions ── */}
-      <div className="flex flex-col gap-2 px-5">
-        <p className="text-[9px] font-semibold tracking-[0.25em] uppercase text-muted-foreground px-1 mb-0.5">Quick Links</p>
+      {/* ── Collections ── */}
+      <div className="flex flex-col px-6">
+        <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-muted-foreground mb-1">Collections</p>
         <NavLink
           to="/collections/all"
           onClick={close}
-          className="group flex items-center gap-3.5 px-4 py-3.5 bg-muted/30 hover:bg-muted/70 rounded-2xl transition-all duration-300 active:scale-[0.98]"
+          className="group flex items-center gap-4 py-3.5 transition-colors duration-200 text-muted-foreground hover:text-foreground"
         >
-          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white text-sm shadow-sm">🔥</span>
-          <div className="flex flex-col">
-            <span className="text-[12px] font-semibold tracking-[0.08em] text-foreground">Best Sellers</span>
-            <span className="text-[10px] text-muted-foreground leading-tight">Our most loved items</span>
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 ml-auto text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
           </svg>
+          <span className="text-base font-medium">Best Sellers</span>
+          {chevron}
         </NavLink>
         <NavLink
           to="/collections/new-arrivals"
           onClick={close}
-          className="group flex items-center gap-3.5 px-4 py-3.5 bg-muted/30 hover:bg-muted/70 rounded-2xl transition-all duration-300 active:scale-[0.98]"
+          className="group flex items-center gap-4 py-3.5 transition-colors duration-200 text-muted-foreground hover:text-foreground"
         >
-          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-teal-400 to-emerald-500 text-white text-sm shadow-sm">✨</span>
-          <div className="flex flex-col">
-            <span className="text-[12px] font-semibold tracking-[0.08em] text-foreground">New Arrivals</span>
-            <span className="text-[10px] text-muted-foreground leading-tight">Fresh additions</span>
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 ml-auto text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
           </svg>
+          <span className="text-base font-medium">New Arrivals</span>
+          {chevron}
         </NavLink>
         <NavLink
           to="/collections/sale"
           onClick={close}
-          className="group flex items-center gap-3.5 px-4 py-3.5 bg-muted/30 hover:bg-muted/70 rounded-2xl transition-all duration-300 active:scale-[0.98]"
+          className="group flex items-center gap-4 py-3.5 transition-colors duration-200 text-muted-foreground hover:text-foreground"
         >
-          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-rose-400 to-pink-600 text-white text-sm shadow-sm">🛍️</span>
-          <div className="flex flex-col">
-            <span className="text-[12px] font-semibold tracking-[0.08em] text-foreground">Sale</span>
-            <span className="text-[10px] text-muted-foreground leading-tight">Up to 40% off</span>
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5 ml-auto text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
           </svg>
+          <span className="text-base font-medium">Sale</span>
+          {chevron}
         </NavLink>
       </div>
     </nav>
@@ -840,7 +825,7 @@ function DesktopSearchBar() {
                               <p className="text-sm text-text-main truncate">{product.title}</p>
                               {price && (
                                 <span className="text-xs text-foreground font-medium">
-                                  <Money data={price} />
+                                  <Money withoutTrailingZeros data={price} />
                                 </span>
                               )}
                             </div>

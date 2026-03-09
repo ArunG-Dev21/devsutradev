@@ -63,15 +63,15 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
           />
 
           {/* Skeleton content blocks */}
-          <div className="relative w-full px-8 lg:px-12 xl:px-20 pb-16 lg:pb-24">
-            <div className="max-w-2xl space-y-5">
+          <div className="relative w-full px-5 sm:px-6 md:px-8 lg:px-12 xl:px-20 pb-14 sm:pb-16 md:pb-16 lg:pb-20 xl:pb-24">
+            <div className="max-w-2xl space-y-4">
               {/* Heading skeleton */}
-              <div className="h-10 md:h-14 w-3/4 rounded-lg bg-stone-300/40 dark:bg-white/[0.07]" />
-              <div className="h-10 md:h-14 w-1/2 rounded-lg bg-stone-300/40 dark:bg-white/[0.07]" />
+              <div className="h-7 sm:h-9 md:h-10 w-3/4 rounded-lg bg-stone-300/40 dark:bg-white/[0.07]" />
+              <div className="h-7 sm:h-9 md:h-10 w-1/2 rounded-lg bg-stone-300/40 dark:bg-white/[0.07]" />
               {/* Subheading skeleton */}
-              <div className="h-6 w-2/3 rounded-md bg-stone-200/50 dark:bg-white/[0.05] mt-2" />
+              <div className="h-4 sm:h-5 md:h-6 w-2/3 rounded-md bg-stone-200/50 dark:bg-white/[0.05] mt-2" />
               {/* CTA skeleton */}
-              <div className="h-14 w-48 rounded-full bg-stone-300/30 dark:bg-white/[0.06] mt-4" />
+              <div className="h-10 sm:h-11 md:h-12 w-40 sm:w-44 md:w-48 rounded-full bg-stone-300/30 dark:bg-white/[0.06] mt-3" />
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
           loop={canLoop}
           speed={1200}
           className="w-full h-full"
-          style={{ '--swiper-pagination-bottom': '2rem' } as React.CSSProperties}
+          style={{ '--swiper-pagination-bottom': '0.75rem' } as React.CSSProperties}
           onInit={() => setIsReady(true)}
         >
           {slideData.map((slide, idx) => (
@@ -132,32 +132,32 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
                 />
 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
                 {/* Content */}
-                <div className="relative h-full flex items-center lg:items-end">
-                  <div className="w-full px-4 md:px-8 lg:px-12 xl:px-20 md:pb-16 lg:pb-24">
+                <div className="relative h-full flex items-end">
+                  <div className="w-full px-5 pb-14 sm:px-6 sm:pb-16 md:px-8 md:pb-16 lg:px-12 lg:pb-20 xl:px-20 xl:pb-24">
 
                     <div className="max-w-2xl">
                       {/* Heading */}
                       <h2
-                        className="text-4xl md:text-5xl lg:text-6xl xl:text-5xl font-semibold text-white leading-[1.05] mb-4 md:mb-8 font-heading"
+                        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-semibold text-white leading-[1.1] mb-3 sm:mb-4 md:mb-5 font-heading"
                       >
                         {slide.heading}
                       </h2>
                       {/* Subheading */}
-                      <span className="block text-xl md:text-lg lg:text-2xl text-neutral-300 mb-4 md:mb-6">
+                      <span className="block text-sm sm:text-base md:text-lg lg:text-xl text-neutral-300 mb-3 sm:mb-4 md:mb-5">
                         {slide.subheading}
                       </span>
 
                       {/* CTA Button */}
                       <Link
                         to={slide.ctaLink}
-                        className="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 bg-white text-black text-xs md:text-lg uppercase font-medium rounded-full border border-white transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
+                        className="inline-flex items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 bg-white text-black text-[11px] sm:text-xs md:text-sm uppercase font-medium tracking-wider rounded-full border border-white transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
                       >
                         {slide.ctaText}
                         <svg
-                          className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-300 group-hover:translate-x-1"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"

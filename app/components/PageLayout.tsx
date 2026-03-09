@@ -17,6 +17,8 @@ import {
 import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
 import { LandingOverlay } from '~/components/LandingOverlay';
 import { FloatingControls } from '~/components/FloatingControls';
+import { TrustBadgesBar } from '~/components/TrustBadgesBar';
+import { CartNotificationProvider } from '~/components/CartNotification';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -37,6 +39,7 @@ export function PageLayout({
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
+      <CartNotificationProvider>
       <LandingOverlay />
       <FloatingControls />
       <CartAside cart={cart} />
@@ -52,11 +55,13 @@ export function PageLayout({
       )}
       <RouteBreadcrumbBanner />
       <main className='bg-background'>{children}</main>
+      <TrustBadgesBar />
       <Footer
         footer={footer}
         header={header}
         publicStoreDomain={publicStoreDomain}
       />
+      </CartNotificationProvider>
     </Aside.Provider>
   );
 }
@@ -82,20 +87,7 @@ function SearchAside() {
       <div className="predictive-search">
         <SearchFormPredictive>
           {({ fetchResults, goToSearch, inputRef }) => (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                background: 'var(--color-bg-light)',
-                border: '1px solid var(--color-primary-border)',
-                borderRadius: '999px',
-                padding: '10px 16px',
-                margin: '0 0 16px 0',
-                overflow: 'hidden',
-                outline: 'none',
-              }}
-            >
+            <div className="flex items-center gap-2.5 bg-muted border border-border rounded-full px-4 py-2.5 mb-4 overflow-hidden">
               {/* Search icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +95,7 @@ function SearchAside() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                style={{ width: '16px', height: '16px', flexShrink: 0, opacity: 0.5 }}
+                className="w-4 h-4 shrink-0 text-muted-foreground"
               >
                 <path
                   strokeLinecap="round"
@@ -123,38 +115,14 @@ function SearchAside() {
                 type="text"
                 list={queriesDatalistId}
                 autoComplete="off"
-                style={{
-                  flex: 1,
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  padding: 0,
-                  margin: 0,
-                  color: 'var(--color-text-main)',
-                  fontSize: '0.8rem',
-                  letterSpacing: '0.03em',
-                  fontFamily: 'inherit',
-                }}
+                className="flex-1 bg-transparent border-none outline-none p-0 m-0 text-foreground text-[0.8rem] tracking-wide font-[inherit] placeholder:text-muted-foreground"
               />
 
               {/* Go button */}
               <button
                 onClick={goToSearch}
                 title="Search"
-                style={{
-                  flexShrink: 0,
-                  background: 'var(--color-accent, #000)',
-                  border: 'none',
-                  borderRadius: '999px',
-                  padding: '4px 14px',
-                  color: 'var(--color-bg-dark)',
-                  fontSize: '0.7rem',
-                  fontWeight: 600,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  transition: 'opacity 0.2s',
-                }}
+                className="shrink-0 bg-foreground text-background border-none rounded-full px-3.5 py-1 text-[0.7rem] font-semibold tracking-widest uppercase cursor-pointer transition-opacity duration-200 hover:opacity-80"
               >
                 Go
               </button>

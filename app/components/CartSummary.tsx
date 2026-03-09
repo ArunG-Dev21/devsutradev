@@ -23,7 +23,7 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         <span className="text-sm sm:text-base font-semibold text-foreground">Subtotal</span>
         <span className="text-sm sm:text-base font-bold text-foreground">
           {cart?.cost?.subtotalAmount?.amount ? (
-            <Money data={cart.cost.subtotalAmount} />
+            <Money withoutTrailingZeros data={cart.cost.subtotalAmount} />
           ) : (
             '—'
           )}
@@ -214,7 +214,7 @@ function CartGiftCard({
                     ***{giftCard.lastCharacters}
                   </code>
                   <span className="text-xs">
-                    <Money data={giftCard.amountUsed} />
+                    <Money withoutTrailingZeros data={giftCard.amountUsed} />
                   </span>
                 </div>
                 <button
