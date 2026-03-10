@@ -46,7 +46,7 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
   const canAutoplay = slideData.length > 1;
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full overflow-hidden">
 
       {/* ── Skeleton placeholder — visible until Swiper fires onInit ── */}
       {!isReady && (

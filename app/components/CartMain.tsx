@@ -70,7 +70,7 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
   return (
     <div
       className={`h-full flex ${layout === 'page' && cartHasItems
-        ? 'flex-col lg:flex-row gap-8 lg:gap-12 items-start'
+        ? 'flex-col lg:flex-row gap-6 lg:gap-0 items-start'
         : 'flex-col'
         } bg-transparent text-foreground`}
     >
@@ -176,7 +176,7 @@ function CartRecommendations({
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(layout === 'aside' ? 8 : 3);
+  const [visibleCount, setVisibleCount] = useState(8);
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return;
@@ -196,84 +196,61 @@ function CartRecommendations({
         <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-stone-400 dark:text-stone-400">
           You may also like
         </p>
-        {layout === 'aside' && (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => swiper?.slidePrev()}
-              disabled={!swiper || isBeginning}
-              className="w-8 h-8 flex items-center justify-center rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-              aria-label="Previous recommendations"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => swiper?.slideNext()}
-              disabled={!swiper || isEnd}
-              className="w-8 h-8 flex items-center justify-center rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-              aria-label="Next recommendations"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
-              </svg>
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => swiper?.slidePrev()}
+            disabled={!swiper || isBeginning}
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-muted transition-colors"
+            aria-label="Previous recommendations"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => swiper?.slideNext()}
+            disabled={!swiper || isEnd}
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-muted transition-colors"
+            aria-label="Next recommendations"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {layout === 'aside' ? (
-        <Swiper
-          modules={[Navigation]}
-          slidesPerView={2.1}
-          spaceBetween={10}
-          onSwiper={(instance) => {
-            setSwiper(instance);
-            setIsBeginning(instance.isBeginning);
-            setIsEnd(instance.isEnd);
-          }}
-          onSlideChange={(instance) => {
-            setIsBeginning(instance.isBeginning);
-            setIsEnd(instance.isEnd);
-          }}
-          className="pb-1"
-        >
-          {products.map((product) => (
-            <SwiperSlide key={product.id}>
-              <RecommendationCard
-                product={product}
-                compact
-                onNavigateAway={onNavigateAway}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      ) : (
-        <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-            {products.slice(0, visibleCount).map((product) => (
-              <RecommendationCard
-                key={product.id}
-                product={product}
-                onNavigateAway={onNavigateAway}
-              />
-            ))}
-          </div>
-
-          {visibleCount < products.length && (
-            <div className="flex justify-center mt-2">
-              <button
-                onClick={() => setVisibleCount((prev) => prev + 3)}
-                className="px-8 py-3 w-full sm:w-auto rounded-full text-[10px] font-medium tracking-widest uppercase text-stone-900 dark:text-stone-100 bg-transparent border border-stone-900/30 dark:border-white/30 hover:bg-stone-900 hover:text-stone-50 dark:hover:bg-white dark:hover:text-stone-900 hover:border-stone-900 dark:hover:border-white transition-all duration-300 cursor-pointer"
-              >
-                View More
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+      <Swiper
+        modules={[Navigation]}
+        slidesPerView={layout === 'aside' ? 2.1 : 2.2}
+        spaceBetween={layout === 'aside' ? 10 : 12}
+        breakpoints={layout === 'page' ? {
+          640: { slidesPerView: 3.2, spaceBetween: 14 },
+          1024: { slidesPerView: 4.2, spaceBetween: 16 },
+        } : undefined}
+        onSwiper={(instance) => {
+          setSwiper(instance);
+          setIsBeginning(instance.isBeginning);
+          setIsEnd(instance.isEnd);
+        }}
+        onSlideChange={(instance) => {
+          setIsBeginning(instance.isBeginning);
+          setIsEnd(instance.isEnd);
+        }}
+        className="pb-1"
+      >
+        {products.map((product) => (
+          <SwiperSlide key={product.id}>
+            <RecommendationCard
+              product={product}
+              compact
+              onNavigateAway={onNavigateAway}
+            />
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </section>
   );
 }

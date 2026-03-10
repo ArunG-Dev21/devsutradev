@@ -120,9 +120,7 @@ export default function Cart() {
 
       {/* Main Cart Content */}
       <div className="flex-1 container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 md:py-12 w-full">
-        <div className="bg-card text-card-foreground rounded-2xl sm:rounded-3xl shadow-sm border border-border p-3 sm:p-6 md:p-8 lg:p-10">
-          <CartMain layout="page" cart={cart} />
-        </div>
+        <CartMain layout="page" cart={cart} />
       </div>
     </div>
   );
