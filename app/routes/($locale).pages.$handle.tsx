@@ -2,8 +2,18 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/($locale).pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
+import { generateMeta, truncate } from '~/lib/seo';
+
+export const meta: Route.MetaFunction = ({ data }) => {
+  const page = (data as any)?.page;
+  const origin = (data as any)?.seoOrigin || '';
+  const title = `${page?.seo?.title || page?.title || 'Page'} | Devasutra`;
+  const description = page?.seo?.description || `Learn more about Devasutra — ${page?.title || ''}.`;
+  return generateMeta({
+    title,
+    description,
+    canonical: `${origin}/pages/${page?.handle || ''}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -13,7 +23,8 @@ export async function loader(args: Route.LoaderArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  return {...deferredData, ...criticalData};
+  const origin = new URL(args.request.url).origin;
+  return {...deferredData, ...criticalData, seoOrigin: origin};
 }
 
 /**

@@ -3,15 +3,38 @@ import type { Route } from './+types/($locale).blogs.$blogHandle.$articleHandle'
 import { Image, Money } from '@shopify/hydrogen';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import { useEffect, useRef, useState } from 'react';
+import {
+  generateMeta,
+  truncate,
+  stripHtml,
+  articleSchema,
+  breadcrumbSchema,
+  jsonLd,
+} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `Devasutra | ${data?.article.title ?? ''}` }];
+  const article = (data as any)?.article;
+  const origin = (data as any)?.seoOrigin || '';
+  const blogHandle = (data as any)?.blogHandle || '';
+  const title = `${article?.title ?? ''} | Devasutra Blog`;
+  const description = article?.seo?.description
+    || (article?.excerpt ? truncate(stripHtml(article.excerpt), 155) : '')
+    || truncate(stripHtml(article?.contentHtml || ''), 155);
+  const ogImage = article?.image?.url || '';
+  return generateMeta({
+    title,
+    description,
+    canonical: `${origin}/blogs/${blogHandle}/${article?.handle || ''}`,
+    ogType: 'article',
+    ogImage,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return { ...deferredData, ...criticalData };
+  const origin = new URL(args.request.url).origin;
+  return { ...deferredData, ...criticalData, seoOrigin: origin };
 }
 
 async function loadCriticalData({ context, request, params }: Route.LoaderArgs) {
@@ -102,6 +125,7 @@ function estimateReadingTime(html: string) {
 export default function Article() {
   const { article, blogHandle, blogTitle, relatedProducts } =
     useLoaderData<typeof loader>();
+  const seoOrigin = ((useLoaderData<typeof loader>()) as any).seoOrigin || '';
   const { title, image, contentHtml, author, tags, excerpt } = article;
   const collectionLink = getCollectionLinkFromArticle({
     blogHandle,
@@ -138,6 +162,28 @@ export default function Article() {
 
   return (
     <div className="article-page">
+      {/* Article JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            articleSchema(article as any, blogHandle, article.handle, seoOrigin),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            breadcrumbSchema([
+              { name: 'Home', url: `${seoOrigin}/` },
+              { name: 'Blog', url: `${seoOrigin}/blogs` },
+              { name: blogTitle || blogHandle, url: `${seoOrigin}/blogs/${blogHandle}` },
+              { name: title, url: `${seoOrigin}/blogs/${blogHandle}/${article.handle}` },
+            ]),
+          ),
+        }}
+      />
       {/* Reading progress bar */}
       <div className="article-progress-bar" aria-hidden>
         <div

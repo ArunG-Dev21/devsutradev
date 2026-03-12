@@ -19,24 +19,35 @@ import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useCartNotification } from '~/components/CartNotification';
 import { useAside } from '~/components/Aside';
+import {
+  generateMeta,
+  truncate,
+  stripHtml,
+  productSchema,
+  breadcrumbSchema,
+  jsonLd,
+} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [
-    { title: `${data?.product.title ?? ''} | Devasutra` },
-    {
-      name: 'description',
-      content: data?.product.description?.substring(0, 155) ?? '',
-    },
-    {
-      rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
-    },
-  ];
+  const product = (data as any)?.product;
+  const origin = (data as any)?.seoOrigin || '';
+  const title = `${product?.title ?? ''} | Devasutra`;
+  const rawDesc = product?.description || '';
+  const description = truncate(rawDesc, 155) || title;
+  const ogImage = product?.featuredImage?.url || product?.images?.nodes?.[0]?.url || '';
+  return generateMeta({
+    title,
+    description,
+    canonical: `${origin}/products/${product?.handle || ''}`,
+    ogType: 'product',
+    ogImage,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
   const criticalData = await loadCriticalData(args);
-  return criticalData;
+  const origin = new URL(args.request.url).origin;
+  return { ...criticalData, seoOrigin: origin };
 }
 
 async function loadCriticalData({ context, params, request }: Route.LoaderArgs) {
@@ -70,13 +81,14 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     // Silently fail — the section will just be hidden
   }
 
-  return { product, recommendedProducts };
+  return { product, recommendedProducts, seoOrigin: new URL(request.url).origin };
 }
 
 // ─── Main Product Component ───────────────────────────────────────────────────
 
 export default function Product() {
   const { product, recommendedProducts } = useLoaderData<typeof loader>();
+  const seoOrigin = ((useLoaderData<typeof loader>()) as any).seoOrigin || '';
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const productFormRef = useRef<HTMLDivElement>(null);
   const { open } = useAside();
@@ -230,7 +242,34 @@ export default function Product() {
 
   return (
     <div className="min-h-screen text-stone-900 dark:bg-background dark:text-foreground">
-
+      {/* Product JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            productSchema(
+              product as any,
+              seoOrigin,
+              testimonials.length > 0
+                ? { value: Number(avgRating), count: testimonials.length }
+                : undefined,
+            ),
+          ),
+        }}
+      />
+      {/* Breadcrumb JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            breadcrumbSchema([
+              { name: 'Home', url: `${seoOrigin}/` },
+              { name: 'Products', url: `${seoOrigin}/collections/all` },
+              { name: title, url: `${seoOrigin}/products/${product.handle}` },
+            ]),
+          ),
+        }}
+      />
       {/* Lightbox Modal for Customer Uploaded Product Images */}
       {expandedImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md transition-opacity duration-300">

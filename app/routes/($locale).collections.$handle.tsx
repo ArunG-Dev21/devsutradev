@@ -6,15 +6,36 @@ import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { ProductItemFragment } from 'storefrontapi.generated';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useCartNotification } from '~/components/CartNotification';
+import {
+  generateMeta,
+  truncate,
+  collectionSchema,
+  breadcrumbSchema,
+  jsonLd,
+} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `${data?.collection.title ?? ''} | Devasutra` }];
+  const collection = (data as any)?.collection;
+  const origin = (data as any)?.seoOrigin || '';
+  const title = `${collection?.title ?? 'Collection'} — Sacred Collection | Devasutra`;
+  const description = collection?.description
+    ? truncate(collection.description, 155)
+    : `Browse our ${collection?.title || ''} collection. Handpicked, blessed & lab certified. Shop now with free shipping above ₹999.`;
+  const ogImage = collection?.image?.url || '';
+  return generateMeta({
+    title,
+    description,
+    canonical: `${origin}/collections/${collection?.handle || ''}`,
+    ogType: 'website',
+    ogImage,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return { ...deferredData, ...criticalData };
+  const origin = new URL(args.request.url).origin;
+  return { ...deferredData, ...criticalData, seoOrigin: origin };
 }
 
 async function loadCriticalData({ context, params, request }: Route.LoaderArgs) {
@@ -274,6 +295,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
 
 export default function Collection() {
   const { collection, relatedArticles } = useLoaderData<typeof loader>();
+  const seoOrigin = ((useLoaderData<typeof loader>()) as any).seoOrigin || '';
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState('featured');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -321,7 +343,25 @@ export default function Collection() {
 
   return (
     <div className="min-h-screen text-foreground">
-
+      {/* CollectionPage JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(collectionSchema(collection, seoOrigin)),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            breadcrumbSchema([
+              { name: 'Home', url: `${seoOrigin}/` },
+              { name: 'Collections', url: `${seoOrigin}/collections` },
+              { name: collection.title, url: `${seoOrigin}/collections/${collection.handle}` },
+            ]),
+          ),
+        }}
+      />
       {/* BANNER */}
       <div className="relative bg-background border-b border-border overflow-hidden">
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none">

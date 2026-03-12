@@ -4,7 +4,10 @@ import { getPaginationVariables, Image } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `Devasutra | Blog` }];
+  return [
+    { title: 'Blog — Sacred Wisdom & Guides | Devasutra' },
+    { name: 'description', content: 'Explore insights, guides, and wisdom from the world of sacred traditions. Learn about Rudraksha, Karungali, gemstones, and spiritual practices.' },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {

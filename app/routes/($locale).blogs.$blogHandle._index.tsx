@@ -6,7 +6,11 @@ import { PaginatedResourceSection } from '~/components/PaginatedResourceSection'
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `Devasutra | ${data?.blog.title ?? ''}` }];
+  const blog = (data as any)?.blog;
+  return [
+    { title: `${blog?.seo?.title || blog?.title || 'Blog'} | Devasutra` },
+    { name: 'description', content: blog?.seo?.description || `Read the latest articles from ${blog?.title || 'our blog'}.` },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {

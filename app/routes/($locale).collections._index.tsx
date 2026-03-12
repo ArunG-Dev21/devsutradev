@@ -4,6 +4,13 @@ import { getPaginationVariables, Image } from '@shopify/hydrogen';
 import type { CollectionFragment } from 'storefrontapi.generated';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
 
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: 'Sacred Collections — Rudraksha, Karungali & More | Devasutra' },
+    { name: 'description', content: 'Discover our curated collections of authentic, energised spiritual products — Rudraksha, Karungali, Gemstone bracelets and more.' },
+  ];
+};
+
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);

@@ -5,22 +5,28 @@ import { TrustBadges } from '~/components/TrustBadges';
 
 import { WhyDevasutra } from '~/components/WhyDevasutra';
 import { KarungaliPromoter } from '~/components/KarungaliPromoter';
+import {
+  SEO_DEFAULTS,
+  generateMeta,
+  organizationSchema,
+  jsonLd,
+} from '~/lib/seo';
 
-
-export const meta: Route.MetaFunction = () => {
-  return [
-    { title: 'Devasutra | Sacred Ornaments · Divine Energy' },
-    {
-      name: 'description',
-      content:
-        'Discover authentic devotional ornaments — Rudraksha, Karungali, Gemstone bracelets, Sacred Malas & more. Handcrafted, blessed & lab certified.',
-    },
-  ];
+export const meta: Route.MetaFunction = ({ data }) => {
+  const origin = (data as any)?.seoOrigin || '';
+  const title = `${SEO_DEFAULTS.siteName} | ${SEO_DEFAULTS.tagline}`;
+  return generateMeta({
+    title,
+    description: SEO_DEFAULTS.defaultDescription,
+    canonical: origin || '/',
+    ogType: 'website',
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
   const criticalData = await loadCriticalData(args);
-  return { ...criticalData };
+  const origin = new URL(args.request.url).origin;
+  return { ...criticalData, seoOrigin: origin };
 }
 
 async function loadCriticalData({ context }: Route.LoaderArgs) {
@@ -192,9 +198,17 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
+  const origin = (data as any).seoOrigin || '';
 
   return (
     <div className="home">
+      {/* Organization + WebSite JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(organizationSchema(origin)),
+        }}
+      />
       {data.featuredCollection && (
         <Hero collection={data.featuredCollection} slides={data.heroSlides} />
       )}

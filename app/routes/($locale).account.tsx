@@ -9,6 +9,13 @@ import {
 import type { Route } from './+types/($locale).account';
 import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetailsQuery';
 
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: 'My Account | Devasutra' },
+    { name: 'robots', content: 'noindex, nofollow' },
+  ];
+};
+
 export function shouldRevalidate() {
   return true;
 }

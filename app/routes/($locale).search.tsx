@@ -14,7 +14,10 @@ import type {
 } from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `Hydrogen | Search` }];
+  return [
+    { title: 'Search | Devasutra' },
+    { name: 'robots', content: 'noindex, nofollow' },
+  ];
 };
 
 export async function loader({ request, context }: Route.LoaderArgs) {
