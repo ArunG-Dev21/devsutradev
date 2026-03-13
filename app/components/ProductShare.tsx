@@ -77,7 +77,7 @@ export function ProductShare({ title }: { title: string }) {
                 <div className="w-px h-8 bg-border mx-1 hidden sm:block"></div>
 
                 <button
-                    onClick={copyToClipboard}
+                    onClick={() => { void copyToClipboard(); }}
                     className="group relative flex items-center gap-2 px-4 h-10 rounded-full bg-muted/30 border border-border hover:bg-foreground hover:text-background hover:border-foreground transition-all duration-300 ml-auto sm:ml-0"
                     type="button"
                 >

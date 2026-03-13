@@ -1,5 +1,5 @@
 import { Await, Link } from 'react-router';
-import { Suspense, useId } from 'react';
+import { Suspense, useId, useRef } from 'react';
 import type {
   CartApiQueryFragment,
   FooterQuery,
@@ -8,6 +8,7 @@ import type {
 import { Aside } from '~/components/Aside';
 import { Footer } from '~/components/Footer';
 import { Header, HeaderMenu } from '~/components/Header';
+import type { SubNavIslandHandle } from '~/components/Header';
 import { CartMain } from '~/components/CartMain';
 import { RouteBreadcrumbBanner } from '~/components/RouteBreadcrumbBanner';
 import {
@@ -19,6 +20,7 @@ import { LandingOverlay } from '~/components/LandingOverlay';
 import { FloatingControls } from '~/components/FloatingControls';
 import { TrustBadgesBar } from '~/components/TrustBadgesBar';
 import { CartNotificationProvider } from '~/components/CartNotification';
+import { MobileBottomNav } from '~/components/MobileBottomNav';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -37,6 +39,8 @@ export function PageLayout({
   isLoggedIn,
   publicStoreDomain,
 }: PageLayoutProps) {
+  const subNavRef = useRef<SubNavIslandHandle | null>(null);
+
   return (
     <Aside.Provider>
       <CartNotificationProvider>
@@ -51,16 +55,18 @@ export function PageLayout({
           cart={cart}
           isLoggedIn={isLoggedIn}
           publicStoreDomain={publicStoreDomain}
+          subNavRef={subNavRef}
         />
       )}
       <RouteBreadcrumbBanner />
-      <main className='bg-background'>{children}</main>
+      <main className='bg-background pb-[60px] md:pb-0'>{children}</main>
       <TrustBadgesBar />
       <Footer
         footer={footer}
         header={header}
         publicStoreDomain={publicStoreDomain}
       />
+      <MobileBottomNav onOpenCollections={() => subNavRef.current?.toggle()} />
       </CartNotificationProvider>
     </Aside.Provider>
   );

@@ -58,25 +58,26 @@ export function FloatingControls() {
     return (
         <div
             className="
-        fixed bottom-6 left-1/2 -translate-x-1/2 z-[40]
-        flex items-center gap-2
+        fixed top-[calc(var(--header-h,64px)+0.75rem)] left-4 md:left-6 z-[40]
+        flex flex-col items-center gap-2.5
       "
         >
-            {/* Audio toggle */}
             <button
                 onClick={handleAudioToggle}
                 className="
-          w-11 h-11
+          w-9 h-9
           rounded-full
           flex items-center justify-center
-          bg-foreground text-background
-          shadow-lg
+          bg-card/90 backdrop-blur-md text-foreground
+          border border-border shadow-md
           transition-all duration-300
-          hover:scale-110
+          hover:scale-110 hover:bg-foreground hover:text-background
           active:scale-95
           cursor-pointer
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground
         "
                 aria-label={playing ? 'Mute audio' : 'Play audio'}
+                title={playing ? 'Mute audio' : 'Play audio'}
             >
                 {playing ? (
                     <svg
@@ -87,7 +88,7 @@ export function FloatingControls() {
                         strokeWidth="1.8"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="w-4.5 h-4.5"
+                        className="w-4 h-4"
                     >
                         <path d="M11 5L6 9H2v6h4l5 4V5z" />
                         <path d="M15 9.5a3.5 3.5 0 010 5" />
@@ -102,7 +103,7 @@ export function FloatingControls() {
                         strokeWidth="1.8"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="w-4.5 h-4.5"
+                        className="w-4 h-4"
                     >
                         <path d="M11 5L6 9H2v6h4l5 4V5z" />
                         <line x1="23" y1="9" x2="17" y2="15" />
@@ -115,17 +116,19 @@ export function FloatingControls() {
             <button
                 onClick={toggleTheme}
                 className="
-          w-11 h-11
+          w-9 h-9
           rounded-full
           flex items-center justify-center
-          bg-foreground text-background
-          shadow-lg
+          bg-card/90 backdrop-blur-md text-foreground
+          border border-border shadow-md
           transition-all duration-300
-          hover:scale-110
+          hover:scale-110 hover:bg-foreground hover:text-background
           active:scale-95
           cursor-pointer
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground
         "
                 aria-label="Toggle dark mode"
+                title="Toggle dark mode"
             >
                 {/* Moon — shown in light mode */}
                 <svg
@@ -133,10 +136,10 @@ export function FloatingControls() {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth={1.5}
+                    strokeWidth={1.8}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="block w-4.5 h-4.5 dark:hidden"
+                    className="block w-4 h-4 dark:hidden"
                 >
                     <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z" />
                 </svg>
@@ -147,10 +150,10 @@ export function FloatingControls() {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth={1.5}
+                    strokeWidth={1.8}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="hidden w-4.5 h-4.5 dark:block"
+                    className="hidden w-4 h-4 dark:block"
                 >
                     <circle cx="12" cy="12" r="4" />
                     <path d="M12 2v2" />

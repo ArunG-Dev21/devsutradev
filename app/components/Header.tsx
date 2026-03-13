@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState, useEffect, useCallback, useId } from 'react';
+import { Suspense, useRef, useState, useEffect, useCallback, useId, forwardRef, useImperativeHandle } from 'react';
 import { Await, NavLink, useAsyncValue, Link, useFetcher, useNavigate } from 'react-router';
 import {
   type CartViewPayload,
@@ -21,6 +21,51 @@ import {
 
 import { BRAND_LOGO_DARK_SRC, BRAND_LOGO_LIGHT_SRC } from '~/lib/branding';
 
+const SEARCH_PLACEHOLDERS = [
+  'Karungali mala',
+  'gemstone bracelets',
+  'karungali silver',
+  'silver rudraksha',
+];
+
+/** Hook that cycles through placeholder strings with a typing animation */
+function useAnimatedPlaceholder(phrases: string[], typingSpeed = 80, pauseMs = 1800) {
+  const [text, setText] = useState('');
+  const idxRef = useRef(0);
+
+  useEffect(() => {
+    let charIdx = 0;
+    let deleting = false;
+    let timer: ReturnType<typeof setTimeout>;
+
+    function tick() {
+      const phrase = phrases[idxRef.current % phrases.length];
+      if (!deleting) {
+        charIdx++;
+        setText(phrase.slice(0, charIdx));
+        if (charIdx === phrase.length) {
+          deleting = true;
+          timer = setTimeout(tick, pauseMs);
+          return;
+        }
+      } else {
+        charIdx--;
+        setText(phrase.slice(0, charIdx));
+        if (charIdx === 0) {
+          deleting = false;
+          idxRef.current++;
+        }
+      }
+      timer = setTimeout(tick, deleting ? typingSpeed / 2 : typingSpeed);
+    }
+
+    timer = setTimeout(tick, 400);
+    return () => clearTimeout(timer);
+  }, [phrases, typingSpeed, pauseMs]);
+
+  return text;
+}
+
 interface HeaderProps {
   header: HeaderQuery;
   cart: Promise<CartApiQueryFragment | null>;
@@ -30,16 +75,65 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
+/** Imperative handle for SubNavIsland so the bottom nav can open/close it */
+export interface SubNavIslandHandle {
+  open: () => void;
+  close: () => void;
+  toggle: () => void;
+}
+
 export function Header({
   header,
   isLoggedIn,
   cart,
   publicStoreDomain,
-}: HeaderProps) {
+  subNavRef,
+}: HeaderProps & { subNavRef?: React.RefObject<SubNavIslandHandle | null> }) {
   const { shop, menu } = header;
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileSearchFocused, setMobileSearchFocused] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Track scroll position with hysteresis to prevent jitter when the
+  // mobile search bar collapses and shifts the page height by ~72px.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // If scrolling down past 120px, hide the search bar
+      if (currentScrollY > 120 && lastScrollY <= 120) {
+        setScrolled(true);
+      } 
+      // If scrolling up past 40px, show the search bar
+      else if (currentScrollY < 40 && lastScrollY >= 40) {
+        setScrolled(false);
+      }
+      
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Initial check
+    handleScroll();
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Set --header-h CSS variable so floating controls can position below the header
+  useEffect(() => {
+    if (!headerRef.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      document.documentElement.style.setProperty('--header-h', `${entry.contentRect.height}px`);
+    });
+    observer.observe(headerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <header className="relative top-0 z-50 bg-background text-foreground border-b border-border shadow-sm transition-all duration-300">
+    <header ref={headerRef} className="sticky top-0 z-50 bg-background text-foreground border-b border-border transition-all duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-8 flex items-center gap-4 relative">
         {/* Mobile Menu Toggle (left on mobile) */}
         <div className="md:hidden">
@@ -61,7 +155,6 @@ export function Header({
           />
         </NavLink>
 
-        {/* Spacer to push icons right on desktop */}
         {/* Desktop Left Links (About + Contact) */}
         <div className="hidden md:flex items-center gap-8">
           <NavLink
@@ -90,11 +183,29 @@ export function Header({
         <div className="flex-1" />
 
         {/* Right Side Icons */}
-        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+        <HeaderCtas
+          isLoggedIn={isLoggedIn}
+          cart={cart}
+          scrolled={scrolled}
+          onSearchOpen={() => {
+            setMobileSearchFocused(true);
+            setTimeout(() => {
+              document.getElementById('mobile-search-input')?.focus();
+            }, 50);
+          }}
+        />
       </div>
 
-      {/* Floating Sub-Nav Island — desktop only, loops through Shopify menu links */}
+      {/* Mobile inline search bar — collapses on scroll, but forces open if focused */}
+      <MobileSearchBar
+        scrolled={scrolled}
+        isFocused={mobileSearchFocused}
+        setIsFocused={setMobileSearchFocused}
+      />
+
+      {/* Floating Sub-Nav Island — desktop only for inline, mobile controlled externally */}
       <SubNavIsland
+        ref={subNavRef as React.Ref<SubNavIslandHandle>}
         menu={menu}
         collections={(header as any).collections}
         primaryDomainUrl={header.shop.primaryDomain.url}
@@ -104,19 +215,20 @@ export function Header({
   );
 }
 
-/** Floating pill-shaped sub-navigation bar — uses Shopify menu links */
-function SubNavIsland({
-
-  menu,
-  collections,
-  primaryDomainUrl,
-  publicStoreDomain,
-}: {
+/** Floating pill-shaped sub-navigation bar — uses Shopify menu links.
+ *  Mobile modal is now triggered externally via ref (from MobileBottomNav).
+ */
+const SubNavIsland = forwardRef<SubNavIslandHandle, {
   menu: HeaderProps['header']['menu'];
   collections: any;
   primaryDomainUrl: string;
   publicStoreDomain: string;
-}) {
+}>(function SubNavIsland({
+  menu,
+  collections,
+  primaryDomainUrl,
+  publicStoreDomain,
+}, ref) {
   const [isOpen, setIsOpen] = useState(false);
   const rawItems = menu?.items?.length ? menu.items : FALLBACK_HEADER_MENU.items;
 
@@ -133,85 +245,47 @@ function SubNavIsland({
     return collection?.image?.url || null;
   };
 
+  // Expose open/close/toggle to parent via ref
+  useImperativeHandle(ref, () => ({
+    open: () => setIsOpen(true),
+    close: () => setIsOpen(false),
+    toggle: () => setIsOpen((v) => !v),
+  }));
+
   return (
     <>
-      {/* Animated trigger button — fixed to top-right of the header */}
+      {/* Mobile: no trigger button — controlled via bottom nav */}
       <div className="md:hidden">
-        {/* ── TRIGGER BUTTON ── */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Browse collections"
-          className={`
-      group absolute top-20 right-4 z-50
-      w-12 h-12 rounded-full
-      flex items-center justify-center
-      border border-border bg-card/80 backdrop-blur-md
-      shadow-md active:scale-90
-      transition-all duration-300 ease-out
-      ${isOpen ? 'scale-90 ring-2 ring-foreground/20' : ''}
-    `}
-        >
-          {/* Search icon — fades + shrinks when open */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.8}
-            stroke="currentColor"
-            className={`w-5 h-5 transition-all duration-300
-        ${isOpen ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-            />
-          </svg>
-
-          {/* X — fades in when open */}
-          <svg
-            width="20" height="20" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
-            className={`absolute transition-all duration-300 text-foreground
-        ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
-          >
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-
-          {/* Pulse ring — only when closed, invites interaction */}
-          {!isOpen && (
-            <span className="absolute inset-0 rounded-full border border-foreground/25 animate-ping pointer-events-none" />
-          )}
-        </button>
-
         {/* ── BACKDROP ── */}
         <div
+          role="button"
+          tabIndex={0}
           onClick={() => setIsOpen(false)}
-          className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-400
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              setIsOpen(false);
+            }
+          }}
+          className={`fixed inset-0 z-40 transition-opacity duration-400
       ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         />
 
-        {/* ── SLIDE-UP MODAL PANEL ── */}
+        {/* ── SLIDE-UP MODAL ── from bottom */}
         <div
           className={`
-      fixed left-3 right-3 bottom-4 z-50
-      bg-card rounded-3xl border border-border shadow-2xl
-      max-h-[92dvh] flex flex-col overflow-hidden
+      fixed bottom-[72px] left-2 right-2 z-50
+      bg-card rounded-2xl border border-border shadow-2xl
+      max-h-[85dvh] flex flex-col overflow-hidden
       transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
       ${isOpen
               ? 'translate-y-0 opacity-100'
-              : 'translate-y-[110%] opacity-0 pointer-events-none'}
+              : 'translate-y-full opacity-0 pointer-events-none'}
     `}
         >
-          {/* Handle bar */}
-          <div className="flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1 rounded-full bg-border" />
-          </div>
-
           {/* Header row */}
-          <div className="flex items-center justify-between px-5 pt-2 pb-4 border-b border-border">
-            <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-muted-foreground">
-              Search & Browse
+          <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-border">
+            <p className="text-[11px] uppercase tracking-[0.2em] font-semibold text-muted-foreground">
+              Browse Collections
             </p>
             <button
               onClick={() => setIsOpen(false)}
@@ -224,123 +298,10 @@ function SubNavIsland({
           </div>
 
           {/* Scrollable body */}
-          <div className="flex-1 overflow-y-auto px-px [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-
-          {/* Search bar */}
-          <div className="px-4 pt-4 pb-2">
-            <div className="predictive-search">
-              <SearchFormPredictive>
-                {({ fetchResults, goToSearch, inputRef }) => (
-                  <div className="flex items-center bg-muted/60 backdrop-blur-sm rounded-2xl pl-4 pr-1.5 py-1.5 gap-2 transition-all duration-300 w-full">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-4 h-4 text-muted-foreground flex-shrink-0"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                      />
-                    </svg>
-                    <input
-                      name="q"
-                      onChange={fetchResults}
-                      onFocus={fetchResults}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          goToSearch();
-                          setIsOpen(false);
-                        }
-                      }}
-                      placeholder="Search sacred items…"
-                      ref={inputRef}
-                      type="search"
-                      autoComplete="off"
-                      className="flex-1 text-[13px] bg-transparent outline-none placeholder:text-muted-foreground/60 font-body [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => { goToSearch(); setIsOpen(false); }}
-                      className="bg-foreground text-background text-[10px] font-semibold px-4 py-2 rounded-xl tracking-[0.12em] uppercase shrink-0 hover:opacity-90 active:scale-95 transition-all duration-200"
-                    >
-                      Go
-                    </button>
-                  </div>
-                )}
-              </SearchFormPredictive>
-              <SearchResultsPredictive>
-                {({ items, total, term, state, closeSearch }) => {
-                  const { articles, collections: searchCollections, pages, products, queries } = items;
-
-                  if (state === 'loading' && term.current) {
-                    return (
-                      <div className="mt-3">
-                        <div className="p-3 text-sm opacity-60">Searching…</div>
-                      </div>
-                    );
-                  }
-
-                  if (!term.current) return null;
-
-                  if (!total) {
-                    return (
-                      <div className="mt-3">
-                        <SearchResultsPredictive.Empty term={term} />
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div className="mt-3 border-t border-border pt-2">
-                      <div className="flex flex-col gap-3 pb-2 max-h-[45vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                        <SearchResultsPredictive.Queries
-                          queries={queries}
-                          queriesDatalistId="modal-search-queries"
-                        />
-                        <SearchResultsPredictive.Products
-                          products={products}
-                          closeSearch={() => { closeSearch(); setIsOpen(false); }}
-                          term={term}
-                        />
-                        <SearchResultsPredictive.Collections
-                          collections={searchCollections}
-                          closeSearch={() => { closeSearch(); setIsOpen(false); }}
-                          term={term}
-                        />
-                        <SearchResultsPredictive.Pages
-                          pages={pages}
-                          closeSearch={() => { closeSearch(); setIsOpen(false); }}
-                          term={term}
-                        />
-                        <SearchResultsPredictive.Articles
-                          articles={articles}
-                          closeSearch={() => { closeSearch(); setIsOpen(false); }}
-                          term={term}
-                        />
-                        {total ? (
-                          <Link
-                            onClick={() => { closeSearch(); setIsOpen(false); }}
-                            to={`${SEARCH_ENDPOINT}?q=${term.current}`}
-                            className="block text-center p-3 mt-1 border-t border-border text-[11px] tracking-widest uppercase font-semibold text-foreground hover:underline"
-                          >
-                            View all {total} results →
-                          </Link>
-                        ) : null}
-                      </div>
-                    </div>
-                  );
-                }}
-              </SearchResultsPredictive>
-            </div>
-          </div>
+          <div className="flex-1 overflow-y-auto px-2 pb-6 pt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 
           {/* Collection cards grid */}
-          <nav className="p-4 grid grid-cols-2 gap-3 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <nav className="p-4 grid grid-cols-2 gap-3.5">
             {items.map((item, index) => {
               if (!item.url) return null;
 
@@ -361,10 +322,9 @@ function SubNavIsland({
                   prefetch="intent"
                   onClick={() => setIsOpen(false)}
                   className={({ isActive }) =>
-                    `group relative rounded-2xl overflow-hidden aspect-[3/4] flex items-end
-               transition-all duration-300 active:scale-95
-               ${isActive ? 'ring-2 ring-foreground ring-offset-2 ring-offset-card' : ''}
-               ${index === 0 && items.length % 2 !== 0 ? 'col-span-2 aspect-[16/7]' : ''}`
+                    `group relative rounded-2xl overflow-hidden aspect-square flex items-end
+               transition-all duration-300 active:scale-95 border border-border/40
+               ${isActive ? 'ring-2 ring-foreground ring-offset-2 ring-offset-card' : ''}`
                   }
                   style={{
                     animationDelay: `${index * 60}ms`,
@@ -485,7 +445,7 @@ function SubNavIsland({
       </div>
     </>
   );
-}
+});
 
 export function HeaderMenu({
   menu,
@@ -550,48 +510,6 @@ export function HeaderMenu({
         </NavLink>
       </div>
 
-      {/* ── Divider ── */}
-      <div className="mx-6 my-3 border-t border-border/30" />
-
-      {/* ── Collections ── */}
-      <div className="flex flex-col px-6">
-        <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-muted-foreground mb-1">Collections</p>
-        <NavLink
-          to="/collections/all"
-          onClick={close}
-          className="group flex items-center gap-4 py-3.5 transition-colors duration-200 text-muted-foreground hover:text-foreground"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
-          </svg>
-          <span className="text-base font-medium">Best Sellers</span>
-          {chevron}
-        </NavLink>
-        <NavLink
-          to="/collections/new-arrivals"
-          onClick={close}
-          className="group flex items-center gap-4 py-3.5 transition-colors duration-200 text-muted-foreground hover:text-foreground"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-          </svg>
-          <span className="text-base font-medium">New Arrivals</span>
-          {chevron}
-        </NavLink>
-        <NavLink
-          to="/collections/sale"
-          onClick={close}
-          className="group flex items-center gap-4 py-3.5 transition-colors duration-200 text-muted-foreground hover:text-foreground"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
-          </svg>
-          <span className="text-base font-medium">Sale</span>
-          {chevron}
-        </NavLink>
-      </div>
     </nav>
   );
 }
@@ -599,13 +517,40 @@ export function HeaderMenu({
 function HeaderCtas({
   isLoggedIn,
   cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+  scrolled,
+  onSearchOpen,
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & {
+  scrolled: boolean;
+  onSearchOpen: () => void;
+}) {
   return (
     <nav className="flex items-center gap-3 md:gap-4 ml-auto md:ml-0">
       {/* Inline Search Bar — desktop only */}
       <DesktopSearchBar />
 
-      {/* Account — desktop only */}
+      {/* Mobile search icon — only appears when scrolled (search bar collapsed) */}
+      <button
+        onClick={onSearchOpen}
+        className={`md:hidden text-foreground transition-all duration-300 cursor-pointer
+          ${scrolled ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none w-0 overflow-hidden'}`}
+        aria-label="Search"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="w-5 h-5"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+      </button>
+
+      {/* Account — desktop only (mobile uses bottom nav) */}
       <NavLink
         to="/account"
         prefetch="intent"
@@ -619,29 +564,6 @@ function HeaderCtas({
           strokeWidth={1.5}
           stroke="currentColor"
           className="w-5 h-5 xl:w-8 h-8"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-          />
-        </svg>
-      </NavLink>
-
-      {/* Account — mobile only */}
-      <NavLink
-        to="/account"
-        prefetch="intent"
-        className="text-foreground transition md:hidden"
-        aria-label="Account"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-5 h-5"
         >
           <path
             strokeLinecap="round"
@@ -691,6 +613,7 @@ function DesktopSearchBar() {
   const navigate = useNavigate();
   const fetcher = useFetcher<PredictiveSearchReturn>({ key: 'desktop-search' });
   const [open, setOpen] = useState(false);
+  const animatedPlaceholder = useAnimatedPlaceholder(SEARCH_PLACEHOLDERS);
 
   const { items, total } =
     fetcher?.data?.result ?? getEmptyPredictiveSearchResult();
@@ -766,7 +689,7 @@ function DesktopSearchBar() {
           ref={inputRef}
           type="text"
           name="q"
-          placeholder="Search sacred items…"
+          placeholder={animatedPlaceholder || 'Search…'}
           onChange={handleChange}
           onFocus={(e) => {
             if (e.target.value.length > 0) setOpen(true);
@@ -915,30 +838,167 @@ function DesktopSearchBar() {
   );
 }
 
-function SearchToggle() {
-  const { open } = useAside();
+/** Inline search bar shown below header on mobile — collapses on scroll */
+function MobileSearchBar({
+  scrolled,
+  isFocused,
+  setIsFocused,
+}: {
+  scrolled: boolean;
+  isFocused: boolean;
+  setIsFocused: (v: boolean) => void;
+}) {
+  const animatedPlaceholder = useAnimatedPlaceholder(SEARCH_PLACEHOLDERS);
 
   return (
-    <button
-      onClick={() => open('search')}
-      className="md:hidden hover:text-accent transition cursor-pointer"
-      aria-label="Search"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="w-5 h-5"
+    <>
+      <div
+        className={`md:hidden overflow-visible transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
+          ${scrolled && !isFocused 
+            ? 'max-h-0 opacity-0 -translate-y-4 pointer-events-none' 
+            : 'max-h-[72px] opacity-100 translate-y-0'}`}
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-        />
-      </svg>
-    </button>
+        <div className="px-4 pb-4">
+          <div className="predictive-search p-0">
+            <SearchFormPredictive>
+              {({ fetchResults, goToSearch, inputRef }) => (
+                <div className={`flex items-center w-full rounded-[10px] px-4 py-2 gap-2.5 border transition-all duration-300 bg-card ${isFocused ? 'border-accent shadow-[0_0_0_1px_rgba(var(--color-accent),1)]' : 'border-border'}`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-4 h-4 text-muted-foreground flex-shrink-0"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                  <input
+                    id="mobile-search-input"
+                    name="q"
+                    onChange={fetchResults}
+                    onFocus={(e) => {
+                      setIsFocused(true);
+                      fetchResults(e);
+                    }}
+                    onBlur={() => {
+                      // Small delay so picking a result works before blur hides it
+                      setTimeout(() => setIsFocused(false), 200);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        goToSearch();
+                        inputRef.current?.blur();
+                        setIsFocused(false);
+                      }
+                    }}
+                    placeholder={animatedPlaceholder || 'Search…'}
+                    ref={inputRef}
+                    type="search"
+                    autoComplete="off"
+                    className="flex-1 text-sm bg-transparent outline-none border-0 focus:ring-0 focus:border-0 placeholder:text-muted-foreground/70 font-body h-7 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+                  />
+                  {isFocused && inputRef?.current?.value && (
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // keep focus
+                        if (inputRef.current) {
+                          inputRef.current.value = '';
+                          setIsFocused(false);
+                        }
+                      }}
+                      className="w-5 h-5 rounded-full flex items-center justify-center bg-muted-foreground/20 text-foreground hover:bg-muted-foreground/40 transition-all duration-200 active:scale-90 shrink-0"
+                      aria-label="Clear search"
+                    >
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              )}
+            </SearchFormPredictive>
+          </div>
+        </div>
+      </div>
+
+      {/* Fullscreen Mobile Search Results overlay */}
+      <div 
+        className={`md:hidden absolute top-full left-0 right-0 h-[calc(100vh-100%)] bg-background border-t border-border overflow-y-auto transition-all duration-300 ease-out z-[45]
+        ${isFocused ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
+      >
+        <div className="px-5 pt-3 pb-8">
+           <SearchResultsPredictive>
+             {({ items, total, term, state, closeSearch }) => {
+                const { articles, collections: searchCollections, pages, products, queries } = items;
+
+                if (state === 'loading' && term.current) {
+                  return (
+                    <div className="mt-3">
+                      <div className="p-3 text-sm opacity-60">Searching…</div>
+                    </div>
+                  );
+                }
+
+                if (!term.current) return null;
+
+                if (!total) {
+                  return (
+                    <div className="mt-3">
+                      <SearchResultsPredictive.Empty term={term} />
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="mt-1">
+                    <div className="flex flex-col gap-3 pb-2 max-h-[70vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                      <SearchResultsPredictive.Queries
+                        queries={queries}
+                        queriesDatalistId="mobile-fullscreen-search-queries"
+                      />
+                      <SearchResultsPredictive.Products
+                        products={products}
+                        closeSearch={() => { closeSearch(); setIsFocused(false); }}
+                        term={term}
+                      />
+                      <SearchResultsPredictive.Collections
+                        collections={searchCollections}
+                        closeSearch={() => { closeSearch(); setIsFocused(false); }}
+                        term={term}
+                      />
+                      <SearchResultsPredictive.Pages
+                        pages={pages}
+                        closeSearch={() => { closeSearch(); setIsFocused(false); }}
+                        term={term}
+                      />
+                      <SearchResultsPredictive.Articles
+                        articles={articles}
+                        closeSearch={() => { closeSearch(); setIsFocused(false); }}
+                        term={term}
+                      />
+                      {total ? (
+                        <Link
+                          onClick={() => { closeSearch(); setIsFocused(false); }}
+                          to={`${SEARCH_ENDPOINT}?q=${term.current}`}
+                          className="block text-center p-3 mt-1 border-t border-border text-[11px] tracking-widest uppercase font-semibold text-foreground hover:underline"
+                        >
+                          View all {total} results →
+                        </Link>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+             }}
+           </SearchResultsPredictive>
+        </div>
+      </div>
+    </>
   );
 }
 

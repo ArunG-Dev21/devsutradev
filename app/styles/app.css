@@ -27,9 +27,6 @@
  * Search
  * --------------------------------------------------
  */
-.predictive-search {
-  padding: 1rem;
-}
 
 .predictive-search-form {
   position: sticky;
@@ -38,6 +35,8 @@
   outline: none;
   padding: 0;
   margin: 0;
+  border:1px solid black;
+  border-radius:10px;
 }
 
 /* ── Global search input resets ── */
