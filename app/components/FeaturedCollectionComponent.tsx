@@ -193,7 +193,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
     <div className="relative bg-background text-foreground flex flex-col lg:h-full lg:overflow-hidden">
 
       {/* ── HEADER ── */}
-      <div className="px-4 sm:px-6 md:px-10 lg:px-14 pt-12 pb-10 border-b border-border flex-shrink-0">
+      <div className="px-4 sm:px-6 md:px-10 lg:px-14 pt-12 pb-10 border-b border-border shrink-0">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium leading-tight uppercase tracking-tight mb-3 font-heading">
           {collection.title}
         </h2>
@@ -340,7 +340,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
 
                     {/* Gradient vignette */}
                     <div
-                      className="absolute inset-0 bg-gradient-to-t from-stone-900/15 to-transparent pointer-events-none"
+                      className="absolute inset-0 bg-linear-to-t from-stone-900/15 to-transparent pointer-events-none"
                       style={{
                         opacity: isHovered ? 1 : 0,
                         transition: 'opacity 0.4s ease',

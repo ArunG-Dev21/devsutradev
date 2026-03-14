@@ -273,7 +273,7 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
         {/* ── SLIDE-UP MODAL ── from bottom */}
         <div
           className={`
-      fixed bottom-[82px] left-2 right-2 z-50
+      fixed bottom-20.5 left-2 right-2 z-50
       bg-card rounded-2xl border border-border shadow-2xl
       max-h-[85dvh] flex flex-col overflow-hidden
       transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
@@ -341,12 +341,12 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-active:scale-105"
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
+                    <div className="absolute inset-0 bg-linear-to-br from-muted to-muted-foreground/20" />
                   )}
 
                   {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                  <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/20 to-transparent" />
+                  <div className="absolute inset-x-0 top-0 h-12 bg-linear-to-b from-black/20 to-transparent" />
 
                   {/* Collection name */}
                   <div className="relative w-full px-3.5 pb-3.5">
@@ -432,13 +432,13 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
                         width={200}
                         height={200}
                         sizes="200px"
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full object-cover transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:w-full group-hover:h-full group-hover:rounded-none z-0"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full object-cover transition-all duration-500 ease-in-out group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:w-full group-hover:h-full group-hover:rounded-none z-0"
                       />
                       {/* Dark overlay for text readability on hover */}
-                      <span className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-500 z-[1] pointer-events-none rounded-full" />
+                      <span className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-500 z-1 pointer-events-none rounded-full" />
                     </>
                   )}
-                  <span className="relative z-[2]">{item.title}</span>
+                  <span className="relative z-2">{item.title}</span>
                 </NavLink>
               );
             })}
@@ -565,7 +565,7 @@ function HeaderCtas({
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-5 h-5 xl:w-8 h-8"
+          className="w-5 h-5 xl:w-8 xl:h-8"
         >
           <path
             strokeLinecap="round"
@@ -679,7 +679,7 @@ function DesktopSearchBar() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-4 h-4 text-text-muted flex-shrink-0"
+          className="w-4 h-4 text-text-muted shrink-0"
         >
           <path
             strokeLinecap="round"
@@ -703,7 +703,7 @@ function DesktopSearchBar() {
 
       {open && (
         <div
-          className="absolute top-full right-0 mt-2 w-80 lg:w-96 bg-card rounded-xl shadow-silver border border-border overflow-hidden z-[200]"
+          className="absolute top-full right-0 mt-2 w-80 lg:w-96 bg-card rounded-xl shadow-silver border border-border overflow-hidden z-200"
           style={{ maxHeight: '70vh', overflowY: 'auto' }}
         >
           {isLoading && term && (
@@ -744,7 +744,7 @@ function DesktopSearchBar() {
                                 width={44}
                                 height={44}
                                 sizes="44px"
-                                className="rounded-lg object-cover flex-shrink-0"
+                                className="rounded-lg object-cover shrink-0"
                               />
                             )}
                             <div className="flex-1 min-w-0">
@@ -787,7 +787,7 @@ function DesktopSearchBar() {
                                 width={44}
                                 height={44}
                                 sizes="44px"
-                                className="rounded-lg object-cover flex-shrink-0"
+                                className="rounded-lg object-cover shrink-0"
                               />
                             )}
                             <span className="text-sm text-text-main">{collection.title}</span>
@@ -860,7 +860,7 @@ function MobileSearchBar({
         className={`md:hidden overflow-visible transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
           ${scrolled && !isFocused 
             ? 'max-h-0 opacity-0 -translate-y-4 pointer-events-none' 
-            : 'max-h-[72px] opacity-100 translate-y-0'}`}
+            : 'max-h-18 opacity-100 translate-y-0'}`}
       >
         <div className="px-4 pb-4">
           <div className="predictive-search p-0">
@@ -875,7 +875,7 @@ function MobileSearchBar({
                     strokeWidth={1.5}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="w-4 h-4 text-muted-foreground flex-shrink-0"
+                    className="w-4 h-4 text-muted-foreground shrink-0"
                   >
                     <circle cx="11" cy="11" r="8" />
                     <path d="m21 21-4.3-4.3" />
@@ -933,7 +933,7 @@ function MobileSearchBar({
 
       {/* Fullscreen Mobile Search Results overlay */}
       <div 
-        className={`md:hidden absolute top-full left-0 right-0 h-[calc(100vh-100%)] bg-background border-t border-border overflow-y-auto transition-all duration-300 ease-out z-[45]
+        className={`md:hidden absolute top-full left-0 right-0 h-[calc(100vh-100%)] bg-background border-t border-border overflow-y-auto transition-all duration-300 ease-out z-45
         ${isFocused ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
       >
         <div className="px-5 pt-3 pb-8">

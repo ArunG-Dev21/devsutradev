@@ -87,7 +87,7 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
           <div className="flex flex-col items-center gap-2 mt-3">
 
   {/* Payment Icons */}
-  <div className="flex items-center max-w-[300px] justify-center gap-2 flex-wrap">
+  <div className="flex items-center max-w-75 justify-center gap-2 flex-wrap">
 
     {[
       { src: "/icons/UPI.svg", alt: "UPI" },

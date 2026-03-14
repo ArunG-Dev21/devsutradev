@@ -76,7 +76,7 @@ export function FloatingControls() {
     <div
       className={`
         fixed top-1/2 right-4 md:right-6 -translate-y-1/2
-        z-[40]
+        z-40
         flex flex-col items-center gap-2.5
         transition-all duration-300 ease-out
         ${visible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}

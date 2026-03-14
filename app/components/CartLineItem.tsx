@@ -45,7 +45,7 @@ export function CartLineItem({
           <Link
             to={lineItemUrl}
             onClick={() => layout === 'aside' && close()}
-            className="flex-shrink-0"
+            className="shrink-0"
           >
             <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg sm:rounded-xl overflow-hidden">
               <Image
@@ -100,14 +100,14 @@ export function CartLineItem({
         </div>
 
         {/* Remove */}
-        <div className="flex-shrink-0 self-start pt-0.5">
+        <div className="shrink-0 self-start pt-0.5">
           <CartLineRemoveButton lineIds={[id]} disabled={!!line.isOptimistic} />
         </div>
       </div>
 
       {/* Child line items */}
       {lineItemChildren ? (
-        <div className="ml-[76px] sm:ml-24 mt-2 sm:mt-3 pl-2 sm:pl-3 border-l-2 border-border">
+        <div className="ml-19 sm:ml-24 mt-2 sm:mt-3 pl-2 sm:pl-3 border-l-2 border-border">
           <p id={childrenLabelId} className="sr-only">
             Line items with {product.title}
           </p>
@@ -204,7 +204,7 @@ function CartLineRemoveButton({
 
       {/* Confirmation Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/40 backdrop-blur-sm px-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-stone-900/40 backdrop-blur-sm px-4">
           <div className="bg-card text-card-foreground rounded-2xl shadow-xl border border-border w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-6 text-center">
               <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4">

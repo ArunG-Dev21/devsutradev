@@ -86,10 +86,10 @@ function ProductSpotlight({
                         className="w-full h-full object-cover rounded-xl transition-transform duration-500 ease-out group-hover/card:scale-105"
                     />
                 ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-amber-50 via-orange-50 to-orange-100 dark:from-neutral-800 dark:via-neutral-750 dark:to-neutral-700" />
+                    <div className="w-full h-full bg-linear-to-br from-amber-50 via-orange-50 to-orange-100 dark:from-neutral-800 dark:via-neutral-750 dark:to-neutral-700" />
                 )}
                 {/* Subtle inner glow */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-linear-to-t from-background/30 to-transparent pointer-events-none" />
             </div>
 
             {/* Info strip */}
@@ -100,7 +100,7 @@ function ProductSpotlight({
                         <p className="text-lg sm:text-xl font-medium text-foreground mt-0.5 leading-none">{productPrice}</p>
                     )}
                 </div>
-                <div className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-foreground text-background rotate-[-35deg] transition-transform duration-300 ease-out">
+                <div className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-foreground text-background rotate-[-35deg] transition-transform duration-300 ease-out">
                     <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>
@@ -158,7 +158,7 @@ function Hotspot({
                 className="relative w-8 h-8 flex items-center justify-center focus:outline-none"
             >
                 <span className="absolute inset-0 rounded-full bg-white/30 animate-ping" />
-                <span className="absolute inset-[4px] rounded-full bg-white/60 backdrop-blur-[2px] border border-white/70" />
+                <span className="absolute inset-1 rounded-full bg-white/60 backdrop-blur-[2px] border border-white/70" />
                 <span className="relative w-2.5 h-2.5 rounded-full bg-white" />
             </button>
             {open && (
@@ -192,7 +192,7 @@ function CustomerTag({ name, avatar }: { name: string; avatar?: string }) {
 
 function ReelTile({ reel }: { reel: ReelItem }) {
     return (
-        <div className="relative rounded-2xl h-full min-h-[200px] sm:min-h-[260px] shadow-lg group">
+        <div className="relative rounded-2xl h-full min-h-50 sm:min-h-65 shadow-lg group">
             <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                 {reel.videoUrl ? (
                     <video
@@ -204,9 +204,9 @@ function ReelTile({ reel }: { reel: ReelItem }) {
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500"
                     />
                 ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-100 to-orange-200 dark:from-neutral-800 dark:to-neutral-700" />
+                    <div className="absolute inset-0 bg-linear-to-br from-amber-100 to-orange-200 dark:from-neutral-800 dark:to-neutral-700" />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent z-10" />
             </div>
             <div className="absolute bottom-2 left-2 z-40 pointer-events-none">
                 <CustomerTag name={reel.customerName} avatar={reel.customerAvatar} />
@@ -226,14 +226,14 @@ function ReelTile({ reel }: { reel: ReelItem }) {
 /* ---------------------- Testimonial Tile ---------------------- */
 function ImageTile({ testimonial }: { testimonial: TestimonialItem }) {
     return (
-        <div className="relative rounded-2xl h-full min-h-[180px] sm:min-h-[120px] shadow-lg group">
+        <div className="relative rounded-2xl h-full min-h-45 sm:min-h-60 shadow-lg group">
             <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                 <img
                     src={testimonial.avatar}
                     alt={testimonial.name}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500 pointer-events-auto"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-10" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent z-10" />
             </div>
             <div className="absolute bottom-2 left-2 z-40 pointer-events-none">
                 <CustomerTag name={testimonial.name} />
@@ -289,7 +289,7 @@ function SocialProofMosaic({
                                 {t.avatar ? (
                                     <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full bg-gradient-to-br dark:to-neutral-600" />
+                                    <div className="w-full h-full bg-linear-to-br dark:to-neutral-600" />
                                 )}
                             </div>
                         ))}
@@ -302,7 +302,7 @@ function SocialProofMosaic({
                                 {r.customerAvatar ? (
                                     <img src={r.customerAvatar} alt={r.customerName} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-amber-100 to-orange-200 dark:from-neutral-700 dark:to-neutral-600" />
+                                    <div className="w-full h-full bg-linear-to-br from-amber-100 to-orange-200 dark:from-neutral-700 dark:to-neutral-600" />
                                 )}
                             </div>
                         ))}
@@ -330,7 +330,7 @@ function CertCarousel() {
 
     return (
         <div className="flex flex-col gap-3">
-            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted border border-border flex items-center justify-center">
+            <div className="relative aspect-4/3 rounded-xl overflow-hidden bg-muted border border-border flex items-center justify-center">
                 {slide.src ? (
                     <img src={slide.src} alt={slide.label} className="w-full h-full object-cover" />
                 ) : (
