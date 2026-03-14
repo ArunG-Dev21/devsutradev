@@ -121,7 +121,7 @@ function Logout() {
     <Form className="w-full" method="POST" action="/account/logout">
       <button
         type="submit"
-        className="w-full flex items-center gap-4 px-6 py-4 text-sm font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors border-l-4 border-transparent text-left cursor-pointer"
+        className="w-full flex items-center gap-4 px-6 py-4 text-sm font-semibold text-red-500 hover:bg-red-500/10 transition-colors border-l-4 border-transparent text-left cursor-pointer"
       >
         <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />

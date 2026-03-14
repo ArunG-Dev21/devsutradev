@@ -11,6 +11,7 @@ import {
   breadcrumbSchema,
   jsonLd,
 } from '~/lib/seo';
+import { sanitizeHtml } from '~/lib/sanitizer';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   const article = (data as any)?.article;
@@ -256,7 +257,7 @@ export default function Article() {
 
           {/* Body */}
           <div
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentHtml) }}
             className="article-body"
           />
 

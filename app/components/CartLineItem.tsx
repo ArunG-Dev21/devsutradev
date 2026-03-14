@@ -134,41 +134,41 @@ function CartLineQuantity({ line }: { line: CartLine }) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="flex items-center gap-0 mt-2 sm:mt-3 w-fit border border-border rounded-lg overflow-hidden">
-      <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
-        <button
-          aria-label="Decrease quantity"
-          title={
-            quantity <= 1
-              ? 'Minimum quantity is 1'
-              : `Set quantity to ${prevQuantity}`
-          }
-          disabled={quantity <= 1 || !!isOptimistic}
-          name="decrease-quantity"
-          value={prevQuantity}
-          className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
-        >
-          −
-        </button>
-      </CartLineUpdateButton>
+    <div className="flex items-center mt-2 sm:mt-3 w-fit border border-gray-300 rounded-lg overflow-hidden">
+  <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
+    <button
+      aria-label="Decrease quantity"
+      title={
+        quantity <= 1
+          ? "Minimum quantity is 1"
+          : `Set quantity to ${prevQuantity}`
+      }
+      disabled={quantity <= 1 || !!isOptimistic}
+      name="decrease-quantity"
+      value={prevQuantity}
+      className="w-8 h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
+    >
+      −
+    </button>
+  </CartLineUpdateButton>
 
-      <span className="w-8 h-8 flex items-center justify-center text-xs font-bold text-foreground border-x border-border select-none">
-        {quantity}
-      </span>
+  <span className="w-8 h-8 flex items-center justify-center text-xs font-bold text-black border-x border-gray-300 select-none">
+    {quantity}
+  </span>
 
-      <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
-        <button
-          aria-label="Increase quantity"
-          title={`Set quantity to ${nextQuantity}`}
-          name="increase-quantity"
-          value={nextQuantity}
-          disabled={!!isOptimistic}
-          className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
-        >
-          +
-        </button>
-      </CartLineUpdateButton>
-    </div>
+  <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
+    <button
+      aria-label="Increase quantity"
+      title={`Set quantity to ${nextQuantity}`}
+      name="increase-quantity"
+      value={nextQuantity}
+      disabled={!!isOptimistic}
+      className="w-8 h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
+    >
+      +
+    </button>
+  </CartLineUpdateButton>
+</div>
   );
 }
 
@@ -188,7 +188,7 @@ function CartLineRemoveButton({
         disabled={disabled}
         onClick={() => setShowConfirm(true)}
         aria-label="Remove item"
-        className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-rose-600 hover:bg-muted transition-all disabled:opacity-30 cursor-pointer shadow-sm border border-border"
+        className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-red-600 hover:bg-muted transition-all disabled:opacity-30 cursor-pointer shadow-sm border border-border"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -207,13 +207,13 @@ function CartLineRemoveButton({
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/40 backdrop-blur-sm px-4">
           <div className="bg-card text-card-foreground rounded-2xl shadow-xl border border-border w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </div>
               <h3 className="text-lg font-bold text-foreground mb-2">Remove Item?</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+              <p className="text-sm text-gray-600 leading-relaxed mb-6">
                 Are you sure you want to remove this sacred ornament from your cart? You can always add it back later.
               </p>
 
@@ -234,7 +234,7 @@ function CartLineRemoveButton({
                 >
                   <button
                     type="submit"
-                    className="w-full px-4 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
+                    className="w-full px-4 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-sm"
                   >
                     Remove
                   </button>

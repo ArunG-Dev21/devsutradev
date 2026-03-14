@@ -112,7 +112,7 @@ export default function OrderRoute() {
         <a
           target="_blank"
           href={order.statusPageUrl}
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="px-6 py-2.5 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-neutral-800 transition-colors text-center inline-block"
         >
           Track Shipment
@@ -217,7 +217,7 @@ function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
       <div className="shrink-0">
         {lineItem?.image ? (
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-muted border border-border">
-            <Image data={lineItem.image} width={96} height={96} className="w-full h-full object-cover" />
+            <Image data={lineItem.image} width={96} height={96} sizes="96px" className="w-full h-full object-cover" />
           </div>
         ) : (
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-muted border border-border flex items-center justify-center">

@@ -20,7 +20,9 @@ export default async function handleRequest(
       context.env.PUBLIC_CHECKOUT_DOMAIN || context.env.PUBLIC_STORE_DOMAIN,
     storeDomain: context.env.PUBLIC_STORE_DOMAIN,
   },
-
+  baseUri: ["'self'"],
+  frameAncestors: ["'none'"],
+  formAction: ["'self'", "https://*.shopify.com", "https://*.myshopify.com"],
   styleSrc: [
     "'self'",
     'https://cdn.shopify.com',
@@ -69,6 +71,11 @@ export default async function handleRequest(
 
   responseHeaders.set('Content-Type', 'text/html');
   responseHeaders.set('Content-Security-Policy', header);
+  responseHeaders.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  responseHeaders.set('X-Frame-Options', 'DENY');
+  responseHeaders.set('X-Content-Type-Options', 'nosniff');
+  responseHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  responseHeaders.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
   return new Response(body, {
     headers: responseHeaders,

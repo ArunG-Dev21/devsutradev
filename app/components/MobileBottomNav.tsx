@@ -66,8 +66,8 @@ export function MobileBottomNav({ onOpenCollections }: MobileBottomNavProps) {
                 active:scale-95
                 ${
                   navActive || isActive
-                    ? "text-foreground"
-                    : "text-muted-foreground"
+                    ? "text-black"
+                    : "text-gray-700"
                 }
               `
               }
@@ -104,10 +104,10 @@ export function MobileBottomNav({ onOpenCollections }: MobileBottomNavProps) {
             className="
             flex flex-col items-center justify-center
             flex-1 h-full
-            text-muted-foreground
+            text-gray-700
             transition-all duration-200
             active:scale-95
-            active:text-foreground
+            active:text-black
             cursor-pointer
           "
             aria-label={tab.label}

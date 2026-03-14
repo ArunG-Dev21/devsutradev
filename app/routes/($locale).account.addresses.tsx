@@ -386,7 +386,7 @@ function ExistingAddresses({
                       disabled={stateForMethod('DELETE') !== 'idle'}
                       formMethod="DELETE"
                       type="submit"
-                      className="px-5 py-2.5 bg-rose-50 text-rose-600 text-xs font-semibold tracking-widest uppercase rounded-lg hover:bg-rose-100 transition-colors disabled:opacity-50"
+                      className="px-5 py-2.5 bg-red-50 text-red-600 text-xs font-semibold tracking-widest uppercase rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
                     >
                       {stateForMethod('DELETE') !== 'idle' ? 'Deleting...' : 'Delete'}
                     </button>
@@ -592,7 +592,7 @@ export function AddressForm({
       </div>
 
       {error && (
-        <div className="p-3 bg-rose-50 text-rose-600 rounded-xl text-sm border border-rose-100 mt-4">
+        <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100 mt-4">
           <p>{error}</p>
         </div>
       )}

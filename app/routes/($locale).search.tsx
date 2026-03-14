@@ -79,7 +79,7 @@ export default function SearchPage() {
             )}
           </SearchForm>
         </div>
-        {error && <p className="text-rose-500 text-center mb-8">{error}</p>}
+        {error && <p className="text-red-500 text-center mb-8">{error}</p>}
         {!term || !result?.total ? (
           <SearchResults.Empty />
         ) : (

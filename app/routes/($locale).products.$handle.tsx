@@ -27,6 +27,7 @@ import {
   breadcrumbSchema,
   jsonLd,
 } from '~/lib/seo';
+import { sanitizeHtml } from '~/lib/sanitizer';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   const product = (data as any)?.product;
@@ -300,7 +301,7 @@ export default function Product() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     {expandedImage.customer_image ? (
-                      <Image data={expandedImage.customer_image} className="w-10 h-10 rounded-full object-cover border border-white/20" width={40} height={40} />
+                      <Image data={expandedImage.customer_image} className="w-10 h-10 rounded-full object-cover border border-white/20" width={40} height={40} sizes="40px" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-stone-800 border border-white/10 flex items-center justify-center">
                         <span className="text-stone-300 text-lg font-light" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>{expandedImage.name.charAt(0)}</span>
@@ -451,10 +452,10 @@ export default function Product() {
               <span
                 className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase border transition-all duration-200 ${selectedVariant?.availableForSale
                   ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30'
-                  : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800/30'
+                  : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/30'
                   }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${selectedVariant?.availableForSale ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${selectedVariant?.availableForSale ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
                 {selectedVariant?.availableForSale ? 'In Stock' : 'Out of Stock'}
               </span>
             </div>
@@ -528,7 +529,7 @@ export default function Product() {
               if (qty == null) return null;
               const isLow = qty <= 5;
               return (
-                <p className={`text-lg font-semibold mt-4 ${isLow ? 'text-rose-600' : 'text-stone-700 dark:text-muted-foreground'
+                <p className={`text-lg font-semibold mt-4 ${isLow ? 'text-red-600' : 'text-stone-700 dark:text-muted-foreground'
                   }`}>
                   {isLow && '⚠ '}Only {qty} left in stock{isLow ? ' — order soon!' : ''}
                 </p>
@@ -653,7 +654,7 @@ export default function Product() {
                     {section.html ? (
                       <div
                         className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:text-stone-900 dark:prose-headings:text-foreground prose-a:text-stone-900 dark:prose-a:text-foreground underline-offset-4"
-                        dangerouslySetInnerHTML={{ __html: section.html }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.html) }}
                       />
                     ) : (
                       <p>{section.content}</p>
@@ -705,6 +706,7 @@ export default function Product() {
                               data={review.customer_image}
                               className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border border-stone-100 shadow-sm shrink-0"
                               width={56} height={56}
+                              sizes="56px"
                             />
                           ) : (
                             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border border-stone-100 flex items-center justify-center shrink-0 shadow-inner">

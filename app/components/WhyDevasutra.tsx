@@ -13,6 +13,7 @@ export interface ReelItem {
     productTitle?: string | null;
     productImage?: string | null;
     productPrice?: string | null;
+    initiallyOpen?: boolean;
 }
 
 export interface TestimonialItem {
@@ -42,7 +43,7 @@ const STATS = [
 ];
 
 const CERT_SLIDES = [
-    { src: "", label: "Lab Certificate – Rudraksha 5 Mukhi", hint: "GIA / IGI verified origin & treatment report" },
+    { src: "/certificate-card.jpg", label: "Lab Certificate – Rudraksha 5 Mukhi", hint: "GIA / IGI verified origin & treatment report" },
     { src: "", label: "Certificate – Karungali Bracelet", hint: "Tamil Nadu sourced · zero chemical treatment" },
     { src: "", label: "Vedic Energisation Record", hint: "Pandit-signed ritual completion certificate" },
     { src: "", label: "Gemstone Authenticity Report", hint: "UV fluorescence & refractive index verified" },
@@ -117,6 +118,7 @@ function Hotspot({
     productPrice,
     top = "40%",
     left = "55%",
+    initiallyOpen = false,
 }: {
     productHandle?: string | null;
     productTitle?: string | null;
@@ -124,9 +126,15 @@ function Hotspot({
     productPrice?: string | null;
     top?: string;
     left?: string;
+    initiallyOpen?: boolean;
 }) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(initiallyOpen);
     const ref = useRef<HTMLDivElement>(null);
+
+    // Sync state if initiallyOpen changes (e.g., from parent)
+    useEffect(() => {
+        setOpen(initiallyOpen);
+    }, [initiallyOpen]);
 
     useEffect(() => {
         if (!open) return;
@@ -209,6 +217,7 @@ function ReelTile({ reel }: { reel: ReelItem }) {
                 productTitle={reel.productTitle}
                 productImage={reel.productImage}
                 productPrice={reel.productPrice}
+                initiallyOpen={reel.initiallyOpen}
             />
         </div>
     );
@@ -253,7 +262,7 @@ function SocialProofMosaic({
             {/* Mobile: stack vertically; sm+: 2-col mosaic */}
             <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 gap-3 flex-1">
                 <div className="sm:row-span-2">
-                    {reels[0] && <ReelTile reel={reels[0]} />}
+                    {reels[0] && <ReelTile reel={{ ...reels[0], initiallyOpen: true }} />}
                 </div>
                 <div>{testimonials[0] && <ImageTile testimonial={testimonials[0]} />}</div>
                 <div>{testimonials[1] && <ImageTile testimonial={testimonials[1]} />}</div>

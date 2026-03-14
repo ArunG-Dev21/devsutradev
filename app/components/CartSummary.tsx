@@ -84,16 +84,37 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
       {/* Payment logos + powered by line */}
       <div className={`border-t border-border flex flex-col items-center ${layout === 'aside' ? 'mt-2.5 pt-2.5' : 'mt-5 sm:mt-7 pt-4 sm:pt-5'}`}>
         <div className={`flex items-center justify-center flex-wrap ${layout === 'aside' ? 'gap-2 mb-1.5' : 'gap-2 sm:gap-3 mb-3'}`}>
-          <img src="/icons/UPI.svg" alt="UPI" className="h-3 sm:h-5 w-auto" />
-          <img src="/icons/visa.svg" alt="Visa" className="h-3 sm:h-5 w-auto" />
-          <img src="/icons/mastercard.svg" alt="Mastercard" className="h-3 sm:h-5 w-auto" />
-          <img src="/icons/RuPay.svg" alt="RuPay" className="h-3 sm:h-5 w-auto" />
-          <img src="/icons/netbanking.svg" alt="Net Banking" className="h-5 sm:h-5 w-auto" />
-          <img src="/icons/paytm.svg" alt="Paytm" className="h-3 sm:h-5 w-auto" />
+          <div className="flex flex-col items-center gap-2 mt-3">
+
+  {/* Payment Icons */}
+  <div className="flex items-center max-w-[300px] justify-center gap-2 flex-wrap">
+
+    {[
+      { src: "/icons/UPI.svg", alt: "UPI" },
+      { src: "/icons/PhonePe.svg", alt: "PhonePe" },
+      { src: "/icons/visa.svg", alt: "Visa" },
+      { src: "/icons/mastercard.svg", alt: "Mastercard" },
+      { src: "/icons/RuPay.svg", alt: "RuPay" },
+      { src: "/icons/netbanking.svg", alt: "Net Banking" },
+      { src: "/icons/paytm.svg", alt: "Paytm" },
+    ].map((icon) => (
+      <div
+        key={icon.alt}
+        className="w-16 h-8 flex items-center justify-center bg-white rounded-md border border-gray-200"
+      >
+        <img
+          src={icon.src}
+          alt={icon.alt}
+          className="max-h-4 w-auto object-contain"
+          loading="lazy"
+        />
+      </div>
+    ))}
+
+  </div>
+
+</div>
         </div>
-        <p className={`text-muted-foreground ${layout === 'aside' ? 'text-[8px]' : 'text-[9px]'} tracking-wide`}>
-          Secure checkout powered by Shopify
-        </p>
       </div>
     </div>
   );
@@ -121,7 +142,7 @@ function CartCheckoutActions({
             layout === 'aside' ? 'py-2.5 text-xs' : 'py-2.5 sm:py-3 text-xs sm:text-sm'
           }`}
         >
-          Checkout →
+          BUY NOW
         </a>
       ) : (
         <button
@@ -131,7 +152,7 @@ function CartCheckoutActions({
             layout === 'aside' ? 'py-2.5 text-xs' : 'py-2.5 sm:py-3 text-xs sm:text-sm'
           }`}
         >
-          Checkout →
+          BUY NOW
         </button>
       )}
       {layout === 'aside' && (
@@ -141,7 +162,7 @@ function CartCheckoutActions({
           prefetch="viewport"
           className="block w-full py-2 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg border border-border text-foreground transition-all duration-200 hover:bg-muted"
         >
-          View Full Cart
+          VIEW MY CART
         </Link>
       )}
     </div>

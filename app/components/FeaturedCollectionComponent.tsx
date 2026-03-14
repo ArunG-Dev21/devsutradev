@@ -276,10 +276,10 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
       <div className="px-4 sm:px-6 md:px-10 lg:px-14 py-6 sm:py-8 flex-1 lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {/*
           Mobile:  2 columns, compact cards, no horizontal scroll
-          Tablet:  2 columns
+          Tablet:  3 columns
           Desktop: 3 columns
         */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 md:grid-cols-3 lg:grid-cols-3">
           {visibleProducts.map((product) => {
             const isHovered = hoveredId === product.id;
             const isUnavailable = product.availableForSale === false;
@@ -311,6 +311,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                       <Image
                         data={product.featuredImage}
                         className="absolute inset-0 w-full h-full object-cover"
+                        sizes="(min-width: 1024px) 33vw, 50vw"
                         style={{
                           opacity: isHovered && secondaryImage ? 0 : 1,
                           transform: isHovered ? 'scale(1.05)' : 'scale(1)',
@@ -326,6 +327,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                       <Image
                         data={secondaryImage}
                         className="absolute inset-0 w-full h-full object-cover"
+                        sizes="(min-width: 1024px) 33vw, 50vw"
                         style={{
                           opacity: isHovered ? 1 : 0,
                           transform: isHovered ? 'scale(1.02)' : 'scale(1.07)',

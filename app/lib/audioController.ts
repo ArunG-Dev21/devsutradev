@@ -49,11 +49,12 @@ export function fadeIn(durationMs: number = 2500): void {
     const start = performance.now();
 
     const step = (now: number) => {
-        const elapsed = now - start;
+        const elapsed = Math.max(0, now - start);
         const progress = Math.min(elapsed / durationMs, 1);
         // Ease-out curve for natural fade
         const eased = 1 - Math.pow(1 - progress, 3);
-        audio!.volume = eased * TARGET_VOLUME;
+        const targetVol = eased * TARGET_VOLUME;
+        audio!.volume = Math.max(0, Math.min(targetVol, 1));
 
         if (progress < 1) {
             fadeFrame = requestAnimationFrame(step);
@@ -78,10 +79,11 @@ export function fadeOut(durationMs: number = 800): void {
     const start = performance.now();
 
     const step = (now: number) => {
-        const elapsed = now - start;
+        const elapsed = Math.max(0, now - start);
         const progress = Math.min(elapsed / durationMs, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        audio!.volume = startVol * (1 - eased);
+        const targetVol = startVol * (1 - eased);
+        audio!.volume = Math.max(0, Math.min(targetVol, 1));
 
         if (progress < 1) {
             fadeFrame = requestAnimationFrame(step);

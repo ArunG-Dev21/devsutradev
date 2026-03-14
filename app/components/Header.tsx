@@ -273,7 +273,7 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
         {/* ── SLIDE-UP MODAL ── from bottom */}
         <div
           className={`
-      fixed bottom-[72px] left-2 right-2 z-50
+      fixed bottom-[82px] left-2 right-2 z-50
       bg-card rounded-2xl border border-border shadow-2xl
       max-h-[85dvh] flex flex-col overflow-hidden
       transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
@@ -337,6 +337,7 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
                       alt={item.title}
                       width={400}
                       height={500}
+                      sizes="(min-width: 768px) 50vw, 100vw"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-active:scale-105"
                     />
                   ) : (
@@ -430,6 +431,7 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
                         alt={item.title}
                         width={200}
                         height={200}
+                        sizes="200px"
                         className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full object-cover transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:w-full group-hover:h-full group-hover:rounded-none z-0"
                       />
                       {/* Dark overlay for text readability on hover */}
@@ -741,6 +743,7 @@ function DesktopSearchBar() {
                                 src={image.url}
                                 width={44}
                                 height={44}
+                                sizes="44px"
                                 className="rounded-lg object-cover flex-shrink-0"
                               />
                             )}
@@ -783,6 +786,7 @@ function DesktopSearchBar() {
                                 src={collection.image.url}
                                 width={44}
                                 height={44}
+                                sizes="44px"
                                 className="rounded-lg object-cover flex-shrink-0"
                               />
                             )}

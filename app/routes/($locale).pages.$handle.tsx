@@ -3,6 +3,7 @@ import type {Route} from './+types/($locale).pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 import { generateMeta, truncate } from '~/lib/seo';
+import { sanitizeHtml } from '~/lib/sanitizer';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   const page = (data as any)?.page;
@@ -96,7 +97,7 @@ export default function Page() {
             prose-a:no-underline
             hover:prose-a:underline
           "
-          dangerouslySetInnerHTML={{__html: page.body}}
+          dangerouslySetInnerHTML={{__html: sanitizeHtml(page.body)}}
         />
       </section>
     </div>

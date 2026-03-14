@@ -2,6 +2,7 @@ import { Link, useLoaderData } from 'react-router';
 import type { Route } from './+types/($locale).blogs._index';
 import { getPaginationVariables, Image } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
+import { sanitizeHtml } from '~/lib/sanitizer';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -139,7 +140,7 @@ export default function Blogs() {
                           {article.excerpt && (
                             <div 
                               className="blog-card-excerpt" 
-                              dangerouslySetInnerHTML={{ __html: article.excerpt }} 
+                              dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.excerpt) }} 
                             />
                           )}
                           <span className="blog-card-read-more">Read more →</span>

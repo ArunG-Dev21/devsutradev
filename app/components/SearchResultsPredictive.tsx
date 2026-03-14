@@ -111,6 +111,7 @@ function SearchResultsPredictiveArticles({
                     src={article.image.url}
                     width={64}
                     height={64}
+                    sizes="64px"
                     className="w-16 h-16 rounded-lg object-cover bg-muted shrink-0 shadow-sm"
                   />
                 )}
@@ -159,6 +160,7 @@ function SearchResultsPredictiveCollections({
                     src={collection.image.url}
                     width={64}
                     height={64}
+                    sizes="64px"
                     className="w-16 h-16 rounded-lg object-cover bg-muted shrink-0 shadow-sm"
                   />
                 )}
@@ -248,6 +250,7 @@ function SearchResultsPredictiveProducts({
                     src={image.url}
                     width={64}
                     height={64}
+                    sizes="64px"
                     className="w-16 h-16 rounded-lg object-cover bg-muted shrink-0 shadow-sm"
                   />
                 )}
