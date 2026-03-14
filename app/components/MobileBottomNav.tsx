@@ -18,7 +18,7 @@ export function MobileBottomNav({ onOpenCollections }: MobileBottomNavProps) {
       id: "collections",
       label: "Collections",
       action: onOpenCollections,
-      icon: "/icons/collections.png",
+      icon: "/icons/collection.png",
     },
     {
       id: "new-arrivals",
