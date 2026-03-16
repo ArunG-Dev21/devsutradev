@@ -103,52 +103,58 @@ function loadDeferredData({ context }: Route.LoaderArgs) {
 
 
 
+// --- Unified FilterSidebar from collections.handle ---
 function FilterSidebar({
-  activeFilterIds,
+  activeFilters,
   onToggleFilter,
-  onClearAll,
   isMobile = false,
+  onClearAll,
 }: {
-  activeFilterIds: string[];
-  onToggleFilter: (filterId: string) => void;
-  onClearAll: () => void;
+  activeFilters: string[];
+  onToggleFilter: (f: string) => void;
   isMobile?: boolean;
+  onClearAll?: () => void;
 }) {
   return (
-    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'border border-border rounded-2xl p-6 shadow-sm'}`}>
+    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'rounded-2xl p-6 shadow-sm'}`}>
       <div className="flex items-center justify-between mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border/40">
         <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
         </h2>
-        {activeFilterIds.length > 0 && (
-          <button
-            onClick={onClearAll}
-            className="text-[10px] text-muted-foreground hover:text-foreground tracking-wide hover:underline transition-all underline-offset-4"
-          >
-            Clear all
-          </button>
-        )}
+        <div className="flex items-center gap-4">
+          {activeFilters.length > 0 && (
+            <button
+              onClick={() => {
+                if (onClearAll) onClearAll();
+                else activeFilters.forEach(onToggleFilter);
+              }}
+              className="text-[10px] text-muted-foreground hover:text-foreground tracking-wide hover:underline transition-all underline-offset-4"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6 lg:space-y-8">
         {FILTER_GROUPS.map((group) => (
           <div key={group.label}>
-            <p className="text-xs tracking-wider uppercase text-foreground font-semibold mb-4">
+            <p className="text-xs tracking-wider uppercase text-foreground font-semibold mb-3 lg:mb-4">
               {group.label}
             </p>
-            <div className="space-y-3">
-              {group.options.map((option) => {
-                const isActive = activeFilterIds.includes(option.id);
+            <div className="space-y-2 lg:space-y-3">
+              {group.options.map((opt) => {
+                const isActive = activeFilters.includes(opt.label);
                 return (
                   <button
-                    key={option.id}
+                    key={opt.label}
                     type="button"
                     className="flex items-center gap-3 cursor-pointer group w-full text-left"
-                    onClick={() => onToggleFilter(option.id)}
+                    onClick={() => onToggleFilter(opt.label)}
                     aria-pressed={isActive}
                   >
                     <div
-                      className={`w-4.5 h-4.5 rounded-[4px] border flex-shrink-0 flex items-center justify-center transition-all duration-200 ${isActive
+                      className={`w-4.5 h-4.5 rounded-lg border shrink-0 flex items-center justify-center transition-all duration-200 ${isActive
                         ? 'bg-foreground border-foreground'
                         : 'border-muted-foreground/40 group-hover:border-foreground bg-background'
                         }`}
@@ -170,12 +176,12 @@ function FilterSidebar({
                       )}
                     </div>
                     <span
-                      className={`text-[13px] transition-colors ${isActive
+                      className={`text-xs lg:text-[13px] transition-colors ${isActive
                         ? 'text-foreground font-medium'
                         : 'text-muted-foreground group-hover:text-foreground'
                         }`}
                     >
-                      {option.label}
+                      {opt.label}
                     </span>
                   </button>
                 );
@@ -185,18 +191,20 @@ function FilterSidebar({
         ))}
       </div>
 
-      <div className="mt-8 pt-6 border-t border-border/40">
-        <div className="bg-muted/30 rounded-xl p-4 text-center border border-border/50 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative z-10">
-            <p className="text-[11px] tracking-widest uppercase text-foreground font-bold mb-1.5 flex items-center justify-center gap-1.5">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
-              Free Shipping
-            </p>
-            <p className="text-xs text-muted-foreground">On all orders above Rs 999</p>
+      {!isMobile && (
+        <div className="mt-8 pt-6 border-t border-border/40">
+          <div className="bg-muted/30 rounded-xl p-4 text-center border border-border/50 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-linear-to-br from-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative z-10">
+              <p className="text-[11px] tracking-widest uppercase text-foreground font-bold mb-1.5 flex items-center justify-center gap-1.5">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+                Free Shipping
+              </p>
+              <p className="text-xs text-muted-foreground">On all orders above ₹999</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -221,7 +229,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`group flex items-center justify-between w-[190px] text-left text-[13px] border rounded-full px-5 py-3 bg-card text-foreground focus:outline-none cursor-pointer transition-all duration-200 select-none ${
+        className={`group flex items-center justify-between w-47.5 text-left text-[13px] border rounded-full px-5 py-3 bg-card text-foreground focus:outline-none cursor-pointer transition-all duration-200 select-none ${
           isOpen
             ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
             : 'border-border hover:border-foreground/15 hover:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)]'
@@ -229,7 +237,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       >
         <span className="truncate block font-medium tracking-wide">Sort by</span>
         <svg
-          className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-300 ml-2 flex-shrink-0 ${isOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
+          className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-300 ml-2 shrink-0 ${isOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
           fill="none"
           stroke="currentColor"
           strokeWidth={2.5}
@@ -240,7 +248,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 right-0 w-[210px] mt-2.5 bg-card/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="absolute z-50 right-0 w-52.5 mt-2.5 bg-card/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
           <div className="py-2 max-h-60 overflow-auto">
             {SORT_OPTIONS.map((option) => (
               <button
@@ -371,24 +379,19 @@ export default function Collection() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="relative bg-background border-b border-border overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-foreground rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-foreground rounded-full blur-3xl" />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
-          <div className="w-[500px] h-[500px] border border-foreground rounded-full" />
-          <div className="absolute w-[320px] h-[320px] border border-foreground rounded-full" />
-          <div className="absolute w-[160px] h-[160px] border border-foreground rounded-full" />
+      {/* BANNER (from collections.handle) */}
+      <div className="relative border-b border-border overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <img src='/bg-slug.jpg' alt='' className='object-cover w-full h-full' />
         </div>
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground mb-3">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-white/80 mb-3">
             Handpicked and Energised
           </p>
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
             All Products
           </h1>
-          <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
+          <p className="text-sm text-white/80 max-w-lg mx-auto leading-relaxed">
             Discover our complete collection of authentic sacred items.
           </p>
         </div>
@@ -396,10 +399,14 @@ export default function Collection() {
 
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="flex gap-8 items-start">
-          <aside className="hidden lg:block w-56 xl:w-64 flex-shrink-0 sticky top-6 self-start">
+          <aside className="hidden lg:block w-56 xl:w-64 shrink-0 sticky top-30 self-start">
             <FilterSidebar
-              activeFilterIds={activeFilterIds}
-              onToggleFilter={toggleFilter}
+              activeFilters={activeFilterIds.map(id => labelById[id] ?? id)}
+              onToggleFilter={filterLabel => {
+                // Map label back to id for toggling
+                const id = Object.keys(labelById).find(key => labelById[key] === filterLabel) || filterLabel;
+                toggleFilter(id);
+              }}
               onClearAll={clearAllFilters}
             />
           </aside>
@@ -420,7 +427,7 @@ export default function Collection() {
                   </svg>
                   <span className="font-medium tracking-wide">Filters</span>
                   {activeFilterIds.length > 0 && (
-                    <span className="bg-foreground text-background w-[18px] h-[18px] rounded-full flex items-center justify-center text-[9px] font-bold">
+                    <span className="bg-foreground text-background w-4.5 h-4.5 rounded-full flex items-center justify-center text-[9px] font-bold">
                       {activeFilterIds.length}
                     </span>
                   )}
@@ -438,10 +445,13 @@ export default function Collection() {
 
                 {/* Mobile Filters Dropdown */}
                 {mobileFiltersOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-[280px] sm:w-[320px] max-h-[70vh] overflow-y-auto bg-card border border-border rounded-2xl shadow-xl z-50 lg:hidden ring-1 ring-black ring-opacity-5">
+                  <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-card rounded-2xl shadow-xl z-50 lg:hidden border border-gray-100">
                     <FilterSidebar
-                      activeFilterIds={activeFilterIds}
-                      onToggleFilter={toggleFilter}
+                      activeFilters={activeFilterIds.map(id => labelById[id] ?? id)}
+                      onToggleFilter={filterLabel => {
+                        const id = Object.keys(labelById).find(key => labelById[key] === filterLabel) || filterLabel;
+                        toggleFilter(id);
+                      }}
                       onClearAll={clearAllFilters}
                       isMobile={true}
                     />

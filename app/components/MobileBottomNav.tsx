@@ -36,7 +36,7 @@ export function MobileBottomNav({ onOpenCollections }: MobileBottomNavProps) {
       z-50
       flex items-center justify-around
       h-17.5
-      bg-card/90 backdrop-blur-xl
+      bg-gold dark:bg-black backdrop-blur-xl
       border-t border-border/60
       shadow-[0_-2px_20px_rgba(0,0,0,0.06)]
       safe-area-pb
@@ -64,21 +64,22 @@ export function MobileBottomNav({ onOpenCollections }: MobileBottomNavProps) {
                 flex-1 h-full
                 transition-all duration-200
                 active:scale-95
+                filter brightness-0 invert
                 ${
                   navActive || isActive
-                    ? "text-black"
-                    : "text-gray-700"
+                    ? "text-white"
+                    : "text-gold"
                 }
               `
               }
               aria-label={tab.label}
             >
               <img
-                src={tab.icon}
-                alt=""
-                className="w-8 h-8 object-contain"
-                loading="lazy"
-              />
+  src={tab.icon}
+  alt=""
+  className="w-8 h-8 object-contain"
+  loading="lazy"
+/>
 
               <span
                 className="
@@ -104,20 +105,21 @@ export function MobileBottomNav({ onOpenCollections }: MobileBottomNavProps) {
             className="
             flex flex-col items-center justify-center
             flex-1 h-full
-            text-gray-700
+            text-gold
             transition-all duration-200
             active:scale-95
-            active:text-black
+            active:text-gold
             cursor-pointer
+            filter brightness-0 invert
           "
             aria-label={tab.label}
           >
             <img
-              src={tab.icon}
-              alt=""
-              className="w-8 h-8 object-contain"
-              loading="lazy"
-            />
+  src={tab.icon}
+  alt=""
+  className="w-8 h-8 object-contain"
+  loading="lazy"
+/>
 
             <span
               className="

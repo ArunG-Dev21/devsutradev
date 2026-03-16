@@ -46,15 +46,10 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policy">
-      <br />
-      <br />
-      <div>
-        <Link to="/policies">← Back to Policies</Link>
-      </div>
-      <br />
-      <h1>{policy.title}</h1>
-      <div dangerouslySetInnerHTML={{__html: sanitizeHtml(policy.body)}} />
+    <div className="policy-page">
+      <Link className="policy-back-link" to="/policies">← Back to Policies</Link>
+      <h1 className="policy-title">{policy.title}</h1>
+      <div className="policy-content" dangerouslySetInnerHTML={{__html: sanitizeHtml(policy.body)}} />
     </div>
   );
 }

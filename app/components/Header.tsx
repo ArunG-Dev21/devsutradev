@@ -9,7 +9,6 @@ import {
 } from '@shopify/hydrogen';
 import type { HeaderQuery, CartApiQueryFragment } from 'storefrontapi.generated';
 import { useAside } from '~/components/Aside';
-import { SUB_NAV_ITEMS } from '~/lib/constants';
 import { SEARCH_ENDPOINT, SearchFormPredictive } from '~/components/SearchFormPredictive';
 import { SearchResultsPredictive } from '~/components/SearchResultsPredictive';
 import { BrandLogo } from '~/components/BrandLogo';
@@ -545,7 +544,7 @@ function HeaderCtas({
           strokeWidth={1.8}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="w-5 h-5"
+          className="w-6 h-6"
         >
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
@@ -596,7 +595,7 @@ function HeaderMenuMobileToggle() {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="w-6 h-6"
+        className="w-7 h-7"
       >
         <path
           strokeLinecap="round"
@@ -1030,7 +1029,7 @@ function CartBadge({ count }: { count: number | null }) {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="w-5 h-5 xl:w-8 xl:h-8"
+        className="w-6 h-6 xl:w-8 xl:h-8"
       >
         <path
           strokeLinecap="round"

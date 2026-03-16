@@ -36,8 +36,8 @@ interface WhyDevasutraProps {
 
 /* -------------------------- Constants -------------------------- */
 const STATS = [
-    { value: "10,000+", label: "Happy Customers" },
-    { value: "500+", label: "Products Blessed" },
+    { value: "50+", label: "Happy Customers" },
+    { value: "100+", label: "Products Blessed" },
     { value: "100%", label: "Lab Certified" },
     { value: "4★", label: "Avg Rating" },
 ];
@@ -430,16 +430,87 @@ export function WhyDevasutra({ reels = [], testimonials = [] }: WhyDevasutraProp
                 </div>
 
                 {/* Stats */}
-                <div className="mt-12 bg-gold border border-border rounded-2xl px-4 sm:px-6 py-5 sm:py-6 shadow-sm">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                        {STATS.map((s) => (
-                            <div key={s.label} className="text-center py-2 sm:py-0 sm:border-r border-border sm:last:border-0 relative">
-                                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white tabular-nums">{s.value}</p>
-                                <p className="text-[10px] sm:text-[11px] text-white mt-0.5 tracking-wide">{s.label}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+<div
+  className="
+  mt-12
+  relative
+  bg-black
+  border border-border
+  xl:rounded-2xl
+  -mx-4 sm:mx-0
+  px-0 sm:px-6
+  py-5 sm:py-6
+  shadow-sm
+  overflow-hidden
+"
+>
+  {/* Decorative blurred blobs */}
+  <div className="pointer-events-none absolute -top-16 -left-10 w-40 h-40 bg-white/40 blur-3xl rounded-full" />
+  <div className="pointer-events-none absolute top-10 -right-10 w-52 h-52 bg-white/40 blur-3xl rounded-full" />
+  <div className="pointer-events-none absolute -bottom-12 left-1/3 w-44 h-44 bg-white/20 blur-3xl rounded-full" />
+
+  {/* Content wrapper to counter tilt */}
+  <div>
+    {/* On small screens: horizontal auto-scroll with tilt; on sm+: grid as before */}
+    <div className="relative">
+
+      {/* Mobile: Animated horizontal scroll */}
+      <div className="block sm:hidden -mx-4 overflow-x-hidden">
+
+        <style>{`
+          @keyframes stats-autoscroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+
+          .stats-autoscroll {
+            animation: stats-autoscroll 16s linear infinite;
+            will-change: transform;
+          }
+        `}</style>
+
+        <div
+          className="flex gap-3 px-4 whitespace-nowrap stats-autoscroll"
+          style={{ width: "max-content" }}
+        >
+          {STATS.concat(STATS).map((s, i) => (
+            <div
+              key={s.label + i}
+              className="min-w-36 text-center py-2 relative mx-1"
+            >
+              <p className="text-xl font-bold text-white tabular-nums">
+                {s.value}
+              </p>
+
+              <p className="text-[10px] text-white mt-0.5 tracking-wide">
+                {s.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: Original grid */}
+      <div className="hidden sm:grid grid-cols-4 gap-4">
+        {STATS.map((s) => (
+          <div
+            key={s.label}
+            className="text-center py-0 border-r border-border last:border-0 relative"
+          >
+            <p className="text-2xl md:text-3xl font-bold text-white tabular-nums">
+              {s.value}
+            </p>
+
+            <p className="text-[11px] text-white mt-0.5 tracking-wide">
+              {s.label}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
             </div>
         </section>
     );

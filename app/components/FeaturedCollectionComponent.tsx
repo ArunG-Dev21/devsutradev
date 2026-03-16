@@ -199,76 +199,97 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
         </h2>
 
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <span className="text-base sm:text-xl uppercase font-light tracking-wider text-muted-foreground">
+          <span className="text-sm sm:text-xl uppercase font-medium tracking-wider text-gold-muted">
             Top Picks This Season
           </span>
 
-          <div className="relative" ref={sortButtonRef}>
+<div className="relative" ref={sortButtonRef}>
+  <button
+    onClick={() => setIsSortOpen((prev) => !prev)}
+    className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-medium tracking-wide uppercase
+    text-foreground bg-background border border-border
+    hover:bg-muted hover:border-foreground/20
+    transition-all duration-200 cursor-pointer"
+  >
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="opacity-70"
+    >
+      <path d="M3 6h18M7 12h10M11 18h2" />
+    </svg>
+
+    Sort
+
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      className={`transition-transform duration-200 opacity-70 ${
+        isSortOpen ? "rotate-180" : ""
+      }`}
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
+
+  {/* ── SORT DROPDOWN ── */}
+  {isSortOpen && (
+    <>
+      <button
+        type="button"
+        className="fixed inset-0 z-40 w-full h-full cursor-default"
+        aria-label="Close sort dropdown"
+        onClick={() => setIsSortOpen(false)}
+      />
+
+      <div
+        className="absolute top-full right-0 mt-3 z-50 w-56 rounded-xl overflow-hidden
+        bg-card border border-border shadow-2xl"
+      >
+        <p
+          className="px-5 pt-3 pb-2 text-[10px] tracking-widest uppercase
+          font-semibold text-muted-foreground border-b border-border"
+        >
+          Sort By
+        </p>
+
+        <div className="py-1">
+          {sortOptions.map((option) => (
             <button
-              onClick={() => setIsSortOpen((prev) => !prev)}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-medium tracking-wider uppercase text-foreground bg-transparent border border-border hover:bg-foreground hover:text-background transition-all duration-200 cursor-pointer"
+              key={option.value}
+              onClick={() => {
+                setSortKey(option.value);
+                setVisibleCount(6);
+                setIsSortOpen(false);
+              }}
+              className={`
+                w-full text-left px-5 py-3 text-sm flex items-center justify-between
+                transition-all duration-150 cursor-pointer rounded-none
+
+                ${
+                  sortKey === option.value
+                    ? "text-foreground bg-muted"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                }
+              `}
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 6h18M7 12h10M11 18h2" />
-              </svg>
-              Sort
-              <svg
-                width="11" height="11" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" strokeWidth="2.5"
-                className={`transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`}
-              >
-                <path d="M6 9l6 6 6-6" />
-              </svg>
+              {option.label}
             </button>
+          ))}
+        </div>
+      </div>
+    </>
+  )}
+</div>
 
-            {/* ── SORT DROPDOWN ── */}
-            {isSortOpen && (
-              <>
-                <button
-                  type="button"
-                  className="fixed inset-0 z-40 w-full h-full cursor-default"
-                  aria-label="Close sort dropdown"
-                  onClick={() => setIsSortOpen(false)}
-                />
-
-                <div
-                  className="absolute top-full right-0 mt-2 z-50 w-52 rounded-xl overflow-hidden bg-card border border-border shadow-xl"
-                >
-                  <p className="px-5 pt-3 pb-2 text-[9px] tracking-widest uppercase font-medium text-muted-foreground border-b border-border">
-                    Sort By
-                  </p>
-
-                  {sortOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setSortKey(option.value);
-                        setVisibleCount(6);
-                        setIsSortOpen(false);
-                      }}
-                      className={`
-                        w-full text-left px-5 py-2.5 text-xs flex items-center justify-between
-                        transition-colors duration-150 cursor-pointer hover:bg-muted
-                        ${sortKey === option.value ? 'text-foreground font-medium' : 'text-muted-foreground'}
-                      `}
-                    >
-                      {option.label}
-
-                      {sortKey === option.value && (
-                        <svg
-                          width="11" height="11" viewBox="0 0 24 24"
-                          fill="none" stroke="currentColor" strokeWidth="2.5"
-                          className="text-foreground"
-                        >
-                          <path d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
         </div>
       </div>
 
@@ -422,18 +443,27 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
 
         {/* ── FOOTER ── */}
         <div className="mt-8 sm:mt-10 pt-5 flex items-center justify-between border-t border-border">
-          <span className="text-[10px] tracking-widest uppercase text-muted-foreground">
+          <span className="text-[10px] tracking-widest uppercase text-black">
             {sortedProducts.length} products
           </span>
           <Link
-            to={`/collections/${collection.handle}`}
-            className="inline-flex items-center gap-2 text-[10px] font-medium tracking-widest uppercase text-muted-foreground border-b border-border pb-0.5 hover:text-foreground hover:border-foreground transition-all duration-200"
-          >
-            Explore Full Collection
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </Link>
+  to={`/collections/${collection.handle}`}
+  className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2 bg-primary text-white rounded-full shadow-lg transition-all duration-200 hover:bg-primary-dark hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 group text-sm sm:text-base"
+  style={{ letterSpacing: '0.1em' }}
+>
+  <span className="truncate">Explore Full Collection</span>
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="transition-transform duration-200 group-hover:translate-x-1 sm:w-4 sm:h-4 w-3.5 h-3.5"
+  >
+    <path d="M5 12h14M12 5l7 7-7 7" />
+  </svg>
+</Link>
         </div>
       </div>
 

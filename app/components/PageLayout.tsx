@@ -59,7 +59,7 @@ export function PageLayout({
         />
       )}
       <RouteBreadcrumbBanner />
-      <main className='bg-background pb-[60px] md:pb-0'>{children}</main>
+      <main className='bg-background md:pb-0'>{children}</main>
       <TrustBadgesBar />
       <Footer
         footer={footer}

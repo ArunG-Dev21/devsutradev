@@ -108,14 +108,14 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
           fadeEffect={{ crossFade: true }}
           autoplay={
             canAutoplay
-              ? { delay: 1000, disableOnInteraction: false, pauseOnMouseEnter: true }
+              ? { delay: 2000, disableOnInteraction: true, pauseOnMouseEnter: true }
               : false
           }
           pagination={{
             clickable: true,
           }}
           loop={canLoop}
-          speed={1200}
+          speed={1500}
           className="w-full h-full"
           style={{ '--swiper-pagination-bottom': '0.75rem' } as React.CSSProperties}
           onInit={() => setIsReady(true)}
@@ -141,7 +141,7 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
                     <div className="max-w-2xl">
                       {/* Heading */}
                       <h2
-                        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-semibold text-white leading-[1.1] mb-3 sm:mb-4 md:mb-5 font-heading"
+                        className="text-4xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-bold text-white leading-[1.1] mb-3 sm:mb-4 md:mb-5 font-heading"
                       >
                         {slide.heading}
                       </h2>

@@ -342,7 +342,7 @@ export default function Product() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 lg:items-start">
 
           {/* ── LEFT: Image Gallery ── */}
-          <div className="lg:sticky lg:top-10">
+          <div className="lg:sticky lg:top-42">
 
             {/* Main Image */}
             <div
@@ -425,23 +425,6 @@ export default function Product() {
                 ))}
               </div>
             )}
-
-            {/* Certification badge below image */}
-            <div className="mt-6 flex items-center gap-4 bg-linear-to-r from-amber-50/80 to-white dark:from-amber-900/10 dark:to-card border border-amber-200/40 dark:border-amber-800/20 rounded-2xl px-5 py-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] group hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-              <div className="w-10 h-10 rounded-full bg-amber-100/80 dark:bg-amber-900/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-5 h-5 text-amber-700 dark:text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-[11px] font-bold tracking-widest uppercase text-stone-900 dark:text-foreground mb-0.5">
-                  Lab Certified Authenticity
-                </p>
-                <p className="text-[11px] text-stone-500 dark:text-muted-foreground leading-relaxed">
-                  This product comes with a certificate of authenticity verified by our gemological lab.
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* ── RIGHT: Product Info ── */}

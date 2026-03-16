@@ -77,7 +77,7 @@ export default function Page() {
           {page.title}
         </h1>
 
-        <div className="mt-4 w-16 h-[2px] bg-foreground mx-auto" />
+        <div className="mt-4 w-16 h-0.5 bg-foreground mx-auto" />
       </section>
 
       {/* Content Section */}

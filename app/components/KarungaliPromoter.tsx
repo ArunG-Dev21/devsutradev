@@ -52,7 +52,7 @@ function ChevronIcon({ direction = "right", className = "" }: { direction?: "lef
 export function KarungaliPromoter({
     tabs = DEFAULT_TABS,
     introTitle = "The Power of Authentic Karungali",
-    introText = "Sourced directly from the dense forests of Tamil Nadu, our Karungali (Ebony) wood is 100% natural and unpolished. Known for its ability to absorb radiation and negative energy, wearing Karungali brings peace, prosperity, and spiritual grounding.",
+    introText = "Natural Karungali (Ebony) wood from Tamil Nadu, known for absorbing negative energy and promoting peace and spiritual balance.",
     introImages = ["/karungali-bg.jpg"],
     viewMoreLink = "/collections/karungali",
 }: KarungaliPromoterProps) {
@@ -70,7 +70,7 @@ export function KarungaliPromoter({
     return (
         <section className="relative py-16 md:py-24 bg-background overflow-hidden">
             {/* ── Subtle ambient glow ────────────────────────────────── */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-amber-500/[0.04] dark:bg-amber-400/[0.03] blur-3xl pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-100 rounded-full bg-amber-500/4 dark:bg-amber-400/3 blur-3xl pointer-events-none" />
 
             <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
                 {/* ── Section Header ────────────────────────────────── */}
@@ -103,10 +103,10 @@ export function KarungaliPromoter({
 
                         {/* Text content */}
                         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 z-10">
-                            <h3 className="text-white font-heading text-xl md:text-2xl lg:text-4xl uppercase font-medium leading-snug mb-3 drop-shadow-lg">
+                            <h3 className="text-white font-heading text-xl md:text-2xl lg:text-4xl uppercase font-bold leading-snug mb-3 drop-shadow-lg">
                                 {introTitle}
                             </h3>
-                            <p className="text-white/80 text-base leading-relaxed mb-6 max-w-md drop-shadow-md">
+                            <p className="text-white/80 text-xs leading-relaxed mb-6 max-w-md drop-shadow-md">
                                 {introText}
                             </p>
 

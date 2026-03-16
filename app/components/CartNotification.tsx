@@ -6,129 +6,150 @@ import {
   useEffect,
   useRef,
   type ReactNode,
-} from 'react';
-import { useAside } from '~/components/Aside';
+} from "react";
+import { useAside } from "~/components/Aside";
 
 type CartNotificationContextValue = {
   showNotification: (productTitle?: string) => void;
 };
 
 const CartNotificationContext =
-  createContext<CartNotificationContextValue | null>(null);
+  createContext<CartNotificationContextValue | undefined>(undefined);
 
-export function CartNotificationProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function CartNotificationProvider({ children }: { children: ReactNode }) {
+
   const [visible, setVisible] = useState(false);
   const [productTitle, setProductTitle] = useState<string | undefined>();
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = useRef<number | null>(null);
   const { open: openAside } = useAside();
+
+  // Helper to get latest product name from cart DOM if available
+  function getFallbackProductTitle() {
+    try {
+      // Try to find the first cart line item title in the DOM (works for most Hydrogen carts)
+      const el = document.querySelector('[data-cart-line-title]');
+      if (el && el.textContent) return el.textContent.trim();
+    } catch {}
+    return undefined;
+  }
 
   const dismiss = useCallback(() => {
     setVisible(false);
   }, []);
 
-  const showNotification = useCallback(
-    (title?: string) => {
-      // Clear any existing timer
-      if (timerRef.current) clearTimeout(timerRef.current);
-      setProductTitle(title);
-      setVisible(true);
-      timerRef.current = setTimeout(() => {
-        setVisible(false);
-      }, 5000);
-    },
-    [],
-  );
+  const showNotification = useCallback((title?: string) => {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+    let finalTitle = title;
+    if (!finalTitle || finalTitle === 'Product') {
+      finalTitle = getFallbackProductTitle() || 'Product';
+    }
+    setProductTitle(finalTitle);
+    setVisible(true);
+
+    timerRef.current = window.setTimeout(() => {
+      setVisible(false);
+    }, 5000);
   }, []);
 
   const handleViewCart = useCallback(() => {
     dismiss();
-    openAside('cart');
+    openAside("cart");
   }, [dismiss, openAside]);
+
+  /* Escape key dismiss */
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") dismiss();
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [dismiss]);
+
+  /* Cleanup timers */
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    };
+  }, []);
 
   return (
     <CartNotificationContext.Provider value={{ showNotification }}>
       {children}
-      {/* Toast notification */}
+
+      {/* Toast */}
       <div
+        role="status"
         aria-live="polite"
-        className={`fixed top-4 right-4 z-[200] transition-all duration-300 ease-out ${
+        className={`fixed top-3 right-2 left-2 sm:left-auto sm:right-6 z-[200]
+        transition-all duration-300 ease-out
+        ${
           visible
-            ? 'translate-y-0 opacity-100 pointer-events-auto'
-            : '-translate-y-4 opacity-0 pointer-events-none'
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "-translate-y-2 opacity-0 pointer-events-none"
         }`}
+        style={{
+          filter: visible
+            ? "drop-shadow(0 10px 30px rgba(0,0,0,0.15))"
+            : undefined,
+          maxWidth: "100vw",
+        }}
       >
-        <div className="bg-white dark:bg-card border border-stone-200 dark:border-border rounded-xl shadow-xl px-5 py-4 flex items-center gap-4 min-w-[280px] max-w-[380px]">
-          {/* Check icon */}
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <div className="flex items-center gap-3 px-3 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/95 dark:bg-stone-900/90 backdrop-blur-md border border-stone-200 dark:border-stone-700 shadow-xl w-full max-w-[520px]">
+
+          {/* Success icon */}
+          <div className="flex-shrink-0 w-7 h-7 rounded-full bg-green-500/10 flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={2}
+              strokeWidth={2.5}
               stroke="currentColor"
-              className="w-4 h-4 text-green-600 dark:text-green-400"
+              className="w-4 h-4 text-green-600"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m4.5 12.75 6 6 9-13.5"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
 
           {/* Text */}
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-stone-900 dark:text-stone-100 m-0">
+          <div
+            onClick={handleViewCart}
+            className="flex items-center text-sm min-w-0 flex-1 cursor-pointer"
+          >
+            <span className="font-semibold text-stone-900 dark:text-white whitespace-nowrap">
               Added to cart
-            </p>
-            {productTitle && (
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 m-0 truncate">
-                {productTitle}
-              </p>
-            )}
+            </span>
           </div>
 
-          {/* View Cart button */}
+          {/* View cart */}
           <button
             type="button"
             onClick={handleViewCart}
-            className="flex-shrink-0 text-[10px] font-semibold tracking-[0.15em] uppercase px-4 py-2 rounded-full bg-stone-900 dark:bg-white text-white dark:text-black border-none cursor-pointer hover:opacity-90 transition-opacity"
+            className="flex-shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-stone-900 dark:bg-white text-white dark:text-black hover:scale-105 transition"
           >
-            View Cart
+            View
           </button>
 
-          {/* Dismiss button */}
+          {/* Dismiss */}
           <button
             type="button"
             onClick={dismiss}
-            className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 bg-transparent border-none cursor-pointer transition-colors"
+            className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-stone-400 hover:text-stone-700 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition"
             aria-label="Dismiss notification"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={1.5}
+              strokeWidth={1.8}
               stroke="currentColor"
-              className="w-3.5 h-3.5"
+              className="w-4 h-4"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18 18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
           </button>
+
         </div>
       </div>
     </CartNotificationContext.Provider>
@@ -137,10 +158,12 @@ export function CartNotificationProvider({
 
 export function useCartNotification() {
   const ctx = useContext(CartNotificationContext);
+
   if (!ctx) {
     throw new Error(
-      'useCartNotification must be used within a CartNotificationProvider',
+      "useCartNotification must be used within a CartNotificationProvider"
     );
   }
+
   return ctx;
 }

@@ -133,7 +133,7 @@ function FilterSidebar({
   isMobile?: boolean;
 }) {
   return (
-    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'border border-border rounded-2xl p-6 shadow-sm'}`}>
+    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'rounded-2xl p-6 shadow-sm'}`}>
       <div className="flex items-center justify-between mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border/40">
         <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
@@ -363,25 +363,19 @@ export default function Collection() {
         }}
       />
       {/* BANNER */}
-      <div className="relative bg-background border-b border-border overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-foreground rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-foreground rounded-full blur-3xl" />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
-          <div className="w-125 h-125 border border-foreground rounded-full" />
-          <div className="absolute w-80 h-80 border border-foreground rounded-full" />
-          <div className="absolute w-40 h-40 border border-foreground rounded-full" />
+      <div className="relative  border-b border-border overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <img src='/bg-slug.jpg' alt='' className='object-cover w-full h-full' />
         </div>
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground mb-3">
+          <p className="text-[10px] tracking-[0.4em] uppercase text-white/80 mb-3">
             Handpicked and Energised
           </p>
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
             {collection.title}
           </h1>
           {collection.description && (
-            <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            <p className="text-sm text-white/80 max-w-lg mx-auto leading-relaxed">
               {collection.description}
             </p>
           )}
@@ -392,7 +386,7 @@ export default function Collection() {
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="flex gap-8 items-start">
 
-          <aside className="hidden lg:block w-56 xl:w-64 shrink-0 sticky top-6 self-start">
+          <aside className="hidden lg:block w-56 xl:w-64 shrink-0 sticky top-30 self-start">
             <FilterSidebar
               activeFilters={activeFilters}
               onToggleFilter={toggleFilter}
@@ -434,7 +428,7 @@ export default function Collection() {
 
                 {/* Mobile Filters Dropdown */}
                 {mobileFiltersOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-card border border-border rounded-2xl shadow-xl z-50 lg:hidden ring-1 ring-black ring-opacity-5">
+                  <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-card rounded-2xl shadow-xl z-50 lg:hidden border border-gray-100">
                     <FilterSidebar
                       activeFilters={activeFilters}
                       onToggleFilter={toggleFilter}
