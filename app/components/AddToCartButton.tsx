@@ -10,6 +10,7 @@ export function AddToCartButton({
   lines,
   onClick,
   productTitle,
+  productImage,
 }: {
   analytics?: unknown;
   children: React.ReactNode;
@@ -17,6 +18,7 @@ export function AddToCartButton({
   lines: Array<OptimisticCartLineInput>;
   onClick?: () => void;
   productTitle?: string;
+  productImage?: { url: string; altText?: string | null };
 }) {
   return (
     <CartForm route="/cart" inputs={{ lines }} action={CartForm.ACTIONS.LinesAdd}>
@@ -27,6 +29,7 @@ export function AddToCartButton({
           disabled={disabled}
           onClick={onClick}
           productTitle={productTitle}
+          productImage={productImage}
         >
           {children}
         </AddToCartInner>
@@ -41,6 +44,7 @@ function AddToCartInner({
   disabled,
   onClick,
   productTitle,
+  productImage,
   children,
 }: {
   fetcher: FetcherWithComponents<any>;
@@ -48,6 +52,7 @@ function AddToCartInner({
   disabled?: boolean;
   onClick?: () => void;
   productTitle?: string;
+  productImage?: { url: string; altText?: string | null };
   children: React.ReactNode;
 }) {
   const { showNotification } = useCartNotification();
@@ -56,10 +61,10 @@ function AddToCartInner({
   useEffect(() => {
     // Trigger notification when fetcher transitions from loading/submitting to idle
     if (prevState.current !== 'idle' && fetcher.state === 'idle') {
-      showNotification(productTitle);
+      showNotification(productTitle, productImage);
     }
     prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle]);
+  }, [fetcher.state, showNotification, productTitle, productImage]);
 
   return (
     <>

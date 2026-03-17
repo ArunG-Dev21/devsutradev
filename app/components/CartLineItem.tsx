@@ -69,7 +69,7 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="no-underline block"
           >
-            <p className="text-xs sm:text-lg leading-snug truncate">
+            <p className="text-sm rounded-lg sm:text-lg leading-snug truncate">
               {product.title}
             </p>
           </Link>
@@ -91,7 +91,7 @@ export function CartLineItem({
           )}
 
           {/* Price */}
-          <div className="mt-1.5 sm:mt-2 text-xs sm:text-sm font-bold text-foreground">
+          <div className="mt-1.5 sm:mt-2 text-base sm:text-sm font-bold text-foreground">
             <ProductPrice price={line?.cost?.totalAmount} />
           </div>
 

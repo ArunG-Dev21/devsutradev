@@ -74,7 +74,7 @@ function AddToCartButton({ product }: { product: ProductNode }) {
       fetcherKey={`add-to-cart-${product.id}`}
     >
       {(fetcher) => (
-        <AddToCartInner fetcher={fetcher} productTitle={product.title} />
+        <AddToCartInner fetcher={fetcher} productTitle={product.title} productImage={product.featuredImage} />
       )}
     </CartForm>
   );
@@ -83,9 +83,11 @@ function AddToCartButton({ product }: { product: ProductNode }) {
 function AddToCartInner({
   fetcher,
   productTitle,
+  productImage,
 }: {
   fetcher: any;
   productTitle: string;
+  productImage?: ImageNode | null;
 }) {
   const [justAdded, setJustAdded] = useState(false);
   const { showNotification } = useCartNotification();
@@ -93,10 +95,10 @@ function AddToCartInner({
 
   useEffect(() => {
     if (prevState.current !== 'idle' && fetcher.state === 'idle') {
-      showNotification(productTitle);
+      showNotification(productTitle, productImage || undefined);
     }
     prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle]);
+  }, [fetcher.state, showNotification, productTitle, productImage]);
 
   const isAdding = fetcher.state !== 'idle';
 

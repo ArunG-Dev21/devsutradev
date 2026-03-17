@@ -375,7 +375,7 @@ export default function Product() {
                     type="button"
                     aria-label="Previous image"
                     onClick={goToPreviousImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 dark:bg-black/45 backdrop-blur-md border border-stone-200/80 dark:border-white/15 text-stone-700 dark:text-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-300"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 dark:bg-black/45 backdrop-blur-md border border-stone-200/80 dark:border-white/15 text-stone-700 dark:text-white shadow-md flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 transition-all duration-300"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
@@ -385,7 +385,7 @@ export default function Product() {
                     type="button"
                     aria-label="Next image"
                     onClick={goToNextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 dark:bg-black/45 backdrop-blur-md border border-stone-200/80 dark:border-white/15 text-stone-700 dark:text-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 dark:bg-black/45 backdrop-blur-md border border-stone-200/80 dark:border-white/15 text-stone-700 dark:text-white shadow-md flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 transition-all duration-300"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 6l6 6-6 6" />

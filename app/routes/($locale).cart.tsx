@@ -112,10 +112,10 @@ export default function Cart() {
       {/* Header Area */}
       <div className="bg-card border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 md:py-12">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground tracking-tight">
-            Your Cart
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-medium uppercase font-heading text-foreground tracking-tight">
+            Your Basket
           </h1>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
+          <p className="mt-1 sm:mt-5 text-xs sm:text-xl text-black">
             Review your sacred items before proceeding to checkout.
           </p>
         </div>

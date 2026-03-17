@@ -1,11 +1,9 @@
 import { NavLink, useLocation } from "react-router";
+import { useAside } from "~/components/Aside";
 
-interface MobileBottomNavProps {
-  onOpenCollections: () => void;
-}
-
-export function MobileBottomNav({ onOpenCollections }: MobileBottomNavProps) {
+export function MobileBottomNav() {
   const location = useLocation();
+  const { open } = useAside();
 
   const tabs = [
     {
@@ -15,9 +13,9 @@ export function MobileBottomNav({ onOpenCollections }: MobileBottomNavProps) {
       icon: "/icons/account.png",
     },
     {
-      id: "collections",
-      label: "Collections",
-      action: onOpenCollections,
+      id: "menu",
+      label: "Menu",
+      action: () => open("mobile"),
       icon: "/icons/collection.png",
     },
     {

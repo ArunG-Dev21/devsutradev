@@ -113,7 +113,7 @@ export default function OrderRoute() {
           target="_blank"
           href={order.statusPageUrl}
           rel="noopener noreferrer"
-          className="px-6 py-2.5 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-neutral-800 transition-colors text-center inline-block"
+          className="px-6 py-3 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-neutral-800 transition-colors text-center inline-block shadow-sm"
         >
           Track Shipment
         </a>
@@ -121,18 +121,18 @@ export default function OrderRoute() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-card text-card-foreground rounded-3xl border border-border shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-border bg-muted/50">
-              <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Order Items</h3>
+          <div className="bg-stone-50/80 rounded-3xl overflow-hidden">
+            <div className="px-6 py-5 border-b border-stone-200/60 bg-white/40">
+              <h3 className="text-sm font-bold text-stone-900 uppercase tracking-widest">Order Items</h3>
             </div>
 
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-stone-200/60">
               {lineItems.map((lineItem, lineItemIndex) => (
                 <OrderLineRow key={lineItemIndex} lineItem={lineItem} />
               ))}
             </div>
 
-            <div className="px-6 py-6 bg-muted/30">
+            <div className="px-6 py-6 border-t border-stone-200/60 bg-white/40">
               <div className="space-y-3 text-sm">
                 {((discountValue && discountValue.amount) || discountPercentage) && (
                   <div className="flex justify-between text-emerald-600 font-medium">
@@ -146,17 +146,17 @@ export default function OrderRoute() {
                     </p>
                   </div>
                 )}
-                <div className="flex justify-between text-muted-foreground">
+                <div className="flex justify-between text-stone-500">
                   <p>Subtotal</p>
                   <p><Money withoutTrailingZeros data={order.subtotal!} /></p>
                 </div>
-                <div className="flex justify-between text-muted-foreground">
+                <div className="flex justify-between text-stone-500">
                   <p>Tax</p>
                   <p><Money withoutTrailingZeros data={order.totalTax!} /></p>
                 </div>
-                <div className="pt-4 mt-4 border-t border-border flex justify-between items-center">
-                  <p className="text-base font-bold text-foreground">Total</p>
-                  <p className="text-xl font-bold text-foreground"><Money withoutTrailingZeros data={order.totalPrice!} /></p>
+                <div className="pt-4 mt-4 border-t border-stone-200/60 flex justify-between items-center">
+                  <p className="text-base font-bold text-stone-900 tracking-widest uppercase">Total</p>
+                  <p className="text-xl font-bold text-stone-900"><Money withoutTrailingZeros data={order.totalPrice!} /></p>
                 </div>
               </div>
             </div>
@@ -164,11 +164,11 @@ export default function OrderRoute() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-card text-card-foreground rounded-3xl border border-border shadow-sm p-6">
-            <h3 className="text-sm font-bold text-foreground uppercase tracking-widest mb-4">Shipping Address</h3>
+          <div className="bg-stone-50/80 rounded-3xl shadow-sm p-6 sm:p-8">
+            <h3 className="text-sm font-bold text-stone-900 uppercase tracking-widest mb-4">Shipping Address</h3>
             {order?.shippingAddress ? (
-              <address className="not-italic text-sm text-muted-foreground space-y-1">
-                <p className="font-semibold text-foreground mb-2">{order.shippingAddress.name}</p>
+              <address className="not-italic text-sm text-stone-500 space-y-1">
+                <p className="font-semibold text-stone-900 mb-2">{order.shippingAddress.name}</p>
                 {order.shippingAddress.formatted ? (
                   order.shippingAddress.formatted.map((line, idx) => (
                     <p key={idx}>{line}</p>
@@ -178,13 +178,13 @@ export default function OrderRoute() {
                 )}
               </address>
             ) : (
-              <p className="text-sm text-muted-foreground italic">No shipping address provided.</p>
+              <p className="text-sm text-stone-500 italic">No shipping address provided.</p>
             )}
           </div>
 
-          <div className="bg-card text-card-foreground rounded-3xl border border-border shadow-sm p-6">
-            <h3 className="text-sm font-bold text-foreground uppercase tracking-widest mb-4">Fulfillment Status</h3>
-            <div className="flex items-center gap-3 text-sm font-medium text-foreground">
+          <div className="bg-stone-50/80 rounded-3xl shadow-sm p-6 sm:p-8">
+            <h3 className="text-sm font-bold text-stone-900 uppercase tracking-widest mb-4">Fulfillment Status</h3>
+            <div className="flex items-center gap-3 text-sm font-medium text-stone-900">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               {fulfillmentStatus}
             </div>
@@ -216,12 +216,12 @@ function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
     <div className="p-6 flex flex-col sm:flex-row gap-6">
       <div className="shrink-0">
         {lineItem?.image ? (
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-muted border border-border">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white shadow-sm">
             <Image data={lineItem.image} width={96} height={96} sizes="96px" className="w-full h-full object-cover" />
           </div>
         ) : (
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-muted border border-border flex items-center justify-center">
-            <svg className="w-8 h-8 text-stone-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white shadow-sm flex items-center justify-center">
+            <svg className="w-8 h-8 text-stone-200" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
             </svg>
           </div>
@@ -229,15 +229,15 @@ function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
       </div>
 
       <div className="flex-1 flex flex-col justify-center">
-        <p className="font-semibold text-foreground text-base">{lineItem.title}</p>
+        <p className="font-semibold text-stone-900 text-base">{lineItem.title}</p>
         {lineItem.variantTitle && lineItem.variantTitle !== 'Default Title' && (
-          <p className="text-sm text-muted-foreground mt-1">{lineItem.variantTitle}</p>
+          <p className="text-sm text-stone-500 mt-1">{lineItem.variantTitle}</p>
         )}
-        <p className="text-sm text-muted-foreground mt-2">Qty: {lineItem.quantity}</p>
+        <p className="text-sm text-stone-500 mt-2">Qty: {lineItem.quantity}</p>
       </div>
 
       <div className="sm:text-right flex flex-col justify-center">
-        <p className="font-bold text-foreground text-lg">
+        <p className="font-bold text-stone-900 text-lg">
           {totalMoney ? <Money withoutTrailingZeros data={totalMoney} /> : null}
         </p>
         {totalDiscountAmount > 0 && beforeMoney ? (

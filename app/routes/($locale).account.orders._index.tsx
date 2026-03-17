@@ -64,10 +64,10 @@ export default function Orders() {
 
   return (
     <div className="account-orders">
-      <div className="mb-8 border-b border-border pb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+      <div className="mb-8 border-b border-stone-200 pb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground tracking-tight">Order History</h2>
-          <p className="text-sm text-neutral-500 mt-2">
+          <h2 className="text-2xl font-bold text-stone-900 tracking-tight">Order History</h2>
+          <p className="text-sm text-stone-500 mt-2">
             Review your past purchases and track current shipments.
           </p>
         </div>
@@ -103,8 +103,8 @@ function OrdersTable({
 
 function EmptyOrders({ hasFilters = false }: { hasFilters?: boolean }) {
   return (
-    <div className="p-8 md:p-12 text-center bg-card text-card-foreground rounded-3xl border border-border shadow-sm flex flex-col items-center justify-center min-h-[400px]">
-      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+    <div className="p-8 md:p-16 text-center bg-stone-50/80 rounded-3xl flex flex-col items-center justify-center min-h-[400px]">
+      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
         <svg className="w-8 h-8 text-stone-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
         </svg>
@@ -168,7 +168,7 @@ function OrderSearchForm({
   };
 
   const hasFilters = currentFilters.name || currentFilters.confirmationNumber;
-  const inputClass = "w-full md:w-32 lg:w-40 px-3 py-2 text-xs bg-background text-foreground placeholder:text-muted-foreground border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-ring focus:bg-background transition-colors";
+  const inputClass = "w-full md:w-32 lg:w-40 px-0 py-2 border-b border-stone-200 bg-transparent text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-black transition-colors rounded-none text-sm";
 
   return (
     <form
@@ -226,12 +226,12 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
   const fulfillmentStatus = flattenConnection(order.fulfillments)[0]?.status;
 
   const statusColor =
-    order.financialStatus === 'PAID' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-      order.financialStatus === 'REFUNDED' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-        'bg-muted text-foreground border-border';
+    order.financialStatus === 'PAID' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+      order.financialStatus === 'REFUNDED' ? 'bg-orange-50 text-orange-700 border border-orange-200' :
+        'bg-stone-100 text-stone-600 border border-stone-200';
 
   return (
-    <div className="bg-card text-card-foreground rounded-2xl border border-border p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-sm mb-4 transition-all hover:shadow-md">
+    <div className="bg-stone-50/80 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-4">
       <div className="flex-1 space-y-3">
         <div className="flex items-center gap-3">
           <Link to={`/account/orders/${btoa(order.id)}`} className="text-lg font-bold text-stone-900 hover:text-stone-600 transition-colors">
@@ -271,10 +271,10 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
       <div className="sm:self-center shrink-0">
         <Link
           to={`/account/orders/${btoa(order.id)}`}
-          className="flex items-center gap-2 px-6 py-2.5 bg-muted text-foreground text-xs font-semibold tracking-widest uppercase rounded-xl border border-border hover:bg-muted/70 transition-colors"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-stone-900 text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-stone-100 transition-colors shadow-sm"
         >
           View Details
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
           </svg>
         </Link>

@@ -22,9 +22,9 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         }`}
     >
       {/* Subtotal */}
-      <div className="flex items-center justify-between mb-0.5">
-        <span className={`font-semibold text-foreground ${layout === 'aside' ? 'text-sm' : 'text-sm sm:text-base'}`}>Subtotal</span>
-        <span className={`font-bold text-foreground ${layout === 'aside' ? 'text-sm' : 'text-sm sm:text-base'}`}>
+      <div className="flex items-center justify-between mb-1">
+        <span className={`font-semibold text-black ${layout === 'aside' ? 'text-base' : 'text-base sm:text-lg'}`}>Subtotal</span>
+        <span className={`font-medium text-black ${layout === 'aside' ? 'text-lg' : 'text-lg sm:text-xl'}`}>
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money withoutTrailingZeros data={cart.cost.subtotalAmount} />
           ) : (
@@ -34,7 +34,7 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
       </div>
 
       {/* Shipping note */}
-      <p className={`text-muted-foreground ${layout === 'aside' ? 'text-[10px] mb-2.5' : 'text-[10px] sm:text-[11px] mb-3 sm:mb-4'}`}>
+      <p className={`text-black text-center ${layout === 'aside' ? 'text-xs mb-2.5' : 'text-[10px] sm:text-[11px] mb-3 sm:mb-4'}`}>
         Taxes and shipping calculated at checkout
       </p>
 
@@ -45,10 +45,10 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
           <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
         </>
       ) : (
-        <div className="mb-2.5 flex items-center gap-2 px-2.5 py-2 bg-muted/50 rounded-lg">
+        <div className="mb-2.5 flex items-center justify-center gap-2 px-2.5 py-2 border border-dashed border-black rounded-lg">
           <span className="text-xs leading-none">🏷️</span>
-          <p className="text-[10px] text-muted-foreground">
-            <span className="font-medium text-foreground">Discount codes</span> applied at checkout
+          <p className="text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">Discount codes applied at checkout</span>
           </p>
         </div>
       )}
@@ -58,9 +58,8 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         {/* Terms checkbox */}
         <label
           htmlFor={termsId}
-          className={`flex items-center gap-2 cursor-pointer select-none group ${
-            layout === 'aside' ? 'mb-2.5 py-2 border-t border-border' : 'mb-4 sm:mb-5 py-4 sm:py-5 border-y border-border'
-          }`}
+          className={`flex items-center gap-2 cursor-pointer select-none group ${layout === 'aside' ? 'mb-2.5 py-2 border-t border-border' : 'mb-4 sm:mb-5 py-4 sm:py-5 border-y border-border'
+            }`}
         >
           <input
             type="checkbox"
@@ -69,7 +68,7 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
             onChange={(e) => setTermsAccepted(e.target.checked)}
             className="rounded border-border text-foreground focus:ring-ring h-3.5 w-3.5 cursor-pointer accent-foreground shrink-0"
           />
-          <span className={`text-muted-foreground leading-snug group-hover:text-foreground transition-colors ${layout === 'aside' ? 'text-[10px]' : 'text-[11px]'}`}>
+          <span className={`text-muted-foreground leading-snug group-hover:text-foreground transition-colors ${layout === 'aside' ? 'text-xs' : 'text-xs'}`}>
             I agree to the{' '}
             <a href="/policies/terms-of-service" className="underline hover:text-foreground" onClick={(e) => e.stopPropagation()}>terms</a>
             {' & '}
@@ -86,34 +85,34 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         <div className={`flex items-center justify-center flex-wrap ${layout === 'aside' ? 'gap-2 mb-1.5' : 'gap-2 sm:gap-3 mb-3'}`}>
           <div className="flex flex-col items-center gap-2 mt-3">
 
-  {/* Payment Icons */}
-  <div className="flex items-center max-w-75 justify-center gap-2 flex-wrap">
+            {/* Payment Icons */}
+            <div className="flex items-center max-w-75 justify-center gap-2 flex-wrap">
 
-    {[
-      { src: "/icons/UPI.svg", alt: "UPI" },
-      { src: "/icons/PhonePe.svg", alt: "PhonePe" },
-      { src: "/icons/visa.svg", alt: "Visa" },
-      { src: "/icons/mastercard.svg", alt: "Mastercard" },
-      { src: "/icons/RuPay.svg", alt: "RuPay" },
-      { src: "/icons/netbanking.svg", alt: "Net Banking" },
-      { src: "/icons/paytm.svg", alt: "Paytm" },
-    ].map((icon) => (
-      <div
-        key={icon.alt}
-        className="w-16 h-8 flex items-center justify-center bg-white rounded-md border border-gray-200"
-      >
-        <img
-          src={icon.src}
-          alt={icon.alt}
-          className="max-h-4 w-auto object-contain"
-          loading="lazy"
-        />
-      </div>
-    ))}
+              {[
+                { src: "/icons/UPI.svg", alt: "UPI" },
+                { src: "/icons/PhonePe.svg", alt: "PhonePe" },
+                { src: "/icons/visa.svg", alt: "Visa" },
+                { src: "/icons/mastercard.svg", alt: "Mastercard" },
+                { src: "/icons/RuPay.svg", alt: "RuPay" },
+                { src: "/icons/netbanking.svg", alt: "Net Banking" },
+                { src: "/icons/paytm.svg", alt: "Paytm" },
+              ].map((icon) => (
+                <div
+                  key={icon.alt}
+                  className="w-16 h-8 flex items-center justify-center bg-white rounded-md border border-gray-200"
+                >
+                  <img
+                    src={icon.src}
+                    alt={icon.alt}
+                    className="max-h-4 w-auto object-contain"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
 
-  </div>
+            </div>
 
-</div>
+          </div>
         </div>
       </div>
     </div>
@@ -138,31 +137,43 @@ function CartCheckoutActions({
         <a
           href={checkoutUrl}
           target="_self"
-          className={`block w-full text-center tracking-[0.15em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background ${
-            layout === 'aside' ? 'py-2.5 text-xs' : 'py-2.5 sm:py-3 text-xs sm:text-sm'
-          }`}
+          className={`flex items-center justify-center gap-2 w-full text-center tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background ${layout === 'aside'
+              ? 'py-2 text-[11px]'
+              : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
+            }`}
         >
-          BUY NOW
+          <img src='/icons/rps.png' alt='rupees icon' className='w-6 h-6 ' />
+          PROCEED TO CHECKOUT
         </a>
       ) : (
         <button
           type="button"
           disabled
-          className={`w-full text-center tracking-[0.15em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60 ${
-            layout === 'aside' ? 'py-2.5 text-xs' : 'py-2.5 sm:py-3 text-xs sm:text-sm'
-          }`}
+          className={`flex items-center justify-center gap-2 w-full text-center tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60 ${layout === 'aside'
+              ? 'py-2 text-[11px]'
+              : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
+            }`}
         >
-          BUY NOW
+          <img src='/icons/rps.png' alt='rupees icon' className='w-6 h-6 ' />
+          PROCEED TO CHECKOUT
         </button>
       )}
+
       {layout === 'aside' && (
         <Link
           to="/cart"
           onClick={close}
           prefetch="viewport"
-          className="block w-full py-2 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg border border-border text-foreground transition-all duration-200 hover:bg-muted"
+          className="flex items-center justify-center gap-2 w-full py-2 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg border border-border text-foreground transition-all duration-200 hover:bg-muted"
         >
-          VIEW MY CART
+          <svg className='w-5 h-5' viewBox="-0.5 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.9999 9.32007L19.9999 17.3201C19.8507 18.4088 19.3192 19.409 18.5003 20.1418C17.6813 20.8746 16.6285 21.2923 15.5299 21.3201H8.38992C7.29136 21.2923 6.23848 20.8746 5.41957 20.1418C4.60066 19.409 4.0691 18.4088 3.91992 17.3201L2.91992 9.32007" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M3 9.32004C8.81444 7.20973 15.1856 7.20973 21 9.32004" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M6.42969 8.34006L9.07969 3.32007" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M17.5699 8.34006L14.9199 3.32007" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+
+          VIEW CART
         </Link>
       )}
     </div>

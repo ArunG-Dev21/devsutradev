@@ -55,8 +55,8 @@ export default function AccountLayout() {
           <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">
             My Account
           </h1>
-          <p className="text-base text-muted-foreground">
-            Welcome back, {customer?.firstName || 'Valued Customer'}. Manage your sacred journey here.
+          <p className="text-base text-stone-500 mt-2">
+            Welcome back, {customer?.firstName || customer?.lastName || customer?.displayName || customer?.emailAddress?.emailAddress || 'Valued Customer'}. Manage your sacred journey here.
           </p>
         </div>
 
@@ -87,32 +87,30 @@ function AccountMenu() {
   ];
 
   return (
-    <div className="bg-card text-card-foreground rounded-3xl border border-border overflow-hidden shadow-sm">
-      <nav role="navigation" className="flex flex-col">
-        {menuItems.map((item) => {
-          const isActive = location.pathname.includes(item.to);
-          return (
-            <NavLink
-              key={item.name}
-              to={item.to}
-              className={`flex items-center gap-4 px-6 py-4 text-sm font-semibold transition-all duration-300 border-l-4 ${isActive
-                  ? 'border-foreground text-foreground bg-muted'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/60'
-                }`}
-            >
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-              </svg>
-              {item.name}
-            </NavLink>
-          );
-        })}
+    <nav role="navigation" className="flex flex-col gap-1">
+      {menuItems.map((item) => {
+        const isActive = location.pathname.includes(item.to) || (location.pathname === '/account' && item.name === 'Orders');
+        return (
+          <NavLink
+            key={item.name}
+            to={item.to}
+            className={`flex items-center gap-4 px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 ${isActive
+                ? 'bg-stone-900 text-white shadow-sm'
+                : 'text-stone-500 hover:text-stone-900 hover:bg-stone-100'
+              }`}
+          >
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+            </svg>
+            {item.name}
+          </NavLink>
+        );
+      })}
 
-        <div className="border-t border-border">
-          <Logout />
-        </div>
-      </nav>
-    </div>
+      <div className="mt-4 pt-4 border-t border-stone-200">
+        <Logout />
+      </div>
+    </nav>
   );
 }
 
@@ -121,7 +119,7 @@ function Logout() {
     <Form className="w-full" method="POST" action="/account/logout">
       <button
         type="submit"
-        className="w-full flex items-center gap-4 px-6 py-4 text-sm font-semibold text-red-500 hover:bg-red-500/10 transition-colors border-l-4 border-transparent text-left cursor-pointer"
+        className="w-full flex items-center gap-4 px-4 py-3.5 text-sm font-medium text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-xl transition-colors text-left cursor-pointer"
       >
         <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />

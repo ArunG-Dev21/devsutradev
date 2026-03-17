@@ -87,18 +87,18 @@ export default function AccountProfile() {
   const isUpdating = state !== 'idle';
 
   return (
-    <div className="bg-card text-card-foreground rounded-3xl border border-border p-6 md:p-8 lg:p-10 shadow-sm max-w-3xl">
-      <div className="mb-8 border-b border-border pb-6">
-        <h2 className="text-2xl font-bold text-foreground tracking-tight">Personal Information</h2>
-        <p className="text-sm text-muted-foreground mt-2">
+    <div className="max-w-2xl">
+      <div className="mb-8 border-b border-stone-200 pb-6">
+        <h2 className="text-2xl font-bold text-stone-900 tracking-tight">Personal Information</h2>
+        <p className="text-sm text-stone-500 mt-2">
           Update your contact details to keep your account secure.
         </p>
       </div>
 
       <Form method="PUT" className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-2">
-            <label htmlFor="firstName" className="block text-sm font-semibold text-foreground">
+            <label htmlFor="firstName" className="block text-xs font-semibold text-stone-700 uppercase tracking-widest">
               First name
             </label>
             <input
@@ -110,12 +110,12 @@ export default function AccountProfile() {
               aria-label="First name"
               defaultValue={customer.firstName ?? ''}
               minLength={2}
-              className="w-full px-4 py-3 bg-background text-foreground placeholder:text-muted-foreground border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-ring focus:bg-background transition-colors"
+              className="w-full px-0 py-3 bg-transparent text-stone-900 border-b border-stone-200 focus:outline-none focus:border-black transition-colors rounded-none placeholder:text-stone-400"
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="lastName" className="block text-sm font-semibold text-foreground">
+            <label htmlFor="lastName" className="block text-xs font-semibold text-stone-700 uppercase tracking-widest">
               Last name
             </label>
             <input
@@ -127,7 +127,7 @@ export default function AccountProfile() {
               aria-label="Last name"
               defaultValue={customer.lastName ?? ''}
               minLength={2}
-              className="w-full px-4 py-3 bg-background text-foreground placeholder:text-muted-foreground border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-ring focus:bg-background transition-colors"
+              className="w-full px-0 py-3 bg-transparent text-stone-900 border-b border-stone-200 focus:outline-none focus:border-black transition-colors rounded-none placeholder:text-stone-400"
             />
           </div>
         </div>
@@ -141,13 +141,13 @@ export default function AccountProfile() {
           </div>
         )}
 
-        <div className="pt-4 flex items-center justify-end">
+        <div className="pt-8 flex items-center">
           <button
             type="submit"
             disabled={isUpdating}
-            className="px-8 py-3.5 bg-black text-white text-sm font-semibold tracking-[0.15em] uppercase rounded-xl hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3.5 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isUpdating ? 'Saving Changes...' : 'Save Changes'}
+            {isUpdating ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </Form>

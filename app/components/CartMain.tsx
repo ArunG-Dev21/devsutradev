@@ -11,6 +11,7 @@ import { useCartNotification } from '~/components/CartNotification';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper/types';
+import { CartRecommendationsPage } from './CartRecommendationsPage';
 import type { CartApiQueryFragment } from 'storefrontapi.generated';
 import { useAside } from '~/components/Aside';
 import { CartLineItem, type CartLine } from '~/components/CartLineItem';
@@ -120,11 +121,15 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
 
         {cartHasItems && (
           <div className={`${layout === 'aside' ? 'mt-6 mb-2' : 'mt-10'}`}>
-            <CartRecommendations
-              layout={layout}
-              excludeProductIds={cartProductIds}
-              onNavigateAway={() => layout === 'aside' && close()}
-            />
+            {layout === 'aside' ? (
+              <CartRecommendations
+                layout={layout}
+                excludeProductIds={cartProductIds}
+                onNavigateAway={() => layout === 'aside' && close()}
+              />
+            ) : (
+              <CartRecommendationsPage excludeProductIds={cartProductIds} />
+            )}
           </div>
         )}
       </div>
@@ -193,7 +198,7 @@ function CartRecommendations({
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-stone-400 dark:text-stone-400">
+        <p className="text-base tracking-[0.15em] uppercase text-black dark:text-white">
           You may also like
         </p>
         <div className="flex items-center gap-2">
@@ -224,12 +229,13 @@ function CartRecommendations({
 
       <Swiper
         modules={[Navigation]}
-        slidesPerView={layout === 'aside' ? 2.1 : 2.2}
-        spaceBetween={layout === 'aside' ? 10 : 12}
-        breakpoints={layout === 'page' ? {
-          640: { slidesPerView: 3.2, spaceBetween: 14 },
-          1024: { slidesPerView: 4.2, spaceBetween: 16 },
-        } : undefined}
+        slidesPerView={1}
+        spaceBetween={12}
+        breakpoints={{
+          0: { slidesPerView: 1, spaceBetween: 12 },
+          640: { slidesPerView: 1, spaceBetween: 12 },
+          1024: { slidesPerView: 1, spaceBetween: 12 },
+        }}
         onSwiper={(instance) => {
           setSwiper(instance);
           setIsBeginning(instance.isBeginning);
@@ -269,14 +275,16 @@ function RecommendationCard({
   const badgeTag = product.tags?.[0];
 
   return (
-    <div className="group bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-border h-full relative">
+    <div className="group bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 flex items-stretch relative">
+
+      {/* IMAGE */}
       <Link
         to={`/products/${product.handle}`}
         onClick={onNavigateAway}
-        className="no-underline block"
+        className="no-underline block w-28 shrink-0"
         prefetch="intent"
       >
-        <div className={`${compact ? 'aspect-square' : 'aspect-[4/5]'} bg-muted overflow-hidden relative`}>
+        <div className="h-full bg-muted overflow-hidden relative rounded-l-2xl">
           {product.featuredImage?.url ? (
             <img
               src={product.featuredImage.url}
@@ -286,12 +294,13 @@ function RecommendationCard({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-muted">
-              <span className="text-5xl opacity-20 text-muted-foreground">*</span>
+              <span className="text-4xl opacity-20 text-muted-foreground">*</span>
             </div>
           )}
+
           {!canAdd && (
-            <div className="absolute top-2.5 right-2.5">
-              <span className="inline-flex items-center justify-center px-2.5 py-1 bg-muted/90 backdrop-blur-sm border border-border/50 text-muted-foreground text-[9px] font-bold tracking-wider uppercase rounded-full shadow-sm">
+            <div className="absolute top-2 right-2">
+              <span className="px-2 py-0.5 bg-white/90 backdrop-blur text-[9px] font-semibold tracking-wider uppercase rounded-full shadow-sm">
                 Sold Out
               </span>
             </div>
@@ -299,39 +308,46 @@ function RecommendationCard({
         </div>
       </Link>
 
-      <div className={`flex flex-col flex-1 ${compact ? 'p-2.5' : 'p-3.5'}`}>
+      {/* CONTENT */}
+      <div className="flex flex-col gap-2 flex-1 px-4 py-3">
 
-
+        {/* TITLE */}
         <Link
           to={`/products/${product.handle}`}
           onClick={onNavigateAway}
-          className="no-underline group-hover/title:underline"
+          className="no-underline"
           prefetch="intent"
         >
-          <h3 className={`${compact ? 'text-[13px]' : 'text-base font-medium'} text-foreground mb-2 leading-snug line-clamp-2`}>
+          <h3 className="text-lg font-medium text-foreground leading-snug line-clamp-2 group-hover:underline underline-offset-2">
             {product.title}
           </h3>
         </Link>
 
-        <div className="mt-auto flex flex-col gap-2.5">
+        {/* PRICE + BUTTON */}
+        <div className="flex items-center justify-between">
+
           <Money
             withoutTrailingZeros
             data={product.priceRange.minVariantPrice}
-            className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-foreground`}
+            className="text-2xl text-foreground"
           />
-
-          {canAdd && (
-            <CartForm
-              route="/cart"
-              action={CartForm.ACTIONS.LinesAdd}
-              inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1 }] }}
-            >
-              {(fetcher: FetcherWithComponents<any>) => (
-                <RecommendationAddButton fetcher={fetcher} productTitle={product.title} />
-              )}
-            </CartForm>
-          )}
         </div>
+
+        {canAdd && (
+          <CartForm
+            route="/cart"
+            action={CartForm.ACTIONS.LinesAdd}
+            inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1 }] }}
+          >
+            {(fetcher: FetcherWithComponents<any>) => (
+              <RecommendationAddButton
+                fetcher={fetcher}
+                productTitle={product.title}
+              />
+            )}
+          </CartForm>
+        )}
+
       </div>
     </div>
   );
@@ -358,14 +374,14 @@ function RecommendationAddButton({
     <button
       type="submit"
       disabled={fetcher.state !== 'idle'}
-      className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 rounded-lg text-[11px] uppercase tracking-wider font-bold transition-colors cursor-pointer"
+      className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 rounded-lg text-[11px] uppercase tracking-wider font-bold transition-colors cursor-pointer"
     >
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
         <line x1="3" y1="6" x2="21" y2="6"></line>
         <path d="M16 10a4 4 0 0 1-8 0"></path>
       </svg>
-      Add
+      Add to Cart
     </button>
   );
 }

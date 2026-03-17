@@ -56,7 +56,7 @@ export function StickyAddToCart({
 
       {/* Product image */}
       {product.featuredImage && (
-        <div className="w-9 h-9 rounded-lg overflow-hidden border border-stone-200 dark:border-border flex-shrink-0">
+        <div className="w-14 h-14 rounded-lg overflow-hidden border border-stone-200 dark:border-border flex-shrink-0">
           <Image
             data={product.featuredImage}
             className="w-full h-full object-cover"
@@ -72,17 +72,18 @@ export function StickyAddToCart({
         </p>
 
         {selectedVariant.price && (
-          <div className="text-[11px] text-stone-600 dark:text-muted-foreground">
+          <div className="text-xl text-black dark:text-muted-foreground">
             <Money withoutTrailingZeros data={selectedVariant.price} />
           </div>
         )}
       </div>
 
       {/* Add to cart */}
-      <div className="[&_button]:!px-4 [&_button]:!py-2.5 [&_button]:!text-[11px]">
+      <div className="[&_button]:px-4! [&_button]:py-2.5! [&_button]:text-[11px]!">
         <AddToCartButton
           disabled={!isAvailable}
           onClick={onAddToCartClick}
+          productImage={product.featuredImage || undefined}
           lines={[
             {
               merchandiseId: selectedVariant.id,
@@ -152,6 +153,7 @@ export function StickyAddToCart({
                                 <AddToCartButton
                                     disabled={!isAvailable}
                                     onClick={onAddToCartClick}
+                                    productImage={product.featuredImage || undefined}
                                     lines={[
                                         {
                                             merchandiseId: selectedVariant.id,

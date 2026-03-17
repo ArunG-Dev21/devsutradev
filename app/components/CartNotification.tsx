@@ -10,7 +10,7 @@ import {
 import { useAside } from "~/components/Aside";
 
 type CartNotificationContextValue = {
-  showNotification: (productTitle?: string) => void;
+  showNotification: (productTitle?: string, productImage?: { url: string; altText?: string | null }) => void;
 };
 
 const CartNotificationContext =
@@ -20,6 +20,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
 
   const [visible, setVisible] = useState(false);
   const [productTitle, setProductTitle] = useState<string | undefined>();
+  const [productImage, setProductImage] = useState<{ url: string; altText?: string | null } | undefined>();
   const timerRef = useRef<number | null>(null);
   const { open: openAside } = useAside();
 
@@ -37,7 +38,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
     setVisible(false);
   }, []);
 
-  const showNotification = useCallback((title?: string) => {
+  const showNotification = useCallback((title?: string, image?: { url: string; altText?: string | null }) => {
     if (timerRef.current) window.clearTimeout(timerRef.current);
 
     let finalTitle = title;
@@ -45,6 +46,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
       finalTitle = getFallbackProductTitle() || 'Product';
     }
     setProductTitle(finalTitle);
+    setProductImage(image);
     setVisible(true);
 
     timerRef.current = window.setTimeout(() => {
@@ -98,28 +100,39 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
       >
         <div className="flex items-center gap-3 px-3 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/95 dark:bg-stone-900/90 backdrop-blur-md border border-stone-200 dark:border-stone-700 shadow-xl w-full max-w-[520px]">
 
-          {/* Success icon */}
-          <div className="flex-shrink-0 w-7 h-7 rounded-full bg-green-500/10 flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4 text-green-600"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
+          {/* Success icon or Product Image */}
+          {productImage ? (
+            <div className="flex-shrink-0 w-8 h-8 rounded-md overflow-hidden bg-stone-100 dark:bg-stone-800">
+              <img src={productImage.url} alt={productImage.altText || productTitle || 'Product'} className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="flex-shrink-0 w-7 h-7 rounded-full bg-green-500/10 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+                className="w-4 h-4 text-green-600"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          )}
 
           {/* Text */}
           <div
             onClick={handleViewCart}
-            className="flex items-center text-sm min-w-0 flex-1 cursor-pointer"
+            className="flex flex-col min-w-0 flex-1 cursor-pointer justify-center"
           >
-            <span className="font-semibold text-stone-900 dark:text-white whitespace-nowrap">
+            <span className="font-semibold text-stone-900 dark:text-white text-sm leading-tight">
               Added to cart
             </span>
+            {productTitle && (
+              <span className="text-[11px] text-stone-500 dark:text-stone-400 truncate mt-0.5 max-w-[200px] sm:max-w-xs">
+                {productTitle}
+              </span>
+            )}
           </div>
 
           {/* View cart */}

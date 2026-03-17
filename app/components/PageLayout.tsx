@@ -66,7 +66,7 @@ export function PageLayout({
         header={header}
         publicStoreDomain={publicStoreDomain}
       />
-      <MobileBottomNav onOpenCollections={() => subNavRef.current?.toggle()} />
+      <MobileBottomNav />
       </CartNotificationProvider>
     </Aside.Provider>
   );
@@ -211,7 +211,6 @@ function MobileMenuAside({
   publicStoreDomain: PageLayoutProps['publicStoreDomain'];
 }) {
   return (
-    header.menu &&
     header.shop.primaryDomain?.url && (
       <Aside type="mobile" heading="MENU">
         <HeaderMenu
@@ -219,6 +218,7 @@ function MobileMenuAside({
           viewport="mobile"
           primaryDomainUrl={header.shop.primaryDomain.url}
           publicStoreDomain={publicStoreDomain}
+          collections={(header as any).collections}
         />
       </Aside>
     )

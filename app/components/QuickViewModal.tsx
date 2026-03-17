@@ -53,11 +53,11 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
     useEffect(() => {
         // Close modal and show notification after the cart add completes
         if (prevFetcherState.current !== 'idle' && fetcher.state === 'idle' && fetcher.data) {
-            showNotification(product.title);
+            showNotification(product.title, normalizedFeaturedImage || undefined);
             onClose();
         }
         prevFetcherState.current = fetcher.state;
-    }, [fetcher.state, fetcher.data, onClose, showNotification, product.title]);
+    }, [fetcher.state, fetcher.data, onClose, showNotification, product.title, normalizedFeaturedImage]);
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6">

@@ -95,6 +95,7 @@ export function ProductForm({
             onClick={() => {
               open('cart');
             }}
+            productImage={selectedVariant?.image || undefined}
             lines={
               selectedVariant
                 ? [
