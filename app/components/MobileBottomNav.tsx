@@ -34,7 +34,7 @@ export function MobileBottomNav() {
       z-50
       flex items-center justify-around
       h-17.5
-      bg-gold dark:bg-black backdrop-blur-xl
+      bg-white dark:bg-black backdrop-blur-xl
       border-t border-border/60
       shadow-[0_-2px_20px_rgba(0,0,0,0.06)]
       safe-area-pb
@@ -62,11 +62,11 @@ export function MobileBottomNav() {
                 flex-1 h-full
                 transition-all duration-200
                 active:scale-95
-                filter brightness-0 invert
+                dark:filter dark:brightness-0 dark:invert
                 ${
                   navActive || isActive
                     ? "text-white"
-                    : "text-gold"
+                    : "text-black"
                 }
               `
               }
@@ -75,6 +75,9 @@ export function MobileBottomNav() {
               <img
   src={tab.icon}
   alt=""
+  width={32}
+  height={32}
+  sizes="32px"
   className="w-8 h-8 object-contain"
   loading="lazy"
 />
@@ -103,18 +106,21 @@ export function MobileBottomNav() {
             className="
             flex flex-col items-center justify-center
             flex-1 h-full
-            text-gold
+            text-black
             transition-all duration-200
             active:scale-95
-            active:text-gold
+            active:text-black
             cursor-pointer
-            filter brightness-0 invert
+            dark:filter dark:brightness-0 dark:invert
           "
             aria-label={tab.label}
           >
             <img
   src={tab.icon}
   alt=""
+  width={32}
+  height={32}
+  sizes="32px"
   className="w-8 h-8 object-contain"
   loading="lazy"
 />

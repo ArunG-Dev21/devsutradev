@@ -1,5 +1,5 @@
-import { Await, Link } from 'react-router';
-import { Suspense, useId, useRef } from 'react';
+import { Await, Link, useLocation } from 'react-router';
+import { Suspense, useId, useMemo, useRef } from 'react';
 import type {
   CartApiQueryFragment,
   FooterQuery,
@@ -40,6 +40,17 @@ export function PageLayout({
   publicStoreDomain,
 }: PageLayoutProps) {
   const subNavRef = useRef<SubNavIslandHandle | null>(null);
+  const location = useLocation();
+  const pathnameWithoutLocale = useMemo(() => {
+    const segments = location.pathname.split('/').filter(Boolean);
+    if (segments[0] && /^[a-z]{2}-[a-z]{2}$/i.test(segments[0])) {
+      segments.shift();
+    }
+    return `/${segments.join('/')}`;
+  }, [location.pathname]);
+  const hasCustomBreadcrumbPlacement =
+    pathnameWithoutLocale === '/collections' ||
+    pathnameWithoutLocale.startsWith('/collections/');
 
   return (
     <Aside.Provider>
@@ -58,8 +69,8 @@ export function PageLayout({
           subNavRef={subNavRef}
         />
       )}
-      <RouteBreadcrumbBanner />
-      <main className='bg-background md:pb-0'>{children}</main>
+      {!hasCustomBreadcrumbPlacement ? <RouteBreadcrumbBanner variant="contrast" /> : null}
+      <main className='bg- md:pb-0'>{children}</main>
       <TrustBadgesBar />
       <Footer
         footer={footer}

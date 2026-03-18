@@ -30,6 +30,9 @@ export function SplitHero({ featuredProducts }: SplitHeroProps) {
           <SwiperSlide>
             <img
               src="/hero1.jpg"
+              width={1000}
+              height={1000}
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="w-full h-[85vh] object-cover"
               alt=""
             />
@@ -38,6 +41,9 @@ export function SplitHero({ featuredProducts }: SplitHeroProps) {
           <SwiperSlide>
             <img
               src="/hero2.jpg"
+              width={1000}
+              height={1000}
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="w-full h-[85vh] object-cover"
               alt=""
             />
@@ -46,6 +52,9 @@ export function SplitHero({ featuredProducts }: SplitHeroProps) {
           <SwiperSlide>
             <img
               src="/hero3.jpg"
+              width={1000}
+              height={1000}
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="w-full h-[85vh] object-cover"
               alt=""
             />
@@ -73,6 +82,9 @@ export function SplitHero({ featuredProducts }: SplitHeroProps) {
                   <img
                     src={product.image}
                     alt={product.title}
+                    width={500}
+                    height={500}
+                    sizes="(min-width: 1024px) 25vw, 50vw"
                     className="w-full aspect-square object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>

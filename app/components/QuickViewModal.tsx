@@ -131,6 +131,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                                         {
                                             merchandiseId: firstVariant.id,
                                             quantity: 1,
+                                            selectedVariant: firstVariant,
                                         },
                                     ],
                                 }}

@@ -104,6 +104,9 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
                   <img
                     src={icon.src}
                     alt={icon.alt}
+                    width={40}
+                    height={16}
+                    sizes="40px"
                     className="max-h-4 w-auto object-contain"
                     loading="lazy"
                   />
@@ -142,7 +145,7 @@ function CartCheckoutActions({
               : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
             }`}
         >
-          <img src='/icons/rps.png' alt='rupees icon' className='w-6 h-6 ' />
+          <img src='/icons/rps.png' alt='rupees icon' width={24} height={24} sizes="24px" className='w-6 h-6 ' />
           PROCEED TO CHECKOUT
         </a>
       ) : (
@@ -154,7 +157,7 @@ function CartCheckoutActions({
               : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
             }`}
         >
-          <img src='/icons/rps.png' alt='rupees icon' className='w-6 h-6 ' />
+          <img src='/icons/rps.png' alt='rupees icon' width={24} height={24} sizes="24px" className='w-6 h-6 ' />
           PROCEED TO CHECKOUT
         </button>
       )}
@@ -167,10 +170,10 @@ function CartCheckoutActions({
           className="flex items-center justify-center gap-2 w-full py-2 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg border border-border text-foreground transition-all duration-200 hover:bg-muted"
         >
           <svg className='w-5 h-5' viewBox="-0.5 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20.9999 9.32007L19.9999 17.3201C19.8507 18.4088 19.3192 19.409 18.5003 20.1418C17.6813 20.8746 16.6285 21.2923 15.5299 21.3201H8.38992C7.29136 21.2923 6.23848 20.8746 5.41957 20.1418C4.60066 19.409 4.0691 18.4088 3.91992 17.3201L2.91992 9.32007" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M3 9.32004C8.81444 7.20973 15.1856 7.20973 21 9.32004" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M6.42969 8.34006L9.07969 3.32007" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M17.5699 8.34006L14.9199 3.32007" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M20.9999 9.32007L19.9999 17.3201C19.8507 18.4088 19.3192 19.409 18.5003 20.1418C17.6813 20.8746 16.6285 21.2923 15.5299 21.3201H8.38992C7.29136 21.2923 6.23848 20.8746 5.41957 20.1418C4.60066 19.409 4.0691 18.4088 3.91992 17.3201L2.91992 9.32007" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M3 9.32004C8.81444 7.20973 15.1856 7.20973 21 9.32004" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6.42969 8.34006L9.07969 3.32007" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M17.5699 8.34006L14.9199 3.32007" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
 
           VIEW CART

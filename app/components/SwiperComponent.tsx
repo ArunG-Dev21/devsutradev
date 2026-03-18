@@ -127,6 +127,9 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
                 <img
                   src={slide.image}
                   alt={slide.heading}
+                  width={1920}
+                  height={1080}
+                  sizes="100vw"
                   loading={idx === 0 ? 'eager' : 'lazy'}
                   className="absolute inset-0 w-full h-full object-cover"
                 />

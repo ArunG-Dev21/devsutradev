@@ -28,9 +28,15 @@ export async function action({ request, context }: Route.ActionArgs) {
   let result: CartQueryDataReturn;
 
   switch (action) {
-    case CartForm.ACTIONS.LinesAdd:
-      result = await cart.addLines(inputs.lines);
+    case CartForm.ACTIONS.LinesAdd: {
+      // Strip out selectedVariant (added for optimistic UI) before sending to Storefront API
+      const sanitizedLines = inputs.lines.map((line: any) => {
+        const { merchandiseId, quantity, attributes, sellingPlanId } = line;
+        return { merchandiseId, quantity, attributes, sellingPlanId };
+      });
+      result = await cart.addLines(sanitizedLines);
       break;
+    }
     case CartForm.ACTIONS.LinesUpdate:
       result = await cart.updateLines(inputs.lines);
       break;

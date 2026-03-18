@@ -1,86 +1,69 @@
-import { useLoaderData, Link } from 'react-router';
-import type { Route } from './+types/($locale).collections._index';
-import { getPaginationVariables, Image } from '@shopify/hydrogen';
-import type { CollectionFragment } from 'storefrontapi.generated';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
+import {useLoaderData, Link} from 'react-router';
+import type {Route} from './+types/($locale).collections._index';
+import {getPaginationVariables, Image} from '@shopify/hydrogen';
+import type {CollectionFragment} from 'storefrontapi.generated';
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {CollectionHeroBanner} from '~/components/CollectionHeroBanner';
+import {RouteBreadcrumbBanner} from '~/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: 'Sacred Collections — Rudraksha, Karungali & More | Devasutra' },
-    { name: 'description', content: 'Discover our curated collections of authentic, energised spiritual products — Rudraksha, Karungali, Gemstone bracelets and more.' },
+    {title: 'Sacred Collections - Rudraksha, Karungali & More | Devasutra'},
+    {
+      name: 'description',
+      content:
+        'Discover our curated collections of authentic, energised spiritual products - Rudraksha, Karungali, gemstone bracelets and more.',
+    },
   ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
-  return { ...deferredData, ...criticalData };
+  return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
-async function loadCriticalData({ context, request }: Route.LoaderArgs) {
+async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 4,
   });
 
-  const [{ collections }] = await Promise.all([
+  const [{collections}] = await Promise.all([
     context.storefront.query(COLLECTIONS_QUERY, {
       variables: paginationVariables,
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return { collections };
+  return {collections};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({ context }: Route.LoaderArgs) {
+function loadDeferredData(_args: Route.LoaderArgs) {
   return {};
 }
 
 export default function Collections() {
-  const { collections } = useLoaderData<typeof loader>();
+  const {collections} = useLoaderData<typeof loader>();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Hero Section */}
-      <div className="relative bg-neutral-950 overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/60 dark:bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400 rounded-full blur-3xl" />
-        </div>
+      <CollectionHeroBanner
+        eyebrow="Sacred Offerings"
+        title="Our Collections"
+        description="From Rudraksha to Karungali and spiritual bracelets, each collection is arranged to help you discover the material, meaning, and energy that best fits your practice."
+        imageSrc="/menu-all-collections.png"
+        imageAlt="Devasutra sacred collections"
+        align="right"
+        highlights={['Rudraksha', 'Karungali', 'Bracelets', 'Sacred Living']}
+        breadcrumb={<RouteBreadcrumbBanner variant="overlay" />}
+        breadcrumbPlacement="inside-top"
+      />
 
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-neutral-400 mb-3">
-            ✦ Sacred Offerings ✦
-          </p>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-            Our Collections
-          </h1>
-          <p className="text-sm text-neutral-400 max-w-xl mx-auto leading-relaxed">
-            Discover our carefully curated ranges of authentic, energised spiritual tools and artifacts.
-          </p>
-        </div>
-      </div>
-
-      {/* Collections Grid */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <div className="container mx-auto px-4 py-12 sm:px-6 md:py-16 lg:px-8">
         <PaginatedResourceSection<CollectionFragment>
           connection={collections}
-          resourcesClassName="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12"
+          resourcesClassName="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12"
         >
-          {({ node: collection, index }) => (
+          {({node: collection, index}) => (
             <CollectionItem
               key={collection.id}
               collection={collection}
@@ -102,44 +85,53 @@ function CollectionItem({
 }) {
   return (
     <Link
-      className="group bg-card text-card-foreground rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col border border-border"
+      className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
     >
-      <div className="aspect-[2/1] bg-neutral-900 border-b border-border overflow-hidden relative">
+      <div className="relative aspect-[2/1] overflow-hidden border-b border-border bg-neutral-900">
         {collection?.image ? (
           <Image
             alt={collection.image.altText || collection.title}
             data={collection.image}
             loading={index < 2 ? 'eager' : 'lazy'}
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-neutral-100">
-            <span className="text-6xl opacity-20 text-muted-foreground">✦</span>
+          <div className="flex h-full w-full items-center justify-center bg-neutral-100">
+            <span className="text-6xl text-muted-foreground/20">*</span>
           </div>
         )}
 
-        {/* Hover corner ornaments */}
-        <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-white/50 rounded-tl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-white/50 rounded-br pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="pointer-events-none absolute left-4 top-4 h-6 w-6 rounded-tl border-l-2 border-t-2 border-white/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute bottom-4 right-4 h-6 w-6 rounded-br border-b-2 border-r-2 border-white/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
 
-      <div className="p-6 md:p-8 flex flex-col sm:flex-row items-center sm:items-start justify-between text-center sm:text-left gap-4">
+      <div className="flex flex-col items-center justify-between gap-4 p-6 text-center sm:flex-row sm:items-start sm:text-left md:p-8">
         <div>
-          <h3 className="text-2xl font-bold text-foreground tracking-tight mb-2">
+          <h3 className="mb-2 text-2xl font-bold tracking-tight text-foreground">
             {collection.title}
           </h3>
-          <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium">
+          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Explore Collection
           </p>
         </div>
 
-        <span className="shrink-0 w-12 h-12 rounded-full border border-border flex items-center justify-center transition-all duration-300 group-hover:bg-foreground group-hover:border-foreground group-hover:text-background text-foreground shadow-sm group-hover:shadow-md">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border text-foreground shadow-sm transition-all duration-300 group-hover:border-foreground group-hover:bg-foreground group-hover:text-background group-hover:shadow-md">
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+            />
           </svg>
         </span>
       </div>

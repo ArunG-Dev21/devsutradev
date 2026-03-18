@@ -2,6 +2,14 @@ import { Link, useLocation, useMatches } from 'react-router';
 import { useMemo } from 'react';
 
 type Crumb = { to: string; label: string; isCurrent: boolean };
+type BreadcrumbVariant = 'contrast' | 'light' | 'overlay';
+
+interface RouteBreadcrumbBannerProps {
+  variant?: BreadcrumbVariant;
+  className?: string;
+  containerClassName?: string;
+  navClassName?: string;
+}
 
 const STATIC_LABELS: Record<string, string> = {
   account: 'Account',
@@ -95,37 +103,85 @@ function buildBreadcrumbs(
   return crumbs;
 }
 
-export function RouteBreadcrumbBanner() {
+function cn(...values: Array<string | undefined | false>) {
+  return values.filter(Boolean).join(' ');
+}
+
+export function useRouteBreadcrumbs() {
   const location = useLocation();
   const matches = useMatches();
 
-  const crumbs = useMemo(
+  return useMemo(
     () => buildBreadcrumbs(location.pathname, matches),
     [location.pathname, matches],
   );
+}
+
+const VARIANT_STYLES: Record<
+  BreadcrumbVariant,
+  {
+    wrapper: string;
+    container: string;
+    nav: string;
+    link: string;
+    current: string;
+    separator: string;
+  }
+> = {
+  contrast: {
+    wrapper: 'relative z-20 text-white mix-blend-difference',
+    container: 'mx-auto container px-4 py-2 md:px-10 md:py-8',
+    nav: 'flex w-full items-center gap-1.5 overflow-x-auto whitespace-nowrap text-[10px] uppercase tracking-[0.14em] md:w-fit md:gap-2 md:text-xs md:tracking-[0.2em]',
+    link: 'text-white transition-opacity hover:opacity-70',
+    current: 'text-white/85',
+    separator: 'text-white',
+  },
+  light: {
+    wrapper: 'border-b border-border/70 bg-background/95',
+    container: 'container mx-auto px-4 py-4 sm:px-6 lg:px-8',
+    nav: 'flex w-full items-center gap-1.5 overflow-x-auto whitespace-nowrap text-[10px] uppercase tracking-[0.14em] text-foreground md:w-fit md:gap-2 md:text-xs md:tracking-[0.2em]',
+    link: 'text-foreground transition-opacity hover:opacity-65',
+    current: 'text-muted-foreground',
+    separator: 'text-muted-foreground',
+  },
+  overlay: {
+    wrapper: 'pointer-events-none relative z-30',
+    container: 'container mx-auto px-4 py-4 sm:px-6 lg:px-8',
+    nav: 'pointer-events-auto flex w-full items-center gap-1.5 overflow-x-auto whitespace-nowrap text-[10px] uppercase tracking-[0.14em] text-white md:w-fit md:gap-2 md:text-xs md:tracking-[0.2em]',
+    link: 'text-white transition-opacity hover:opacity-70',
+    current: 'text-white/80',
+    separator: 'text-white/75',
+  },
+};
+
+export function RouteBreadcrumbBanner({
+  variant = 'contrast',
+  className,
+  containerClassName,
+  navClassName,
+}: RouteBreadcrumbBannerProps) {
+  const crumbs = useRouteBreadcrumbs();
+  const styles = VARIANT_STYLES[variant];
 
   if (crumbs.length <= 1) return null;
 
   return (
-    <div
-      className="mx-auto container et py-2 px-4 md:py-8 md:px-10"
-      style={{ color: '#ffffff', mixBlendMode: 'difference', borderColor: '#ffffff', }}
-    >
+    <div className={cn(styles.wrapper, className)}>
+      <div className={cn(styles.container, containerClassName)}>
       <nav
         aria-label="Breadcrumb"
-        className="flex w-full items-center gap-1.5 text-[10px] tracking-[0.14em] uppercase overflow-x-auto whitespace-nowrap md:w-fit md:gap-2 md:text-xs md:tracking-[0.2em]"
+        className={cn(styles.nav, navClassName)}
       >
         {crumbs.map((crumb, idx) => (
           <span key={crumb.to} className="inline-flex items-center gap-1.5 md:gap-2">
             {idx > 0 ? (
               <svg
                 aria-hidden="true"
-                className="w-2.5 h-2.5 md:w-3 md:h-3"
+                className={cn('h-2.5 w-2.5 md:h-3 md:w-3', styles.separator)}
                 viewBox="0 0 20 20"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
-                style={{ color: '#ffffff' }}
               >
                 <path
                   strokeLinecap="round"
@@ -135,14 +191,11 @@ export function RouteBreadcrumbBanner() {
               </svg>
             ) : null}
             {crumb.isCurrent ? (
-              <span style={{ color: '#ffffff', opacity: 0.85 }}>
-                {crumb.label}
-              </span>
+              <span className={styles.current}>{crumb.label}</span>
             ) : (
               <Link
                 to={crumb.to}
-                className="transition-opacity hover:opacity-70"
-                style={{ color: '#ffffff' }}
+                className={styles.link}
               >
                 {crumb.label}
               </Link>
@@ -150,6 +203,7 @@ export function RouteBreadcrumbBanner() {
           </span>
         ))}
       </nav>
+      </div>
     </div>
   );
 }

@@ -2,6 +2,8 @@ import type { Route } from './+types/($locale).collections.all';
 import { useLoaderData, useSearchParams } from 'react-router';
 import { getPaginationVariables, Image, Money, CartForm } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
+import { CollectionHeroBanner } from '~/components/CollectionHeroBanner';
+import { RouteBreadcrumbBanner } from '~/components/RouteBreadcrumbBanner';
 
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCartNotification } from '~/components/CartNotification'; type CategoryFilter = {
@@ -68,6 +70,17 @@ const FILTER_GROUPS: Array<{ id: 'category' | 'price'; label: string; options: F
 
 const CATEGORY_BY_ID = new Map(CATEGORY_FILTERS.map((item) => [item.id, item]));
 const PRICE_BY_ID = new Map(PRICE_FILTERS.map((item) => [item.id, item]));
+
+const ALL_PRODUCTS_HERO = {
+  eyebrow: 'One Sacred Catalogue',
+  title: 'All Products',
+  description:
+    'View the full Devasutra world in one place - Rudraksha, Karungali, bracelets, malas, and sacred essentials chosen for authenticity and everyday spiritual use.',
+  imageSrc: '/menu-all-collections.png',
+  imageAlt: 'All Devasutra products',
+  align: 'center' as const,
+  highlights: ['Rudraksha', 'Karungali', 'Bracelets', 'All Products'],
+};
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: 'All Products | Devasutra - Sacred Living' }];
@@ -379,23 +392,17 @@ export default function Collection() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* BANNER (from collections.handle) */}
-      <div className="relative border-b border-border overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <img src='/bg-slug.jpg' alt='' className='object-cover w-full h-full' />
-        </div>
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-white/80 mb-3">
-            Handpicked and Energised
-          </p>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-            All Products
-          </h1>
-          <p className="text-sm text-white/80 max-w-lg mx-auto leading-relaxed">
-            Discover our complete collection of authentic sacred items.
-          </p>
-        </div>
-      </div>
+      <CollectionHeroBanner
+        eyebrow={ALL_PRODUCTS_HERO.eyebrow}
+        title={ALL_PRODUCTS_HERO.title}
+        description={ALL_PRODUCTS_HERO.description}
+        imageSrc={ALL_PRODUCTS_HERO.imageSrc}
+        imageAlt={ALL_PRODUCTS_HERO.imageAlt}
+        align={ALL_PRODUCTS_HERO.align}
+        highlights={ALL_PRODUCTS_HERO.highlights}
+        breadcrumb={<RouteBreadcrumbBanner variant="overlay" />}
+        breadcrumbPlacement="inside-top"
+      />
 
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="flex gap-8 items-start">
@@ -494,21 +501,23 @@ export default function Collection() {
               {({ node: product, index }) => (
                 <div
                   key={product.id}
-                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-border"
+                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col border border-border/60"
                 >
-                  <a href={`/products/${product.handle}`} className="aspect-square bg-muted overflow-hidden relative block">
-                    {product.featuredImage ? (
-                      <Image
-                        data={product.featuredImage}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
-                        loading={index < 8 ? 'eager' : 'lazy'}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-muted">
-                        <span className="text-5xl opacity-20 text-muted-foreground">✦</span>
-                      </div>
-                    )}
+                  <a href={`/products/${product.handle}`} className="block p-2 pb-0">
+                    <div className="aspect-square rounded-xl overflow-hidden bg-muted">
+                      {product.featuredImage ? (
+                        <Image
+                          data={product.featuredImage}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
+                          loading={index < 8 ? 'eager' : 'lazy'}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted">
+                          <span className="text-5xl opacity-20 text-muted-foreground">✦</span>
+                        </div>
+                      )}
+                    </div>
                   </a>
 
                   <div className="p-3 sm:p-3.5 flex flex-col flex-1 gap-1.5">
@@ -523,7 +532,7 @@ export default function Collection() {
                         <Money
                           data={product.priceRange.minVariantPrice}
                           withoutTrailingZeros
-                          className="text-base sm:text-lg font-semibold text-foreground block"
+                          className="text-lg sm:text-xl font-medium text-foreground block"
                         />
                         {product.priceRange.maxVariantPrice.amount !==
                           product.priceRange.minVariantPrice.amount && (
@@ -538,6 +547,7 @@ export default function Collection() {
                             {
                               merchandiseId: product.variants?.nodes?.[0]?.id,
                               quantity: 1,
+                              selectedVariant: product.variants?.nodes?.[0],
                             },
                           ],
                         }}
@@ -696,5 +706,3 @@ const CATALOG_QUERY = `#graphql
   }
   ${COLLECTION_ITEM_FRAGMENT}
 ` as const;
-
-

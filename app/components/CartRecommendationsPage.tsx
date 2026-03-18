@@ -130,6 +130,9 @@ function RecommendationCardPage({ product }: { product: RecommendedProduct }) {
             <img
               src={product.featuredImage.url}
               alt={product.featuredImage.altText ?? product.title}
+              width={300}
+              height={300}
+              sizes="112px"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
@@ -171,7 +174,7 @@ function RecommendationCardPage({ product }: { product: RecommendedProduct }) {
           <CartForm
             route="/cart"
             action={CartForm.ACTIONS.LinesAdd}
-            inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1 }] }}
+            inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1, selectedVariant: product.variant }] }}
           >
             {(fetcher: any) => (
               <RecommendationAddButtonPage fetcher={fetcher} productTitle={product.title} />

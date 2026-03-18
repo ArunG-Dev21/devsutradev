@@ -98,6 +98,9 @@ export function Testimonials({ items }: TestimonialsProps) {
                         <img
                             src={t.avatar}
                             alt={t.name}
+                            width={44}
+                            height={44}
+                            sizes="44px"
                             className="w-11 h-11 rounded-full object-cover border border-neutral-700 flex-shrink-0"
                         />
                     ) : (

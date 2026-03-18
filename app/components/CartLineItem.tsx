@@ -1,15 +1,11 @@
-import type { CartLineUpdateInput } from '@shopify/hydrogen/storefront-api-types';
-import { useState } from 'react';
-import type { CartLayout, LineItemChildrenMap } from '~/components/CartMain';
-import { CartForm, Image, type OptimisticCartLine } from '@shopify/hydrogen';
-import { useVariantUrl } from '~/lib/variants';
-import { Link } from 'react-router';
-import { ProductPrice } from './ProductPrice';
-import { useAside } from './Aside';
-import type {
-  CartApiQueryFragment,
-  CartLineFragment,
-} from 'storefrontapi.generated';
+import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
+import {useState} from 'react';
+import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
+import {CartForm, Image, Money, type OptimisticCartLine} from '@shopify/hydrogen';
+import {useVariantUrl} from '~/lib/variants';
+import {Link} from 'react-router';
+import {useAside} from './Aside';
+import type {CartApiQueryFragment, CartLineFragment} from 'storefrontapi.generated';
 
 export type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
@@ -22,12 +18,26 @@ export function CartLineItem({
   line: CartLine;
   childrenMap: LineItemChildrenMap;
 }) {
-  const { id, merchandise } = line;
-  const { product, title, image, selectedOptions } = merchandise;
+  const {id, merchandise} = line;
+
+  // Optimistic lines from useOptimisticCart may not have full merchandise data.
+  // Skip rendering if essential product info is missing to prevent crashes.
+  if (!merchandise?.product?.handle) {
+    return null;
+  }
+
+  const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
-  const { close } = useAside();
+  const {close} = useAside();
   const lineItemChildren = childrenMap[id];
   const childrenLabelId = `cart-line-children-${id}`;
+  const visibleOptions = (selectedOptions || []).filter(
+    (opt) => opt.value !== 'Default Title',
+  );
+  const mmOption = visibleOptions.find((option) =>
+    /mm/i.test(`${option.name} ${option.value}`),
+  );
+  const inlineOptions = visibleOptions.filter((option) => option !== mmOption);
 
   return (
     <li
@@ -35,11 +45,10 @@ export function CartLineItem({
       className={
         layout === 'page'
           ? 'p-3 sm:p-4 mb-3 sm:mb-4 rounded-xl sm:rounded-2xl border border-border bg-card shadow-sm last:mb-0 transition-shadow hover:shadow-md'
-          : 'py-4 sm:py-5 border-b border-border last:border-b-0'
+          : 'p-2 rounded-2xl sm:my-5 border border-gray-200'
       }
     >
-      <div className="flex gap-3 sm:gap-4">
-
+      <div className="relative flex gap-3 sm:gap-4">
         {/* Product Image */}
         {image && (
           <Link
@@ -47,13 +56,14 @@ export function CartLineItem({
             onClick={() => layout === 'aside' && close()}
             className="shrink-0"
           >
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg sm:rounded-xl overflow-hidden">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden">
               <Image
                 alt={title}
                 aspectRatio="1/1"
                 data={image}
                 height={80}
                 loading="lazy"
+                sizes="(min-width: 640px) 112px, 96px"
                 width={80}
                 className="w-full h-full object-cover"
               />
@@ -62,7 +72,7 @@ export function CartLineItem({
         )}
 
         {/* Product Info */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pr-14 sm:pr-16">
           <Link
             prefetch="intent"
             to={lineItemUrl}
@@ -75,24 +85,26 @@ export function CartLineItem({
           </Link>
 
           {/* Variant options */}
-          {(selectedOptions || []).filter(opt => opt.value !== 'Default Title').length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {selectedOptions
-                .filter(opt => opt.value !== 'Default Title')
-                .map((option) => (
-                  <span
-                    key={option.name}
-                    className="inline-block text-[10px] font-medium tracking-wide uppercase text-muted-foreground bg-muted px-2 py-0.5 rounded-full"
-                  >
-                    {option.value}
-                  </span>
-                ))}
+          {inlineOptions.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {inlineOptions.map((option) => (
+                <span
+                  key={option.name}
+                  className="inline-block text-[10px] font-medium tracking-wide uppercase text-muted-foreground bg-muted px-2 py-0.5 rounded-full"
+                >
+                  {option.value}
+                </span>
+              ))}
             </div>
           )}
 
           {/* Price */}
-          <div className="mt-1.5 sm:mt-2 text-base sm:text-sm font-bold text-foreground">
-            <ProductPrice price={line?.cost?.totalAmount} />
+          <div className="mt-1.5 sm:mt-2 text-2xl sm:text-lg text-foreground">
+            {line?.cost?.totalAmount ? (
+              <span className="leading-none">
+                <Money withoutTrailingZeros data={line.cost.totalAmount} />
+              </span>
+            ) : null}
           </div>
 
           {/* Quantity controls */}
@@ -100,9 +112,21 @@ export function CartLineItem({
         </div>
 
         {/* Remove */}
-        <div className="shrink-0 self-start pt-0.5">
+        <div className="shrink-0 self-start pt-1">
           <CartLineRemoveButton lineIds={[id]} disabled={!!line.isOptimistic} />
         </div>
+
+        {mmOption ? (
+          <div
+            className={`pointer-events-none absolute rounded-full px-3 py-1.5 text-[11px] font-medium border text-black shadow-2xl ${
+              layout === 'page'
+                ? 'bottom-1 right-1 sm:bottom-4 sm:right-4'
+                : 'bottom-1 right-1'
+            }`}
+          >
+            {mmOption.value}
+          </div>
+        ) : null}
       </div>
 
       {/* Child line items */}
@@ -127,48 +151,50 @@ export function CartLineItem({
   );
 }
 
-function CartLineQuantity({ line }: { line: CartLine }) {
+function CartLineQuantity({line}: {line: CartLine}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const { id: lineId, quantity, isOptimistic } = line;
+  const {id: lineId, quantity, isOptimistic} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="flex items-center mt-2 sm:mt-3 w-fit border border-gray-300 rounded-lg overflow-hidden">
-  <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
-    <button
-      aria-label="Decrease quantity"
-      title={
-        quantity <= 1
-          ? "Minimum quantity is 1"
-          : `Set quantity to ${prevQuantity}`
-      }
-      disabled={quantity <= 1 || !!isOptimistic}
-      name="decrease-quantity"
-      value={prevQuantity}
-      className="w-8 h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
-    >
-      −
-    </button>
-  </CartLineUpdateButton>
+    <div className="flex items-center mt-3 sm:mt-3 w-fit border border-gray-300 rounded-lg overflow-hidden">
+      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+        <button
+          aria-label="Decrease quantity"
+          title={
+            quantity <= 1 ? 'Minimum quantity is 1' : `Set quantity to ${prevQuantity}`
+          }
+          disabled={quantity <= 1 || !!isOptimistic}
+          name="decrease-quantity"
+          value={prevQuantity}
+          className="w-8 h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
+        >
+          <span aria-hidden="true" className="text-2xl sm:text-2xl">
+            -
+          </span>
+        </button>
+      </CartLineUpdateButton>
 
-  <span className="w-8 h-8 flex items-center justify-center text-xs font-bold text-black border-x border-gray-300 select-none">
-    {quantity}
-  </span>
+      <span className="w-8 h-8 flex items-center justify-center text-sm text-black border-x border-gray-300 select-none">
+        {quantity}
+      </span>
 
-  <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
-    <button
-      aria-label="Increase quantity"
-      title={`Set quantity to ${nextQuantity}`}
-      name="increase-quantity"
-      value={nextQuantity}
-      disabled={!!isOptimistic}
-      className="w-8 h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer text-base font-light"
-    >
-      +
-    </button>
-  </CartLineUpdateButton>
-</div>
+      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+        <button
+          aria-label="Increase quantity"
+          title={`Set quantity to ${nextQuantity}`}
+          name="increase-quantity"
+          value={nextQuantity}
+          disabled={!!isOptimistic}
+          className="w-8 h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
+        >
+          <span aria-hidden="true" className="text-xl sm:text-2xl leading-none">
+            +
+          </span>
+        </button>
+      </CartLineUpdateButton>
+    </div>
   );
 }
 
@@ -188,7 +214,7 @@ function CartLineRemoveButton({
         disabled={disabled}
         onClick={() => setShowConfirm(true)}
         aria-label="Remove item"
-        className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-red-600 hover:bg-muted transition-all disabled:opacity-30 cursor-pointer shadow-sm border border-border"
+        className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-gray-100 hover:text-red-600 hover:bg-muted transition-all disabled:opacity-30 cursor-pointer shadow-sm border border-border"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -230,7 +256,7 @@ function CartLineRemoveButton({
                   fetcherKey={getUpdateKey(lineIds)}
                   route="/cart"
                   action={CartForm.ACTIONS.LinesRemove}
-                  inputs={{ lineIds }}
+                  inputs={{lineIds}}
                 >
                   <button
                     type="submit"
@@ -261,7 +287,7 @@ function CartLineUpdateButton({
       fetcherKey={getUpdateKey(lineIds)}
       route="/cart"
       action={CartForm.ACTIONS.LinesUpdate}
-      inputs={{ lines }}
+      inputs={{lines}}
     >
       {children}
     </CartForm>

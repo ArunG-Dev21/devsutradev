@@ -69,7 +69,7 @@ function AddToCartButton({ product }: { product: ProductNode }) {
       route="/cart"
       action={CartForm.ACTIONS.LinesAdd}
       inputs={{
-        lines: [{ merchandiseId: firstVariant.id, quantity: 1 }],
+        lines: [{ merchandiseId: firstVariant.id, quantity: 1, selectedVariant: firstVariant }],
       }}
       fetcherKey={`add-to-cart-${product.id}`}
     >
@@ -416,10 +416,10 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                 {/* ── INFO + ADD TO CART ── */}
                 <div className="px-3 pt-3 pb-4 sm:px-4 sm:pt-3.5 sm:pb-5 flex flex-col flex-1">
                   <Link to={`/products/${product.handle}`} className="flex flex-col gap-1">
-                    <p className="text-[0.82rem] sm:text-[0.92rem] font-medium leading-snug text-foreground line-clamp-2">
+                    <p className="text-[0.82rem] sm:text-[0.92rem] leading-snug text-foreground line-clamp-2">
                       {product.title}
                     </p>
-                    <span className="text-base sm:text-lg font-semibold text-foreground">
+                    <span className="text-lg sm:text-xl text-black">
                       <Money withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
                     </span>
                   </Link>
@@ -449,23 +449,22 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
             {sortedProducts.length} products
           </span>
           <Link
-  to={`/collections/${collection.handle}`}
-  className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2 bg-primary text-white rounded-full shadow-lg transition-all duration-200 hover:bg-primary-dark hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 group text-sm sm:text-base"
-  style={{ letterSpacing: '0.1em' }}
->
-  <span className="truncate">Explore Full Collection</span>
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    className="transition-transform duration-200 group-hover:translate-x-1 sm:w-4 sm:h-4 w-3.5 h-3.5"
-  >
-    <path d="M5 12h14M12 5l7 7-7 7" />
-  </svg>
-</Link>
+            to={`/collections/${collection.handle}`}
+            className="group inline-flex items-center gap-2.5 rounded-full border border-foreground/12 bg-background/85 px-4 py-2.5 sm:px-5 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.18em] text-foreground/85 shadow-[0_10px_28px_-22px_rgba(0,0,0,0.55)] transition-all duration-200 hover:border-foreground/20 hover:bg-muted/55 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:ring-offset-2"
+          >
+            <span className="truncate">Explore Full Collection</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.9"
+              className="w-3.5 h-3.5 text-foreground/55 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-foreground"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
       </div>
 

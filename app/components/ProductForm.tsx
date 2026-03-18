@@ -175,7 +175,7 @@ function ProductOptionSwatch({
       }}
     >
       {!!image && (
-        <img src={image} alt={name} className="w-full h-full rounded-full" />
+        <img src={image} alt={name} width={400} height={400} sizes="20px" className="w-full h-full rounded-full" />
       )}
     </div>
   );

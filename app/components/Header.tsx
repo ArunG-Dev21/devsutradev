@@ -366,38 +366,60 @@ export function HeaderMenu({
     return collection?.image?.url || null;
   };
 
+  const normalizeMenuUrl = (url: string) =>
+    url.includes('myshopify.com') ||
+    url.includes(publicStoreDomain) ||
+    url.includes(primaryDomainUrl)
+      ? new URL(url).pathname
+      : url;
+
   const rawItems = menu?.items?.length ? menu.items : [];
   const collectionItems = rawItems.filter(
     (item) => !['About', 'Contact'].includes(item.title)
   );
+  const mobileCollectionCards = [
+    {
+      id: 'all-collections',
+      title: 'All Collections',
+      url: '/collections/all',
+      imageUrl: '/menu-all-collections.png',
+    },
+    ...collectionItems
+      .map((item) => {
+        if (!item.url) return null;
+
+        const url = normalizeMenuUrl(item.url);
+        if (url === '/collections/all') return null;
+
+        return {
+          id: item.id,
+          title: item.title,
+          url,
+          imageUrl: getCollectionImage(url),
+        };
+      })
+      .filter(Boolean),
+  ];
 
   return (
     <nav
       role="navigation"
       className="flex flex-col pt-2"
     >
-      <div className="px-6 pb-4 pt-2">
-        <p className="text-[11px] uppercase tracking-[0.2em] font-semibold text-muted-foreground mb-4">
+      <div className="px-6 pb-5 pt-3">
+        <p className="text-sm uppercase tracking-[0.2em] font-medium text-gold mb-5">
           Browse Collections
         </p>
-        <div className="grid grid-cols-2 gap-3.5">
-          {collectionItems.map((item, index) => {
-            if (!item.url) return null;
-
-            const url =
-              item.url.includes('myshopify.com') ||
-                item.url.includes(publicStoreDomain) ||
-                item.url.includes(primaryDomainUrl)
-                ? new URL(item.url).pathname
-                : item.url;
-
-            const imageUrl = getCollectionImage(url);
+        <div className="grid grid-cols-2 gap-2">
+          {mobileCollectionCards.map((item) => {
+            if (!item) return null;
 
             return (
               <NavLink
                 key={item.id}
-                to={url}
+                to={item.url}
                 end
+                replace
                 prefetch="intent"
                 onClick={close}
                 className={({ isActive }) =>
@@ -407,13 +429,13 @@ export function HeaderMenu({
                 }
               >
                 {/* Background image */}
-                {imageUrl ? (
+                {item.imageUrl ? (
                   <Image
-                    src={imageUrl}
+                    src={item.imageUrl}
                     alt={item.title}
                     width={400}
                     height={500}
-                    sizes="(min-width: 768px) 50vw, 100vw"
+                    sizes="(min-width: 768px) 33vw, 50vw"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-active:scale-105"
                   />
                 ) : (
@@ -425,16 +447,10 @@ export function HeaderMenu({
                 <div className="absolute inset-x-0 top-0 h-12 bg-linear-to-b from-black/20 to-transparent" />
 
                 {/* Collection name */}
-                <div className="relative w-full px-3.5 pb-3.5">
-                  <p className="text-white text-[11px] font-semibold tracking-[0.12em] uppercase leading-tight drop-shadow-sm line-clamp-2">
+                <div className="relative w-full px-4 pb-4">
+                  <p className="text-white text-sm tracking-[0.12em] uppercase leading-tight drop-shadow-sm line-clamp-2">
                     {item.title}
                   </p>
-                  <div className="mt-1.5 flex items-center gap-1 opacity-70">
-                    <span className="text-white/80 text-[9px] tracking-wider uppercase font-medium">Shop</span>
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </div>
                 </div>
               </NavLink>
             );
@@ -446,28 +462,28 @@ export function HeaderMenu({
 
       {/* ── Main Navigation ── */}
       <div className="flex flex-col px-6">
-        <NavLink to="/" end onClick={close} className={navLinkClass}>
+        <NavLink to="/" end replace onClick={close} className={navLinkClass}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
           </svg>
           <span className="text-base font-medium">Home</span>
           {chevron}
         </NavLink>
-        <NavLink to="/pages/about" onClick={close} className={navLinkClass}>
+        <NavLink to="/pages/about" replace onClick={close} className={navLinkClass}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
           </svg>
           <span className="text-base font-medium">About</span>
           {chevron}
         </NavLink>
-        <NavLink to="/pages/contact" onClick={close} className={navLinkClass}>
+        <NavLink to="/pages/contact" replace onClick={close} className={navLinkClass}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
           </svg>
           <span className="text-base font-medium">Contact</span>
           {chevron}
         </NavLink>
-        <NavLink to="/blogs" onClick={close} className={navLinkClass}>
+        <NavLink to="/blogs" replace onClick={close} className={navLinkClass}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
           </svg>

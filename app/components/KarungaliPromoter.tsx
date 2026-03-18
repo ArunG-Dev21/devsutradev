@@ -94,6 +94,9 @@ export function KarungaliPromoter({
                                 key={activeImageIdx}
                                 src={introImages[activeImageIdx]}
                                 alt={`Karungali ${activeImageIdx + 1}`}
+                                width={1000}
+                                height={1000}
+                                sizes="(min-width: 1024px) 40vw, 100vw"
                                 className="absolute inset-0 w-full h-full object-cover animate-[fadeIn_0.6s_ease]"
                             />
                         )}
@@ -186,6 +189,9 @@ export function KarungaliPromoter({
                                                     <img
                                                         src={product.featuredImage.url}
                                                         alt={product.featuredImage.altText || product.title}
+                                                        width={800}
+                                                        height={800}
+                                                        sizes="(min-width: 768px) 31vw, (min-width: 640px) 42vw, 46vw"
                                                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-700 ease-out"
                                                     />
                                                 ) : (
@@ -240,10 +246,10 @@ export function KarungaliPromoter({
                         <div className="lg:hidden">
                             <Link
                                 to={viewMoreLink}
-                                className="flex items-center justify-center gap-2 bg-foreground text-background px-6 py-3.5 rounded-full text-sm font-semibold hover:opacity-90 hover:scale-[1.02] transition-all w-full shadow-md"
+                                className="group flex items-center justify-center gap-2.5 w-full rounded-full border border-foreground/12 bg-background/85 px-5 py-3.5 text-[11px] font-medium uppercase tracking-[0.18em] text-foreground/85 shadow-[0_10px_28px_-22px_rgba(0,0,0,0.55)] transition-all duration-200 hover:border-foreground/20 hover:bg-muted/55 hover:text-foreground"
                             >
                                 View All Karungali
-                                <ChevronIcon className="w-3.5 h-3.5" />
+                                <ChevronIcon className="w-3.5 h-3.5 text-foreground/55 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-foreground" />
                             </Link>
                         </div>
                     </div>

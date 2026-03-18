@@ -27,3 +27,5 @@ lint_results.json
 # OS files
 .DS_Store
 Thumbs.db
+
+PROJECT_ARCHITECTURE.md

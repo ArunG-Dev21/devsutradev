@@ -30,6 +30,9 @@ export function Footer({
                     <img
                       src="/logo-branding.png"
                       alt="Brand Logo"
+                      width={200}
+                      height={100}
+                      sizes="(min-width: 1024px) 192px, 128px"
                       className="w-32 lg:w-48 object-contain dark:invert dark:brightness-0"
                     />
                   </div>

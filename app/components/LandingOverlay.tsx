@@ -145,6 +145,9 @@ export function LandingOverlay() {
                     <img
                         src="/logo-new.png"
                         alt="Devasutra"
+                        width={800}
+                        height={200}
+                        sizes="(min-width: 1024px) 28vw, (min-width: 768px) 35vw, (min-width: 640px) 42vw, 50vw"
                         className="w-[50vw] sm:w-[42vw] md:w-[35vw] lg:w-[28vw] max-w-lg h-auto object-contain drop-shadow-2xl"
                         onError={(e) => {
                             (e.currentTarget as HTMLImageElement).style.display = 'none';

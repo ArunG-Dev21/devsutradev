@@ -40,11 +40,19 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
   const discount = searchParams.get('discount');
   const discountArray = discount ? [discount] : [];
 
-  // create a cart
-  const result = await cart.create({
-    lines: linesMap,
-    discountCodes: discountArray,
-  });
+  // Add lines to the existing cart instead of creating a new one if it exists.
+  // Using cart.create() would destroy the existing cart session,
+  // so items would disappear when the user navigates back from checkout.
+  const existingCart = await cart.get();
+  
+  const result = existingCart
+    ? await cart.addLines(linesMap)
+    : await cart.create({ lines: linesMap });
+
+  // Apply discount codes if any
+  if (discountArray.length > 0) {
+    await cart.updateDiscountCodes(discountArray);
+  }
 
   const cartResult = result.cart;
 

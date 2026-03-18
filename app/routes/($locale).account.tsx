@@ -52,7 +52,7 @@ export default function AccountLayout() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
         {/* Header Section */}
         <div className="mb-10">
-          <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">
+          <h1 className="text-3xl md:text-5xl font-medium font-heading uppercase tracking-tight mb-3">
             My Account
           </h1>
           <p className="text-base text-stone-500 mt-2">

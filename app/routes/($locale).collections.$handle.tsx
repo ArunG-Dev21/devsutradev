@@ -6,6 +6,8 @@ import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { ProductItemFragment } from 'storefrontapi.generated';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useCartNotification } from '~/components/CartNotification';
+import { CollectionHeroBanner } from '~/components/CollectionHeroBanner';
+import { RouteBreadcrumbBanner } from '~/components/RouteBreadcrumbBanner';
 import {
   generateMeta,
   truncate,
@@ -120,6 +122,46 @@ const FILTER_GROUPS = [
     options: ['Lab Certified', 'Energised', 'Premium'],
   },
 ];
+
+const COLLECTION_HERO_CONTENT: Record<
+  string,
+  {
+    eyebrow: string;
+    description: string;
+    imageSrc: string;
+    imageAlt: string;
+    align: 'center' | 'right';
+    highlights: string[];
+  }
+> = {
+  rudraksha: {
+    eyebrow: 'Handpicked and Energised',
+    description:
+      'Sacred Rudraksha beads chosen for devotion, focus, protection, and a deeper daily connection to sadhana.',
+    imageSrc: '/bg-slug.jpg',
+    imageAlt: 'Rudraksha collection banner',
+    align: 'center',
+    highlights: ['Lab Selected', 'Sacred Seed', 'Daily Sadhana'],
+  },
+  karungali: {
+    eyebrow: 'Protective Tamil Ebony',
+    description:
+      'Authentic Karungali pieces rooted in traditional use for grounding, steadiness, and shielding from heavy energies.',
+    imageSrc: '/karungali-bg.jpg',
+    imageAlt: 'Karungali collection banner',
+    align: 'right',
+    highlights: ['Grounding', 'Protective', 'Tamil Heritage'],
+  },
+  bracelets: {
+    eyebrow: 'Wearable Sacred Energy',
+    description:
+      'Bracelets designed to carry intention beautifully - spiritual companions for protection, balance, and everyday ritual.',
+    imageSrc: '/bg-slug.jpg',
+    imageAlt: 'Bracelets collection banner',
+    align: 'right',
+    highlights: ['Everyday Wear', 'Intentional Design', 'Blessed Pieces'],
+  },
+};
 
 /* ───────── Filter Sidebar ───────── */
 
@@ -299,6 +341,8 @@ export default function Collection() {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState('featured');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const heroConfig =
+    COLLECTION_HERO_CONTENT[collection.handle.toLowerCase()] || null;
 
   function toggleFilter(f: string) {
     setActiveFilters((prev) =>
@@ -362,25 +406,21 @@ export default function Collection() {
           ),
         }}
       />
-      {/* BANNER */}
-      <div className="relative  border-b border-border overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <img src='/bg-slug.jpg' alt='' className='object-cover w-full h-full' />
-        </div>
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 text-center">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-white/80 mb-3">
-            Handpicked and Energised
-          </p>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-            {collection.title}
-          </h1>
-          {collection.description && (
-            <p className="text-sm text-white/80 max-w-lg mx-auto leading-relaxed">
-              {collection.description}
-            </p>
-          )}
-        </div>
-      </div>
+      <CollectionHeroBanner
+        eyebrow={heroConfig?.eyebrow || 'Handpicked and Energised'}
+        title={collection.title}
+        description={
+          heroConfig?.description ||
+          collection.description ||
+          `Explore the ${collection.title} collection from Devasutra.`
+        }
+        imageSrc={heroConfig?.imageSrc || '/bg-slug.jpg'}
+        imageAlt={heroConfig?.imageAlt || `${collection.title} collection banner`}
+        align={heroConfig?.align || 'center'}
+        highlights={heroConfig?.highlights || ['Authentic', 'Energised', 'Sacred Living']}
+        breadcrumb={<RouteBreadcrumbBanner variant="overlay" />}
+        breadcrumbPlacement="inside-top"
+      />
 
       {/* BODY */}
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -424,7 +464,7 @@ export default function Collection() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                   </svg>
                 </button>
-                <p className="hidden lg:block text-xs text-muted-foreground tracking-wide">Browsing {collection.title}</p>
+                <p className="hidden lg:block text-sm lg:text-base text-stone-900 font-medium tracking-tight">Explore Our {collection.title}</p>
 
                 {/* Mobile Filters Dropdown */}
                 {mobileFiltersOpen && (
@@ -453,22 +493,25 @@ export default function Collection() {
               {({ node: product, index }) => (
                 <div
                   key={product.id}
-                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col border border-border"
+                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col border border-border/60"
                 >
-                  <a href={`/products/${product.handle}`} className="aspect-square bg-muted overflow-hidden relative block">
-                    {product.featuredImage ? (
-                      <Image
-                        data={product.featuredImage}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading={index < 8 ? 'eager' : 'lazy'}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-muted">
-                        <span className="text-5xl opacity-20 text-muted-foreground">
-                          ✦
-                        </span>
-                      </div>
-                    )}
+                  <a href={`/products/${product.handle}`} className="block p-2 pb-0">
+                    <div className="aspect-square rounded-xl overflow-hidden bg-muted">
+                      {product.featuredImage ? (
+                        <Image
+                          data={product.featuredImage}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
+                          loading={index < 8 ? 'eager' : 'lazy'}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted">
+                          <span className="text-5xl opacity-20 text-muted-foreground">
+                            ✦
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </a>
 
                   <div className="p-3 sm:p-3.5 flex flex-col flex-1 gap-1.5">
@@ -483,7 +526,7 @@ export default function Collection() {
                       <Money
                         data={product.priceRange.minVariantPrice}
                         withoutTrailingZeros
-                        className="text-base sm:text-lg font-semibold text-foreground"
+                        className="text-lg sm:text-xl font-medium text-foreground"
                       />
 
                       <CartForm
@@ -493,6 +536,7 @@ export default function Collection() {
                             {
                               merchandiseId: product.variants?.nodes?.[0]?.id,
                               quantity: 1,
+                              selectedVariant: product.variants?.nodes?.[0],
                             },
                           ],
                         }}
@@ -503,6 +547,7 @@ export default function Collection() {
                             fetcher={fetcher}
                             availableForSale={product.variants?.nodes?.[0]?.availableForSale}
                             productTitle={product.title}
+                            productImage={product.featuredImage ?? undefined}
                           />
                         )}
                       </CartForm>
@@ -589,20 +634,22 @@ function CollectionAddButton({
   fetcher,
   availableForSale,
   productTitle,
+  productImage,
 }: {
   fetcher: any;
   availableForSale?: boolean;
   productTitle: string;
+  productImage?: { url: string; altText?: string | null };
 }) {
   const { showNotification } = useCartNotification();
   const prevState = useRef(fetcher.state);
 
   useEffect(() => {
     if (prevState.current !== 'idle' && fetcher.state === 'idle') {
-      showNotification(productTitle);
+      showNotification(productTitle, productImage);
     }
     prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle]);
+  }, [fetcher.state, showNotification, productTitle, productImage]);
 
   return (
     <button

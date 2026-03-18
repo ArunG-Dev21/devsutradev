@@ -17,8 +17,6 @@ import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
-import './styles/policy.css'; // Importing the new policy stylesheet
-import './styles/policies.css'; // Importing the new policies index stylesheet
 import { PageLayout } from './components/PageLayout';
 import { ThemeProvider, ThemeScript } from '~/context/theme';
 
@@ -184,7 +182,7 @@ export default function App() {
   const data = useRouteLoaderData<RootLoader>('root');
 
   if (!data) {
-    return <Outlet />;
+    return null;
   }
 
   return (

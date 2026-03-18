@@ -91,8 +91,8 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
               </div>
             </>
           ) : (
-            <p className="text-[11px] font-semibold text-foreground tracking-wide">
-              You qualify for free shipping.
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-shipping-gradient">
+              You qualify for free shipping
             </p>
           )}
         </div>
@@ -103,7 +103,7 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
           }`}
       >
         <CartEmpty hidden={linesCount} layout={layout} />
-        <ul>
+        <ul className={layout === 'aside' ? 'pt-3 space-y-3 pb-2' : ''}>
           {(cart?.lines?.nodes ?? []).map((line) => {
             if ('parentRelationship' in line && line.parentRelationship?.parent) {
               return null;
@@ -289,6 +289,9 @@ function RecommendationCard({
             <img
               src={product.featuredImage.url}
               alt={product.featuredImage.altText ?? product.title}
+              width={300}
+              height={300}
+              sizes="112px"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
@@ -337,7 +340,7 @@ function RecommendationCard({
           <CartForm
             route="/cart"
             action={CartForm.ACTIONS.LinesAdd}
-            inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1 }] }}
+            inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1, selectedVariant: product.variant }] }}
           >
             {(fetcher: FetcherWithComponents<any>) => (
               <RecommendationAddButton

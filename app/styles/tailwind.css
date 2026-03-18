@@ -41,6 +41,16 @@
   box-shadow: 0 0 15px 0 rgba(229, 228, 226, 0.2);
 }
 
+@utility text-shipping-gradient {
+  background-image: linear-gradient(90deg, #0a0a0a 0%, #7f1d1d 22%, #dc2626 50%, #991b1b 78%, #0a0a0a 100%);
+  background-size: 220% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shipping-gradient-shift 4.5s linear infinite;
+}
+
 /* ── Custom transition duration for overlay exit ── */
 @utility duration-1200 {
   transition-duration: 1200ms;
@@ -114,6 +124,16 @@
 
   100% {
     transform: translateX(100%);
+  }
+}
+
+@keyframes shipping-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 220% 50%;
   }
 }
 
