@@ -2,7 +2,7 @@ import { useLoaderData, data, type HeadersFunction } from 'react-router';
 import type { Route } from './+types/($locale).cart';
 import type { CartQueryDataReturn } from '@shopify/hydrogen';
 import { CartForm } from '@shopify/hydrogen';
-import { CartMain } from '~/components/CartMain';
+import { CartMain } from '~/features/cart/components/CartMain';
 
 export const meta: Route.MetaFunction = () => {
   return [

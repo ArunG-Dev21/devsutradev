@@ -1,13 +1,13 @@
 import { Link, redirect, useLoaderData } from 'react-router';
 import type { Route } from './+types/($locale).collections.$handle';
 import { getPaginationVariables, Analytics, Image, Money, CartForm } from '@shopify/hydrogen';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
+import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { ProductItemFragment } from 'storefrontapi.generated';
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { useCartNotification } from '~/components/CartNotification';
-import { CollectionHeroBanner } from '~/components/CollectionHeroBanner';
-import { RouteBreadcrumbBanner } from '~/components/RouteBreadcrumbBanner';
+import { useCartNotification } from '~/features/cart/components/CartNotification';
+import { CollectionHeroBanner } from '~/features/collection/components/CollectionHeroBanner';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 import {
   generateMeta,
   truncate,
@@ -138,16 +138,16 @@ const COLLECTION_HERO_CONTENT: Record<
     eyebrow: 'Handpicked and Energised',
     description:
       'Sacred Rudraksha beads chosen for devotion, focus, protection, and a deeper daily connection to sadhana.',
-    imageSrc: '/bg-slug.jpg',
+    imageSrc: '/bg-rudraksha.png',
     imageAlt: 'Rudraksha collection banner',
-    align: 'center',
+    align: 'right',
     highlights: ['Lab Selected', 'Sacred Seed', 'Daily Sadhana'],
   },
   karungali: {
     eyebrow: 'Protective Tamil Ebony',
     description:
       'Authentic Karungali pieces rooted in traditional use for grounding, steadiness, and shielding from heavy energies.',
-    imageSrc: '/karungali-bg.jpg',
+    imageSrc: '/bg-karungali.png',
     imageAlt: 'Karungali collection banner',
     align: 'right',
     highlights: ['Grounding', 'Protective', 'Tamil Heritage'],
@@ -156,7 +156,7 @@ const COLLECTION_HERO_CONTENT: Record<
     eyebrow: 'Wearable Sacred Energy',
     description:
       'Bracelets designed to carry intention beautifully - spiritual companions for protection, balance, and everyday ritual.',
-    imageSrc: '/bg-slug.jpg',
+    imageSrc: '/bg-bracelet.png',
     imageAlt: 'Bracelets collection banner',
     align: 'right',
     highlights: ['Everyday Wear', 'Intentional Design', 'Blessed Pieces'],
@@ -175,7 +175,7 @@ function FilterSidebar({
   isMobile?: boolean;
 }) {
   return (
-    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'rounded-2xl p-6 shadow-sm'}`}>
+    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'rounded-2xl p-6'}`}>
       <div className="flex items-center justify-between mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border/40">
         <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
@@ -290,7 +290,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
         className={`group flex items-center justify-between w-47.5 text-left text-[13px] border rounded-full px-5 py-3 bg-card text-foreground focus:outline-none cursor-pointer transition-all duration-200 select-none ${
           isOpen
             ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
-            : 'border-border hover:border-foreground/15 hover:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)]'
+            : 'border-border hover:border-foreground/15'
         }`}
       >
         <span className="truncate block font-medium tracking-wide">Sort by</span>
@@ -442,7 +442,7 @@ export default function Collection() {
                   className={`lg:hidden group flex items-center gap-2 px-5 py-3 border rounded-full text-[13px] text-foreground bg-card cursor-pointer transition-all duration-200 select-none ${
                     mobileFiltersOpen
                       ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
-                      : 'border-border hover:border-foreground/15 hover:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)]'
+                      : 'border-border hover:border-foreground/15'
                   }`}
                 >
                   <svg className="w-4 h-4 text-muted-foreground/70" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -493,7 +493,7 @@ export default function Collection() {
               {({ node: product, index }) => (
                 <div
                   key={product.id}
-                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col border border-border/60"
+                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden transition-all duration-300 flex flex-col border border-border/60"
                 >
                   <a href={`/products/${product.handle}`} className="block p-2 pb-0">
                     <div className="aspect-square rounded-xl overflow-hidden bg-muted">
@@ -581,7 +581,7 @@ export default function Collection() {
                     <Link
                       key={article.id}
                       to={`/blogs/${article.blog.handle}/${article.handle}`}
-                      className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                      className="group bg-card border border-border rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
                       prefetch="intent"
                     >
                       {article.image && (
@@ -655,7 +655,7 @@ function CollectionAddButton({
     <button
       type="submit"
       disabled={!availableForSale || fetcher.state !== 'idle'}
-      className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+      className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       aria-label="Add to cart"
     >
       <svg

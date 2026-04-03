@@ -1,8 +1,8 @@
 import { useLoaderData } from 'react-router';
 import type { Route } from './+types/($locale).search';
 import { getPaginationVariables, Analytics } from '@shopify/hydrogen';
-import { SearchForm } from '~/components/SearchForm';
-import { SearchResults } from '~/components/SearchResults';
+import { SearchForm } from '~/features/search/components/SearchForm';
+import { SearchResults } from '~/features/search/components/SearchResults';
 import {
   type RegularSearchReturn,
   type PredictiveSearchReturn,
@@ -50,7 +50,7 @@ export default function SearchPage() {
         <div className="max-w-2xl mx-auto mb-16">
           <SearchForm>
             {({ inputRef }) => (
-              <div className="relative flex items-center shadow-sm hover:shadow-glow transition-shadow duration-300 rounded-full">
+              <div className="relative flex items-center transition-shadow duration-300 rounded-full">
                 <input
                   defaultValue={term}
                   name="q"
@@ -59,7 +59,7 @@ export default function SearchPage() {
                   type="text"
                   className="w-full bg-background border border-border rounded-full py-4 pl-8 pr-16 text-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring transition-all appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                 />
-                <button type="submit" aria-label="Search" className="absolute right-2 p-3 bg-gold text-white rounded-full transition-colors flex items-center justify-center cursor-pointer hover:bg-gold-600 hover:shadow-lg hover:scale-105 active:scale-95" >
+                <button type="submit" aria-label="Search" className="absolute right-2 p-3 bg-gold text-white rounded-full transition-colors flex items-center justify-center cursor-pointer hover:bg-gold-600 hover:scale-105 active:scale-95" >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

@@ -121,7 +121,7 @@ export default function Contact() {
         </div>
 
         {/* Right Column: High-End Contact Form */}
-        <div className="md:col-span-3 bg-white dark:bg-card p-8 sm:p-12 rounded-3xl border border-stone-200/80 dark:border-border shadow-sm relative overflow-hidden">
+        <div className="md:col-span-3 bg-white dark:bg-card p-8 sm:p-12 rounded-3xl border border-stone-200/80 dark:border-border relative overflow-hidden">
           {/* Abstract Decorative SVG inside Form */}
           <svg
             className="absolute top-0 right-0 text-stone-50 dark:text-white/5 w-64 h-64 -translate-y-1/2 translate-x-1/3 rotate-45 pointer-events-none"

@@ -1,7 +1,7 @@
 import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/($locale).blogs._index';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {PaginatedResourceSection} from '~/features/collection/components/PaginatedResourceSection';
 
 export const meta: Route.MetaFunction = () => {
   return [

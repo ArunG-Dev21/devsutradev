@@ -113,7 +113,7 @@ export default function OrderRoute() {
           target="_blank"
           href={order.statusPageUrl}
           rel="noopener noreferrer"
-          className="px-6 py-3 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-neutral-800 transition-colors text-center inline-block shadow-sm"
+          className="px-6 py-3 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-neutral-800 transition-colors text-center inline-block"
         >
           Track Shipment
         </a>
@@ -164,7 +164,7 @@ export default function OrderRoute() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-stone-50/80 rounded-3xl shadow-sm p-6 sm:p-8">
+          <div className="bg-stone-50/80 rounded-3xl p-6 sm:p-8">
             <h3 className="text-sm font-bold text-stone-900 uppercase tracking-widest mb-4">Shipping Address</h3>
             {order?.shippingAddress ? (
               <address className="not-italic text-sm text-stone-500 space-y-1">
@@ -182,7 +182,7 @@ export default function OrderRoute() {
             )}
           </div>
 
-          <div className="bg-stone-50/80 rounded-3xl shadow-sm p-6 sm:p-8">
+          <div className="bg-stone-50/80 rounded-3xl p-6 sm:p-8">
             <h3 className="text-sm font-bold text-stone-900 uppercase tracking-widest mb-4">Fulfillment Status</h3>
             <div className="flex items-center gap-3 text-sm font-medium text-stone-900">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -216,11 +216,11 @@ function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
     <div className="p-6 flex flex-col sm:flex-row gap-6">
       <div className="shrink-0">
         {lineItem?.image ? (
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white shadow-sm">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white">
             <Image data={lineItem.image} width={96} height={96} sizes="96px" className="w-full h-full object-cover" />
           </div>
         ) : (
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white shadow-sm flex items-center justify-center">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white flex items-center justify-center">
             <svg className="w-8 h-8 text-stone-200" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
             </svg>

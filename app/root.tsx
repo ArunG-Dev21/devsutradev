@@ -17,7 +17,7 @@ import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
-import { PageLayout } from './components/PageLayout';
+import { PageLayout } from './shared/components/PageLayout';
 import { ThemeProvider, ThemeScript } from '~/context/theme';
 
 export type RootLoader = typeof loader;
@@ -169,7 +169,7 @@ export function Layout({ children }: { children?: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="font-body antialiased">
+      <body className="font-body antialiased bg-[#FAF9F6] text-stone-900">
         <ThemeProvider>{children}</ThemeProvider>
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
@@ -235,7 +235,7 @@ export function ErrorBoundary() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-card text-card-foreground border border-border rounded-3xl p-6 md:p-8 shadow-sm">
+        <div className="bg-card text-card-foreground border border-border rounded-3xl p-6 md:p-8">
           <div className="flex flex-wrap gap-3 mb-6">
             <Link
               to="/"

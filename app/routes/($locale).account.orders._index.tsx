@@ -22,7 +22,7 @@ import type {
   CustomerOrdersFragment,
   OrderItemFragment,
 } from 'customer-accountapi.generated';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
+import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
 
 type OrdersLoaderData = {
   customer: CustomerOrdersFragment;
@@ -104,7 +104,7 @@ function OrdersTable({
 function EmptyOrders({ hasFilters = false }: { hasFilters?: boolean }) {
   return (
     <div className="p-8 md:p-16 text-center bg-stone-50/80 rounded-3xl flex flex-col items-center justify-center min-h-[400px]">
-      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
+      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6">
         <svg className="w-8 h-8 text-stone-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
         </svg>
@@ -271,7 +271,7 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
       <div className="sm:self-center shrink-0">
         <Link
           to={`/account/orders/${btoa(order.id)}`}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-stone-900 text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-stone-100 transition-colors shadow-sm"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-stone-900 text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-stone-100 transition-colors"
         >
           View Details
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">

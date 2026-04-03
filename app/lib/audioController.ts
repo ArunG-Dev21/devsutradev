@@ -6,6 +6,7 @@ const AUDIO_SRC = "/audio/ambient.mp3";
 const AUDIO_PREF_KEY = "devotion-audio-pref";
 const TARGET_VOLUME = 0.3;
 const STATE_EVENT = "audio-state-change";
+const AUTOPLAY_FAILED_EVENT = "audio-autoplay-failed";
 
 let audio: HTMLAudioElement | null = null;
 let playing = false;
@@ -44,7 +45,14 @@ export function fadeIn(durationMs: number = 2500): void {
     cancelFade();
 
     audio.volume = 0;
-    audio.play().catch(() => { });
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+            if (err instanceof Error && err.name === 'NotAllowedError') {
+                window.dispatchEvent(new CustomEvent(AUTOPLAY_FAILED_EVENT));
+            }
+        });
+    }
 
     const start = performance.now();
 
@@ -128,4 +136,4 @@ function dispatch(): void {
     );
 }
 
-export { STATE_EVENT };
+export { STATE_EVENT, AUTOPLAY_FAILED_EVENT };

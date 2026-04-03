@@ -602,6 +602,60 @@ export type TestimonialsQuery = {
   };
 };
 
+export type SocialReelsQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type SocialReelsQuery = {
+  metaobjects: {
+    nodes: Array<
+      Pick<StorefrontAPI.Metaobject, 'id'> & {
+        fields: Array<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'> & {
+            reference?: StorefrontAPI.Maybe<
+              | Pick<StorefrontAPI.GenericFile, 'id' | 'url' | 'mimeType'>
+              | {
+                  image?: StorefrontAPI.Maybe<
+                    Pick<
+                      StorefrontAPI.Image,
+                      'url' | 'altText' | 'width' | 'height'
+                    >
+                  >;
+                }
+              | (Pick<StorefrontAPI.Video, 'id'> & {
+                  sources: Array<
+                    Pick<
+                      StorefrontAPI.VideoSource,
+                      'url' | 'mimeType' | 'format'
+                    >
+                  >;
+                })
+            >;
+            references?: StorefrontAPI.Maybe<{
+              nodes: Array<
+                Pick<StorefrontAPI.Product, 'id' | 'handle' | 'title'> & {
+                  featuredImage?: StorefrontAPI.Maybe<
+                    Pick<
+                      StorefrontAPI.Image,
+                      'url' | 'altText' | 'width' | 'height'
+                    >
+                  >;
+                  priceRange: {
+                    minVariantPrice: Pick<
+                      StorefrontAPI.MoneyV2,
+                      'amount' | 'currencyCode'
+                    >;
+                  };
+                }
+              >;
+            }>;
+          }
+        >;
+      }
+    >;
+  };
+};
+
 export type MoneyRecommendationsFragment = Pick<
   StorefrontAPI.MoneyV2,
   'amount' | 'currencyCode'
@@ -1755,9 +1809,13 @@ interface GeneratedQueryTypes {
     return: HomepageSlidesQuery;
     variables: HomepageSlidesQueryVariables;
   };
-  '#graphql\n  query Testimonials {\n    metaobjects(type: "testimonials", first: 20) {\n      nodes {\n        id\n        handle\n        fields {\n          key\n          value\n          reference {\n            # ── Customer photo ──────────────────────────────────────────────\n            ... on MediaImage {\n              image { url altText width height }\n            }\n\n            # ── Linked product (product_reference field) ─────────────────\n            ... on Product {\n              id\n              handle\n              title\n              featuredImage { url altText width height }\n              priceRange {\n                minVariantPrice { amount currencyCode }\n              }\n            }\n\n            # ── Video uploaded to Shopify Files (customer_product_image) ──\n            ... on Video {\n              id\n              sources {\n                url\n                mimeType\n                format\n                height\n                width\n              }\n            }\n\n            # ── Fallback: non-transcoded upload stored as GenericFile ─────\n            ... on GenericFile {\n              id\n              url\n              mimeType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query Testimonials {\n    metaobjects(type: "testimonials", first: 20) {\n      nodes {\n        id\n        handle\n        fields {\n          key\n          value\n          reference {\n            ... on MediaImage {\n              image { url altText width height }\n            }\n            ... on Product {\n              id\n              handle\n              title\n              featuredImage { url altText width height }\n              priceRange {\n                minVariantPrice { amount currencyCode }\n              }\n            }\n            ... on Video {\n              id\n              sources {\n                url\n                mimeType\n                format\n                height\n                width\n              }\n            }\n            ... on GenericFile {\n              id\n              url\n              mimeType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: TestimonialsQuery;
     variables: TestimonialsQueryVariables;
+  };
+  '#graphql\n  query SocialReels {\n    metaobjects(type: "social_reel", first: 20) {\n      nodes {\n        id\n        fields {\n          key\n          value\n          reference {\n            ... on Video {\n              id\n              sources {\n                url\n                mimeType\n                format\n              }\n            }\n            ... on GenericFile {\n              id\n              url\n              mimeType\n            }\n            ... on MediaImage {\n              image { url altText width height }\n            }\n          }\n          references(first: 10) {\n            nodes {\n              ... on Product {\n                id\n                handle\n                title\n                featuredImage { url altText width height }\n                priceRange {\n                  minVariantPrice { amount currencyCode }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+    return: SocialReelsQuery;
+    variables: SocialReelsQueryVariables;
   };
   '#graphql\n  fragment MoneyRecommendations on MoneyV2 {\n    amount\n    currencyCode\n  }\n\n  fragment RecommendedProduct on Product {\n    id\n    handle\n    title\n    tags\n    featuredImage {\n      url\n      altText\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyRecommendations\n      }\n    }\n    variants(first: 1) {\n      nodes {\n        id\n        availableForSale\n      }\n    }\n  }\n\n  query Recommendations(\n    $country: CountryCode\n    $language: LanguageCode\n    $collectionsFirst: Int!\n    $productsFirst: Int!\n  ) @inContext(country: $country, language: $language) {\n    collections(first: $collectionsFirst) {\n      nodes {\n        id\n        handle\n        products(first: $productsFirst) {\n          nodes {\n            ...RecommendedProduct\n          }\n        }\n      }\n    }\n  }\n': {
     return: RecommendationsQuery;

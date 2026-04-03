@@ -40,7 +40,7 @@ export default function PagesIndexRoute() {
             <Link
               key={page.href}
               to={page.href}
-              className="group bg-card text-card-foreground rounded-2xl border border-border p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all no-underline"
+              className="group bg-card text-card-foreground rounded-2xl border border-border p-6 hover:-translate-y-0.5 transition-all no-underline"
             >
               <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-3">
                 Page

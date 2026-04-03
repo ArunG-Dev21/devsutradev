@@ -1,0 +1,543 @@
+/*
+ * --------------------------------------------------
+ * Social Feed & Video Reels
+ * --------------------------------------------------
+ */
+
+.social-feed-section {
+  padding: 5rem 0;
+  background-color: #FAF9F6; /* Matches body background */
+  overflow: hidden;
+}
+
+.social-feed-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.social-feed-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.social-feed-title {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.social-feed-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #666;
+  opacity: 0.8;
+}
+
+/* ── Swiper Customisations ── */
+
+.social-feed-swiper {
+  padding: 3rem 0 5rem !important;
+  overflow: visible !important;
+}
+
+.social-feed-swiper .swiper-slide {
+  width: 300px;
+  height: 530px;
+  transition: opacity 0.4s ease;
+  opacity: 0.6;
+  cursor: pointer;
+  border-radius: 24px;
+}
+
+@media (max-width: 640px) {
+  .social-feed-swiper .swiper-slide {
+    width: 250px;
+    height: 440px;
+  }
+}
+
+.social-feed-swiper .swiper-slide-active {
+  opacity: 1;
+}
+
+.social-feed-swiper .swiper-slide-prev,
+.social-feed-swiper .swiper-slide-next {
+  opacity: 0.9;
+}
+
+/* ── Reel Card ── */
+
+.reel-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  background: #000;
+}
+
+.reel-card-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reel-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+}
+
+.reel-card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  z-index: 2;
+}
+
+.reel-product-badge {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.reel-product-badge-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Full Screen Reel Overlay Elements ── */
+
+.reel-view-count {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  padding: 0.4rem 0.8rem;
+  border-radius: 100px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* ── Content Overlay & Sidebars ── */
+
+.reel-modal-item {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+/* The Fixed 9:16 Viewport */
+.reel-viewport {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 9/16;
+  background: #000;
+  box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.reel-modal {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 100000;
+  overflow: hidden;
+}
+
+.reel-modal-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+}
+
+.reel-modal-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.reel-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reel-overlay.caption-expanded {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.reel-overlay > * {
+  pointer-events: auto;
+}
+
+/* Bottom shadow for text readability */
+.reel-info-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, transparent 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.reel-bottom-info {
+  position: relative;
+  z-index: 2;
+  padding: 1.5rem;
+  padding-right: 5rem; /* Space for sidebar */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 200px;
+}
+
+.info-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* PUSH UP EFFECT: When expanded, info area grows from bottom */
+.caption-expanded .info-content-wrapper {
+  transform: translateY(0);
+}
+
+.reel-author-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.reel-author-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.reel-author-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.75rem;
+  border: 1.5px solid #fff;
+}
+
+.reel-author-name {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.reel-author-handle {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-left: 2px;
+}
+
+/* Caption with Read More */
+.reel-caption-container {
+  position: relative;
+  max-height: 50vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  cursor: pointer;
+}
+
+.reel-caption-container::-webkit-scrollbar {
+  display: none;
+}
+
+.reel-caption-text {
+  font-size: 0.9rem;
+  color: #fff;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  transition: all 0.3s ease;
+}
+
+.reel-caption-text.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.btn-read-more {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-left: 6px;
+}
+
+/* Sidebar Interactions */
+.reel-sidebar {
+  position: absolute;
+  right: 1rem;
+  bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  z-index: 20;
+}
+
+.reel-sidebar-btn {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reel-sidebar-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.reel-sidebar-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ── Connected Product Popover ── */
+
+.reel-popover-anchor {
+  position: relative;
+}
+
+.reel-product-popover-container {
+  position: absolute;
+  right: 60px;
+  bottom: 0;
+  width: 280px;
+  z-index: 1000;
+  animation: popoverIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reel-product-popover {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+@keyframes popoverIn {
+  from { opacity: 0; transform: translateX(10px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.popover-header span {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #666;
+}
+
+.popover-header button {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.popover-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.popover-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.popover-item-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #1a1a1a;
+}
+
+.popover-item-link img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f5f5f5;
+}
+
+.popover-item-info h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+  line-height: 1.2;
+}
+
+.popover-item-info p {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6366f1; /* Premium indigo for price */
+}
+
+.btn-add-bag {
+  background: #fff;
+  border: 1px solid #eee;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-add-bag:hover {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.btn-add-bag svg {
+  width: 16px;
+  height: 16px;
+}
+
+.popover-arrow {
+  position: absolute;
+  right: -6px;
+  bottom: 20px;
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  transform: rotate(45deg);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Close Button */
+.reel-close-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s;
+}
+
+.reel-close-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+  transform: scale(1.1);
+}
+
+@media (max-width: 640px) {
+  .reel-product-popover {
+    width: 240px;
+    right: 50px;
+  }
+  
+  .reel-sidebar {
+    right: 0.75rem;
+    bottom: 2rem;
+  }
+}

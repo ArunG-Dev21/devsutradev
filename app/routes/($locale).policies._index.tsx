@@ -44,7 +44,7 @@ export default function Policies() {
           <div className="mx-auto mt-12 grid max-w-5xl gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {policies.map((policy, index) => (
               <Link
-                className="group relative overflow-hidden rounded-[26px] border border-border/70 bg-card/95 p-6 text-card-foreground shadow-[0_18px_45px_-32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-foreground/25 hover:shadow-[0_24px_55px_-28px_rgba(0,0,0,0.45)]"
+                className="group relative overflow-hidden rounded-[26px] border border-border/70 bg-card/95 p-6 text-card-foreground shadow-[0_18px_45px_-32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-foreground/25"
                 key={policy.id}
                 to={`/policies/${policy.handle}`}
               >

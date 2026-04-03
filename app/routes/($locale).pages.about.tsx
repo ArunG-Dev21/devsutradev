@@ -12,7 +12,7 @@ export default function About() {
 
           <img src='/icons/hindi-logo.png' alt='' width={520} height={130} sizes="(min-width: 1024px) 520px, (min-width: 768px) 320px, (min-width: 640px) 240px, 160px" className='w-40 sm:w-60 md:w-80 lg:w-130 absolute left-1/2 top-10 sm:top-16 md:top-20 lg:top-24 -translate-x-1/2' />
           <img
-            src='/public/Albumcover-01.svg'
+            src='/Albumcover-01.svg'
             alt='About Us'
             width={1920}
             height={1080}

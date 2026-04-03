@@ -2,9 +2,9 @@ import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/($locale).collections._index';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
-import {CollectionHeroBanner} from '~/components/CollectionHeroBanner';
-import {RouteBreadcrumbBanner} from '~/components/RouteBreadcrumbBanner';
+import {PaginatedResourceSection} from '~/features/collection/components/PaginatedResourceSection';
+import {CollectionHeroBanner} from '~/features/collection/components/CollectionHeroBanner';
+import {RouteBreadcrumbBanner} from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -85,7 +85,7 @@ function CollectionItem({
 }) {
   return (
     <Link
-      className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
+      className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card text-card-foreground transition-all duration-300 hover:-translate-y-1.5"
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
@@ -119,7 +119,7 @@ function CollectionItem({
           </p>
         </div>
 
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border text-foreground shadow-sm transition-all duration-300 group-hover:border-foreground group-hover:bg-foreground group-hover:text-background group-hover:shadow-md">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-all duration-300 group-hover:border-foreground group-hover:bg-foreground group-hover:text-background">
           <svg
             className="h-5 w-5"
             fill="none"

@@ -1,12 +1,12 @@
 import type { Route } from './+types/($locale).collections.all';
 import { useLoaderData, useSearchParams } from 'react-router';
 import { getPaginationVariables, Image, Money, CartForm } from '@shopify/hydrogen';
-import { PaginatedResourceSection } from '~/components/PaginatedResourceSection';
-import { CollectionHeroBanner } from '~/components/CollectionHeroBanner';
-import { RouteBreadcrumbBanner } from '~/components/RouteBreadcrumbBanner';
+import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
+import { CollectionHeroBanner } from '~/features/collection/components/CollectionHeroBanner';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { useCartNotification } from '~/components/CartNotification'; type CategoryFilter = {
+import { useCartNotification } from '~/features/cart/components/CartNotification'; type CategoryFilter = {
   id: string;
   label: string;
   handle: string;
@@ -129,7 +129,7 @@ function FilterSidebar({
   onClearAll?: () => void;
 }) {
   return (
-    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'rounded-2xl p-6 shadow-sm'}`}>
+    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'rounded-2xl p-6'}`}>
       <div className="flex items-center justify-between mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border/40">
         <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
           Filters
@@ -245,7 +245,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
         className={`group flex items-center justify-between w-47.5 text-left text-[13px] border rounded-full px-5 py-3 bg-card text-foreground focus:outline-none cursor-pointer transition-all duration-200 select-none ${
           isOpen
             ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
-            : 'border-border hover:border-foreground/15 hover:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)]'
+            : 'border-border hover:border-foreground/15'
         }`}
       >
         <span className="truncate block font-medium tracking-wide">Sort by</span>
@@ -426,7 +426,7 @@ export default function Collection() {
                   className={`lg:hidden group flex items-center gap-2 px-5 py-3 border rounded-full text-[13px] text-foreground bg-card cursor-pointer transition-all duration-200 select-none ${
                     mobileFiltersOpen
                       ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
-                      : 'border-border hover:border-foreground/15 hover:shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)]'
+                      : 'border-border hover:border-foreground/15'
                   }`}
                 >
                   <svg className="w-4 h-4 text-muted-foreground/70" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
@@ -479,7 +479,7 @@ export default function Collection() {
                 {activeFilterIds.map((filterId) => (
                   <span
                     key={filterId}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted text-foreground text-xs rounded-full border border-border shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted text-foreground text-xs rounded-full border border-border"
                   >
                     {labelById[filterId] ?? filterId}
                     <button
@@ -501,7 +501,7 @@ export default function Collection() {
               {({ node: product, index }) => (
                 <div
                   key={product.id}
-                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col border border-border/60"
+                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden transition-all duration-300 flex flex-col border border-border/60"
                 >
                   <a href={`/products/${product.handle}`} className="block p-2 pb-0">
                     <div className="aspect-square rounded-xl overflow-hidden bg-muted">
@@ -576,7 +576,7 @@ export default function Collection() {
                 </p>
                 <a
                   href="/collections/all"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-xs font-semibold tracking-wider uppercase rounded-xl hover:bg-neutral-800 transition-colors shadow-sm"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-xs font-semibold tracking-wider uppercase rounded-xl hover:bg-neutral-800 transition-colors"
                 >
                   Browse all
                 </a>
@@ -612,7 +612,7 @@ function CollectionAllAddButton({
     <button
       type="submit"
       disabled={!availableForSale || fetcher.state !== 'idle'}
-      className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+      className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       aria-label="Add to cart"
     >
       <svg

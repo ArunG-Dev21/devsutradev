@@ -95,7 +95,7 @@ function AccountMenu() {
             key={item.name}
             to={item.to}
             className={`flex items-center gap-4 px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 ${isActive
-                ? 'bg-stone-900 text-white shadow-sm'
+                ? 'bg-stone-900 text-white'
                 : 'text-stone-500 hover:text-stone-900 hover:bg-stone-100'
               }`}
           >

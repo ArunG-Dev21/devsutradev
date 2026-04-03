@@ -1,0 +1,9 @@
+export { Hero } from './Hero';
+export { SplitHero } from './SplitHero';
+export { SwiperComponent } from './SwiperComponent';
+export { FeaturedCollectionComponent } from './FeaturedCollectionComponent';
+export { Testimonials } from './Testimonials';
+export { TrustBadges } from './TrustBadges';
+export { TrustBadgesBar } from './TrustBadgesBar';
+export { WhyDevasutra } from './WhyDevasutra';
+export { KarungaliPromoter } from './KarungaliPromoter';
