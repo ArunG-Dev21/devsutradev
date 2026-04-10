@@ -93,32 +93,57 @@ export function Header({
   const [mobileSearchFocused, setMobileSearchFocused] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
-  // Track scroll position with hysteresis to prevent jitter when the
-  // mobile search bar collapses and shifts the page height by ~72px.
+  // Track scroll with hysteresis + a post-transition lock to prevent the
+  // layout shift caused by collapsing the header from re-triggering a toggle.
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
     let lastScrollY = window.scrollY;
+    let locked = false;           // blocks state changes during CSS transition
+    let lockTimer: ReturnType<typeof setTimeout>;
+    let rafId: number;
+
+    const THRESHOLD = 40;         // px of intentional scroll before toggling
+    const LOCK_MS   = 380;        // must be >= CSS transition-duration (300ms) + buffer
+
+    const applyState = (next: boolean) => {
+      setScrolled((prev) => {
+        if (prev === next) return prev;
+        // Lock out further toggles while the header animates
+        locked = true;
+        clearTimeout(lockTimer);
+        lockTimer = setTimeout(() => { locked = false; }, LOCK_MS);
+        return next;
+      });
+    };
 
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // If scrolling down past 120px, hide the search bar
-      if (currentScrollY > 120 && lastScrollY <= 120) {
-        setScrolled(true);
-      } 
-      // If scrolling up past 40px, show the search bar
-      else if (currentScrollY < 40 && lastScrollY >= 40) {
-        setScrolled(false);
-      }
-      
-      lastScrollY = currentScrollY;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+
+        if (!locked) {
+          if (currentScrollY <= 40) {
+            applyState(false);
+          } else if (currentScrollY > lastScrollY + THRESHOLD) {
+            applyState(true);   // intentional downward scroll
+          } else if (currentScrollY < lastScrollY - THRESHOLD) {
+            applyState(false);  // intentional upward scroll
+          }
+        }
+
+        lastScrollY = currentScrollY;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Initial check
-    handleScroll();
-    
-    return () => window.removeEventListener('scroll', handleScroll);
+    handleScroll(); // initial check
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
+      clearTimeout(lockTimer);
+    };
   }, []);
 
   // Set --header-h CSS variable so floating controls can position below the header
@@ -132,67 +157,71 @@ export function Header({
   }, []);
 
   return (
-    <header ref={headerRef} className="sticky top-0 z-50 bg-background text-foreground border-b border-border transition-all duration-300">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-8 flex items-center gap-4 relative">
-        {/* Mobile Menu Toggle (left on mobile) */}
-        <div className="md:hidden">
-          <HeaderMenuMobileToggle />
+    <header ref={headerRef} className="sticky top-0 z-50 bg-background text-foreground transition-all duration-300">
+      <div className={`relative z-20 transition-all duration-300 border-b border-border
+        grid ease-in-out
+        ${scrolled ? 'grid-rows-[0fr] opacity-0 border-b-0' : 'grid-rows-[1fr] opacity-100'}
+      `}>
+        <div className={`min-h-0 ${scrolled ? 'overflow-hidden' : 'overflow-visible md:overflow-visible'}`}>
+          <div className="container px-3 mx-auto sm:px-6 lg:px-8 py-3 lg:py-4 flex items-center justify-between relative">
+
+            {/* 1. Left Section — hamburger (mobile) | search bar (desktop) */}
+            <div className="flex items-center gap-3 shrink-0 z-10">
+              {/* Mobile: hamburger toggle */}
+              <div className="md:hidden">
+                <HeaderMenuMobileToggle />
+              </div>
+              {/* Desktop: search bar on the left */}
+              <div className="hidden md:block">
+                <DesktopSearchBar />
+              </div>
+            </div>
+
+            {/* 2. Center Section — Logo always centered absolutely */}
+            <div className="absolute inset-x-0 flex justify-center pointer-events-none z-0">
+              <NavLink
+                to="/"
+                end
+                prefetch="intent"
+                className="flex items-center pointer-events-auto"
+              >
+                <BrandLogo
+                  lightSrc={BRAND_LOGO_LIGHT_SRC}
+                  darkSrc={BRAND_LOGO_DARK_SRC}
+                  alt={shop.name}
+                  className="h-8 md:h-8 lg:h-9 xl:h-11 2xl:h-12 w-auto object-contain"
+                />
+              </NavLink>
+            </div>
+
+            {/* 3. Right Section (Icons & Links) */}
+            <div className="flex items-center justify-end gap-2 md:gap-2 lg:gap-3 xl:gap-5 shrink-0 z-10">
+
+              {/* Account and Cart Icons */}
+              <HeaderCtas
+                isLoggedIn={isLoggedIn}
+                cart={cart}
+                scrolled={scrolled}
+                onSearchOpen={() => {
+                  setMobileSearchFocused(true);
+                  setTimeout(() => {
+                    document.getElementById('mobile-search-input')?.focus();
+                  }, 50);
+                }}
+              />
+
+              {/* Vertical Decorative Divider */}
+              <div className="hidden md:block w-px h-6 bg-border/80 mx-1 lg:mx-2" />
+
+              {/* About and Help Dropdowns */}
+              <div className="hidden md:flex items-center gap-3 lg:gap-5 xl:gap-8">
+                <HeaderDropdown title="About" items={ABOUT_LINKS} />
+                <HeaderDropdown title="Help" items={HELP_LINKS} />
+              </div>
+            </div>
+
+          </div>
         </div>
-
-        {/* Logo — left on mobile, centered on desktop */}
-        <NavLink
-          to="/"
-          end
-          prefetch="intent"
-          className="absolute left-1/2 -translate-x-1/2 -mt-1 md:-mt-7 shrink-0"
-        >
-          <BrandLogo
-            lightSrc={BRAND_LOGO_LIGHT_SRC}
-            darkSrc={BRAND_LOGO_DARK_SRC}
-            alt={shop.name}
-            className="h-8 md:h-12 w-auto object-contain"
-          />
-        </NavLink>
-
-        {/* Desktop Left Links (About + Contact) */}
-        <div className="hidden md:flex items-center gap-8">
-          <NavLink
-            to="/pages/about"
-            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-foreground hover:text-foreground transition"
-          >
-            About
-          </NavLink>
-
-          <NavLink
-            to="/pages/contact"
-            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-foreground hover:text-foreground transition"
-          >
-            Contact
-          </NavLink>
-
-          <NavLink
-            to="/blogs"
-            className="text-xs lg:text-lg tracking-[0.18em] uppercase text-foreground hover:text-foreground transition"
-          >
-            Blog
-          </NavLink>
-        </div>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Right Side Icons */}
-        <HeaderCtas
-          isLoggedIn={isLoggedIn}
-          cart={cart}
-          scrolled={scrolled}
-          onSearchOpen={() => {
-            setMobileSearchFocused(true);
-            setTimeout(() => {
-              document.getElementById('mobile-search-input')?.focus();
-            }, 50);
-          }}
-        />
       </div>
 
       {/* Mobile inline search bar — collapses on scroll, but forces open if focused */}
@@ -251,76 +280,61 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
     toggle: () => setIsOpen((v) => !v),
   }));
 
+  const SECONDARY_NAV_ITEMS = [
+    { title: 'Karungali', handle: 'karungali' },
+    { title: 'Rudraksha', handle: 'rudraksha' },
+    { title: 'Bracelets', handle: 'bracelets' },
+    { title: 'Shiva Idols', handle: 'shiva-idols' },
+    { title: 'Pyrite Stones', handle: 'pyrite-stones' },
+    { title: 'Pyramids', handle: 'pyramids' },
+  ];
+
   return (
     <>
-      {/* Desktop Horizontal List */}
-      <div className="hidden md:flex justify-center absolute mt-2 pb-3 md:pb-0 md:mt-0 md:top-28 md:left-1/2 w-full px-2 md:px-0 md:-translate-x-1/2 md:-translate-y-1/2 z-50">
-        <div className="w-full max-w-[95vw] md:w-auto overflow-x-auto no-scrollbar flex justify-start md:justify-center">
-          <nav
-            className="
-            bg-card
-            shadow-inner
-            rounded-full
-            px-2.5 py-2
-            flex items-center gap-2
-            border border-border
-            min-w-max
-          "
-          >
-            {items.map((item) => {
-              if (!item.url) return null;
-
-              const url =
-                item.url.includes('myshopify.com') ||
-                  item.url.includes(publicStoreDomain) ||
-                  item.url.includes(primaryDomainUrl)
-                  ? new URL(item.url).pathname
-                  : item.url;
-
+      <div className="hidden md:block w-full bg-background md:border-b md:border-border shadow-[0_4px_10px_rgb(0,0,0,0.02)]">
+        <div className="w-full overflow-x-auto no-scrollbar py-2.5 2xl:py-3 px-4 xl:px-8 text-center whitespace-nowrap">
+          <nav className="inline-flex items-center gap-3 lg:gap-4 align-middle">
+            {SECONDARY_NAV_ITEMS.map((item) => {
+              const url = `/collections/${item.handle}`;
               const imageUrl = getCollectionImage(url);
 
               return (
                 <NavLink
-                  key={item.id}
+                  key={item.handle}
                   to={url}
                   end
                   prefetch="intent"
                   className={({ isActive }) =>
                     `
-                  group relative
-                  px-8 py-3
-                  text-sm tracking-[0.15em]
-                  uppercase
-                  font-semibold
-                  rounded-full
-                  flex items-center gap-1
-                  transition-all duration-300
-                  overflow-hidden
-                  ${isActive
-                      ? 'bg-gold text-white shadow-lg'
-                      : 'text-foreground bg-card border border-border hover:text-white'
+                    group relative
+                    pr-6 pl-2 py-1.5
+                    text-xs lg:text-[13px] tracking-[0.1em]
+                    uppercase
+                    font-semibold
+                    rounded-[30px]
+                    flex items-center gap-3
+                    transition-all duration-300
+                    border
+                    ${isActive
+                      ? 'bg-gold text-white border-gold shadow-md'
+                      : 'text-foreground bg-card border-border hover:border-gold hover:text-gold shadow-xs'
                     }
                   `
                   }
                 >
-                  {imageUrl && (
-                    <>
-                      {/* Spacer to maintain gap in static state */}
-                      <span className="w-4 shrink-0 group-hover:w-0 transition-all duration-500" />
-                      {/* Circle image that expands to fill the pill on hover */}
-                      <Image
-                        src={imageUrl}
-                        alt={item.title}
-                        width={200}
-                        height={200}
-                        sizes="200px"
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full object-cover transition-all duration-500 ease-in-out group-hover:left-0 group-hover:top-0 group-hover:translate-y-0 group-hover:w-full group-hover:h-full group-hover:rounded-none z-0"
-                      />
-                      {/* Dark overlay for text readability on hover */}
-                      <span className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-500 z-1 pointer-events-none rounded-full" />
-                    </>
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={item.title}
+                      width={100}
+                      height={100}
+                      sizes="100px"
+                      className="w-8 h-8 lg:w-10 lg:h-10 rounded-full object-cover shrink-0 border border-black/10 transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-muted border border-black/10 shrink-0" />
                   )}
-                  <span className="relative z-2">{item.title}</span>
+                  <span className="relative z-10 whitespace-nowrap leading-none mt-[2px]">{item.title}</span>
                 </NavLink>
               );
             })}
@@ -347,10 +361,9 @@ export function HeaderMenu({
   const { close } = useAside();
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `group flex items-center gap-4 py-3.5 transition-colors duration-200 ${
-      isActive
-        ? 'text-foreground'
-        : 'text-muted-foreground hover:text-foreground'
+    `group flex items-center gap-4 py-3.5 transition-colors duration-200 ${isActive
+      ? 'text-foreground'
+      : 'text-muted-foreground hover:text-foreground'
     }`;
 
   const chevron = (
@@ -368,15 +381,20 @@ export function HeaderMenu({
 
   const normalizeMenuUrl = (url: string) =>
     url.includes('myshopify.com') ||
-    url.includes(publicStoreDomain) ||
-    url.includes(primaryDomainUrl)
+      url.includes(publicStoreDomain) ||
+      url.includes(primaryDomainUrl)
       ? new URL(url).pathname
       : url;
 
-  const rawItems = menu?.items?.length ? menu.items : [];
-  const collectionItems = rawItems.filter(
-    (item) => !['About', 'Contact'].includes(item.title)
-  );
+  const SECONDARY_NAV_ITEMS = [
+    { title: 'Karungali', handle: 'karungali' },
+    { title: 'Rudraksha', handle: 'rudraksha' },
+    { title: 'Bracelets', handle: 'bracelets' },
+    { title: 'Shiva Idols', handle: 'shiva-idols' },
+    { title: 'Pyrite Stones', handle: 'pyrite-stones' },
+    { title: 'Pyramids', handle: 'pyramids' },
+  ];
+
   const mobileCollectionCards = [
     {
       id: 'all-collections',
@@ -384,21 +402,12 @@ export function HeaderMenu({
       url: '/collections/all',
       imageUrl: '/menu-all-collections.png',
     },
-    ...collectionItems
-      .map((item) => {
-        if (!item.url) return null;
-
-        const url = normalizeMenuUrl(item.url);
-        if (url === '/collections/all') return null;
-
-        return {
-          id: item.id,
-          title: item.title,
-          url,
-          imageUrl: getCollectionImage(url),
-        };
-      })
-      .filter(Boolean),
+    ...SECONDARY_NAV_ITEMS.map((item) => ({
+      id: item.handle,
+      title: item.title,
+      url: `/collections/${item.handle}`,
+      imageUrl: getCollectionImage(`/collections/${item.handle}`),
+    })),
   ];
 
   return (
@@ -506,10 +515,7 @@ function HeaderCtas({
   onSearchOpen: () => void;
 }) {
   return (
-    <nav className="flex items-center gap-3 md:gap-4 ml-auto md:ml-0">
-      {/* Inline Search Bar — desktop only */}
-      <DesktopSearchBar />
-
+    <nav className="flex items-center gap-3 md:gap-5 ml-auto md:ml-0">
       {/* Mobile search icon — only appears when scrolled (search bar collapsed) */}
       <button
         onClick={onSearchOpen}
@@ -567,7 +573,7 @@ function HeaderMenuMobileToggle() {
   return (
     <button
       onClick={() => open('mobile')}
-      className="p-1 hover:text-accent transition cursor-pointer"
+      className="p-1.5 border border-black rounded-full hover:text-accent transition cursor-pointer flex items-center justify-center"
       aria-label="Open menu"
     >
       <svg
@@ -576,7 +582,7 @@ function HeaderMenuMobileToggle() {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="w-7 h-7"
+        className="w-8 h-8 md:w-9 md:h-9"
       >
         <path
           strokeLinecap="round"
@@ -648,10 +654,10 @@ function DesktopSearchBar() {
   const isLoading = fetcher.state === 'loading';
 
   return (
-    <div ref={containerRef} className="hidden md:block relative">
+    <div ref={containerRef} className="hidden md:block relative group/search">
       <form
         onSubmit={handleSubmit}
-        className="flex items-center bg-card rounded-full px-5 py-3 gap-2 w-44 lg:w-64 transition-all border border-border focus-within:ring-1 focus-within:ring-ring focus-within:bg-muted"
+        className="flex items-center bg-transparent rounded-[30px] px-3 md:px-4 lg:px-5 py-2 md:py-2 lg:py-2.5 2xl:py-3 gap-2 lg:gap-3 w-44 md:w-44 lg:w-64 xl:w-[22rem] 2xl:w-[28rem] transition-all duration-300 border border-gray-300 hover:border-gold focus-within:!border-gold focus-within:shadow-[0_0_0_1px_#BC9251]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -659,7 +665,7 @@ function DesktopSearchBar() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-4 h-4 text-text-muted shrink-0"
+          className="w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-gray-800 shrink-0 transition-colors group-focus-within/search:text-gold"
         >
           <path
             strokeLinecap="round"
@@ -676,7 +682,7 @@ function DesktopSearchBar() {
           onFocus={(e) => {
             if (e.target.value.length > 0) setOpen(true);
           }}
-          className="header-search-input flex-1 text-xs text-text-main placeholder-text-muted bg-transparent [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+          className="header-search-input flex-1 text-xs md:text-xs lg:text-sm xl:text-base text-gray-800 placeholder-gray-800 bg-transparent outline-none ring-0 border-none shadow-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           autoComplete="off"
         />
       </form>
@@ -838,8 +844,8 @@ function MobileSearchBar({
     <>
       <div
         className={`md:hidden overflow-visible transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
-          ${scrolled && !isFocused 
-            ? 'max-h-0 opacity-0 -translate-y-4 pointer-events-none' 
+          ${scrolled && !isFocused
+            ? 'max-h-0 opacity-0 -translate-y-4 pointer-events-none'
             : 'max-h-18 opacity-100 translate-y-0'}`}
       >
         <div className="px-4 pb-4">
@@ -912,74 +918,74 @@ function MobileSearchBar({
       </div>
 
       {/* Fullscreen Mobile Search Results overlay */}
-      <div 
+      <div
         className={`md:hidden absolute top-full left-0 right-0 h-[calc(100vh-100%)] bg-background border-t border-border overflow-y-auto transition-all duration-300 ease-out z-45
         ${isFocused ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-4 pointer-events-none'}`}
       >
         <div className="px-5 pt-3 pb-8">
-           <SearchResultsPredictive>
-             {({ items, total, term, state, closeSearch }) => {
-                const { articles, collections: searchCollections, pages, products, queries } = items;
+          <SearchResultsPredictive>
+            {({ items, total, term, state, closeSearch }) => {
+              const { articles, collections: searchCollections, pages, products, queries } = items;
 
-                if (state === 'loading' && term.current) {
-                  return (
-                    <div className="mt-3">
-                      <div className="p-3 text-sm opacity-60">Searching…</div>
-                    </div>
-                  );
-                }
-
-                if (!term.current) return null;
-
-                if (!total) {
-                  return (
-                    <div className="mt-3">
-                      <SearchResultsPredictive.Empty term={term} />
-                    </div>
-                  );
-                }
-
+              if (state === 'loading' && term.current) {
                 return (
-                  <div className="mt-1">
-                    <div className="flex flex-col gap-3 pb-2 max-h-[70vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                      <SearchResultsPredictive.Queries
-                        queries={queries}
-                        queriesDatalistId="mobile-fullscreen-search-queries"
-                      />
-                      <SearchResultsPredictive.Products
-                        products={products}
-                        closeSearch={() => { closeSearch(); setIsFocused(false); }}
-                        term={term}
-                      />
-                      <SearchResultsPredictive.Collections
-                        collections={searchCollections}
-                        closeSearch={() => { closeSearch(); setIsFocused(false); }}
-                        term={term}
-                      />
-                      <SearchResultsPredictive.Pages
-                        pages={pages}
-                        closeSearch={() => { closeSearch(); setIsFocused(false); }}
-                        term={term}
-                      />
-                      <SearchResultsPredictive.Articles
-                        articles={articles}
-                        closeSearch={() => { closeSearch(); setIsFocused(false); }}
-                        term={term}
-                      />
-                      {total ? (
-                        <Link
-                          onClick={() => { closeSearch(); setIsFocused(false); }}
-                          to={`${SEARCH_ENDPOINT}?q=${term.current}`}
-                          className="block text-center p-3 mt-1 border-t border-border text-[11px] tracking-widest uppercase font-semibold text-foreground hover:underline"
-                        >
-                          View all {total} results →
-                        </Link>
-                      ) : null}
-                    </div>
+                  <div className="mt-3">
+                    <div className="p-3 text-sm opacity-60">Searching…</div>
                   </div>
                 );
-             }}
-           </SearchResultsPredictive>
+              }
+
+              if (!term.current) return null;
+
+              if (!total) {
+                return (
+                  <div className="mt-3">
+                    <SearchResultsPredictive.Empty term={term} />
+                  </div>
+                );
+              }
+
+              return (
+                <div className="mt-1">
+                  <div className="flex flex-col gap-3 pb-2 max-h-[70vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    <SearchResultsPredictive.Queries
+                      queries={queries}
+                      queriesDatalistId="mobile-fullscreen-search-queries"
+                    />
+                    <SearchResultsPredictive.Products
+                      products={products}
+                      closeSearch={() => { closeSearch(); setIsFocused(false); }}
+                      term={term}
+                    />
+                    <SearchResultsPredictive.Collections
+                      collections={searchCollections}
+                      closeSearch={() => { closeSearch(); setIsFocused(false); }}
+                      term={term}
+                    />
+                    <SearchResultsPredictive.Pages
+                      pages={pages}
+                      closeSearch={() => { closeSearch(); setIsFocused(false); }}
+                      term={term}
+                    />
+                    <SearchResultsPredictive.Articles
+                      articles={articles}
+                      closeSearch={() => { closeSearch(); setIsFocused(false); }}
+                      term={term}
+                    />
+                    {total ? (
+                      <Link
+                        onClick={() => { closeSearch(); setIsFocused(false); }}
+                        to={`${SEARCH_ENDPOINT}?q=${term.current}`}
+                        className="block text-center p-3 mt-1 border-t border-border text-[11px] tracking-widest uppercase font-semibold text-foreground hover:underline"
+                      >
+                        View all {total} results →
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            }}
+          </SearchResultsPredictive>
         </div>
       </div>
     </>
@@ -1001,27 +1007,20 @@ function CartBadge({ count }: { count: number | null }) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className="relative text-foreground transition cursor-pointer"
+      className="relative p-1.5 border border-black rounded-full text-foreground transition cursor-pointer flex items-center justify-center"
       aria-label={`Cart with ${count ?? 0} items`}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="w-6 h-6 xl:w-8 xl:h-8"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-        />
-      </svg>
+      <img
+        src="/icons/bag-icon.png"
+        alt=""
+        width={36}
+        height={36}
+        className="w-7 h-7 md:w-8 md:h-8 object-contain"
+        loading="lazy"
+      />
       {(count ?? 0) > 0 && (
         <span
-          className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center"
-          style={{ backgroundColor: 'var(--color-silver-dark)', color: 'var(--color-bg-dark)' }}
+          className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center bg-black text-white shadow-sm"
         >
           {count}
         </span>
@@ -1070,4 +1069,68 @@ const FALLBACK_HEADER_MENU = {
       url: '/blogs',
     },
   ],
+}
+
+// ============================================
+// HEADER DROPDOWN COMPONENT & ICONS
+// ============================================
+
+const MapPinIcon = <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+const PhoneIcon = <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>;
+const DocumentIcon = <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
+const SparklesIcon = <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>;
+const GridIcon = <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
+const StarIcon = <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>;
+
+const ABOUT_LINKS = [
+  { label: 'Our Story', url: '/pages/about', icon: SparklesIcon },
+  { label: 'Our Collections', url: '/collections', icon: GridIcon },
+  { label: 'All Products', url: '/collections/all', icon: StarIcon },
+];
+
+const HELP_LINKS = [
+  { label: 'Track Order', url: '/account', icon: MapPinIcon },
+  { label: 'Contact Us', url: '/pages/contact', icon: PhoneIcon },
+  { label: 'Return & Refund Policy', url: '/policies/refund-policy', icon: DocumentIcon },
+  { label: 'Shipping Policy', url: '/policies/shipping-policy', icon: DocumentIcon },
+];
+
+function HeaderDropdown({ title, items }: { title: string; items: typeof ABOUT_LINKS }) {
+  return (
+    <div className="relative group">
+      {/* Trigger */}
+      <button className="flex items-center gap-1 lg:gap-1.5 text-[10px] md:text-[10px] lg:text-xs xl:text-sm tracking-[0.12em] uppercase text-foreground hover:text-gold transition-colors duration-300 py-1.5 lg:py-2">
+        {title}
+        <svg className="w-3.5 h-3.5 text-muted-foreground group-hover:rotate-180 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown Card */}
+      <div className="absolute top-full left-0 mt-3 w-64 bg-card border border-border rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top group-hover:translate-y-0 translate-y-3 z-50">
+
+        {/* Top Floating Arrow */}
+        <div className="absolute -top-[7px] left-6 w-3.5 h-3.5 bg-card border-l border-t border-border rotate-45" />
+
+        <div className="flex flex-col py-3 px-2 relative z-10 bg-card rounded-2xl">
+          {items.map((item, i) => (
+            <div key={item.label}>
+              <NavLink
+                to={item.url}
+                className="flex items-center gap-3.5 px-3 py-2.5 rounded-xl hover:bg-muted/60 transition-colors duration-200 group/item"
+              >
+                <div className="text-muted-foreground group-hover/item:text-gold transition-colors">
+                  {item.icon}
+                </div>
+                <span className="text-[13px] font-medium text-foreground group-hover/item:text-gold transition-colors">
+                  {item.label}
+                </span>
+              </NavLink>
+              {i < items.length - 1 && <div className="h-px bg-border/50 mx-4 my-1" />}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 };

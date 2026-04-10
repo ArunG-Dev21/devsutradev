@@ -62,6 +62,13 @@ export function Aside({
     return () => abortController.abort();
   }, [dismiss, expanded]);
 
+  const isLeft = type === 'mobile';
+  const positionClasses = isLeft ? 'left-0' : 'right-0';
+  const hiddenClasses = isLeft ? '-translate-x-full' : 'translate-x-full';
+  
+  // Make the width < 100vw on mobile so the backdrop is comfortably clickable
+  const widthClass = isLeft ? 'w-full' : 'w-[min(400px,100vw)]';
+
   return (
     <div
       aria-modal
@@ -71,21 +78,21 @@ export function Aside({
       {/* Backdrop */}
       <button
         type="button"
-        className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity border-0 p-0"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity border-0 p-0 cursor-pointer"
         onClick={dismiss}
         aria-label="Close dialog"
       />
 
       {/* Aside Panel */}
       <aside
-        className={`absolute top-0 right-0 w-[min(400px,100vw)] h-dvh bg-card text-card-foreground shadow-2xl flex flex-col transition-transform duration-300 ease-out ${expanded ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`absolute top-0 ${positionClasses} ${widthClass} h-dvh bg-card text-card-foreground shadow-2xl flex flex-col transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${expanded ? 'translate-x-0' : hiddenClasses}`}
       >
         <header className="flex items-center justify-between h-14 px-5 border-b border-border/40 shrink-0">
           <h3 className="m-0 text-lg font-medium tracking-[0.2em] uppercase text-black">
             {heading}
           </h3>
           <button
-            className="w-10 h-10 flex items-center justify-center rounded-full text-black border cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center rounded-full text-black border cursor-pointer hover:bg-muted transition-colors"
             onClick={dismiss}
             aria-label="Close"
           >
@@ -162,8 +169,51 @@ Aside.Provider = function AsideProvider({ children }: { children: ReactNode }) {
     };
 
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    
+    // Swipe Gestures
+    let startX = 0;
+    let startY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 1) return; // ignore multi-touch
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.changedTouches.length === 0) return;
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const diffX = endX - startX;
+      const diffY = endY - startY;
+
+      // Only respond if horizontal movement is dominant enough (0.8 threshold for natural thumb arcs) and > 30px
+      if (Math.abs(diffX) > Math.abs(diffY) * 0.8 && Math.abs(diffX) > 30) {
+        if (diffX > 0) {
+          // Swiped Right
+          if (type === 'cart') {
+            dismiss(); // Slide cart out to the right
+          } else if (type === 'closed' && startX < 60) {
+            open('mobile'); // Edge swipe right from left edge = open menu
+          }
+        } else {
+          // Swiped Left
+          if (type === 'mobile') {
+            dismiss(); // Slide menu out to the left
+          }
+        }
+      }
+    };
+
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [type, open, dismiss]);
 
   return (
     <AsideContext.Provider

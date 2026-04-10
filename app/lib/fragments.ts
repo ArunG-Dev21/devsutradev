@@ -224,7 +224,7 @@ export const HEADER_QUERY = `#graphql
     menu(handle: $headerMenuHandle) {
       ...Menu
     }
-    collections(first: 50) {
+    collections(first: 100) {
       nodes {
         id
         handle

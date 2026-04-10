@@ -111,8 +111,9 @@ function AddToCartInner({
         setTimeout(() => setJustAdded(false), 1800);
       }}
       className={[
-        'w-8 h-8 sm:w-11 sm:h-11 flex items-center justify-center rounded-full',
-        'bg-foreground text-background transition-transform duration-200 ease-out cursor-pointer select-none shrink-0',
+        'w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full shrink-0',
+        'bg-white border border-black transition-all duration-200 ease-out cursor-pointer select-none',
+        'hover:bg-black group/atc',
         isAdding
           ? 'opacity-60 scale-[0.97] cursor-not-allowed'
           : justAdded
@@ -123,7 +124,7 @@ function AddToCartInner({
     >
       {isAdding ? (
         <svg
-          className="animate-spin w-4 h-4 sm:w-6 sm:h-6 opacity-70"
+          className="animate-spin w-3.5 h-3.5 sm:w-4 sm:h-4 text-black group-hover/atc:text-white"
           viewBox="0 0 24 24"
           fill="none" stroke="currentColor" strokeWidth="2.5"
         >
@@ -131,7 +132,7 @@ function AddToCartInner({
         </svg>
       ) : justAdded ? (
         <svg
-          className="w-4 h-4 sm:w-6 sm:h-6"
+          className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black group-hover/atc:text-white"
           viewBox="0 0 24 24"
           fill="none" stroke="currentColor" strokeWidth="2.5"
           strokeLinecap="round"
@@ -140,9 +141,9 @@ function AddToCartInner({
         </svg>
       ) : (
         <img
-          src="/icons/add-bag-icon.png"
+          src="/icons/add-bag.png"
           alt="Add to cart"
-          className="w-4 h-4 sm:w-6 sm:h-6 object-contain dark:invert"
+          className="w-5 h-5 sm:w-7 sm:h-7 object-contain group-hover/atc:invert"
         />
       )}
     </button>
@@ -193,13 +194,13 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
     <div className="relative bg-gray-50 bg-background text-foreground flex flex-col lg:h-full lg:overflow-hidden">
 
       {/* ── HEADER ── */}
-      <div className="px-4 sm:px-6 md:px-10 lg:px-14 pt-12 pb-10 border-b border-border shrink-0">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium leading-tight uppercase tracking-tight mb-3 font-heading">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-8 xl:px-14 pt-8 lg:pt-10 xl:pt-12 pb-6 lg:pb-8 xl:pb-10 border-b border-border shrink-0">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-medium leading-tight uppercase tracking-tight mb-2 lg:mb-3 font-heading">
           {collection.title}
         </h2>
 
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <span className="text-sm sm:text-xl uppercase font-medium tracking-wider text-gold-muted">
+          <span className="text-xs sm:text-sm xl:text-xl uppercase font-medium tracking-wider text-gold-muted">
             Top Picks This Season
           </span>
 
@@ -294,13 +295,13 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
       </div>
 
       {/* ── GRID ── */}
-      <div className="px-4 sm:px-6 md:px-10 lg:px-14 py-6 sm:py-8 flex-1 lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-8 xl:px-14 py-4 sm:py-6 xl:py-8 flex-1 lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {/*
           Mobile:  2 columns, compact cards, no horizontal scroll
           Tablet:  3 columns
           Desktop: 3 columns
         */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 md:grid-cols-3 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-3 xl:gap-5 lg:grid-cols-2 xl:grid-cols-3">
           {visibleProducts.map((product) => {
             const isHovered = hoveredId === product.id;
             const isUnavailable = product.availableForSale === false;
@@ -325,7 +326,7 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
               >
                 {/* ── IMAGE ── */}
                 <Link to={`/products/${product.handle}`} className="block">
-                  <div className="relative aspect-square overflow-hidden bg-stone-100 m-2 sm:m-2.5 rounded-xl">
+                  <div className="relative aspect-square overflow-hidden bg-stone-100 m-1.5 sm:m-2 xl:m-2.5 rounded-xl">
 
                     {/* Primary image — fades out when hovered + secondary exists */}
                     {product.featuredImage && (
@@ -412,13 +413,13 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                 </Link>
 
                 {/* ── INFO + ADD TO CART ── */}
-                <div className="relative px-3 sm:px-4 pb-3 sm:pb-4 mt-1 sm:mt-1.5 flex items-center gap-2">
+                <div className="relative px-2 sm:px-3 xl:px-4 pb-2 sm:pb-3 xl:pb-4 mt-1 flex items-center gap-1.5 sm:gap-2">
                   <div className="min-w-0 flex-1">
                     <Link to={`/products/${product.handle}`} className="block">
-                      <p className="text-sm sm:text-base font-medium text-foreground line-clamp-1 leading-snug">
+                      <p className="text-xs sm:text-sm xl:text-base font-medium text-foreground line-clamp-2 leading-snug">
                         {product.title}
                       </p>
-                      <span className="block text-lg sm:text-xl font-medium text-foreground mt-0.5 leading-none">
+                      <span className="block text-sm sm:text-base xl:text-lg font-medium text-foreground mt-0.5 leading-none">
                         <Money withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
                       </span>
                     </Link>

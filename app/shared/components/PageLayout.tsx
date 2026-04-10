@@ -75,7 +75,7 @@ export function PageLayout({
         header={header}
         publicStoreDomain={publicStoreDomain}
       />
-      <MobileBottomNav />
+      <MobileBottomNav cart={cart} />
       </CartNotificationProvider>
     </Aside.Provider>
   );
