@@ -1,4 +1,4 @@
-import { redirect, useLoaderData, Link } from 'react-router';
+import { redirect, useLoaderData, Link, Await, useRouteLoaderData } from 'react-router';
 import type { Route } from './+types/($locale).products.$handle';
 import {
   getSelectedProductOptions,
@@ -15,8 +15,10 @@ import { ProductPrice } from '~/features/product/components/ProductPrice';
 import { ProductForm } from '~/features/product/components/ProductForm';
 import { ProductShare } from '~/features/product/components/ProductShare';
 import { StickyAddToCart } from '~/features/product/components/StickyAddToCart';
+import { JudgeMeReviews } from '~/features/product/components/JudgeMeReviews';
+import { JudgeMeReviewForm } from '~/features/product/components/JudgeMeReviewForm';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useCartNotification } from '~/features/cart/components/CartNotification';
 import { useAside } from '~/shared/components/Aside';
 import {
@@ -82,14 +84,42 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     // Silently fail — the section will just be hidden
   }
 
-  return { product, recommendedProducts, seoOrigin: new URL(request.url).origin };
+  // Fetch Judge.me reviews (non-blocking â€” if it fails, we just show nothing)
+  let judgeme: any = null;
+  const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
+  const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
+  const judgemeRequireLogin =
+    context.env.JUDGEME_REQUIRE_LOGIN_FOR_REVIEW === 'true' ||
+    context.env.JUDGEME_REQUIRE_LOGIN_FOR_REVIEW === '1';
+  const judgemeEnabled =
+    typeof judgeMeToken === 'string' && typeof shopDomain === 'string';
+  if (judgemeEnabled) {
+    const shopifyProductId = String(product.id).split('/').pop();
+    if (shopifyProductId) {
+      try {
+        const {getJudgeMeProductReviews} = await import('~/lib/judgeme.server');
+        judgeme = await getJudgeMeProductReviews({
+          shopDomain,
+          apiToken: judgeMeToken,
+          shopifyProductId,
+          productHandle: handle,
+          perPage: 10,
+        });
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  return { product, recommendedProducts, judgeme, judgemeEnabled, judgemeRequireLogin, seoOrigin: new URL(request.url).origin };
 }
 
 // ─── Main Product Component ───────────────────────────────────────────────────
 
 export default function Product() {
-  const { product, recommendedProducts } = useLoaderData<typeof loader>();
-  const seoOrigin = ((useLoaderData<typeof loader>()) as any).seoOrigin || '';
+  const data = useLoaderData<typeof loader>() as any;
+  const { product, recommendedProducts, judgeme, judgemeEnabled, judgemeRequireLogin } = data;
+  const seoOrigin = data?.seoOrigin || '';
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const productFormRef = useRef<HTMLDivElement>(null);
   const { open } = useAside();
@@ -142,7 +172,7 @@ export default function Product() {
     images.push(normalizeImage(selectedVariant.image));
   }
   if (product.images?.nodes) {
-    product.images.nodes.forEach((img) => {
+    product.images.nodes.forEach((img: any) => {
       const normalized = normalizeImage(img);
       if (!images.find((i) => i.url === normalized.url)) {
         images.push(normalized);
@@ -225,6 +255,27 @@ export default function Product() {
   const avgRating = testimonials.length > 0
     ? (testimonials.reduce((acc: number, curr: any) => acc + curr.rating, 0) / testimonials.length).toFixed(1)
     : 0;
+
+  const judgeMeAvg =
+    typeof judgeme?.summary?.averageRating === 'number'
+      ? judgeme.summary.averageRating
+      : null;
+  const judgeMeCount =
+    typeof judgeme?.summary?.reviewCount === 'number'
+      ? judgeme.summary.reviewCount
+      : null;
+  const showJudgeMeSummary = judgeMeAvg != null && judgeMeCount != null;
+
+  const ratingValue = showJudgeMeSummary ? judgeMeAvg : Number(avgRating);
+  const ratingCount = showJudgeMeSummary ? judgeMeCount : testimonials.length;
+  const ratingLabel = showJudgeMeSummary ? ratingValue.toFixed(1) : String(avgRating);
+  const hasRating = ratingCount > 0;
+
+  const judgeMeReviews = Array.isArray(judgeme?.reviews) ? judgeme.reviews : [];
+  const showJudgeMeReviews = Boolean(judgemeEnabled);
+  const shopifyProductId = String(product?.id ?? '').split('/').pop() || '';
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const rootData = useRouteLoaderData('root') as any;
 
   return (
     <div className="min-h-screen text-gray-900 bg-white">
@@ -440,17 +491,17 @@ export default function Product() {
             </div>
 
             {/* Live Rating */}
-            {testimonials.length > 0 && (
+            {hasRating && (
               <div className="flex items-center gap-3 mb-6">
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className={`w-4 h-4 ${star <= Math.round(Number(avgRating)) ? 'text-amber-400' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={star} className={`w-4 h-4 ${star <= Math.round(ratingValue) ? 'text-amber-400' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
                     </svg>
                   ))}
                 </div>
                 <a href="#reviews" className="text-xs text-gray-600 tracking-wider uppercase font-medium hover:text-gray-900 transition-colors underline underline-offset-4">
-                  ({avgRating} · {testimonials.length} review{testimonials.length !== 1 ? 's' : ''})
+                  ({ratingLabel} · {ratingCount} review{ratingCount !== 1 ? 's' : ''})
                 </a>
               </div>
             )}
@@ -627,24 +678,88 @@ export default function Product() {
                     Customer Reviews
                   </h3>
                 </div>
-                {testimonials.length > 0 && (
-                  <div className="flex items-center gap-2.5 bg-stone-50 dark:bg-muted/30 border border-stone-200/60 dark:border-border rounded-xl px-4 py-2.5">
-                    <span className="text-2xl font-bold text-gray-900">{avgRating}</span>
-                    <div className="flex flex-col gap-0.5">
-                      <div className="flex gap-0.5">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <svg key={star} className={`w-3 h-3 ${star <= Math.round(Number(avgRating)) ? 'text-amber-400' : 'text-stone-200 dark:text-border'}`} fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
-                          </svg>
-                        ))}
+                <div className="flex items-center gap-3">
+                  {showJudgeMeReviews && (
+                    judgemeRequireLogin ? (
+                      <Suspense
+                        fallback={
+                          <button
+                            type="button"
+                            disabled
+                            className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold tracking-widest uppercase opacity-60 cursor-not-allowed"
+                          >
+                            Write a review
+                          </button>
+                        }
+                      >
+                        <Await resolve={rootData?.isLoggedIn}>
+                          {(isLoggedIn: boolean) =>
+                            isLoggedIn ? (
+                              <button
+                                type="button"
+                                disabled={!shopifyProductId}
+                                onClick={() => setIsReviewFormOpen(true)}
+                                className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold tracking-widest uppercase hover:bg-neutral-800 dark:hover:bg-stone-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                Write a review
+                              </button>
+                            ) : (
+                              <Link
+                                to="/account/login"
+                                className="px-4 py-2 rounded-full border border-stone-200/70 dark:border-border text-[10px] font-bold tracking-widest uppercase text-stone-700 dark:text-foreground hover:bg-stone-50 dark:hover:bg-muted transition-colors"
+                              >
+                                Log in to review
+                              </Link>
+                            )
+                          }
+                        </Await>
+                      </Suspense>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={!shopifyProductId}
+                        onClick={() => setIsReviewFormOpen(true)}
+                        className="px-4 py-2 rounded-full bg-black text-white dark:bg-white dark:text-black text-[10px] font-bold tracking-widest uppercase hover:bg-neutral-800 dark:hover:bg-stone-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Write a review
+                      </button>
+                    )
+                  )}
+
+                  {hasRating && (
+                    <div className="flex items-center gap-2.5 bg-stone-50 dark:bg-muted/30 border border-stone-200/60 dark:border-border rounded-xl px-4 py-2.5">
+                      <span className="text-2xl font-bold text-gray-900">{ratingLabel}</span>
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <svg key={star} className={`w-3 h-3 ${star <= Math.round(ratingValue) ? 'text-amber-400' : 'text-stone-200 dark:text-border'}`} fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
+                            </svg>
+                          ))}
+                        </div>
+                        <span className="text-[9px] text-stone-500 dark:text-muted-foreground tracking-wider uppercase font-medium">{ratingCount} review{ratingCount !== 1 ? 's' : ''}</span>
                       </div>
-                      <span className="text-[9px] text-stone-500 dark:text-muted-foreground tracking-wider uppercase font-medium">{testimonials.length} review{testimonials.length !== 1 ? 's' : ''}</span>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
-              {testimonials.length > 0 ? (
+              {isReviewFormOpen && shopifyProductId && (
+                <JudgeMeReviewForm
+                  productId={shopifyProductId}
+                  onClose={() => setIsReviewFormOpen(false)}
+                />
+              )}
+
+              {showJudgeMeReviews ? (
+                judgeMeReviews.length > 0 ? (
+                  <JudgeMeReviews reviews={judgeMeReviews} />
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-stone-500 italic">No reviews yet. Be the first to share your experience!</p>
+                  </div>
+                )
+              ) : testimonials.length > 0 ? (
                 <div className="space-y-5">
                   {testimonials.map((review: any) => (
                     <div key={review.id} className="relative bg-white dark:bg-card border border-stone-200/60 dark:border-border rounded-2xl p-6 sm:p-8 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] transition-shadow duration-300 flex flex-col gap-5 overflow-hidden">
