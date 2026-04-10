@@ -1,11 +1,11 @@
-import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
-import {useState} from 'react';
-import type {CartLayout, LineItemChildrenMap} from './CartMain';
-import {CartForm, Image, Money, type OptimisticCartLine} from '@shopify/hydrogen';
-import {useVariantUrl} from '~/lib/variants';
-import {Link} from 'react-router';
-import {useAside} from '~/shared/components/Aside';
-import type {CartApiQueryFragment, CartLineFragment} from 'storefrontapi.generated';
+import type { CartLineUpdateInput } from '@shopify/hydrogen/storefront-api-types';
+import { useState } from 'react';
+import type { CartLayout, LineItemChildrenMap } from './CartMain';
+import { CartForm, Image, Money, type OptimisticCartLine } from '@shopify/hydrogen';
+import { useVariantUrl } from '~/lib/variants';
+import { Link } from 'react-router';
+import { useAside } from '~/shared/components/Aside';
+import type { CartApiQueryFragment, CartLineFragment } from 'storefrontapi.generated';
 
 export type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
@@ -18,7 +18,7 @@ export function CartLineItem({
   line: CartLine;
   childrenMap: LineItemChildrenMap;
 }) {
-  const {id, merchandise} = line;
+  const { id, merchandise } = line;
 
   // Optimistic lines from useOptimisticCart may not have full merchandise data.
   // Skip rendering if essential product info is missing to prevent crashes.
@@ -26,9 +26,9 @@ export function CartLineItem({
     return null;
   }
 
-  const {product, title, image, selectedOptions} = merchandise;
+  const { product, title, image, selectedOptions } = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
-  const {close} = useAside();
+  const { close } = useAside();
   const lineItemChildren = childrenMap[id];
   const childrenLabelId = `cart-line-children-${id}`;
   const visibleOptions = (selectedOptions || []).filter(
@@ -118,11 +118,10 @@ export function CartLineItem({
 
         {mmOption ? (
           <div
-            className={`pointer-events-none absolute rounded-full px-3 py-1.5 text-[11px] font-medium border text-black shadow-2xl ${
-              layout === 'page'
+            className={`pointer-events-none absolute rounded-full px-3 py-1.5 text-[11px] font-medium border text-black shadow-2xl ${layout === 'page'
                 ? 'bottom-1 right-1 sm:bottom-4 sm:right-4'
                 : 'bottom-1 right-1'
-            }`}
+              }`}
           >
             {mmOption.value}
           </div>
@@ -151,15 +150,15 @@ export function CartLineItem({
   );
 }
 
-function CartLineQuantity({line}: {line: CartLine}) {
+function CartLineQuantity({ line }: { line: CartLine }) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity, isOptimistic} = line;
+  const { id: lineId, quantity, isOptimistic } = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
     <div className="flex items-center mt-3 sm:mt-3 w-fit border border-gray-300 rounded-lg overflow-hidden">
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+      <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
         <button
           aria-label="Decrease quantity"
           title={
@@ -180,7 +179,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
         {quantity}
       </span>
 
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+      <CartLineUpdateButton lines={[{ id: lineId, quantity: nextQuantity }]}>
         <button
           aria-label="Increase quantity"
           title={`Set quantity to ${nextQuantity}`}
@@ -256,7 +255,7 @@ function CartLineRemoveButton({
                   fetcherKey={getUpdateKey(lineIds)}
                   route="/cart"
                   action={CartForm.ACTIONS.LinesRemove}
-                  inputs={{lineIds}}
+                  inputs={{ lineIds }}
                 >
                   <button
                     type="submit"
@@ -287,7 +286,7 @@ function CartLineUpdateButton({
       fetcherKey={getUpdateKey(lineIds)}
       route="/cart"
       action={CartForm.ACTIONS.LinesUpdate}
-      inputs={{lines}}
+      inputs={{ lines }}
     >
       {children}
     </CartForm>

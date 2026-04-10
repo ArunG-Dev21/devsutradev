@@ -141,8 +141,8 @@ function CartCheckoutActions({
           href={checkoutUrl}
           target="_self"
           className={`flex items-center justify-center gap-2 w-full text-center tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background ${layout === 'aside'
-              ? 'py-2 text-[11px]'
-              : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
+            ? 'py-2 text-[11px]'
+            : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
             }`}
         >
           <img src='/icons/rps.png' alt='rupees icon' width={24} height={24} sizes="24px" className='w-6 h-6 ' />
@@ -153,8 +153,8 @@ function CartCheckoutActions({
           type="button"
           disabled
           className={`flex items-center justify-center gap-2 w-full text-center tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60 ${layout === 'aside'
-              ? 'py-2 text-[11px]'
-              : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
+            ? 'py-2 text-[11px]'
+            : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
             }`}
         >
           <img src='/icons/rps.png' alt='rupees icon' width={24} height={24} sizes="24px" className='w-6 h-6 ' />
