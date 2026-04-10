@@ -175,27 +175,27 @@ function FilterSidebar({
   isMobile?: boolean;
 }) {
   return (
-    <div className={`bg-card text-card-foreground ${isMobile ? 'p-4' : 'rounded-2xl p-6'}`}>
-      <div className="flex items-center justify-between mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border/40">
-        <h2 className="text-sm font-bold tracking-widest uppercase text-foreground">
+    <div className={`bg-white border border-gray-200 overflow-hidden ${isMobile ? 'p-4 rounded-2xl' : 'rounded-[24px] p-5 sm:p-6'}`}>
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+        <h2 className="text-sm font-semibold text-gray-900 tracking-wide">
           Filters
         </h2>
-        <div className="flex items-center gap-4">
-          {activeFilters.length > 0 && (
+        {activeFilters.length > 0 && (
+          <div className="flex items-center gap-4">
             <button
               onClick={() => activeFilters.forEach(onToggleFilter)}
-              className="text-[10px] text-muted-foreground hover:text-foreground tracking-wide hover:underline transition-all underline-offset-4"
+              className="text-[11px] text-gray-500 hover:text-black transition-colors underline-offset-4 hover:underline"
             >
               Clear all
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-6 lg:space-y-8">
         {FILTER_GROUPS.map((group) => (
           <div key={group.label}>
-            <p className="text-xs tracking-wider uppercase text-foreground font-semibold mb-3 lg:mb-4">
+            <p className="text-[13px] text-gray-900 font-medium mb-3">
               {group.label}
             </p>
             <div className="space-y-2 lg:space-y-3">
@@ -205,36 +205,32 @@ function FilterSidebar({
                   <button
                     key={opt}
                     type="button"
-                    className="flex items-center gap-3 cursor-pointer group w-full text-left"
+                    className="flex items-center gap-3 cursor-pointer group w-full text-left py-0.5"
                     onClick={() => onToggleFilter(opt)}
                     aria-pressed={isActive}
                   >
                     <div
-                      className={`w-4.5 h-4.5 rounded-lg border shrink-0 flex items-center justify-center transition-all duration-200 ${isActive
-                        ? 'bg-foreground border-foreground'
-                        : 'border-muted-foreground/40 group-hover:border-foreground bg-background'
+                      className={`w-4 h-4 rounded-sm border shrink-0 flex items-center justify-center transition-all duration-200 ${isActive
+                        ? 'bg-black border-black'
+                        : 'border-gray-300 bg-white group-hover:border-black'
                         }`}
                     >
                       {isActive && (
                         <svg
-                          className="w-3 h-3 text-background"
+                          className="w-3 h-3 text-white"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth={3}
+                          strokeWidth={2.5}
                           viewBox="0 0 24 24"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m4.5 12.75 6 6 9-13.5"
-                          />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
                       )}
                     </div>
                     <span
                       className={`text-xs lg:text-[13px] transition-colors ${isActive
-                        ? 'text-foreground font-medium'
-                        : 'text-muted-foreground group-hover:text-foreground'
+                        ? 'text-black font-medium'
+                        : 'text-gray-600 group-hover:text-black'
                         }`}
                     >
                       {opt}
@@ -248,15 +244,14 @@ function FilterSidebar({
       </div>
 
       {!isMobile && (
-        <div className="mt-8 pt-6 border-t border-border/40">
-          <div className="bg-muted/30 rounded-xl p-4 text-center border border-border/50 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-linear-to-br from-foreground/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200 relative overflow-hidden group">
             <div className="relative z-10">
-              <p className="text-[11px] tracking-widest uppercase text-foreground font-bold mb-1.5 flex items-center justify-center gap-1.5">
+              <p className="text-[11px] tracking-widest uppercase text-black font-bold mb-1.5 flex items-center justify-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
                 Free Shipping
               </p>
-              <p className="text-xs text-muted-foreground">On all orders above ₹999</p>
+              <p className="text-xs text-gray-500">On all orders above ₹999</p>
             </div>
           </div>
         </div>
@@ -287,18 +282,14 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`group flex items-center justify-between w-47.5 text-left text-[13px] border rounded-full px-5 py-3 bg-card text-foreground focus:outline-none cursor-pointer transition-all duration-200 select-none ${
-          isOpen
-            ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
-            : 'border-border hover:border-foreground/15'
-        }`}
+        className="group flex items-center gap-2 text-left text-xs sm:text-[13px] border border-gray-300 rounded-full px-4 py-2 sm:px-5 sm:py-2.5 bg-white text-gray-800 focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-black"
       >
-        <span className="truncate block font-medium tracking-wide">Sort by</span>
+        <span className="truncate block"><span className="text-gray-500">Sort by:</span> {activeOption.label}</span>
         <svg
-          className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-300 ml-2 shrink-0 ${isOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
+          className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
-          strokeWidth={2.5}
+          strokeWidth={2}
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -306,8 +297,8 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 right-0 w-52.5 mt-2.5 bg-card/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
-          <div className="py-2 max-h-60 overflow-auto">
+        <div className="absolute z-50 right-0 w-52 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="py-1 max-h-60 overflow-auto">
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option.value}
@@ -315,14 +306,14 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
                   onSortChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] transition-all duration-150 ${sort === option.value
-                  ? 'bg-foreground/5 font-semibold text-foreground'
-                  : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] transition-colors ${sort === option.value
+                  ? 'bg-gray-50 font-medium text-black'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-black'
                   }`}
               >
                 <span>{option.label}</span>
                 {sort === option.value && (
-                  <svg className="w-3.5 h-3.5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="m4.5 12.75 6 6 9-13.5" />
                   </svg>
                 )}
@@ -386,7 +377,7 @@ export default function Collection() {
   }, [activeFilters, collection.products, sort]);
 
   return (
-    <div className="min-h-screen text-foreground">
+    <div className="min-h-screen bg-white text-gray-900">
       {/* CollectionPage JSON-LD */}
       <script
         type="application/ld+json"
@@ -423,7 +414,7 @@ export default function Collection() {
       />
 
       {/* BODY */}
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8 md:py-12 max-w-[1920px] mx-auto">
         <div className="flex gap-8 items-start">
 
           <aside className="hidden lg:block w-56 xl:w-64 shrink-0 sticky top-30 self-start">
@@ -439,23 +430,23 @@ export default function Collection() {
               <div className="flex items-center gap-3 relative">
                 <button
                   onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                  className={`lg:hidden group flex items-center gap-2 px-5 py-3 border rounded-full text-[13px] text-foreground bg-card cursor-pointer transition-all duration-200 select-none ${
+                  className={`lg:hidden group flex items-center gap-2 px-5 py-3 border rounded-full text-[13px] text-gray-800 bg-white cursor-pointer transition-all duration-200 select-none ${
                     mobileFiltersOpen
-                      ? 'border-foreground/20 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.12)] bg-muted/40'
-                      : 'border-border hover:border-foreground/15'
+                      ? 'border-gray-800 shadow-md bg-gray-50'
+                      : 'border-gray-200 hover:border-gray-400'
                   }`}
                 >
-                  <svg className="w-4 h-4 text-muted-foreground/70" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                   </svg>
                   <span className="font-medium tracking-wide">Filters</span>
                   {activeFilters.length > 0 && (
-                    <span className="bg-foreground text-background w-4.5 h-4.5 rounded-full flex items-center justify-center text-[9px] font-bold">
+                    <span className="bg-black text-white w-4.5 h-4.5 rounded-full flex items-center justify-center text-[9px] font-bold">
                       {activeFilters.length}
                     </span>
                   )}
                   <svg
-                    className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-300 ml-0.5 ${mobileFiltersOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
+                    className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-300 ml-0.5 ${mobileFiltersOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2.5}
@@ -464,11 +455,11 @@ export default function Collection() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                   </svg>
                 </button>
-                <p className="hidden lg:block text-sm lg:text-base text-stone-900 font-medium tracking-tight">Explore Our {collection.title}</p>
+                <p className="hidden lg:block text-lg sm:text-3xl text-gray-900 tracking-tight">Explore Our {collection.title} Collection</p>
 
                 {/* Mobile Filters Dropdown */}
                 {mobileFiltersOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-card rounded-2xl shadow-xl z-50 lg:hidden border border-gray-100">
+                  <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-white rounded-2xl shadow-xl z-50 lg:hidden border border-gray-100">
                     <FilterSidebar
                       activeFilters={activeFilters}
                       onToggleFilter={toggleFilter}
@@ -479,56 +470,104 @@ export default function Collection() {
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-[10px] tracking-widest uppercase text-muted-foreground hidden sm:block font-medium">
-                  Sort by
-                </span>
                 <CustomSortDropdown sort={sort} onSortChange={setSort} />
               </div>
             </div>
 
+            {activeFilters.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-5">
+                {activeFilters.map((filter) => (
+                  <span
+                    key={filter}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 shadow-sm text-gray-800 text-xs rounded-full"
+                  >
+                    {filter}
+                    <button
+                      onClick={() => toggleFilter(filter)}
+                      className="text-gray-400 hover:text-black transition-colors leading-none"
+                    >
+                      x
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
             <PaginatedResourceSection<ProductItemFragment>
               connection={filteredConnection}
-              resourcesClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"
+              resourcesClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
             >
               {({ node: product, index }) => (
                 <div
                   key={product.id}
-                  className="group bg-card text-card-foreground rounded-2xl overflow-hidden transition-all duration-300 flex flex-col border border-border/60"
+                  className="group rounded-[24px] border border-black/5 shadow-inner p-2 sm:p-2.5 flex flex-col transition-all h-full"
                 >
-                  <a href={`/products/${product.handle}`} className="block p-2 pb-0">
-                    <div className="aspect-square rounded-xl overflow-hidden bg-muted">
+                  <div className="relative aspect-square overflow-hidden rounded-[16px] mb-2 sm:mb-3 bg-transparent shrink-0">
+                    {product.tags && product.tags.includes('New') && (
+                      <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded shadow-inner z-10 transition-opacity">
+                        New
+                      </span>
+                    )}
+
+                    <a href={`/products/${product.handle}`} className="block w-full h-full">
                       {product.featuredImage ? (
                         <Image
                           data={product.featuredImage}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105"
                           sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
                           loading={index < 8 ? 'eager' : 'lazy'}
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-muted">
-                          <span className="text-5xl opacity-20 text-muted-foreground">
+                        <div className="w-full h-full flex items-center justify-center bg-transparent">
+                          <span className="text-5xl opacity-20 text-gray-400">
                             ✦
                           </span>
                         </div>
                       )}
-                    </div>
-                  </a>
+                    </a>
+                  </div>
 
-                  <div className="p-3 sm:p-3.5 flex flex-col flex-1 gap-1.5">
-
+                  <div className="bg-white rounded-[16px] p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
                     <a href={`/products/${product.handle}`} className="block">
-                      <h3 className="text-sm sm:text-[15px] font-medium text-foreground leading-snug line-clamp-2 hover:underline">
+                      <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
                         {product.title}
                       </h3>
                     </a>
 
-                    <div className="mt-auto flex items-center justify-between gap-2 pt-1">
+                    <div className="flex items-center gap-2">
                       <Money
                         data={product.priceRange.minVariantPrice}
                         withoutTrailingZeros
-                        className="text-lg sm:text-xl font-medium text-foreground"
+                        className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black leading-none"
+                        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                       />
+                      {product.variants?.nodes?.[0]?.compareAtPrice && (
+                        <s 
+                          className="text-[12px] sm:text-[16px] text-gray-400 font-medium whitespace-nowrap"
+                          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                        >
+                          <Money withoutTrailingZeros data={product.variants.nodes[0].compareAtPrice} />
+                        </s>
+                      )}
+                      {product.variants?.nodes?.[0]?.compareAtPrice && (
+                        <span className="ml-auto px-2 py-0.5 sm:py-1 text-[9px] sm:text-xs font-medium tracking-widest rounded-full border border-gold text-gold">
+                          {Math.round(
+                            ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
+                              parseFloat(product.priceRange.minVariantPrice.amount)) /
+                              parseFloat(product.variants.nodes[0].compareAtPrice.amount)) *
+                            100,
+                          )}
+                          % Off
+                        </span>
+                      )}
+                      {!product.variants?.nodes?.[0]?.compareAtPrice &&
+                        product.priceRange.maxVariantPrice.amount !==
+                          product.priceRange.minVariantPrice.amount && (
+                          <span className="text-[10px] text-gray-400 block -ml-1">onwards</span>
+                        )}
+                    </div>
 
+                    <div className="mt-auto pt-2">
                       <CartForm
                         route="/cart"
                         inputs={{
@@ -557,20 +596,36 @@ export default function Collection() {
               )}
             </PaginatedResourceSection>
 
+            {filteredConnection.nodes.length === 0 && (
+              <div className="text-center py-24 bg-gray-50 rounded-3xl mt-4 border border-gray-100">
+                <span className="text-6xl text-gray-300 block mb-4">✦</span>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No products found</h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  Try adjusting your filters or browse all categories.
+                </p>
+                <button
+                  onClick={() => setActiveFilters([])}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-xs font-semibold tracking-wide rounded-full hover:bg-neutral-800 transition-colors cursor-pointer"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
+
             {collection.handle.toLowerCase() === 'rudraksha' && relatedArticles.length > 0 && (
-              <section className="mt-14 border-t border-border pt-10">
+              <section className="mt-14 border-t border-gray-200 pt-10">
                 <div className="flex items-end justify-between gap-4 mb-6">
                   <div>
-                    <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2">
+                    <p className="text-[10px] tracking-[0.3em] uppercase text-gray-500 mb-2">
                       Read and Learn
                     </p>
-                    <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
+                    <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
                       Rudraksha Journal
                     </h2>
                   </div>
                   <Link
                     to="/blogs"
-                    className="text-[11px] tracking-[0.18em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-[11px] tracking-[0.18em] uppercase text-gray-500 hover:text-black transition-colors"
                   >
                     View all blogs
                   </Link>
@@ -581,11 +636,11 @@ export default function Collection() {
                     <Link
                       key={article.id}
                       to={`/blogs/${article.blog.handle}/${article.handle}`}
-                      className="group bg-card border border-border rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
+                      className="group bg-white border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
                       prefetch="intent"
                     >
                       {article.image && (
-                        <div className="aspect-16/10 overflow-hidden bg-muted">
+                        <div className="aspect-16/10 overflow-hidden bg-gray-100">
                           <Image
                             data={article.image}
                             alt={article.image.altText || article.title}
@@ -595,17 +650,17 @@ export default function Collection() {
                         </div>
                       )}
                       <div className="p-4">
-                        <time className="text-[10px] tracking-[0.16em] uppercase text-muted-foreground">
+                        <time className="text-[10px] tracking-[0.16em] uppercase text-gray-500">
                           {new Intl.DateTimeFormat('en-US', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
                           }).format(new Date(article.publishedAt))}
                         </time>
-                        <h3 className="mt-2 text-base font-medium text-foreground leading-snug line-clamp-2">
+                        <h3 className="mt-2 text-base font-medium text-gray-900 leading-snug line-clamp-2">
                           {article.title}
                         </h3>
-                        <span className="mt-3 inline-flex text-[10px] tracking-[0.16em] uppercase text-muted-foreground group-hover:text-foreground transition-colors">
+                        <span className="mt-3 inline-flex text-[10px] tracking-[0.16em] uppercase text-gray-500 group-hover:text-black transition-colors">
                           Read more →
                         </span>
                       </div>
@@ -655,23 +710,11 @@ function CollectionAddButton({
     <button
       type="submit"
       disabled={!availableForSale || fetcher.state !== 'idle'}
-      className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-      aria-label="Add to cart"
+      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-800 text-gray-800 text-xs sm:text-base rounded-full transition-colors group-hover:bg-black/90 group-hover:text-white disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
+      aria-label="Add to bag"
     >
-      <svg
-        className="w-3.5 h-3.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5h.008v.008h-.008v-.008Zm5.375 0h.008v.008h-.008v-.008Z"
-        />
-      </svg>
-      {availableForSale ? 'Add' : 'Sold Out'}
+      <img src="/icons/add-bag.png" alt="" className="w-6 h-6 shrink-0 group-hover:invert group-hover:brightness-0 transition-all" />
+      {availableForSale ? 'Add to Bag' : 'Sold Out'}
     </button>
   );
 }
@@ -705,6 +748,12 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
       nodes {
         id
         availableForSale
+        price {
+          ...MoneyProductItem
+        }
+        compareAtPrice {
+          ...MoneyProductItem
+        }
       }
     }
   }

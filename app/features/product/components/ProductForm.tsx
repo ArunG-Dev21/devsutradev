@@ -41,12 +41,18 @@ export function ProductForm({
                   swatch,
                 } = value;
 
-                const pillClass = `px-5 py-2.5 text-[11px] font-medium tracking-widest uppercase rounded-full border transition-all duration-300 cursor-pointer ${selected
-                  ? 'bg-stone-900 text-white border-stone-900'
-                  : available
-                    ? 'border-stone-200 hover:border-stone-400 dark:border-border dark:hover:border-ring text-stone-700 dark:text-foreground bg-white dark:bg-card'
-                    : 'border-stone-100 dark:border-border text-stone-300 dark:text-muted-foreground line-through cursor-not-allowed bg-stone-50 dark:bg-muted/50'
-                  }`;
+                const isColor = !!swatch?.color || !!swatch?.image;
+                const pillClass = isColor 
+                  ? `p-0.5 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center ${
+                      selected ? 'border-2 border-gray-900 shadow-sm' : 'border-2 border-transparent hover:border-gray-300'
+                    }`
+                  : `min-w-[4rem] px-5 py-3 text-sm font-semibold uppercase rounded-xl transition-all duration-200 cursor-pointer text-center ${
+                      selected 
+                        ? 'border-2 border-gray-900 bg-white text-gray-900 shadow-sm'
+                        : available
+                          ? 'border border-gray-300 hover:border-gray-500 text-gray-700 bg-white shadow-sm'
+                          : 'border border-gray-200 text-gray-300 bg-gray-50 line-through cursor-not-allowed'
+                    }`;
 
                 if (isDifferentProduct) {
                   return (
@@ -93,9 +99,8 @@ export function ProductForm({
           <AddToCartButton
             disabled={!selectedVariant || !selectedVariant.availableForSale}
             onClick={() => {
-              open('cart');
+              window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'cart=open';
             }}
-            productImage={selectedVariant?.image || undefined}
             lines={
               selectedVariant
                 ? [
@@ -127,12 +132,11 @@ export function ProductForm({
                 Add to Cart
               </span>
             ) : (
-              'Sold Out'
+              'Sold out'
             )}
           </AddToCartButton>
         </div>
 
-        {/* Buy Now — directly goes to Shopify checkout */}
         {selectedVariant?.availableForSale && (() => {
           const numericId = selectedVariant.id.split('/').pop();
           return (
@@ -169,13 +173,13 @@ function ProductOptionSwatch({
   return (
     <div
       aria-label={name}
-      className="w-5 h-5 rounded-full my-0.5"
+      className="w-[42px] h-[42px] rounded-full border border-gray-200 flex shrink-0 items-center justify-center overflow-hidden"
       style={{
         backgroundColor: color || 'transparent',
       }}
     >
       {!!image && (
-        <img src={image} alt={name} width={400} height={400} sizes="20px" className="w-full h-full rounded-full" />
+        <img src={image} alt={name} width={42} height={42} sizes="42px" className="w-full h-full object-cover" />
       )}
     </div>
   );

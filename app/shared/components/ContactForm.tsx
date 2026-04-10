@@ -111,26 +111,32 @@ export default function ContactForm() {
 
         setStatus("submitting");
 
-        // TODO: Connect to Web3Forms or WhatsApp API
-        // For now, simulate success after a brief delay
         try {
-            await new Promise((r) => setTimeout(r, 1200));
+            const formData = new FormData();
+            formData.append("access_key", "e4362a3a-74fa-4754-be81-2abed67b1206");
+            formData.append("name", form.name.trim());
+            formData.append("email", form.email.trim());
+            if (form.phone.trim()) formData.append("phone", form.phone.trim());
+            formData.append("message", form.message.trim());
 
-            // Placeholder: replace with actual API call
-            console.warn("Contact form submitted:", {
-                name: form.name.trim(),
-                email: form.email.trim(),
-                phone: form.phone.trim(),
-                message: form.message.trim(),
+            const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                body: formData
             });
 
-            setStatus("success");
-            setForm({ name: "", email: "", phone: "", message: "" });
-            setTouched({});
-            setErrors({});
+            const data = await response.json() as { success: boolean; message?: string };
 
-            // Reset after 5 seconds
-            setTimeout(() => setStatus("idle"), 5000);
+            if (data.success) {
+                setStatus("success");
+                setForm({ name: "", email: "", phone: "", message: "" });
+                setTouched({});
+                setErrors({});
+
+                // Reset after 5 seconds
+                setTimeout(() => setStatus("idle"), 5000);
+            } else {
+                throw new Error(data.message || "Form submission failed");
+            }
         } catch {
             setStatus("error");
             setTimeout(() => setStatus("idle"), 4000);

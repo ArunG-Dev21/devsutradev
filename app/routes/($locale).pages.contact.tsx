@@ -140,8 +140,10 @@ export default function Contact() {
 
           <form
             className="relative z-10 flex flex-col gap-6"
-            onSubmit={(e) => e.preventDefault()}
+            action="https://api.web3forms.com/submit"
+            method="POST"
           >
+            <input type="hidden" name="access_key" value="e4362a3a-74fa-4754-be81-2abed67b1206" />
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
                 <label
@@ -153,8 +155,10 @@ export default function Contact() {
                 <input
                   type="text"
                   id="name"
+                  name="name"
                   className="w-full  dark:bg-background border border-stone-200 dark:border-border text-stone-900 dark:text-foreground placeholder:text-stone-400 dark:placeholder:text-muted-foreground rounded-lg px-4 py-3 focus:outline-none focus:border-stone-400 dark:focus:border-ring focus:bg-white dark:focus:bg-background transition-colors"
                   placeholder="e.g. Anjali Sharma"
+                  required
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -167,8 +171,10 @@ export default function Contact() {
                 <input
                   type="email"
                   id="email"
+                  name="email"
                   className="w-full dark:bg-background border border-stone-200 dark:border-border text-stone-900 dark:text-foreground placeholder:text-stone-400 dark:placeholder:text-muted-foreground rounded-lg px-4 py-3 focus:outline-none focus:border-stone-400 dark:focus:border-ring focus:bg-white dark:focus:bg-background transition-colors"
                   placeholder="you@example.com"
+                  required
                 />
               </div>
             </div>
@@ -182,6 +188,7 @@ export default function Contact() {
               </label>
               <select
                 id="subject"
+                name="subject"
                 className="w-full dark:bg-background border border-stone-200 dark:border-border text-stone-900 dark:text-foreground rounded-lg px-4 py-3 focus:outline-none focus:border-stone-400 dark:focus:border-ring focus:bg-white dark:focus:bg-background transition-colors appearance-none"
               >
                 <option value="order">Order Support &amp; Tracking</option>
@@ -200,14 +207,16 @@ export default function Contact() {
               </label>
               <textarea
                 id="message"
+                name="message"
                 rows={5}
                 className="w-full dark:bg-background border border-stone-200 dark:border-border text-stone-900 dark:text-foreground placeholder:text-stone-400 dark:placeholder:text-muted-foreground rounded-lg px-4 py-3 focus:outline-none focus:border-stone-400 dark:focus:border-ring focus:bg-white dark:focus:bg-background transition-colors resize-none"
                 placeholder="How can we assist you today?"
+                required
               ></textarea>
             </div>
 
             <button
-              type="button"
+              type="submit"
               className="mt-4 w-full sm:w-auto self-start bg-stone-900 text-white font-bold tracking-widest uppercase text-[11px] px-10 py-4 rounded-full hover:bg-stone-800 transition-colors shadow-md"
             >
               Send Message

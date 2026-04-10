@@ -150,67 +150,52 @@ export default function Product() {
     });
   }
 
-  const pointerStartXRef = useRef<number | null>(null);
-  const swipeThreshold = 48;
+  const thumbnailContainerRef = useRef<HTMLDivElement>(null);
+  const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Smooth scroll thumbnail container
+  const scrollThumbnails = (direction: 'up' | 'down') => {
+    if (!thumbnailContainerRef.current) return;
+    const scrollAmount = 250;
+    thumbnailContainerRef.current.scrollBy({
+      top: direction === 'down' ? scrollAmount : -scrollAmount,
+      behavior: 'smooth'
+    });
+  };
+
+  // Click on thumbnail -> scroll main gallery to target image
+  const scrollToImage = (index: number) => {
+    setSelectedImageIndex(index);
+    if (imageRefs.current[index]) {
+      imageRefs.current[index]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  // Intersection Observer for scroll spy
   useEffect(() => {
-    if (selectedImageIndex > images.length - 1) {
-      setSelectedImageIndex(0);
-    }
-  }, [images.length, selectedImageIndex]);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = Number(entry.target.getAttribute('data-index'));
+          if (!isNaN(index)) {
+            setSelectedImageIndex(index);
+          }
+        }
+      });
+    }, {
+      root: null, // Track viewport Native scroll!
+      rootMargin: '-20% 0px -50% 0px', // Trigger when image enters upper/middle viewport
+    });
 
-  const goToPreviousImage = () => {
-    if (images.length <= 1) return;
-    setSelectedImageIndex((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1,
-    );
-  };
+    imageRefs.current.forEach(img => {
+      if (img) observer.observe(img);
+    });
 
-  const goToNextImage = () => {
-    if (images.length <= 1) return;
-    setSelectedImageIndex((prev) =>
-      prev === images.length - 1 ? 0 : prev + 1,
-    );
-  };
-
-  const handleGalleryPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (!event.isPrimary) return;
-    if (event.pointerType === 'mouse' && event.button !== 0) return;
-
-    pointerStartXRef.current = event.clientX;
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  const handleGalleryPointerUp = (event: PointerEvent<HTMLDivElement>) => {
-    if (images.length <= 1 || pointerStartXRef.current === null) return;
-
-    const deltaX = event.clientX - pointerStartXRef.current;
-    pointerStartXRef.current = null;
-
-    if (Math.abs(deltaX) < swipeThreshold) return;
-
-    if (deltaX > 0) {
-      goToPreviousImage();
-    } else {
-      goToNextImage();
-    }
-  };
-
-  const handleGalleryPointerCancel = () => {
-    pointerStartXRef.current = null;
-  };
-
-  const handleGalleryKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'ArrowLeft') {
-      event.preventDefault();
-      goToPreviousImage();
-    }
-
-    if (event.key === 'ArrowRight') {
-      event.preventDefault();
-      goToNextImage();
-    }
-  };
+    return () => observer.disconnect();
+  }, [images]);
 
   const [expandedImage, setExpandedImage] = useState<any>(null);
 
@@ -242,7 +227,7 @@ export default function Product() {
     : 0;
 
   return (
-    <div className="min-h-screen text-stone-900 dark:bg-background dark:text-foreground">
+    <div className="min-h-screen text-gray-900 bg-white">
       {/* Product JSON-LD */}
       <script
         type="application/ld+json"
@@ -339,109 +324,136 @@ export default function Product() {
 
 
         {/* Product Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 lg:items-start">
+        <div className="grid lg:grid-cols-[55%_1fr] gap-10 lg:gap-14 lg:items-start">
 
           {/* ── LEFT: Image Gallery ── */}
-          <div className="lg:sticky lg:top-42">
+          <div className="flex flex-col-reverse lg:flex-row gap-5 relative w-full overflow-hidden lg:overflow-visible lg:sticky lg:top-[96px] lg:h-[max-content]">
 
-            {/* Main Image */}
-            <div
-              className="aspect-square overflow-hidden rounded-[2rem] bg-linear-to-b from-white to-stone-100/60 dark:from-card dark:to-card/70 border border-stone-200/70 dark:border-border shadow-[0_20px_45px_-26px_rgba(0,0,0,0.5)] mb-4 relative group select-none cursor-grab active:cursor-grabbing"
-              onPointerDown={handleGalleryPointerDown}
-              onPointerUp={handleGalleryPointerUp}
-              onPointerCancel={handleGalleryPointerCancel}
-              onPointerLeave={handleGalleryPointerCancel}
-              onKeyDown={handleGalleryKeyDown}
-              onDragStart={(event) => event.preventDefault()}
-              role="button"
-              aria-roledescription="carousel"
-              tabIndex={images.length > 1 ? 0 : -1}
-              aria-label="Product image gallery"
-              style={{ touchAction: 'pan-y' }}
-            >
-              {images[selectedImageIndex] && (
-                <Image
-                  data={images[selectedImageIndex]}
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                />
-              )}
-              {/* Subtle gradient vignette on hover */}
-              <div className="absolute inset-0 bg-linear-to-t from-black/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl" />
-              {images.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    aria-label="Previous image"
-                    onClick={goToPreviousImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 dark:bg-black/45 backdrop-blur-md border border-stone-200/80 dark:border-white/15 text-stone-700 dark:text-white shadow-md flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 transition-all duration-300"
+            {/* Desktop Thumbnails (Sticky sidebar) */}
+            {images.length > 1 && (
+              <div className="hidden lg:block w-16 lg:w-[72px] shrink-0 relative">
+                <div className="sticky top-24 flex flex-col items-center gap-2">
+                  <button 
+                    onClick={() => scrollThumbnails('up')}
+                    className="w-full py-2 rounded-full border border-gray-200 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
                     </svg>
                   </button>
-                  <button
-                    type="button"
-                    aria-label="Next image"
-                    onClick={goToNextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 dark:bg-black/45 backdrop-blur-md border border-stone-200/80 dark:border-white/15 text-stone-700 dark:text-white shadow-md flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 transition-all duration-300"
+
+                  <div 
+                    ref={thumbnailContainerRef}
+                    className="max-h-[500px] overflow-y-auto overflow-x-hidden flex flex-col gap-3 py-1 px-0.5 no-scrollbar scroll-smooth"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 6l6 6-6 6" />
+                    {images.map((img, idx) => (
+                      <button
+                        key={img.url}
+                        onClick={() => scrollToImage(idx)}
+                        className={`shrink-0 w-16 h-20 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer border-[2.5px] ${
+                          idx === selectedImageIndex
+                            ? 'border-gray-900 shadow-md'
+                            : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
+                        }`}
+                        aria-pressed={idx === selectedImageIndex}
+                      >
+                        <Image
+                          data={img}
+                          className="w-full h-full object-cover bg-gray-100"
+                          sizes="80px"
+                        />
+                      </button>
+                    ))}
+                  </div>
+
+                  <button 
+                    onClick={() => scrollThumbnails('down')}
+                    className="w-full py-2 rounded-full border border-gray-200 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                     </svg>
                   </button>
-                </>
-              )}
-              {/* Image counter badge */}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Thumbnails dots/pills representation could go here, but using a counter below instead */}
+
+            {/* Main Stage (Stacked natively on Desktop, Snap scroll on Mobile) */}
+            <div className="flex-1 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none gap-3 lg:gap-6 no-scrollbar pb-4 lg:pb-0">
+              {images.map((img, idx) => (
+                <div 
+                  key={img.url}
+                  ref={(el) => (imageRefs.current[idx] = el)}
+                  data-index={idx}
+                  className="w-full shrink-0 snap-center rounded-[24px] bg-[#F6F6F6] aspect-[4/5] sm:aspect-square relative flex items-center justify-center"
+                >
+                  <Image
+                    data={img}
+                    className="w-full h-full object-cover sm:object-contain object-center mix-blend-multiply"
+                    draggable={false}
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                  />
+                  {/* Mobile Counter Pill relative to each image if wanted, or just a fixed badge */}
+                </div>
+              ))}
+              
+              {/* Mobile Image Counter Badge (Fixed inside the scrolling viewport wrapper) */}
               {images.length > 1 && (
-                <div className="absolute bottom-3 right-3 bg-white/90 dark:bg-card/90 backdrop-blur-md text-stone-700 dark:text-foreground px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider shadow-lg ">
+                <div className="lg:hidden fixed lg:absolute bottom-[88px] right-6 z-10 bg-white/90 backdrop-blur-md text-gray-800 px-4 py-2 rounded-full text-[11px] font-bold tracking-widest shadow-md border border-gray-100/50 pointer-events-none">
                   {selectedImageIndex + 1} / {images.length}
                 </div>
               )}
             </div>
-
-            {/* Thumbnails */}
-            {images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2 pr-1 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                {images.map((img, idx) => (
-                  <button
-                    key={img.url}
-                    onClick={() => setSelectedImageIndex(idx)}
-                    className={`shrink-0 snap-start w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer ${
-                      idx === selectedImageIndex
-                        ? 'border-stone-900 dark:border-foreground shadow-lg  opacity-100'
-                        : 'border-transparent opacity-60 hover:opacity-100 hover:border-stone-300 dark:hover:border-border'
-                    }`}
-                    aria-label={`View image ${idx + 1}`}
-                    aria-pressed={idx === selectedImageIndex}
-                  >
-                    <Image
-                      data={img}
-                      className="w-full h-full object-cover"
-                      sizes="80px"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* ── RIGHT: Product Info ── */}
-          <div className="lg:py-2 flex flex-col">
+          <div className="lg:py-2 flex flex-col lg:sticky lg:top-24">
 
             {/* Vendor + Stock */}
-            <div className="flex items-center flex-wrap gap-3 mb-5">
+            <div className="flex items-center flex-wrap gap-3 mb-3">
               <span
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase border transition-all duration-200 ${selectedVariant?.availableForSale
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30'
-                  : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/30'
+                className={`inline-flex items-center px-2 py-1 rounded text-[11px] uppercase tracking-wide font-bold ${selectedVariant?.availableForSale
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'
                   }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${selectedVariant?.availableForSale ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
                 {selectedVariant?.availableForSale ? 'In Stock' : 'Out of Stock'}
               </span>
             </div>
+
+            {/* Title */}
+            <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-semibold text-gray-900 leading-[1.15] mb-2 tracking-tight">
+              {title}
+            </h1>
+
+            {/* Price */}
+            <div className="flex items-baseline gap-2 mb-4">
+              <div className="text-xl sm:text-2xl font-bold text-gray-900">
+                <ProductPrice
+                  price={selectedVariant?.price}
+                  compareAtPrice={selectedVariant?.compareAtPrice}
+                />
+              </div>
+              <span className="text-[11px] font-medium text-gray-500 uppercase tracking-widest">(MRP Incl. of all taxes)</span>
+            </div>
+
+            {/* Live Rating */}
+            {testimonials.length > 0 && (
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg key={star} className={`w-4 h-4 ${star <= Math.round(Number(avgRating)) ? 'text-amber-400' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
+                    </svg>
+                  ))}
+                </div>
+                <a href="#reviews" className="text-xs text-gray-600 tracking-wider uppercase font-medium hover:text-gray-900 transition-colors underline underline-offset-4">
+                  ({avgRating} · {testimonials.length} review{testimonials.length !== 1 ? 's' : ''})
+                </a>
+              </div>
+            )}
 
             {/* Tags */}
             {displayTags.length > 0 && (
@@ -449,7 +461,7 @@ export default function Product() {
                 {displayTags.map((t) => (
                   <span
                     key={t}
-                    className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-stone-50 dark:bg-card border border-stone-200/70 dark:border-border text-[10px] tracking-widest uppercase font-semibold text-stone-600 dark:text-muted-foreground hover:-translate-y-0.5 transition-all duration-200 cursor-default"
+                    className="inline-flex items-center px-3 py-1 rounded bg-gray-50 border border-gray-200 text-[10px] tracking-widest uppercase font-semibold text-gray-600 cursor-default"
                   >
                     {t}
                   </span>
@@ -457,41 +469,17 @@ export default function Product() {
               </div>
             )}
 
-            {/* Title */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-stone-900 dark:text-foreground leading-tight mb-4" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-              {title}
-            </h1>
-
-            {/* Live Rating */}
-            {testimonials.length > 0 && (
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className={`w-3.5 h-3.5 ${star <= Math.round(Number(avgRating)) ? 'text-stone-900 dark:text-foreground' : 'text-stone-200 dark:text-border'}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
-                    </svg>
-                  ))}
-                </div>
-                <a href="#reviews" className="text-xs text-stone-500 dark:text-muted-foreground tracking-wider uppercase font-medium hover:text-stone-900 dark:hover:text-foreground transition-colors">
-                  ({avgRating} · {testimonials.length} review{testimonials.length !== 1 ? 's' : ''})
-                </a>
-              </div>
-            )}
-
-            {/* Price */}
-            <div className="mb-8 text-xl text-stone-600 dark:text-muted-foreground">
-              <ProductPrice
-                price={selectedVariant?.price}
-                compareAtPrice={selectedVariant?.compareAtPrice}
-              />
-            </div>
-
-            {/* Short description / hook */}
-            <div className="mb-8 relative pl-6">
-              <div className="absolute left-0 top-0 bottom-0 w-0.75 rounded-full bg-linear-to-b from-amber-400/80 via-amber-300/40 to-transparent" />
-              <p className="text-base text-stone-600 dark:text-muted-foreground leading-relaxed italic">
-                Handpicked and energised with Vedic mantras — crafted to bring harmony, protection, and spiritual clarity to your daily life.
+            {/* Short description / hook (styled as green offer box) */}
+            <div className="mb-6 bg-[#e6f7ec] rounded-xl p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+              <p className="text-[13px] text-green-900 font-medium leading-relaxed">
+                ✨ Handpicked and energised with Vedic mantras — crafted to bring harmony and protection.
               </p>
+              <button className="shrink-0 flex items-center gap-1.5 px-4 py-2 border border-green-700/20 rounded-full text-[11px] font-bold text-green-800 uppercase tracking-wider hover:bg-green-100 transition-colors">
+                View Details
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
 
 
@@ -522,75 +510,8 @@ export default function Product() {
             <ProductShare title={title} />
 
 
-            {/* Decorative Divider */}
-            <div className="relative my-10">
-              <div className="h-px bg-linear-to-r from-transparent via-stone-300 dark:via-border to-transparent" />
-              <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-background px-3">
-                <div className="w-1.5 h-1.5 bg-stone-300 dark:bg-border rotate-45" />
-              </div>
-            </div>
-
-            {/* Trust mini-badges */}
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-8">
-              {[
-                {
-                  id: 'auth',
-                  text: '100% Authentic',
-                  sub: 'Ethically sourced',
-                  icon: (
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                    </svg>
-                  ),
-                },
-                {
-                  id: 'lab',
-                  text: 'Lab Certified',
-                  sub: 'Certificate included',
-                  icon: (
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-                    </svg>
-                  ),
-                },
-                {
-                  id: 'ship',
-                  text: 'Free Shipping',
-                  sub: 'Above ₹999',
-                  icon: (
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                    </svg>
-                  ),
-                },
-                {
-                  id: 'ret',
-                  text: 'Easy Returns',
-                  sub: '7-day policy',
-                  icon: (
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
-                    </svg>
-                  ),
-                },
-              ].map((badge) => (
-                <div
-                  key={badge.id}
-                  className="flex flex-col items-center text-center gap-2 py-4 px-3 bg-stone-50 dark:bg-muted/30 rounded-xl border border-stone-100 dark:border-border/60 transition-colors duration-200"
-                >
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white dark:bg-background border border-stone-200 dark:border-border flex items-center justify-center text-stone-700 dark:text-foreground">
-                    {badge.icon}
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <p className="text-[11px] sm:text-xs font-semibold tracking-wide uppercase text-stone-800 dark:text-foreground leading-tight">{badge.text}</p>
-                    <p className="text-[10px] text-stone-500 dark:text-muted-foreground leading-tight">{badge.sub}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Description accordion */}
-            <div className="space-y-0">
+            {/* Accordions */}
+            <div className="space-y-3 mb-10">
               {[
                 {
                   id: 'description',
@@ -614,29 +535,27 @@ export default function Product() {
                   defaultOpen: false,
                 },
               ].map((section) => (
-                <details key={section.id} open={section.defaultOpen} className="group border-b border-stone-200/60 dark:border-border/60">
-                  <summary className="flex items-center justify-between cursor-pointer py-5 sm:py-6 select-none list-none outline-none hover:bg-stone-50/50 dark:hover:bg-muted/20 -mx-2 px-2 rounded-lg transition-colors duration-200">
-                    <h3 className="text-[12px] font-bold tracking-widest uppercase text-stone-900 dark:text-foreground">
+                <details key={section.id} open={section.defaultOpen} className="group border border-gray-200 rounded-xl overflow-hidden bg-white">
+                  <summary className="flex items-center justify-between cursor-pointer p-5 select-none list-none outline-none hover:bg-gray-50 transition-colors duration-200">
+                    <h3 className="text-sm font-bold text-gray-900 tracking-wide">
                       {section.title}
                     </h3>
-                    {/* Plus/Minus icon */}
-                    <div className="w-6 h-6 rounded-full border border-stone-300 dark:border-border flex items-center justify-center shrink-0 group-open:bg-stone-900 group-open:border-stone-900 dark:group-open:bg-foreground dark:group-open:border-foreground transition-all duration-300">
+                    <div className="flex items-center justify-center shrink-0">
                       <svg
-                        className="w-3 h-3 text-stone-500 group-open:text-white dark:group-open:text-background transition-colors duration-300"
+                        className="w-5 h-5 text-gray-500 transition-transform duration-300 group-open:rotate-180"
                         fill="none"
                         stroke="currentColor"
                         strokeWidth={2}
                         viewBox="0 0 24 24"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12" className="group-open:opacity-0 transition-opacity duration-200" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12h12" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
                   </summary>
-                  <div className="pb-6 text-sm text-stone-600 dark:text-muted-foreground leading-relaxed pl-0.5">
+                  <div className="px-5 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-100 mt-2 pt-4">
                     {section.html ? (
                       <div
-                        className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:text-stone-900 dark:prose-headings:text-foreground prose-a:text-stone-900 dark:prose-a:text-foreground underline-offset-4"
+                        className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-a:text-gray-900 underline-offset-4"
                         dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.html) }}
                       />
                     ) : (
@@ -647,18 +566,70 @@ export default function Product() {
               ))}
             </div>
 
+            {/* Trust mini-badges Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100 border border-gray-200 rounded-2xl mb-8 overflow-hidden bg-white">
+              {[
+                {
+                  id: 'auth',
+                  text: '100% Authentic',
+                  icon: (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    </svg>
+                  ),
+                },
+                {
+                  id: 'lab',
+                  text: 'Lab Certified',
+                  icon: (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23.693L5 14.5" />
+                    </svg>
+                  ),
+                },
+                {
+                  id: 'ship',
+                  text: 'Free Shipping',
+                  icon: (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                    </svg>
+                  ),
+                },
+                {
+                  id: 'ret',
+                  text: '7 Days Return',
+                  icon: (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+                    </svg>
+                  ),
+                },
+              ].map((badge) => (
+                <div
+                  key={badge.id}
+                  className="flex flex-col items-center justify-center text-center gap-2 p-3 sm:px-4 sm:py-5"
+                >
+                  <div className="text-gray-700">
+                    {badge.icon}
+                  </div>
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-800">{badge.text}</p>
+                </div>
+              ))}
+            </div>
+
             {/* ── LIVE: Reviews ── */}
             <div id="reviews" className="mt-14 scroll-mt-24">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <p className="text-[10px] tracking-[0.3em] uppercase text-stone-400 dark:text-muted-foreground mb-1.5">What our customers say</p>
-                  <h3 className="text-2xl font-light text-stone-900 dark:text-foreground" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                  <h3 className="text-lg font-bold text-gray-900 uppercase tracking-widest">
                     Customer Reviews
                   </h3>
                 </div>
                 {testimonials.length > 0 && (
                   <div className="flex items-center gap-2.5 bg-stone-50 dark:bg-muted/30 border border-stone-200/60 dark:border-border rounded-xl px-4 py-2.5">
-                    <span className="text-2xl font-light text-stone-900 dark:text-foreground" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>{avgRating}</span>
+                    <span className="text-2xl font-bold text-gray-900">{avgRating}</span>
                     <div className="flex flex-col gap-0.5">
                       <div className="flex gap-0.5">
                         {[1, 2, 3, 4, 5].map((star) => (
@@ -693,7 +664,7 @@ export default function Product() {
                             />
                           ) : (
                             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border border-stone-100 flex items-center justify-center shrink-0 shadow-inner">
-                              <span className="text-stone-400 text-xl font-light" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                              <span className="text-gray-400 text-xl font-bold">
                                 {review.name.charAt(0)}
                               </span>
                             </div>
@@ -770,7 +741,7 @@ export default function Product() {
             <div className="mt-14">
               <div className="mb-6">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-stone-400 dark:text-muted-foreground mb-1.5">Details</p>
-                <h3 className="text-2xl font-light text-stone-900 dark:text-foreground" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-widest">
                   Product Specifications
                 </h3>
               </div>
@@ -796,7 +767,7 @@ export default function Product() {
             <div className="mt-14">
               <div className="mb-8">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-stone-400 dark:text-muted-foreground mb-1.5">Guide</p>
-                <h3 className="text-2xl font-light text-stone-900 dark:text-foreground" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-widest">
                   How to Wear & Care
                 </h3>
               </div>
@@ -831,7 +802,7 @@ export default function Product() {
             <div className="mt-14 mb-10">
               <div className="mb-8">
                 <p className="text-[10px] tracking-[0.3em] uppercase text-stone-400 dark:text-muted-foreground mb-1.5">Support</p>
-                <h3 className="text-2xl font-light text-stone-900 dark:text-foreground" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-widest">
                   Frequently Asked Questions
                 </h3>
               </div>
