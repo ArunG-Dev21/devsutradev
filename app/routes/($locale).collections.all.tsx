@@ -4,6 +4,7 @@ import { getPaginationVariables, Image, Money, CartForm } from '@shopify/hydroge
 import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
 import { CollectionHeroBanner } from '~/features/collection/components/CollectionHeroBanner';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
+import { StarRating } from '~/shared/components/StarRating';
 
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCartNotification } from '~/features/cart/components/CartNotification'; type CategoryFilter = {
@@ -107,7 +108,33 @@ async function loadCriticalData({ context, request }: Route.LoaderArgs) {
     },
   });
 
-  return { products };
+  // Fetch Judge.me review summaries for all products
+  let reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
+  const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
+  const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
+  if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string') {
+    try {
+      const { getJudgeMeBatchSummaries } = await import('~/lib/judgeme.server');
+      const productEntries = products.nodes
+        .map((p: any) => ({
+          id: String(p.id).split('/').pop() || '',
+          handle: p.handle,
+        }))
+        .filter((p: any) => p.id);
+      const summaryMap = await getJudgeMeBatchSummaries({
+        shopDomain,
+        apiToken: judgeMeToken,
+        products: productEntries,
+      });
+      for (const [id, summary] of summaryMap) {
+        reviewSummaries[id] = summary;
+      }
+    } catch {
+      // non-critical
+    }
+  }
+
+  return { products, reviewSummaries };
 }
 
 function loadDeferredData({ context }: Route.LoaderArgs) {
@@ -280,7 +307,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
 }
 
 export default function Collection() {
-  const { products } = useLoaderData<typeof loader>();
+  const { products, reviewSummaries } = useLoaderData<typeof loader>() as any;
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [activeCategoryIds, setActiveCategoryIds] = useState<string[]>([]);
@@ -393,7 +420,7 @@ export default function Collection() {
         breadcrumbPlacement="inside-top"
       />
 
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8 md:py-12 max-w-[1920px] mx-auto">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8 md:py-12 max-w-480 mx-auto">
         <div className="flex gap-8 items-start">
           <aside className="hidden lg:block w-56 xl:w-64 shrink-0 sticky top-30 self-start">
             <FilterSidebar
@@ -480,7 +507,7 @@ export default function Collection() {
 
             <PaginatedResourceSection
               connection={products}
-              resourcesClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
+              resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8"
               filterFn={productFilterFn}
             >
               {({ node: product, index }) => (
@@ -488,7 +515,7 @@ export default function Collection() {
                   key={product.id}
                   className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all hover:shadow-sm h-full"
                 >
-                  <div className="relative aspect-[4/5] sm:aspect-[4/5] overflow-hidden rounded-[16px] mb-2 sm:mb-3 bg-transparent shrink-0">
+                  <div className="relative aspect-4/5 sm:aspect-4/5 overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
                     {product.tags && product.tags.includes('New') && (
                       <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded shadow-sm z-10 transition-opacity">
                         New
@@ -511,12 +538,21 @@ export default function Collection() {
                     </a>
                   </div>
 
-                  <div className="bg-white rounded-[16px] p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/5 shadow-sm relative z-10">
+                  <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/5 shadow-sm relative z-10">
                     <a href={`/products/${product.handle}`} className="block">
                       <h3 className="text-[11px] sm:text-[13px] font-medium text-gray-800 leading-tight line-clamp-1 hover:text-black">
                         {product.title}
                       </h3>
                     </a>
+
+                    {/* Star Rating */}
+                    {(() => {
+                      const pid = String(product.id).split('/').pop();
+                      const summary = pid ? (reviewSummaries as any)?.[pid] : null;
+                      return summary ? (
+                        <StarRating rating={summary.averageRating} count={summary.reviewCount} />
+                      ) : null;
+                    })()}
 
                     <div className="flex items-center gap-2">
                       <Money

@@ -7,13 +7,16 @@
 .social-feed-section {
   padding: 5rem 0;
   background-color: #FAF9F6; /* Matches body background */
-  overflow: hidden;
+  overflow: hidden; /* clip Swiper coverflow neighbours */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .social-feed-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  /* no overflow:hidden — only the header lives here, Swiper is outside */
 }
 
 .social-feed-header {
@@ -43,12 +46,21 @@
 
 .social-feed-swiper {
   padding: 3rem 0 5rem !important;
-  overflow: visible !important;
+  overflow: hidden !important; /* clip coverflow neighbours, prevent horizontal blowout */
+  width: 100%;
+}
+
+/* Give the swiper enough visual breathing room so neighbours peek through */
+.social-feed-swiper .swiper-wrapper {
+  overflow: visible;
 }
 
 .social-feed-swiper .swiper-slide {
-  width: 300px;
-  height: 530px;
+  /* Responsive width: fluid between 220 px and 300 px */
+  width: clamp(220px, 70vw, 300px);
+  /* Responsive height via aspect ratio (9:16 portrait) */
+  height: auto;
+  aspect-ratio: 9 / 16;
   transition: opacity 0.4s ease;
   opacity: 0.6;
   cursor: pointer;
@@ -57,8 +69,11 @@
 
 @media (max-width: 640px) {
   .social-feed-swiper .swiper-slide {
-    width: 250px;
-    height: 440px;
+    width: clamp(200px, 78vw, 260px);
+  }
+
+  .social-feed-swiper {
+    padding: 2rem 0 4rem !important;
   }
 }
 
@@ -77,6 +92,7 @@
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: 0; /* allow flex children to shrink properly */
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
@@ -87,6 +103,16 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Full-screen modal video */
+.reel-video-full {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
 }
 
 .reel-card-overlay {
@@ -184,6 +210,18 @@
   background: #000;
   z-index: 100000;
   overflow: hidden;
+}
+
+/* Blurred ambient background behind the 9:16 viewport */
+.reel-modal-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.4) saturate(1.2);
+  transform: scale(1.1);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .reel-modal-container {
@@ -367,142 +405,156 @@
   height: 22px;
 }
 
-/* ── Connected Product Popover ── */
-
-.reel-popover-anchor {
-  position: relative;
+.reel-sidebar-btn--active {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
 }
 
-.reel-product-popover-container {
+.reel-sidebar-btn--active img {
+  filter: invert(0) !important; /* dark icon on light bg */
+}
+
+/* ── Product Bottom Sheet ── */
+
+.reel-product-sheet {
   position: absolute;
-  right: 60px;
   bottom: 0;
-  width: 280px;
-  z-index: 1000;
-  animation: popoverIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 20px 20px 0 0;
+  padding: 0.75rem 1.25rem 1.5rem;
+  z-index: 30;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.2);
 }
 
-.reel-product-popover {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-  padding: 1.25rem;
+.reel-product-sheet--open {
+  transform: translateY(0);
+}
+
+.reel-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: #d4cfc9;
+  margin: 0 auto 1rem;
+}
+
+.reel-sheet-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9a8c7e;
+  margin: 0 0 0.875rem;
+}
+
+.reel-sheet-products {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.reel-sheet-products::-webkit-scrollbar {
+  display: none;
+}
+
+.reel-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.reel-sheet-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f0ece6;
+  display: block;
+}
+
+.reel-sheet-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.reel-sheet-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.reel-sheet-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-decoration: none;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-@keyframes popoverIn {
-  from { opacity: 0; transform: translateX(10px) scale(0.95); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
+.reel-sheet-title:hover {
+  text-decoration: underline;
 }
 
-.popover-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.popover-header span {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #666;
-}
-
-.popover-header button {
-  background: none;
-  border: none;
-  color: #999;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.popover-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.popover-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  position: relative;
-}
-
-.popover-item-link {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-  color: #1a1a1a;
-}
-
-.popover-item-link img {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  object-fit: cover;
-  background: #f5f5f5;
-}
-
-.popover-item-info h4 {
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 0.15rem;
-  line-height: 1.2;
-}
-
-.popover-item-info p {
+.reel-sheet-price {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #6366f1; /* Premium indigo for price */
+  color: #6b5e4e;
 }
 
-.btn-add-bag {
-  background: #fff;
-  border: 1px solid #eee;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+/* Add to cart button */
+.reel-sheet-atc {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #1a1a1a;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1a1a1a;
   cursor: pointer;
-  transition: all 0.2s;
-  flex-shrink: 0;
+  transition: background 0.2s, transform 0.15s;
+  padding: 0;
 }
 
-.btn-add-bag:hover {
-  background: #1a1a1a;
-  color: #fff;
-  border-color: #1a1a1a;
+.reel-sheet-atc:hover:not(:disabled) {
+  background: #3d3530;
+  transform: scale(1.06);
 }
 
-.btn-add-bag svg {
-  width: 16px;
-  height: 16px;
+.reel-sheet-atc:disabled {
+  cursor: not-allowed;
 }
 
-.popover-arrow {
-  position: absolute;
-  right: -6px;
-  bottom: 20px;
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.9);
-  transform: rotate(45deg);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+.reel-sheet-atc img {
+  filter: invert(1); /* white icon on dark bg */
+  display: block;
+}
+
+.reel-sheet-atc--disabled {
+  background: #f0ece6;
+}
+
+.reel-sheet-atc--disabled img {
+  filter: none;
 }
 
 /* Close Button */

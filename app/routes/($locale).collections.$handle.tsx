@@ -8,6 +8,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useCartNotification } from '~/features/cart/components/CartNotification';
 import { CollectionHeroBanner } from '~/features/collection/components/CollectionHeroBanner';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
+import { StarRating } from '~/shared/components/StarRating';
 import {
   generateMeta,
   truncate,
@@ -98,7 +99,39 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     relatedArticles = deduped.slice(0, 4);
   }
 
-  return { collection, relatedArticles };
+  // Fetch Judge.me review summaries for all products in the collection
+  let reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
+  const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
+  const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
+  console.log('[JudgeMe] Token exists:', !!judgeMeToken, 'Domain:', shopDomain);
+  if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string') {
+    try {
+      const { getJudgeMeBatchSummaries } = await import('~/lib/judgeme.server');
+      const productEntries = collection.products.nodes
+        .map((p: any) => ({
+          id: String(p.id).split('/').pop() || '',
+          handle: p.handle,
+        }))
+        .filter((p: any) => p.id);
+      console.log('[JudgeMe] Product entries:', JSON.stringify(productEntries));
+      const summaryMap = await getJudgeMeBatchSummaries({
+        shopDomain,
+        apiToken: judgeMeToken,
+        products: productEntries,
+      });
+      console.log('[JudgeMe] Summary map size:', summaryMap.size);
+      // Convert Map to a plain object so it serialises safely across the loader boundary
+      for (const [id, summary] of summaryMap) {
+        console.log('[JudgeMe] Found review:', id, summary);
+        reviewSummaries[id] = summary;
+      }
+    } catch (err) {
+      console.error('[JudgeMe] Batch fetch error:', err);
+    }
+  }
+
+  console.log('[JudgeMe] Final reviewSummaries:', JSON.stringify(reviewSummaries));
+  return { collection, relatedArticles, reviewSummaries };
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {
@@ -327,7 +360,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
 }
 
 export default function Collection() {
-  const { collection, relatedArticles } = useLoaderData<typeof loader>();
+  const { collection, relatedArticles, reviewSummaries } = useLoaderData<typeof loader>() as any;
   const seoOrigin = ((useLoaderData<typeof loader>()) as any).seoOrigin || '';
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState('featured');
@@ -495,14 +528,14 @@ export default function Collection() {
 
             <PaginatedResourceSection<ProductItemFragment>
               connection={filteredConnection}
-              resourcesClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
+              resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8"
             >
               {({ node: product, index }) => (
                 <div
                   key={product.id}
-                  className="group rounded-[24px] border border-black/5 shadow-inner p-2 sm:p-2.5 flex flex-col transition-all h-full"
+                  className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all hover:shadow-sm h-full"
                 >
-                  <div className="relative aspect-square overflow-hidden rounded-[16px] mb-2 sm:mb-3 bg-transparent shrink-0">
+                  <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
                     {product.tags && product.tags.includes('New') && (
                       <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded shadow-inner z-10 transition-opacity">
                         New
@@ -527,12 +560,21 @@ export default function Collection() {
                     </a>
                   </div>
 
-                  <div className="bg-white rounded-[16px] p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
+                  <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
                     <a href={`/products/${product.handle}`} className="block">
                       <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
                         {product.title}
                       </h3>
                     </a>
+
+                    {/* Star Rating */}
+                    {(() => {
+                      const pid = String(product.id).split('/').pop();
+                      const summary = pid ? (reviewSummaries as any)?.[pid] : null;
+                      return summary ? (
+                        <StarRating rating={summary.averageRating} count={summary.reviewCount} />
+                      ) : null;
+                    })()}
 
                     <div className="flex items-center gap-2">
                       <Money

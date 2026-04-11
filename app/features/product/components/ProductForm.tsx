@@ -42,17 +42,15 @@ export function ProductForm({
                 } = value;
 
                 const isColor = !!swatch?.color || !!swatch?.image;
-                const pillClass = isColor 
-                  ? `p-0.5 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center ${
-                      selected ? 'border-2 border-gray-900 shadow-sm' : 'border-2 border-transparent hover:border-gray-300'
-                    }`
-                  : `min-w-[4rem] px-5 py-3 text-sm font-semibold uppercase rounded-xl transition-all duration-200 cursor-pointer text-center ${
-                      selected 
-                        ? 'border-2 border-gray-900 bg-white text-gray-900 shadow-sm'
-                        : available
-                          ? 'border border-gray-300 hover:border-gray-500 text-gray-700 bg-white shadow-sm'
-                          : 'border border-gray-200 text-gray-300 bg-gray-50 line-through cursor-not-allowed'
-                    }`;
+                const pillClass = isColor
+                  ? `p-0.5 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center ${selected ? 'border-2 border-gray-900 shadow-sm' : 'border-2 border-transparent hover:border-gray-300'
+                  }`
+                  : `min-w-[4rem] px-5 py-3 text-sm font-semibold uppercase rounded-xl transition-all duration-200 cursor-pointer text-center ${selected
+                    ? 'border-2 border-gray-900 bg-white text-gray-900 shadow-sm'
+                    : available
+                      ? 'border border-gray-300 hover:border-gray-500 text-gray-700 bg-white shadow-sm'
+                      : 'border border-gray-200 text-gray-300 bg-gray-50 line-through cursor-not-allowed'
+                  }`;
 
                 if (isDifferentProduct) {
                   return (

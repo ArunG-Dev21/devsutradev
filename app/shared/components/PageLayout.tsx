@@ -49,7 +49,8 @@ export function PageLayout({
   }, [location.pathname]);
   const hasCustomBreadcrumbPlacement =
     pathnameWithoutLocale === '/collections' ||
-    pathnameWithoutLocale.startsWith('/collections/');
+    pathnameWithoutLocale.startsWith('/collections/') ||
+    pathnameWithoutLocale.startsWith('/products/');
 
   return (
     <Aside.Provider>

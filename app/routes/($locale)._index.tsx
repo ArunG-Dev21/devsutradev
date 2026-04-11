@@ -194,12 +194,15 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
         const productPrice = rawPrice
           ? `${rawPrice.currencyCode === 'INR' ? '₹' : rawPrice.currencyCode} ${Number(rawPrice.amount).toLocaleString('en-IN')}`
           : null;
+        const firstVariant = p.variants?.nodes?.[0];
         return {
           id: p.id,
           handle: p.handle,
           title: p.title,
           image: p.featuredImage?.url,
           price: productPrice,
+          variantId: firstVariant?.id ?? null,
+          availableForSale: firstVariant?.availableForSale ?? true,
         };
       });
 
@@ -405,6 +408,9 @@ const SOCIAL_REELS_QUERY = `#graphql
                 featuredImage { url altText width height }
                 priceRange {
                   minVariantPrice { amount currencyCode }
+                }
+                variants(first: 1) {
+                  nodes { id availableForSale }
                 }
               }
             }

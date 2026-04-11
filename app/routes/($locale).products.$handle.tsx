@@ -30,6 +30,7 @@ import {
   jsonLd,
 } from '~/lib/seo';
 import { sanitizeHtml } from '~/lib/sanitizer';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   const product = (data as any)?.product;
@@ -97,7 +98,7 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     const shopifyProductId = String(product.id).split('/').pop();
     if (shopifyProductId) {
       try {
-        const {getJudgeMeProductReviews} = await import('~/lib/judgeme.server');
+        const { getJudgeMeProductReviews } = await import('~/lib/judgeme.server');
         judgeme = await getJudgeMeProductReviews({
           shopDomain,
           apiToken: judgeMeToken,
@@ -183,49 +184,135 @@ export default function Product() {
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Smooth scroll thumbnail container
+  const mainScrollRef = useRef<HTMLDivElement>(null);
+  const isUserScrolling = useRef(false);
+  const userScrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Smooth scroll thumbnail container (desktop up/down buttons)
   const scrollThumbnails = (direction: 'up' | 'down') => {
-    if (!thumbnailContainerRef.current) return;
-    const scrollAmount = 250;
-    thumbnailContainerRef.current.scrollBy({
-      top: direction === 'down' ? scrollAmount : -scrollAmount,
-      behavior: 'smooth'
-    });
+    const next = direction === 'down'
+      ? Math.min(selectedImageIndex + 1, images.length - 1)
+      : Math.max(selectedImageIndex - 1, 0);
+    scrollToImage(next);
   };
 
-  // Click on thumbnail -> scroll main gallery to target image
+  // Click on thumbnail / nav button -> scroll main gallery to target image
   const scrollToImage = (index: number) => {
+    isUserScrolling.current = true;
     setSelectedImageIndex(index);
-    if (imageRefs.current[index]) {
-      imageRefs.current[index]?.scrollIntoView({
+
+    if (userScrollTimeout.current) clearTimeout(userScrollTimeout.current);
+    userScrollTimeout.current = setTimeout(() => {
+      isUserScrolling.current = false;
+    }, 800);
+
+    const target = imageRefs.current[index];
+    if (!target) return;
+
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile) {
+      target.scrollIntoView({
         behavior: 'smooth',
-        block: 'start'
+        block: 'nearest',
+        inline: 'center',
+      });
+    } else {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
       });
     }
   };
 
-  // Intersection Observer for scroll spy
+  // Desktop scroll spy — pick the image whose center is closest to viewport center
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const index = Number(entry.target.getAttribute('data-index'));
-          if (!isNaN(index)) {
-            setSelectedImageIndex(index);
+    if (typeof window === 'undefined') return;
+
+    let rafId: number;
+    const handleScroll = () => {
+      if (window.innerWidth < 1024) return;
+      if (isUserScrolling.current) return;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const viewportCenter = window.innerHeight / 2;
+        let bestIndex = 0;
+        let bestDist = Infinity;
+
+        imageRefs.current.forEach((img, idx) => {
+          if (!img) return;
+          const rect = img.getBoundingClientRect();
+          // Skip images completely off-screen
+          if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+          const imgCenter = rect.top + rect.height / 2;
+          const dist = Math.abs(imgCenter - viewportCenter);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestIndex = idx;
           }
-        }
+        });
+
+        setSelectedImageIndex(bestIndex);
       });
-    }, {
-      root: null, // Track viewport Native scroll!
-      rootMargin: '-20% 0px -50% 0px', // Trigger when image enters upper/middle viewport
-    });
+    };
 
-    imageRefs.current.forEach(img => {
-      if (img) observer.observe(img);
-    });
+    // Run once on mount to set correct initial index
+    handleScroll();
 
-    return () => observer.disconnect();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, [images]);
+
+  // Mobile horizontal scroll sync
+  useEffect(() => {
+    const container = mainScrollRef.current;
+    if (!container) return;
+
+    let rafId: number;
+    const handleScroll = () => {
+      if (window.innerWidth >= 1024) return;
+      if (isUserScrolling.current) return;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const scrollLeft = container.scrollLeft;
+        const containerWidth = container.clientWidth;
+        let closestIndex = 0;
+        let closestDist = Infinity;
+        imageRefs.current.forEach((img, idx) => {
+          if (!img) return;
+          const imgCenter = img.offsetLeft + img.offsetWidth / 2;
+          const viewCenter = scrollLeft + containerWidth / 2;
+          const dist = Math.abs(imgCenter - viewCenter);
+          if (dist < closestDist) {
+            closestDist = dist;
+            closestIndex = idx;
+          }
+        });
+        setSelectedImageIndex(closestIndex);
+      });
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
+    };
+  }, [images.length]);
+
+  // Auto-scroll desktop thumbnail strip to keep active thumbnail visible
+  useEffect(() => {
+    if (!thumbnailContainerRef.current) return;
+    const container = thumbnailContainerRef.current;
+    const activeThumb = container.children[selectedImageIndex] as HTMLElement;
+    if (activeThumb) {
+      activeThumb.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [selectedImageIndex]);
 
   const [expandedImage, setExpandedImage] = useState<any>(null);
 
@@ -371,20 +458,26 @@ export default function Product() {
       )}
 
       {/* Main Content */}
-      <main className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 md:py-24">
+      <main className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 md:py-12">
 
+        {/* Breadcrumb */}
+        <RouteBreadcrumbBanner
+          variant="light"
+          className="border-0"
+          containerClassName="px-0 py-0 pb-6 md:pb-8"
+        />
 
         {/* Product Grid */}
         <div className="grid lg:grid-cols-[55%_1fr] gap-10 lg:gap-14 lg:items-start">
 
           {/* ── LEFT: Image Gallery ── */}
-          <div className="flex flex-col-reverse lg:flex-row gap-5 relative w-full overflow-hidden lg:overflow-visible lg:sticky lg:top-[96px] lg:h-[max-content]">
+          <div className="flex flex-col lg:flex-row gap-5 relative w-full overflow-hidden lg:overflow-visible lg:sticky lg:top-[96px] lg:h-[max-content]">
 
             {/* Desktop Thumbnails (Sticky sidebar) */}
             {images.length > 1 && (
-              <div className="hidden lg:block w-16 lg:w-[72px] shrink-0 relative">
+              <div className="hidden lg:block w-20 lg:w-24 shrink-0 relative">
                 <div className="sticky top-24 flex flex-col items-center gap-2">
-                  <button 
+                  <button
                     onClick={() => scrollThumbnails('up')}
                     className="w-full py-2 rounded-full border border-gray-200 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer"
                   >
@@ -393,31 +486,30 @@ export default function Product() {
                     </svg>
                   </button>
 
-                  <div 
+                  <div
                     ref={thumbnailContainerRef}
-                    className="max-h-[500px] overflow-y-auto overflow-x-hidden flex flex-col gap-3 py-1 px-0.5 no-scrollbar scroll-smooth"
+                    className="max-h-84 overflow-y-auto overflow-x-hidden flex flex-col gap-3 py-1 px-0.5 no-scrollbar scroll-smooth"
                   >
                     {images.map((img, idx) => (
                       <button
                         key={img.url}
                         onClick={() => scrollToImage(idx)}
-                        className={`shrink-0 w-16 h-20 rounded-xl overflow-hidden transition-all duration-300 cursor-pointer border-[2.5px] ${
-                          idx === selectedImageIndex
-                            ? 'border-gray-900 shadow-md'
-                            : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
-                        }`}
+                        className={`shrink-0 w-24 h-24 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer border-[2.5px] ${idx === selectedImageIndex
+                          ? 'border-gray-900 shadow-md'
+                          : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
+                          }`}
                         aria-pressed={idx === selectedImageIndex}
                       >
                         <Image
                           data={img}
-                          className="w-full h-full object-cover bg-gray-100"
+                          className="w-full h-full object-cover sm:object-contain object-center mix-blend-multiply rounded-xl"
                           sizes="80px"
                         />
                       </button>
                     ))}
                   </div>
 
-                  <button 
+                  <button
                     onClick={() => scrollThumbnails('down')}
                     className="w-full py-2 rounded-full border border-gray-200 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer"
                   >
@@ -429,12 +521,11 @@ export default function Product() {
               </div>
             )}
 
-            {/* Mobile Thumbnails dots/pills representation could go here, but using a counter below instead */}
-
             {/* Main Stage (Stacked natively on Desktop, Snap scroll on Mobile) */}
-            <div className="flex-1 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none gap-3 lg:gap-6 no-scrollbar pb-4 lg:pb-0">
+            {/* Main Image Scroll */}
+            <div ref={mainScrollRef} className="flex-1 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none gap-3 lg:gap-6 no-scrollbar pb-4 lg:pb-0">
               {images.map((img, idx) => (
-                <div 
+                <div
                   key={img.url}
                   ref={(el) => (imageRefs.current[idx] = el)}
                   data-index={idx}
@@ -442,21 +533,65 @@ export default function Product() {
                 >
                   <Image
                     data={img}
-                    className="w-full h-full object-cover sm:object-contain object-center mix-blend-multiply"
+                    className="w-full h-full object-cover sm:object-contain object-center mix-blend-multiply rounded-xl"
                     draggable={false}
                     sizes="(min-width: 1024px) 50vw, 100vw"
                   />
-                  {/* Mobile Counter Pill relative to each image if wanted, or just a fixed badge */}
                 </div>
               ))}
-              
-              {/* Mobile Image Counter Badge (Fixed inside the scrolling viewport wrapper) */}
-              {images.length > 1 && (
-                <div className="lg:hidden fixed lg:absolute bottom-[88px] right-6 z-10 bg-white/90 backdrop-blur-md text-gray-800 px-4 py-2 rounded-full text-[11px] font-bold tracking-widest shadow-md border border-gray-100/50 pointer-events-none">
-                  {selectedImageIndex + 1} / {images.length}
-                </div>
-              )}
             </div>
+
+            {/* ✅ MOBILE THUMBNAILS WITH NAV BUTTONS */}
+            {images.length > 1 && (
+              <div className="lg:hidden mt-3 px-1">
+                <div className="flex items-center justify-center gap-2.5">
+                  {/* Left arrow */}
+                  <button
+                    onClick={() => scrollToImage(Math.max(0, selectedImageIndex - 1))}
+                    disabled={selectedImageIndex === 0}
+                    className="shrink-0 w-9 h-9 rounded-full border border-gray-300 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Previous image"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                  </button>
+
+                  {/* Thumbnails */}
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    {images.map((img, idx) => (
+                      <button
+                        key={img.url}
+                        onClick={() => scrollToImage(idx)}
+                        className={`shrink-0 w-14 h-14 rounded-lg overflow-hidden transition-all duration-300 border-2 ${idx === selectedImageIndex
+                          ? 'border-gray-900 shadow-md'
+                          : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
+                          }`}
+                        aria-pressed={idx === selectedImageIndex}
+                      >
+                        <Image
+                          data={img}
+                          className="w-full h-full object-cover"
+                          sizes="56px"
+                        />
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Right arrow */}
+                  <button
+                    onClick={() => scrollToImage(Math.min(images.length - 1, selectedImageIndex + 1))}
+                    disabled={selectedImageIndex === images.length - 1}
+                    className="shrink-0 w-9 h-9 rounded-full border border-gray-300 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Next image"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ── RIGHT: Product Info ── */}

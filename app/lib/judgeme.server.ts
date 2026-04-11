@@ -172,7 +172,7 @@ export async function getJudgeMeProductReviews(options: {
     const badgeHtml =
       typeof badgeResponse === 'string'
         ? badgeResponse
-        : extractFirstStringField(badgeResponse, ['html', 'widget', 'preview_badge']) ??
+        : extractFirstStringField(badgeResponse, ['badge', 'html', 'widget', 'preview_badge']) ??
           '';
     summary = badgeHtml ? parsePreviewBadgeSummary(badgeHtml) : null;
   } catch {
@@ -216,4 +216,50 @@ export async function getJudgeMeProductReviews(options: {
   } catch {
     return { summary, reviews: [] };
   }
+}
+
+/**
+ * Fetch Judge.me review summaries for multiple products in parallel.
+ * Returns a Map<shopifyProductId, JudgeMeSummary>.
+ * Missing / errored products are silently skipped.
+ */
+export async function getJudgeMeBatchSummaries(options: {
+  shopDomain: string;
+  apiToken: string;
+  products: Array<{ id: string; handle: string }>;
+}): Promise<Map<string, JudgeMeSummary>> {
+  const { shopDomain, apiToken, products } = options;
+  const result = new Map<string, JudgeMeSummary>();
+
+  if (!products.length) return result;
+
+  const baseParams = new URLSearchParams({
+    shop_domain: shopDomain,
+    api_token: apiToken,
+  });
+
+  const fetches = products.map(async ({ id, handle }) => {
+    try {
+      const badgeUrl = new URL('/api/v1/widgets/preview_badge', JUDGEME_API_ORIGIN);
+      const params = new URLSearchParams(baseParams);
+      params.set('external_id', id);
+      params.set('handle', handle);
+      badgeUrl.search = params.toString();
+
+      const response = await fetchTextOrJson(badgeUrl);
+      const html =
+        typeof response === 'string'
+          ? response
+          : extractFirstStringField(response, ['badge', 'html', 'widget', 'preview_badge']) ?? '';
+      const summary = html ? parsePreviewBadgeSummary(html) : null;
+      if (summary && summary.reviewCount > 0) {
+        result.set(id, summary);
+      }
+    } catch {
+      // ignore individual failures
+    }
+  });
+
+  await Promise.allSettled(fetches);
+  return result;
 }
