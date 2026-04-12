@@ -4,6 +4,7 @@ import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { Link } from 'react-router';
 import { QuickViewModal } from '~/features/product/components/QuickViewModal';
 import { useCartNotification } from '~/features/cart/components/CartNotification';
+import { StarRating } from '~/shared/components/StarRating';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,6 +43,7 @@ interface FeaturedCollectionProps {
     handle: string;
     products: { nodes: ProductNode[] };
   };
+  reviewSummaries?: Record<string, { averageRating: number; reviewCount: number }>;
 }
 
 // ─── Add to Cart Button ───────────────────────────────────────────────────────
@@ -150,7 +152,7 @@ function AddToCartInner({
   );
 }
 
-export function FeaturedCollectionComponent({ collection }: FeaturedCollectionProps) {
+export function FeaturedCollectionComponent({ collection, reviewSummaries }: FeaturedCollectionProps) {
   const [sortKey, setSortKey] = useState('price-asc');
   const [quickViewProduct, setQuickViewProduct] = useState<ProductNode | null>(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -380,6 +382,19 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
                       </span>
                     )}
 
+                    {/* Star Rating badge — top-right of image */}
+                    {(() => {
+                      const pid = String(product.id).split('/').pop();
+                      const summary = pid ? reviewSummaries?.[pid] : undefined;
+                      return summary ? (
+                        <StarRating
+                          rating={summary.averageRating}
+                          count={summary.reviewCount}
+                          className="absolute top-2 right-2 z-[4]"
+                        />
+                      ) : null;
+                    })()}
+
                     {/* Eye / Quick View — bottom-right of image, slides up on hover */}
                     {!isUnavailable && (
                       <button
@@ -476,6 +491,10 @@ export function FeaturedCollectionComponent({ collection }: FeaturedCollectionPr
         <QuickViewModal
           product={quickViewProduct}
           onClose={() => setQuickViewProduct(null)}
+          reviewSummary={(() => {
+            const pid = String(quickViewProduct.id).split('/').pop();
+            return pid ? reviewSummaries?.[pid] : undefined;
+          })()}
         />
       )}
     </div>

@@ -76,6 +76,20 @@ export function PageLayout({
         header={header}
         publicStoreDomain={publicStoreDomain}
       />
+      {/* Mobile spacer: clears MobileBottomNav (all pages) + StickyAddToCart (product pages) */}
+      <div
+        className="md:hidden"
+        style={{
+          height: pathnameWithoutLocale.startsWith('/products/')
+            ? 'calc(8.75rem + env(safe-area-inset-bottom))'
+            : 'calc(4.375rem + env(safe-area-inset-bottom))',
+        }}
+        aria-hidden="true"
+      />
+      {/* Desktop spacer: clears StickyAddToCart bar (product pages only, xl+) */}
+      {pathnameWithoutLocale.startsWith('/products/') && (
+        <div className="hidden xl:block" style={{ height: '4rem' }} aria-hidden="true" />
+      )}
       <MobileBottomNav cart={cart} />
       </CartNotificationProvider>
     </Aside.Provider>

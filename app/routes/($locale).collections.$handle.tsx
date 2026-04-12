@@ -558,6 +558,19 @@ export default function Collection() {
                         </div>
                       )}
                     </a>
+
+                    {/* Star Rating badge — top-right of image */}
+                    {(() => {
+                      const pid = String(product.id).split('/').pop();
+                      const summary = pid ? (reviewSummaries as any)?.[pid] : null;
+                      return summary ? (
+                        <StarRating
+                          rating={summary.averageRating}
+                          count={summary.reviewCount}
+                          className="absolute top-2 right-2 z-10"
+                        />
+                      ) : null;
+                    })()}
                   </div>
 
                   <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
@@ -566,15 +579,6 @@ export default function Collection() {
                         {product.title}
                       </h3>
                     </a>
-
-                    {/* Star Rating */}
-                    {(() => {
-                      const pid = String(product.id).split('/').pop();
-                      const summary = pid ? (reviewSummaries as any)?.[pid] : null;
-                      return summary ? (
-                        <StarRating rating={summary.averageRating} count={summary.reviewCount} />
-                      ) : null;
-                    })()}
 
                     <div className="flex items-center gap-2">
                       <Money

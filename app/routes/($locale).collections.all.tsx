@@ -515,7 +515,7 @@ export default function Collection() {
                   key={product.id}
                   className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all hover:shadow-sm h-full"
                 >
-                  <div className="relative aspect-4/5 sm:aspect-4/5 overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
+                  <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
                     {product.tags && product.tags.includes('New') && (
                       <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded shadow-sm z-10 transition-opacity">
                         New
@@ -536,23 +536,27 @@ export default function Collection() {
                         </div>
                       )}
                     </a>
-                  </div>
 
-                  <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/5 shadow-sm relative z-10">
-                    <a href={`/products/${product.handle}`} className="block">
-                      <h3 className="text-[11px] sm:text-[13px] font-medium text-gray-800 leading-tight line-clamp-1 hover:text-black">
-                        {product.title}
-                      </h3>
-                    </a>
-
-                    {/* Star Rating */}
+                    {/* Star Rating badge — top-right of image */}
                     {(() => {
                       const pid = String(product.id).split('/').pop();
                       const summary = pid ? (reviewSummaries as any)?.[pid] : null;
                       return summary ? (
-                        <StarRating rating={summary.averageRating} count={summary.reviewCount} />
+                        <StarRating
+                          rating={summary.averageRating}
+                          count={summary.reviewCount}
+                          className="absolute top-2 right-2 z-10"
+                        />
                       ) : null;
                     })()}
+                  </div>
+
+                  <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
+                    <a href={`/products/${product.handle}`} className="block">
+                      <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
+                        {product.title}
+                      </h3>
+                    </a>
 
                     <div className="flex items-center gap-2">
                       <Money
@@ -570,14 +574,14 @@ export default function Collection() {
                         </s>
                       )}
                       {product.variants?.nodes?.[0]?.compareAtPrice && (
-                        <span className="ml-auto px-2 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold tracking-widest uppercase rounded-md bg-[#f4f4f4] text-gray-600 border border-gray-200">
+                        <span className="ml-auto px-2 py-0.5 sm:py-1 text-[9px] sm:text-xs font-medium tracking-widest rounded-full border border-gold text-gold">
                           {Math.round(
                             ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
                               parseFloat(product.priceRange.minVariantPrice.amount)) /
                               parseFloat(product.variants.nodes[0].compareAtPrice.amount)) *
                             100,
                           )}
-                          % OFF
+                          % Off
                         </span>
                       )}
                       {!product.variants?.nodes?.[0]?.compareAtPrice &&
@@ -606,6 +610,7 @@ export default function Collection() {
                             fetcher={fetcher}
                             availableForSale={product.variants?.nodes?.[0]?.availableForSale}
                             productTitle={product.title}
+                            productImage={product.featuredImage ?? undefined}
                           />
                         )}
                       </CartForm>
@@ -641,33 +646,32 @@ function CollectionAllAddButton({
   fetcher,
   availableForSale,
   productTitle,
+  productImage,
 }: {
   fetcher: any;
   availableForSale?: boolean;
   productTitle: string;
+  productImage?: { url: string; altText?: string | null };
 }) {
   const { showNotification } = useCartNotification();
   const prevState = useRef(fetcher.state);
 
   useEffect(() => {
     if (prevState.current !== 'idle' && fetcher.state === 'idle') {
-      showNotification(productTitle);
+      showNotification(productTitle, productImage);
     }
     prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle]);
+  }, [fetcher.state, showNotification, productTitle, productImage]);
 
   return (
     <button
       type="submit"
       disabled={!availableForSale || fetcher.state !== 'idle'}
-      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-800 text-gray-800 text-xs sm:text-[13px] font-semibold rounded-full transition-colors hover:bg-gray-800 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-      aria-label="Add to cart"
+      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-800 text-gray-800 text-xs sm:text-base rounded-full transition-colors group-hover:bg-black/90 group-hover:text-white disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
+      aria-label="Add to bag"
     >
-      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m-2-2h4"/>
-      </svg>
-      {availableForSale ? 'Add to Cart' : 'Sold Out'}
+      <img src="/icons/add-bag.png" alt="" className="w-6 h-6 shrink-0 group-hover:invert group-hover:brightness-0 transition-all" />
+      {availableForSale ? 'Add to Bag' : 'Sold Out'}
     </button>
   );
 }

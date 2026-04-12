@@ -46,7 +46,7 @@ export function StickyAddToCart({
         <>
             {/* ── Mobile: bottom sticky (below xl) ── */}
             <div
-  className={`xl:hidden fixed bottom-16 left-0 right-0 z-50 transition-transform duration-300 ease-out ${
+  className={`xl:hidden fixed bottom-[4.375rem] left-0 right-0 z-50 transition-transform duration-300 ease-out ${
     isVisible ? "translate-y-0" : "translate-y-full"
   }`}
 >
@@ -109,12 +109,12 @@ export function StickyAddToCart({
   </div>
 </div>
 
-            {/* ── Desktop: top sticky (xl and above) ── */}
+            {/* ── Desktop: bottom sticky (xl and above) ── */}
             <div
-                className={`hidden xl:block fixed top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${isVisible ? 'translate-y-0' : '-translate-y-full'
+                className={`hidden xl:block fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${isVisible ? 'translate-y-0' : 'translate-y-full'
                     }`}
             >
-                <div className="bg-white/95 dark:bg-card/95 backdrop-blur-xl border-b border-stone-200 dark:border-border shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+                <div className="bg-white/95 dark:bg-card/95 backdrop-blur-xl border-t border-stone-200 dark:border-border shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
                     <div className="container mx-auto px-6 lg:px-8 py-3 flex items-center justify-between gap-6">
                         {/* Left: product info */}
                         <div className="flex items-center gap-4 min-w-0 flex-1">

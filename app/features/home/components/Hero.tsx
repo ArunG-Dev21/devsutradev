@@ -28,13 +28,14 @@ interface HeroProps {
     };
   };
   slides?: HeroSlide[];
+  reviewSummaries?: Record<string, { averageRating: number; reviewCount: number }>;
 }
 
 /**
  * Split hero section — Swiper on left, Featured Collection on right.
  * Full viewport height on desktop, stacked on mobile.
  */
-export function Hero({ collection, slides }: HeroProps) {
+export function Hero({ collection, slides, reviewSummaries }: HeroProps) {
   if (!collection) return null;
 
   return (
@@ -55,7 +56,7 @@ export function Hero({ collection, slides }: HeroProps) {
         <SwiperComponent slides={slides} />
       </div>
       <div className="w-full h-auto lg:h-full lg:overflow-y-auto">
-        <FeaturedCollectionComponent collection={collection} />
+        <FeaturedCollectionComponent collection={collection} reviewSummaries={reviewSummaries} />
       </div>
     </section>
   );

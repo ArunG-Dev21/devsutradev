@@ -96,9 +96,7 @@ export function ProductForm({
         <div className="flex-1 w-full flex [&>form]:w-full">
           <AddToCartButton
             disabled={!selectedVariant || !selectedVariant.availableForSale}
-            onClick={() => {
-              window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'cart=open';
-            }}
+            onClick={() => open('cart')}
             lines={
               selectedVariant
                 ? [

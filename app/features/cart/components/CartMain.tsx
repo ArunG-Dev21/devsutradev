@@ -99,7 +99,7 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
       )}
 
       <div
-        className={`flex-1 overflow-y-auto ${layout === 'aside' ? 'px-5' : 'w-full lg:w-3/5 xl:w-2/3'
+        className={`flex-1 min-h-0 overflow-y-auto ${layout === 'aside' ? 'px-5' : 'w-full lg:w-3/5 xl:w-2/3'
           }`}
       >
         <CartEmpty hidden={linesCount} layout={layout} />

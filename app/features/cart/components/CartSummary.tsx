@@ -1,8 +1,8 @@
 import type { CartApiQueryFragment } from 'storefrontapi.generated';
 import type { CartLayout } from './CartMain';
 import { CartForm, Money, type OptimisticCart } from '@shopify/hydrogen';
-import { useEffect, useRef, useState } from 'react';
-import { useFetcher, Link } from 'react-router';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router';
 import { useAside } from '~/shared/components/Aside';
 
 type CartSummaryProps = {
@@ -38,19 +38,11 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         Taxes and shipping calculated at checkout
       </p>
 
-      {/* Discount & Gift Card — page layout only; aside shows a note */}
+      {/* Discount codes */}
       {layout === 'page' ? (
-        <>
-          <CartDiscounts discountCodes={cart?.discountCodes} />
-          <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
-        </>
+        <CartDiscounts discountCodes={cart?.discountCodes} cartLines={cart?.lines?.nodes as any[]} />
       ) : (
-        <div className="mb-2.5 flex items-center justify-center gap-2 px-2.5 py-2 border border-dashed border-black rounded-lg">
-          <span className="text-xs leading-none">🏷️</span>
-          <p className="text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">Discount codes applied at checkout</span>
-          </p>
-        </div>
+        <CartDiscountsAside cart={cart} />
       )}
 
       {/* Terms + Checkout as a tight unit */}
@@ -80,42 +72,33 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} layout={layout} termsAccepted={termsAccepted} />
       </div>
 
-      {/* Payment logos + powered by line */}
-      <div className={`border-t border-border flex flex-col items-center ${layout === 'aside' ? 'mt-2.5 pt-2.5' : 'mt-5 sm:mt-7 pt-4 sm:pt-5'}`}>
-        <div className={`flex items-center justify-center flex-wrap ${layout === 'aside' ? 'gap-2 mb-1.5' : 'gap-2 sm:gap-3 mb-3'}`}>
-          <div className="flex flex-col items-center gap-2 mt-3">
-
-            {/* Payment Icons */}
-            <div className="flex items-center max-w-75 justify-center gap-2 flex-wrap">
-
-              {[
-                { src: "/icons/UPI.svg", alt: "UPI" },
-                { src: "/icons/PhonePe.svg", alt: "PhonePe" },
-                { src: "/icons/visa.svg", alt: "Visa" },
-                { src: "/icons/mastercard.svg", alt: "Mastercard" },
-                { src: "/icons/RuPay.svg", alt: "RuPay" },
-                { src: "/icons/netbanking.svg", alt: "Net Banking" },
-                { src: "/icons/paytm.svg", alt: "Paytm" },
-              ].map((icon) => (
-                <div
-                  key={icon.alt}
-                  className="w-16 h-8 flex items-center justify-center bg-white rounded-md border border-gray-200"
-                >
-                  <img
-                    src={icon.src}
-                    alt={icon.alt}
-                    width={40}
-                    height={16}
-                    sizes="40px"
-                    className="max-h-4 w-auto object-contain"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
-
+      {/* Payment logos */}
+      <div className={`border-t border-border flex flex-col items-center ${layout === 'aside' ? 'mt-2 pt-2' : 'mt-4 pt-3'}`}>
+        <div className="flex items-center justify-center flex-wrap gap-1 mt-1.5">
+          {[
+            { src: "/icons/UPI.svg", alt: "UPI" },
+            { src: "/icons/PhonePe.svg", alt: "PhonePe" },
+            { src: "/icons/visa.svg", alt: "Visa" },
+            { src: "/icons/mastercard.svg", alt: "Mastercard" },
+            { src: "/icons/RuPay.svg", alt: "RuPay" },
+            { src: "/icons/netbanking.svg", alt: "Net Banking" },
+            { src: "/icons/paytm.svg", alt: "Paytm" },
+          ].map((icon) => (
+            <div
+              key={icon.alt}
+              className={`flex items-center justify-center bg-white rounded border border-gray-200 ${layout === 'aside' ? 'w-9 h-5' : 'w-11 h-6'}`}
+            >
+              <img
+                src={icon.src}
+                alt={icon.alt}
+                width={28}
+                height={12}
+                sizes="28px"
+                className={`w-auto object-contain ${layout === 'aside' ? 'max-h-2.5' : 'max-h-3'}`}
+                loading="lazy"
+              />
             </div>
-
-          </div>
+          ))}
         </div>
       </div>
     </div>
@@ -185,55 +168,68 @@ function CartCheckoutActions({
 
 function CartDiscounts({
   discountCodes,
+  cartLines,
 }: {
   discountCodes?: CartApiQueryFragment['discountCodes'];
+  cartLines?: any[];
 }) {
-  const codes: string[] =
-    discountCodes
-      ?.filter((discount) => discount.applicable)
-      ?.map(({ code }) => code) || [];
+  const allEntries = discountCodes ?? [];
+  const validCodes = allEntries.filter((d) => d.applicable).map((d) => d.code);
+  const invalidCodes = allEntries.filter((d) => !d.applicable).map((d) => d.code);
+  const allCodes = allEntries.map((d) => d.code);
+
+  // Build code → offer/label map from cart lines for contextual error messages
+  const couponInfoMap = useMemo(() => {
+    const map: Record<string, { label?: string; offer?: string }> = {};
+    for (const line of cartLines ?? []) {
+      const code = (line as any)?.merchandise?.product?.coupon_code?.value as string | undefined;
+      const label = (line as any)?.merchandise?.product?.coupon_label?.value as string | undefined;
+      const offer = (line as any)?.merchandise?.product?.coupon_offer?.value as string | undefined;
+      if (code) map[code.toUpperCase()] = { label, offer };
+    }
+    return map;
+  }, [cartLines]);
+
+  if (allEntries.length === 0) return null;
 
   return (
-    <div className="mb-3">
-      {/* Existing discount */}
-      {codes.length > 0 && (
-        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-muted rounded-lg">
-          <div className="flex items-center gap-2 text-sm text-foreground">
-            <span>🎫</span>
-            <code className="bg-transparent text-foreground text-xs">
-              {codes.join(', ')}
-            </code>
+    <div className="mb-3 flex flex-col gap-1.5">
+      {validCodes.map((code) => (
+        <div key={code} className="flex items-center justify-between px-3 py-2 bg-muted rounded-lg">
+          <div className="flex items-center gap-2 text-foreground">
+            <span className="text-sm">🎫</span>
+            <code className="text-xs font-mono font-semibold">{code}</code>
           </div>
-          <UpdateDiscountForm>
-            <button
-              type="submit"
-              aria-label="Remove discount"
-              className="text-xs text-muted-foreground hover:text-foreground transition cursor-pointer"
-            >
+          <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
+            <button type="submit" className="text-xs text-muted-foreground hover:text-foreground transition cursor-pointer">
               Remove
             </button>
           </UpdateDiscountForm>
         </div>
-      )}
+      ))}
 
-      {/* Apply discount */}
-      <UpdateDiscountForm discountCodes={codes}>
-        <div className="flex gap-2">
-          <input
-            id="discount-code-input"
-            type="text"
-            name="discountCode"
-            placeholder="Discount code"
-            className="flex-1 px-3 py-2 text-xs border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-ring"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 text-xs tracking-wider uppercase bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-700 dark:hover:bg-neutral-300 transition cursor-pointer"
-          >
-            Apply
-          </button>
-        </div>
-      </UpdateDiscountForm>
+      {invalidCodes.map((code) => {
+        const info = couponInfoMap[code.toUpperCase()];
+        const reason = info?.offer ?? info?.label ?? 'Not applicable to your current cart';
+        return (
+          <div key={code} className="flex items-start justify-between gap-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-500 shrink-0">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <code className="text-xs font-mono font-semibold text-red-600">{code}</code>
+              </div>
+              <p className="text-[10px] text-red-500 leading-snug pl-4">{reason}</p>
+            </div>
+            <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
+              <button type="submit" className="text-xs text-red-400 hover:text-red-600 transition cursor-pointer shrink-0 mt-0.5">
+                Remove
+              </button>
+            </UpdateDiscountForm>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -258,104 +254,117 @@ function UpdateDiscountForm({
   );
 }
 
-function CartGiftCard({
-  giftCardCodes,
-}: {
-  giftCardCodes: CartApiQueryFragment['appliedGiftCards'] | undefined;
-}) {
-  const giftCardCodeInput = useRef<HTMLInputElement>(null);
-  const giftCardAddFetcher = useFetcher({ key: 'gift-card-add' });
+// ── Aside-specific discount section ─────────────────────────────────────────
 
-  useEffect(() => {
-    if (giftCardAddFetcher.data) {
-      giftCardCodeInput.current!.value = '';
+function CartDiscountsAside({
+  cart,
+}: {
+  cart: OptimisticCart<CartApiQueryFragment | null>;
+}) {
+  const allEntries = cart?.discountCodes ?? [];
+  const appliedCodes = useMemo(
+    () => allEntries.filter((d) => d.applicable).map((d) => d.code),
+    [allEntries],
+  );
+  const invalidCodes = useMemo(
+    () => allEntries.filter((d) => !d.applicable).map((d) => d.code),
+    [allEntries],
+  );
+  const allCodes = allEntries.map((d) => d.code);
+
+  // Coupons suggested from products in cart (not yet applied)
+  const availableCoupons = useMemo(() => {
+    const seen = new Set<string>();
+    const result: { code: string; label?: string }[] = [];
+    for (const line of cart?.lines?.nodes ?? []) {
+      const code = (line as any).merchandise?.product?.coupon_code?.value as string | undefined;
+      const label = (line as any).merchandise?.product?.coupon_label?.value as string | undefined;
+      if (code && !seen.has(code)) {
+        seen.add(code);
+        result.push({ code, label });
+      }
     }
-  }, [giftCardAddFetcher.data]);
+    return result;
+  }, [cart?.lines?.nodes]);
+
+  // Build code → offer map for contextual error messages
+  const couponInfoMap = useMemo(() => {
+    const map: Record<string, { label?: string; offer?: string }> = {};
+    for (const line of cart?.lines?.nodes ?? []) {
+      const code = (line as any).merchandise?.product?.coupon_code?.value as string | undefined;
+      const label = (line as any).merchandise?.product?.coupon_label?.value as string | undefined;
+      const offer = (line as any).merchandise?.product?.coupon_offer?.value as string | undefined;
+      if (code) map[code.toUpperCase()] = { label, offer };
+    }
+    return map;
+  }, [cart?.lines?.nodes]);
+
+  const unapplied = availableCoupons.filter((c) => !appliedCodes.includes(c.code));
+
+  const hasAnything = unapplied.length > 0 || appliedCodes.length > 0 || invalidCodes.length > 0;
+  if (!hasAnything) return null;
 
   return (
-    <div className="mb-3">
-      {giftCardCodes && giftCardCodes.length > 0 && (
-        <div className="space-y-2 mb-2">
-          {giftCardCodes.map((giftCard) => (
-            <RemoveGiftCardForm key={giftCard.id} giftCardId={giftCard.id}>
-              <div className="flex items-center justify-between px-3 py-2 bg-muted rounded-lg text-sm">
-                <div className="flex items-center gap-2 text-stone-700">
-                  <span>🎁</span>
-                  <code className="bg-transparent text-stone-700 text-xs">
-                    ***{giftCard.lastCharacters}
-                  </code>
-                  <span className="text-xs">
-                    <Money withoutTrailingZeros data={giftCard.amountUsed} />
-                  </span>
-                </div>
-                <button
-                  type="submit"
-                  className="text-xs text-stone-400 hover:text-stone-600 transition cursor-pointer"
-                >
-                  Remove
-                </button>
-              </div>
-            </RemoveGiftCardForm>
-          ))}
-        </div>
-      )}
-
-      <AddGiftCardForm fetcherKey="gift-card-add">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            name="giftCardCode"
-            placeholder="Gift card code"
-            ref={giftCardCodeInput}
-            className="flex-1 px-3 py-2 text-xs border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-ring"
-          />
+    <div className="mb-3 flex flex-col gap-1.5">
+      {/* Unapplied coupons from cart products — tap to apply */}
+      {unapplied.map(({ code, label }) => (
+        <UpdateDiscountForm key={code} discountCodes={[...appliedCodes, code]}>
           <button
             type="submit"
-            disabled={giftCardAddFetcher.state !== 'idle'}
-            className="px-4 py-2 text-xs tracking-wider uppercase bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-700 dark:hover:bg-neutral-300 transition disabled:opacity-50 cursor-pointer"
+            className="flex items-center justify-between w-full gap-2 px-2.5 py-1.5 rounded-lg border border-dashed border-amber-400 bg-amber-50 text-amber-900 hover:bg-amber-100 transition cursor-pointer"
           >
-            Apply
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="text-[11px] leading-none shrink-0">🏷️</span>
+              <span className="font-mono font-bold text-[11px] tracking-wide truncate">{code}</span>
+              {label && (
+                <span className="text-[10px] text-amber-700 truncate">— {label}</span>
+              )}
+            </div>
+            <span className="text-[10px] bg-amber-200 text-amber-800 rounded px-1.5 py-0.5 font-semibold shrink-0">
+              Apply
+            </span>
           </button>
+        </UpdateDiscountForm>
+      ))}
+
+      {/* Applied valid codes */}
+      {appliedCodes.map((code) => (
+        <div key={code} className="flex items-center justify-between px-2.5 py-1.5 bg-muted rounded-lg">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px]">🎫</span>
+            <code className="font-mono font-semibold text-[11px] text-foreground">{code}</code>
+          </div>
+          <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
+            <button type="submit" className="text-[10px] text-muted-foreground hover:text-foreground transition cursor-pointer">
+              Remove
+            </button>
+          </UpdateDiscountForm>
         </div>
-      </AddGiftCardForm>
+      ))}
+
+      {/* Invalid codes with contextual reason */}
+      {invalidCodes.map((code) => {
+        const info = couponInfoMap[code.toUpperCase()];
+        const reason = info?.offer ?? info?.label ?? 'Not applicable to your current cart';
+        return (
+          <div key={code} className="flex items-start justify-between gap-2 px-2.5 py-1.5 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-500 shrink-0">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <code className="font-mono font-semibold text-[11px] text-red-600">{code}</code>
+              </div>
+              <p className="text-[10px] text-red-500 leading-snug pl-4">{reason}</p>
+            </div>
+            <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
+              <button type="submit" className="text-[10px] text-red-400 hover:text-red-600 transition cursor-pointer shrink-0 mt-0.5">
+                Remove
+              </button>
+            </UpdateDiscountForm>
+          </div>
+        );
+      })}
     </div>
-  );
-}
-
-function AddGiftCardForm({
-  fetcherKey,
-  children,
-}: {
-  fetcherKey?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <CartForm
-      fetcherKey={fetcherKey}
-      route="/cart"
-      action={CartForm.ACTIONS.GiftCardCodesAdd}
-    >
-      {children}
-    </CartForm>
-  );
-}
-
-function RemoveGiftCardForm({
-  giftCardId,
-  children,
-}: {
-  giftCardId: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <CartForm
-      route="/cart"
-      action={CartForm.ACTIONS.GiftCardCodesRemove}
-      inputs={{
-        giftCardCodes: [giftCardId],
-      }}
-    >
-      {children}
-    </CartForm>
   );
 }

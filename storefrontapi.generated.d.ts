@@ -31,7 +31,18 @@ export type CartLineFragment = Pick<
     image?: StorefrontAPI.Maybe<
       Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
     >;
-    product: Pick<StorefrontAPI.Product, 'handle' | 'title' | 'id' | 'vendor'>;
+    product: Pick<
+      StorefrontAPI.Product,
+      'handle' | 'title' | 'id' | 'vendor'
+    > & {
+      coupon_code?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+      coupon_label?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value'>
+      >;
+      coupon_offer?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value'>
+      >;
+    };
     selectedOptions: Array<
       Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
     >;
@@ -64,7 +75,18 @@ export type CartLineComponentFragment = Pick<
     image?: StorefrontAPI.Maybe<
       Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
     >;
-    product: Pick<StorefrontAPI.Product, 'handle' | 'title' | 'id' | 'vendor'>;
+    product: Pick<
+      StorefrontAPI.Product,
+      'handle' | 'title' | 'id' | 'vendor'
+    > & {
+      coupon_code?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+      coupon_label?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value'>
+      >;
+      coupon_offer?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value'>
+      >;
+    };
     selectedOptions: Array<
       Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
     >;
@@ -99,7 +121,17 @@ export type CartLineComponentFragment = Pick<
         product: Pick<
           StorefrontAPI.Product,
           'handle' | 'title' | 'id' | 'vendor'
-        >;
+        > & {
+          coupon_code?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.Metafield, 'value'>
+          >;
+          coupon_label?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.Metafield, 'value'>
+          >;
+          coupon_offer?: StorefrontAPI.Maybe<
+            Pick<StorefrontAPI.Metafield, 'value'>
+          >;
+        };
         selectedOptions: Array<
           Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
         >;
@@ -162,7 +194,17 @@ export type CartApiQueryFragment = Pick<
             product: Pick<
               StorefrontAPI.Product,
               'handle' | 'title' | 'id' | 'vendor'
-            >;
+            > & {
+              coupon_code?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Metafield, 'value'>
+              >;
+              coupon_label?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Metafield, 'value'>
+              >;
+              coupon_offer?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Metafield, 'value'>
+              >;
+            };
             selectedOptions: Array<
               Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
             >;
@@ -200,7 +242,17 @@ export type CartApiQueryFragment = Pick<
             product: Pick<
               StorefrontAPI.Product,
               'handle' | 'title' | 'id' | 'vendor'
-            >;
+            > & {
+              coupon_code?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Metafield, 'value'>
+              >;
+              coupon_label?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Metafield, 'value'>
+              >;
+              coupon_offer?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.Metafield, 'value'>
+              >;
+            };
             selectedOptions: Array<
               Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
             >;
@@ -238,7 +290,17 @@ export type CartApiQueryFragment = Pick<
                 product: Pick<
                   StorefrontAPI.Product,
                   'handle' | 'title' | 'id' | 'vendor'
-                >;
+                > & {
+                  coupon_code?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.Metafield, 'value'>
+                  >;
+                  coupon_label?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.Metafield, 'value'>
+                  >;
+                  coupon_offer?: StorefrontAPI.Maybe<
+                    Pick<StorefrontAPI.Metafield, 'value'>
+                  >;
+                };
                 selectedOptions: Array<
                   Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
                 >;
@@ -644,6 +706,14 @@ export type SocialReelsQuery = {
                     minVariantPrice: Pick<
                       StorefrontAPI.MoneyV2,
                       'amount' | 'currencyCode'
+                    >;
+                  };
+                  variants: {
+                    nodes: Array<
+                      Pick<
+                        StorefrontAPI.ProductVariant,
+                        'id' | 'availableForSale'
+                      >
                     >;
                   };
                 }
@@ -1369,6 +1439,15 @@ export type ProductFragment = Pick<
     >;
   };
   seo: Pick<StorefrontAPI.Seo, 'description' | 'title'>;
+  coupon_code?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  coupon_label?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  coupon_offer?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  product_features?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metafield, 'value' | 'type'>
+  >;
+  shipping_returns?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metafield, 'value' | 'type'>
+  >;
   testimonials?: StorefrontAPI.Maybe<{
     references?: StorefrontAPI.Maybe<{
       nodes: Array<{
@@ -1540,6 +1619,19 @@ export type ProductQuery = {
         >;
       };
       seo: Pick<StorefrontAPI.Seo, 'description' | 'title'>;
+      coupon_code?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+      coupon_label?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value'>
+      >;
+      coupon_offer?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value'>
+      >;
+      product_features?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value' | 'type'>
+      >;
+      shipping_returns?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value' | 'type'>
+      >;
       testimonials?: StorefrontAPI.Maybe<{
         references?: StorefrontAPI.Maybe<{
           nodes: Array<{
@@ -1840,7 +1932,7 @@ interface GeneratedQueryTypes {
     return: TestimonialsQuery;
     variables: TestimonialsQueryVariables;
   };
-  '#graphql\n  query SocialReels {\n    metaobjects(type: "social_reel", first: 20) {\n      nodes {\n        id\n        fields {\n          key\n          value\n          reference {\n            ... on Video {\n              id\n              sources {\n                url\n                mimeType\n                format\n              }\n            }\n            ... on GenericFile {\n              id\n              url\n              mimeType\n            }\n            ... on MediaImage {\n              image { url altText width height }\n            }\n          }\n          references(first: 10) {\n            nodes {\n              ... on Product {\n                id\n                handle\n                title\n                featuredImage { url altText width height }\n                priceRange {\n                  minVariantPrice { amount currencyCode }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query SocialReels {\n    metaobjects(type: "social_reel", first: 20) {\n      nodes {\n        id\n        fields {\n          key\n          value\n          reference {\n            ... on Video {\n              id\n              sources {\n                url\n                mimeType\n                format\n              }\n            }\n            ... on GenericFile {\n              id\n              url\n              mimeType\n            }\n            ... on MediaImage {\n              image { url altText width height }\n            }\n          }\n          references(first: 10) {\n            nodes {\n              ... on Product {\n                id\n                handle\n                title\n                featuredImage { url altText width height }\n                priceRange {\n                  minVariantPrice { amount currencyCode }\n                }\n                variants(first: 1) {\n                  nodes { id availableForSale }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: SocialReelsQuery;
     variables: SocialReelsQueryVariables;
   };
@@ -1892,7 +1984,7 @@ interface GeneratedQueryTypes {
     return: PoliciesQuery;
     variables: PoliciesQueryVariables;
   };
-  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    vendor\n    handle\n    tags\n    descriptionHtml\n    description\n    encodedVariantExistence\n    encodedVariantAvailability\n    images(first: 10) {\n      nodes {\n        id\n        url\n        altText\n        width\n        height\n      }\n    }\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    variants(first: 50) {\n      nodes {\n        ...ProductVariant\n      }\n    }\n    seo {\n      description\n      title\n    }\n    testimonials: metafield(namespace: "custom", key: "testimonials") {\n      references(first: 20) {\n        nodes {\n          ... on Metaobject {\n            fields {\n              key\n              value\n              reference {\n                 ... on MediaImage {\n                    image {\n                       url\n                       width\n                       height\n                       altText\n                    }\n                 }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n    quantityAvailable\n  }\n\n\n': {
+  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    vendor\n    handle\n    tags\n    descriptionHtml\n    description\n    encodedVariantExistence\n    encodedVariantAvailability\n    images(first: 10) {\n      nodes {\n        id\n        url\n        altText\n        width\n        height\n      }\n    }\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    variants(first: 50) {\n      nodes {\n        ...ProductVariant\n      }\n    }\n    seo {\n      description\n      title\n    }\n    coupon_code: metafield(namespace: "custom", key: "coupon_code") {\n      value\n    }\n    coupon_label: metafield(namespace: "custom", key: "coupon_label") {\n      value\n    }\n    coupon_offer: metafield(namespace: "custom", key: "coupon_offer") {\n      value\n    }\n    product_features: metafield(namespace: "custom", key: "product_features") {\n      value\n      type\n    }\n    shipping_returns: metafield(namespace: "custom", key: "shipping_returns") {\n      value\n      type\n    }\n    testimonials: metafield(namespace: "custom", key: "testimonials") {\n      references(first: 20) {\n        nodes {\n          ... on Metaobject {\n            fields {\n              key\n              value\n              reference {\n                 ... on MediaImage {\n                    image {\n                       url\n                       width\n                       height\n                       altText\n                    }\n                 }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n    quantityAvailable\n  }\n\n\n': {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };

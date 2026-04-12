@@ -48,6 +48,32 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
     storefront.query(SOCIAL_REELS_QUERY),
   ]);
 
+  // Fetch Judge.me review summaries for featured collection products
+  let reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
+  const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
+  const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
+  if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string' && collection) {
+    try {
+      const { getJudgeMeBatchSummaries } = await import('~/lib/judgeme.server');
+      const productEntries = (collection.products?.nodes ?? [])
+        .map((p: any) => ({
+          id: String(p.id).split('/').pop() || '',
+          handle: p.handle,
+        }))
+        .filter((p: any) => p.id);
+      const summaryMap = await getJudgeMeBatchSummaries({
+        shopDomain,
+        apiToken: judgeMeToken,
+        products: productEntries,
+      });
+      for (const [id, summary] of summaryMap) {
+        reviewSummaries[id] = summary;
+      }
+    } catch {
+      // non-critical
+    }
+  }
+
   // ── Hero slides ──────────────────────────────────────────────────────────
   const heroSlides = (slidesResult?.metaobjects?.nodes ?? [])
     .map((node: any) => {
@@ -245,6 +271,7 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
     testimonialReels,
     socialReels,
     testimonials: imageTestimonials,
+    reviewSummaries,
   };
 }
 
@@ -261,7 +288,7 @@ export default function Homepage() {
         }}
       />
       {data.featuredCollection && (
-        <Hero collection={data.featuredCollection} slides={data.heroSlides} />
+        <Hero collection={data.featuredCollection} slides={data.heroSlides} reviewSummaries={data.reviewSummaries} />
       )}
       <TrustBadges />
       <WhyDevasutra reels={data.testimonialReels} testimonials={data.testimonials} />

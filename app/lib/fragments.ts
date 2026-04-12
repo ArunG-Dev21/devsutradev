@@ -47,6 +47,15 @@ export const CART_QUERY_FRAGMENT = `#graphql
           title
           id
           vendor
+          coupon_code: metafield(namespace: "custom", key: "coupon_code") {
+            value
+          }
+          coupon_label: metafield(namespace: "custom", key: "coupon_label") {
+            value
+          }
+          coupon_offer: metafield(namespace: "custom", key: "coupon_offer") {
+            value
+          }
         }
         selectedOptions {
           name
@@ -102,6 +111,15 @@ export const CART_QUERY_FRAGMENT = `#graphql
           title
           id
           vendor
+          coupon_code: metafield(namespace: "custom", key: "coupon_code") {
+            value
+          }
+          coupon_label: metafield(namespace: "custom", key: "coupon_label") {
+            value
+          }
+          coupon_offer: metafield(namespace: "custom", key: "coupon_offer") {
+            value
+          }
         }
         selectedOptions {
           name
