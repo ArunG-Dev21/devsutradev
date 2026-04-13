@@ -457,7 +457,7 @@ export function HeaderMenu({
 
                 {/* Collection name */}
                 <div className="relative w-full px-4 pb-4">
-                  <p className="text-white text-sm tracking-[0.12em] uppercase leading-tight drop-shadow-sm line-clamp-2">
+                  <p className="text-white text-sm tracking-[0.12em] uppercase leading-tight drop line-clamp-2">
                     {item.title}
                   </p>
                 </div>
@@ -1020,7 +1020,7 @@ function CartBadge({ count }: { count: number | null }) {
       />
       {(count ?? 0) > 0 && (
         <span
-          className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center bg-black text-white shadow-sm"
+          className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center bg-black text-white"
         >
           {count}
         </span>

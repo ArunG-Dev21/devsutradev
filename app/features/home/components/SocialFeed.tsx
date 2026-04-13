@@ -17,6 +17,7 @@ export interface SocialReel {
     price: string | null;
     variantId?: string | null;
     availableForSale?: boolean;
+    variants?: Array<{ id: string; availableForSale: boolean; title: string }>;
   }[];
   customerName: string;
   customerAvatar?: string;

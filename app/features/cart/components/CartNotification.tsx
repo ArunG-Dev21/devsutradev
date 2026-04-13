@@ -27,8 +27,8 @@ type NotificationItem = {
   exiting?: boolean;
 };
 
-const MAX_VISIBLE = 3;
-const AUTO_DISMISS_MS = 4000;
+const MAX_VISIBLE = 1;
+const AUTO_DISMISS_MS = 4500;
 const STAGGER_MS = 300;
 
 export function CartNotificationProvider({ children }: { children: ReactNode }) {
@@ -43,7 +43,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
     );
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }, 400);
+    }, 500);
   }, []);
 
   /* Process queued notifications one at a time with stagger */
@@ -65,7 +65,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
           if (oldest) {
             setTimeout(() => {
               setNotifications((p) => p.filter((n) => n.id !== oldest.id));
-            }, 400);
+            }, 500);
             return [...prev.map((n) => n.id === oldest.id ? { ...n, exiting: true } : n), next];
           }
         }
@@ -115,100 +115,154 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
     <CartNotificationContext.Provider value={{ showNotification }}>
       {children}
 
-      {/* ───── Notification Stack ───── */}
-      <div
-        aria-live="polite"
-        className="fixed top-3 right-3 sm:top-5 sm:right-5 z-[9999] flex flex-col gap-2.5 pointer-events-none"
-        style={{ width: 'min(340px, calc(100vw - 1.5rem))' }}
-      >
-        {notifications.map((notif) => (
-          <div
-            key={notif.id}
-            className={`pointer-events-auto relative overflow-hidden rounded-2xl bg-white dark:bg-[#1a1a1a] border border-neutral-200 dark:border-neutral-800 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.12)] dark:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.6)] w-full ${
-              notif.exiting ? 'cart-notif-exit' : 'cart-notif-enter'
-            }`}
-          >
-            {/* Content */}
-            <div className="flex items-center gap-3.5 p-2">
-              {/* Product Image */}
-              <div className="flex-shrink-0 w-[60px] h-[60px] sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-neutral-50 dark:bg-neutral-800/80">
-                {notif.image ? (
-                  <img
-                    src={notif.image.url}
-                    alt={notif.image.altText || notif.title}
-                    width={64}
-                    height={64}
-                    sizes="(min-width: 640px) 64px, 60px"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral-300 dark:text-neutral-600">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-              {/* Text — product name first, badge below */}
-              <div className="flex-1 min-w-0">
-                <p className="text-[15px] sm:text-base font-bold text-neutral-900 dark:text-white leading-snug truncate">
-                  {notif.title}
-                </p>
-                <span className="inline-flex items-center gap-1.5 mt-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-[11px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Added to cart
-                </span>
-              </div>
-
-              {/* Arrow button */}
-              <button
-                type="button"
-                onClick={() => handleViewCart(notif.id)}
-                className="flex-shrink-0 w-9 h-9 rounded-full bg-neutral-900 dark:bg-white/10 dark:hover:bg-white/20 flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                aria-label="View cart"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Progress bar */}
-            <div className="h-[3px] w-full bg-emerald-100 dark:bg-emerald-500/10">
+      {/* ───── Centered Notification ───── */}
+      {notifications.length > 0 && (
+        <div
+          aria-live="polite"
+          className="fixed inset-0 z-[110000] flex items-center justify-center pointer-events-none"
+        >
+          <div className="flex flex-col items-center gap-3">
+            {notifications.map((notif) => (
               <div
-                className="h-full bg-emerald-500 dark:bg-emerald-400 origin-left rounded-full"
+                key={notif.id}
+                className={`pointer-events-auto relative overflow-hidden rounded-3xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] ${
+                  notif.exiting ? 'cart-notif-exit' : 'cart-notif-enter'
+                }`}
                 style={{
-                  animation: `notifProgress ${AUTO_DISMISS_MS}ms linear forwards`,
-                  animationDelay: notif.exiting ? '99999s' : '0ms',
+                  width: 'min(420px, calc(100vw - 2rem))',
+                  background: '#0d0d0d',
+                  border: '1px solid rgba(255,255,255,0.08)',
                 }}
-              />
-            </div>
+              >
+                {/* Content */}
+                <div className="px-5 pt-5 pb-4 flex items-start gap-4">
+                  {/* Product Image */}
+                  <div className="flex-shrink-0 w-[84px] h-[84px] rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+                    {notif.image ? (
+                      <img
+                        src={notif.image.url}
+                        alt={notif.image.altText || notif.title}
+                        width={84}
+                        height={84}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.2)" strokeWidth={1.2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Text column */}
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    {/* "Added to Cart" label with check */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span
+                        className="inline-flex items-center justify-center w-4 h-4 rounded-full flex-shrink-0"
+                        style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)' }}
+                      >
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+                        Added to Cart
+                      </span>
+                    </div>
+
+                    {/* Product title */}
+                    <p className="line-clamp-2 mb-3.5" style={{ color: '#fff', fontWeight: 500, fontSize: 15, lineHeight: 1.35 }}>
+                      {notif.title}
+                    </p>
+
+                    {/* View bag CTA */}
+                    <button
+                      type="button"
+                      onClick={() => handleViewCart(notif.id)}
+                      className="inline-flex items-center gap-2 cursor-pointer active:scale-95 group"
+                      style={{
+                        padding: '7px 16px',
+                        borderRadius: '99px',
+                        background: '#fff',
+                        color: '#000',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                        transition: 'background 0.2s',
+                        border: 'none',
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#e5e5e5'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff'; }}
+                      aria-label="View cart"
+                    >
+                      View Bag
+                      <svg className="group-hover:translate-x-0.5 transition-transform" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Close button */}
+                  <button
+                    type="button"
+                    onClick={() => dismiss(notif.id)}
+                    className="flex-shrink-0 flex items-center justify-center cursor-pointer transition-all"
+                    style={{
+                      width: 28, height: 28, borderRadius: '50%',
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      color: 'rgba(255,255,255,0.4)',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLElement).style.color = '#fff'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
+                    aria-label="Dismiss"
+                  >
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Progress bar */}
+                <div className="h-[2px] mx-5 mb-4 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                  <div
+                    className="h-full origin-left rounded-full"
+                    style={{
+                      background: 'rgba(255,255,255,0.55)',
+                      animation: `notifProgress ${AUTO_DISMISS_MS}ms linear forwards`,
+                      animationDelay: notif.exiting ? '99999s' : '0ms',
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
       {/* Keyframes */}
       <style>{`
         @keyframes cartNotifEnter {
-          0% { opacity: 0; transform: translateY(-16px) scale(0.95); }
-          100% { opacity: 1; transform: translateY(0) scale(1); }
+          0%  { opacity: 0; transform: scale(0.84) translateY(20px); filter: blur(4px); }
+          65% { opacity: 1; filter: blur(0); }
+          100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
         }
         @keyframes cartNotifExit {
-          0% { opacity: 1; transform: translateX(0); max-height: 120px; margin-bottom: 10px; }
-          100% { opacity: 0; transform: translateX(100%); max-height: 0; margin-bottom: 0; padding: 0; border-width: 0; overflow: hidden; }
+          0%   { opacity: 1; transform: scale(1); filter: blur(0); }
+          100% { opacity: 0; transform: scale(0.9) translateY(-10px); filter: blur(3px); }
         }
         .cart-notif-enter {
           animation: cartNotifEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .cart-notif-exit {
-          animation: cartNotifExit 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+          animation: cartNotifExit 0.45s cubic-bezier(0.4, 0, 1, 1) forwards;
         }
         @keyframes notifProgress {
           from { width: 100%; }
-          to { width: 0%; }
+          to   { width: 0%; }
         }
       `}</style>
     </CartNotificationContext.Provider>

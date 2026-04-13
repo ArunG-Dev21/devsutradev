@@ -1,3 +1,28 @@
+@keyframes cart-ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes coupon-label-shimmer {
+  0%, 100% { color: #a3e635; } /* lime-400 */
+  50%       { color: #ffffff; }
+}
+
+.coupon-label-animated {
+  background: linear-gradient(90deg, #a3e635, #ffffff, #84cc16, #ffffff, #a3e635);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: coupon-gradient-sweep 2s linear infinite;
+}
+
+@keyframes coupon-gradient-sweep {
+  0%   { background-position: 0% center; }
+  100% { background-position: 100% center; }
+}
+
 :root {
   --aside-width: 420px;
   --cart-aside-summary-height-with-discount: 340px;

@@ -535,7 +535,7 @@ export default function Product() {
                   <button
                     onClick={() => scrollToImage(Math.max(0, selectedImageIndex - 1))}
                     disabled={selectedImageIndex === 0}
-                    className="shrink-0 w-9 h-9 rounded-full border border-gray-300 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="shrink-0 w-9 h-9 rounded-full border border-black bg-white flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                     aria-label="Previous image"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -568,7 +568,7 @@ export default function Product() {
                   <button
                     onClick={() => scrollToImage(Math.min(images.length - 1, selectedImageIndex + 1))}
                     disabled={selectedImageIndex === images.length - 1}
-                    className="shrink-0 w-9 h-9 rounded-full border border-gray-300 bg-white shadow-sm flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="shrink-0 w-9 h-9 rounded-full border border-black bg-white flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                     aria-label="Next image"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -590,7 +590,7 @@ export default function Product() {
               <button
                 type="button"
                 onClick={openShare}
-                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full border border-stone-200 bg-white shadow-sm flex items-center justify-center text-stone-500 hover:text-stone-900 hover:border-stone-400 hover:bg-stone-50 transition-all duration-200"
+                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full border border-stone-200 bg-white flex items-center justify-center text-stone-500 hover:text-stone-900 hover:border-stone-400 hover:bg-stone-50 transition-all duration-200"
                 aria-label="Share this product"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -671,70 +671,7 @@ export default function Product() {
                   setCouponCopied(true);
                   setTimeout(() => setCouponCopied(false), 2200);
                 };
-                return (
-                  <div className="mx-5 mb-4">
-                    {/* Ticket card */}
-                    <div className="relative flex rounded-xl overflow-hidden border border-gold/30 bg-gradient-to-r from-gold/8 via-gold/5 to-gold/8">
-                      {/* Left notch */}
-                      <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border border-stone-200 z-10" />
-                      {/* Right notch */}
-                      <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border border-stone-200 z-10" />
-
-                      {/* Tag icon column */}
-                      <div className="flex items-center justify-center px-4 py-4 border-r border-dashed border-gold/30 shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-gold/15 flex items-center justify-center">
-                          <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
-                          </svg>
-                        </div>
-                      </div>
-
-                      {/* Offer info + code */}
-                      <div className="flex-1 px-4 py-3 flex flex-col justify-center gap-1 min-w-0">
-                        {/* Offer headline — coupon_label metafield */}
-                        <p className="text-sm font-bold text-gold leading-tight">
-                          {label || 'Exclusive Offer'}
-                        </p>
-                        {/* Optional description — coupon_offer metafield */}
-                        {offer && (
-                          <p className="text-[11px] text-gold/80 leading-snug">
-                            {offer}
-                          </p>
-                        )}
-                        {/* Code row */}
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="font-mono font-bold text-sm tracking-widest text-stone-900 bg-white border border-dashed border-gold/50 px-2.5 py-1 rounded-lg select-all">
-                            {code}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => { void copy(); }}
-                            className={`shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all duration-200 ${couponCopied ? 'bg-emerald-500 text-white border border-emerald-500' : 'bg-gold text-white hover:bg-gold/90 border border-gold'}`}
-                            aria-label="Copy coupon code"
-                          >
-                            {couponCopied ? (
-                              <>
-                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                                Copied
-                              </>
-                            ) : (
-                              <>
-                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
-                                </svg>
-                                Copy
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-stone-400 mt-1.5 text-center tracking-wide">Apply at checkout</p>
-                  </div>
-                );
+                return <CouponCard code={code} label={label} offer={offer} />;
               })()}
 
               {/* ── Divider ── */}
@@ -937,7 +874,7 @@ export default function Product() {
                               type="button"
                               disabled={!shopifyProductId}
                               onClick={() => setIsReviewFormOpen(true)}
-                              className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-stone-900 dark:bg-foreground text-white dark:text-background text-[10px] font-bold tracking-widest uppercase hover:bg-stone-700 dark:hover:bg-stone-200 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-stone-900 dark:bg-foreground text-white dark:text-background text-[10px] font-bold tracking-widest uppercase hover:bg-stone-700 dark:hover:bg-stone-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" /></svg>
                               Write a Review
@@ -959,7 +896,7 @@ export default function Product() {
                       type="button"
                       disabled={!shopifyProductId}
                       onClick={() => setIsReviewFormOpen(true)}
-                      className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-stone-900 dark:bg-foreground text-white dark:text-background text-[10px] font-bold tracking-widest uppercase hover:bg-stone-700 dark:hover:bg-stone-200 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-stone-900 dark:bg-foreground text-white dark:text-background text-[10px] font-bold tracking-widest uppercase hover:bg-stone-700 dark:hover:bg-stone-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" /></svg>
                       Write a Review
@@ -1042,7 +979,7 @@ export default function Product() {
                 <JudgeMeReviews reviews={judgeMeReviews} />
               ) : (
                 <div className="py-14 flex flex-col items-center text-center border border-dashed border-stone-200 dark:border-border rounded-2xl bg-stone-50/50 dark:bg-muted/20">
-                  <div className="w-14 h-14 rounded-full bg-white dark:bg-card border border-stone-200 dark:border-border shadow-sm flex items-center justify-center mb-4">
+                  <div className="w-14 h-14 rounded-full bg-white dark:bg-card border border-stone-200 dark:border-border flex items-center justify-center mb-4">
                     <svg className="w-6 h-6 text-stone-300 dark:text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
                     </svg>
@@ -1235,6 +1172,64 @@ export default function Product() {
   );
 }
 
+
+function CouponCard({ code, label, offer }: { code: string; label?: string; offer?: string }) {
+  return (
+    <div className="mx-5 mb-3">
+      <div className="relative rounded-xl bg-black">
+
+        {/* Fire crackers video */}
+        <video
+          src="/videos/fire crackers.webm"
+          autoPlay loop muted playsInline aria-hidden="true"
+          className="absolute top-0 right-0 w-[55%] h-full object-cover object-center pointer-events-none z-5a"
+        />
+
+        {/* Notches */}
+        <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white z-10" />
+        <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white z-10" />
+
+        {/* Festival Offer badge */}
+        <span className="absolute right-0 top-0 z-[2] text-[9px] tracking-[0.14em] uppercase bg-lime-600 text-white rounded-bl-lg rounded-tr-xl px-2 py-0.5">
+          ✦ Festival Offer ✦
+        </span>
+
+        {/* Content */}
+        <div className="relative z-[1] flex items-stretch">
+          {/* Icon */}
+          <div className="flex items-center px-4 sm:px-5 py-4 sm:py-5 shrink-0">
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="#000" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Full-height dashed vertical divider */}
+          <div className="self-stretch w-0 border-l border-dashed border-white" />
+
+          {/* Text */}
+          <div className="flex-1 px-3 sm:px-4 py-3 sm:py-4 flex flex-col gap-1.5 sm:gap-2 min-w-0">
+            <p className="coupon-label-animated text-xs sm:text-sm lg:text-base font-semibold leading-tight">
+              {label || 'Use this code in your bag'}
+            </p>
+            {offer && (
+              <p className="text-[10px] sm:text-xs lg:text-sm text-white/80 leading-tight">{offer}</p>
+            )}
+            <div className="flex items-center gap-2 flex-wrap mt-0.5">
+              <span className="font-mono text-xs sm:text-sm lg:text-base font-medium tracking-widest text-white bg-black/60 px-2 py-0.5 rounded-md border border-dashed border-white/70">
+                {code}
+              </span>
+              <span className="text-[12px] sm:text-sm lg:text-base text-white leading-none">&#x21d2; open bag &#x21d2; tap Apply</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Recommended Products ─────────────────────────────────────────────────────
 
 function RecommendedProducts({ products }: { products: any[] }) {
@@ -1270,53 +1265,48 @@ function RecommendedProducts({ products }: { products: any[] }) {
         {displayProducts.map((product: any, index: number) => (
           <div
             key={product.id}
-            className="group bg-card text-card-foreground border border-border rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5 flex flex-col"
+            className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all h-full"
           >
-            <Link
-              to={`/products/${product.handle}`}
-              prefetch="intent"
-              className="no-underline block aspect-square bg-muted relative overflow-hidden"
-            >
-              {product.featuredImage ? (
-                <Image
-                  data={product.featuredImage}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading={index < 2 ? 'eager' : 'lazy'}
-                  sizes="(min-width: 1024px) 25vw, 50vw"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-5xl opacity-20 text-muted-foreground">
-                    ✦
-                  </span>
-                </div>
-              )}
-            </Link>
+            {/* Image */}
+            <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
+              <Link to={`/products/${product.handle}`} prefetch="intent" className="block w-full h-full">
+                {product.featuredImage ? (
+                  <Image
+                    data={product.featuredImage}
+                    className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    sizes="(min-width: 1024px) 25vw, 50vw"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-transparent">
+                    <span className="text-5xl opacity-20 text-gray-400">✦</span>
+                  </div>
+                )}
+              </Link>
+            </div>
 
-            <div className="p-3 sm:p-3.5 flex flex-col flex-1 gap-1.5">
-              <Link
-                to={`/products/${product.handle}`}
-                prefetch="intent"
-                className="no-underline block"
-              >
-                <h3 className="text-sm sm:text-[15px] lg:text-base xl:text-lg font-medium text-foreground leading-snug line-clamp-2 group-hover:underline underline-offset-4 transition-all">
+            {/* White detail card */}
+            <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
+              <Link to={`/products/${product.handle}`} prefetch="intent" className="block">
+                <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
                   {product.title}
                 </h3>
               </Link>
-              <div className="mt-auto flex items-center justify-between gap-2 pt-1">
-                <div className="text-base sm:text-lg font-semibold text-foreground">
-                  <Money withoutTrailingZeros data={product.priceRange.minVariantPrice} />
-                </div>
 
+              <div className="flex items-center gap-2">
+                <Money
+                  withoutTrailingZeros
+                  data={product.priceRange.minVariantPrice}
+                  className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black leading-none"
+                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                />
+              </div>
+
+              <div className="mt-auto pt-2">
                 <CartForm
                   route="/cart"
                   inputs={{
-                    lines: [
-                      {
-                        merchandiseId: product.variants?.nodes?.[0]?.id,
-                        quantity: 1,
-                      },
-                    ],
+                    lines: [{ merchandiseId: product.variants?.nodes?.[0]?.id, quantity: 1 }],
                   }}
                   action={CartForm.ACTIONS.LinesAdd}
                 >
@@ -1362,23 +1352,11 @@ function RelatedProductAddButton({
     <button
       type="submit"
       disabled={isDisabled}
-      className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white dark:bg-white dark:text-black text-[10px] font-medium tracking-wide uppercase rounded-full transition-colors hover:bg-neutral-800 dark:hover:bg-stone-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-      aria-label="Add to cart"
+      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-800 text-gray-800 text-xs sm:text-base rounded-full group-hover:bg-black/90 group-hover:text-white disabled:cursor-not-allowed cursor-pointer transition-all duration-300 ease-in-out"
+      aria-label="Add to bag"
     >
-      <svg
-        className="w-3.5 h-3.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5h.008v.008h-.008v-.008Zm5.375 0h.008v.008h-.008v-.008Z"
-        />
-      </svg>
-      {availableForSale ? 'Add' : 'Sold Out'}
+      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 group-hover:invert group-hover:brightness-0 transition-all" />
+      {availableForSale ? 'Add to Bag' : 'Sold Out'}
     </button>
   );
 }

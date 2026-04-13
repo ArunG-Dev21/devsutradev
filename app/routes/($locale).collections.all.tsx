@@ -491,7 +491,7 @@ export default function Collection() {
                 {activeFilterIds.map((filterId) => (
                   <span
                     key={filterId}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 shadow-sm text-gray-800 text-xs rounded-full"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 text-gray-800 text-xs rounded-full"
                   >
                     {labelById[filterId] ?? filterId}
                     <button
@@ -513,11 +513,11 @@ export default function Collection() {
               {({ node: product, index }) => (
                 <div
                   key={product.id}
-                  className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all hover:shadow-sm h-full"
+                  className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all hover h-full"
                 >
                   <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
                     {product.tags && product.tags.includes('New') && (
-                      <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded shadow-sm z-10 transition-opacity">
+                      <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded z-10 transition-opacity">
                         New
                       </span>
                     )}
@@ -549,9 +549,21 @@ export default function Collection() {
                         />
                       ) : null;
                     })()}
+
                   </div>
 
                   <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
+                    {/* % Off badge — absolute top-right of white card */}
+                    {product.variants?.nodes?.[0]?.compareAtPrice && (
+                      <span className="absolute top-0 right-0 px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-lime-300 text-green-800">
+                        {Math.round(
+                          ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
+                            parseFloat(product.priceRange.minVariantPrice.amount)) /
+                            parseFloat(product.variants.nodes[0].compareAtPrice.amount)) *
+                          100,
+                        )}% Off
+                      </span>
+                    )}
                     <a href={`/products/${product.handle}`} className="block">
                       <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
                         {product.title}
@@ -573,17 +585,6 @@ export default function Collection() {
                           <Money withoutTrailingZeros data={product.variants.nodes[0].compareAtPrice} />
                         </s>
                       )}
-                      {product.variants?.nodes?.[0]?.compareAtPrice && (
-                        <span className="ml-auto px-2 py-0.5 sm:py-1 text-[9px] sm:text-xs font-medium tracking-widest rounded-full border border-gold text-gold">
-                          {Math.round(
-                            ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
-                              parseFloat(product.priceRange.minVariantPrice.amount)) /
-                              parseFloat(product.variants.nodes[0].compareAtPrice.amount)) *
-                            100,
-                          )}
-                          % Off
-                        </span>
-                      )}
                       {!product.variants?.nodes?.[0]?.compareAtPrice &&
                         product.priceRange.maxVariantPrice.amount !==
                           product.priceRange.minVariantPrice.amount && (
@@ -592,28 +593,7 @@ export default function Collection() {
                     </div>
 
                     <div className="mt-auto pt-2">
-                      <CartForm
-                        route="/cart"
-                        inputs={{
-                          lines: [
-                            {
-                              merchandiseId: product.variants?.nodes?.[0]?.id,
-                              quantity: 1,
-                              selectedVariant: product.variants?.nodes?.[0],
-                            },
-                          ],
-                        }}
-                        action={CartForm.ACTIONS.LinesAdd}
-                      >
-                        {(fetcher) => (
-                          <CollectionAllAddButton
-                            fetcher={fetcher}
-                            availableForSale={product.variants?.nodes?.[0]?.availableForSale}
-                            productTitle={product.title}
-                            productImage={product.featuredImage ?? undefined}
-                          />
-                        )}
-                      </CartForm>
+                      <CollectionAllProductATC product={product} />
                     </div>
                   </div>
                 </div>
@@ -670,9 +650,170 @@ function CollectionAllAddButton({
       className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-800 text-gray-800 text-xs sm:text-base rounded-full transition-colors group-hover:bg-black/90 group-hover:text-white disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
       aria-label="Add to bag"
     >
-      <img src="/icons/add-bag.png" alt="" className="w-6 h-6 shrink-0 group-hover:invert group-hover:brightness-0 transition-all" />
+      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 group-hover:invert group-hover:brightness-0 transition-all" />
       {availableForSale ? 'Add to Bag' : 'Sold Out'}
     </button>
+  );
+}
+
+// ─── Size pill inner — proper component so useEffect works ───────────────────
+function CollectionAllSizePillInner({
+  fetcher,
+  variant,
+  productTitle,
+  productImage,
+  onAdded,
+}: {
+  fetcher: any;
+  variant: { id: string; availableForSale: boolean; title?: string };
+  productTitle: string;
+  productImage?: { url: string; altText?: string | null };
+  onAdded: () => void;
+}) {
+  const { showNotification } = useCartNotification();
+  const prevState = useRef<string>('idle');
+
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+      showNotification(productTitle, productImage);
+      onAdded();
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, showNotification, productTitle, productImage, onAdded]);
+
+  const isAdding = fetcher.state !== 'idle';
+
+  return (
+    <button
+      type="submit"
+      disabled={!variant.availableForSale || isAdding}
+      className={[
+        'px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-medium tracking-wide uppercase border transition-all duration-150 cursor-pointer select-none',
+        !variant.availableForSale
+          ? 'border-gray-200 text-gray-300 line-through cursor-not-allowed'
+          : isAdding
+            ? 'border-gray-900 bg-gray-900 text-white opacity-70 cursor-not-allowed'
+            : 'border-gray-300 text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white active:scale-95',
+      ].join(' ')}
+      aria-label={`Add size ${variant.title ?? ''}`}
+    >
+      {isAdding ? (
+        <svg className="animate-spin inline-block w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        </svg>
+      ) : (
+        variant.title ?? '—'
+      )}
+    </button>
+  );
+}
+
+// ─── Size pill form wrapper ───────────────────────────────────────────────────
+function CollectionAllSizePill({
+  variant,
+  productTitle,
+  productImage,
+  productId,
+  onAdded,
+}: {
+  variant: { id: string; availableForSale: boolean; title?: string };
+  productTitle: string;
+  productImage?: { url: string; altText?: string | null };
+  productId: string;
+  onAdded: () => void;
+}) {
+  return (
+    <CartForm
+      route="/cart"
+      action={CartForm.ACTIONS.LinesAdd}
+      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1 }] }}
+      fetcherKey={`all-size-${productId}-${variant.id}`}
+    >
+      {(fetcher) => (
+        <CollectionAllSizePillInner
+          fetcher={fetcher}
+          variant={variant}
+          productTitle={productTitle}
+          productImage={productImage}
+          onAdded={onAdded}
+        />
+      )}
+    </CartForm>
+  );
+}
+
+// ─── Smart ATC for all-products collection cards ──────────────────────────────
+function CollectionAllProductATC({ product }: { product: any }) {
+  const [showSizes, setShowSizes] = useState(false);
+  const variants: Array<{ id: string; availableForSale: boolean; title?: string }> = product.variants?.nodes ?? [];
+  const firstVariant = variants[0];
+  const isAvailable = firstVariant?.availableForSale ?? false;
+  const hasMultiple = variants.length > 1;
+
+  if (!isAvailable) {
+    return (
+      <button disabled className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-400 text-xs sm:text-base rounded-full cursor-not-allowed">
+        Sold Out
+      </button>
+    );
+  }
+
+  if (!hasMultiple) {
+    return (
+      <CartForm
+        route="/cart"
+        inputs={{ lines: [{ merchandiseId: firstVariant.id, quantity: 1, selectedVariant: firstVariant }] }}
+        action={CartForm.ACTIONS.LinesAdd}
+      >
+        {(fetcher) => (
+          <CollectionAllAddButton
+            fetcher={fetcher}
+            availableForSale={isAvailable}
+            productTitle={product.title}
+            productImage={product.featuredImage ?? undefined}
+          />
+        )}
+      </CartForm>
+    );
+  }
+
+  return (
+    <div>
+      {showSizes && (
+        <div className="mb-2">
+          <p className="text-[9px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-1.5">Select Size</p>
+          <div className="flex flex-wrap gap-1.5">
+            {variants.map((v) => (
+              <CollectionAllSizePill
+                key={v.id}
+                variant={v}
+                productTitle={product.title}
+                productImage={product.featuredImage ?? undefined}
+                productId={product.id}
+                onAdded={() => setShowSizes(false)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => setShowSizes((s) => !s)}
+        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-800 text-gray-800 text-xs sm:text-base rounded-full transition-colors group-hover:bg-black/90 group-hover:text-white disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out ${
+          showSizes
+            ? 'bg-black border-white text-white'
+            : 'bg-white border-black text-black hover:bg-black hover:text-white'
+        }`}
+        aria-label="Select size"
+      >
+        <img
+          src="/icons/add-bag.png"
+          alt=""
+          className={`w-4 h-4 md:w-6 md:h-6 shrink-0 transition-all ${showSizes ? '' : 'group-hover:invert group-hover:brightness-0'}`}
+        />
+        {showSizes ? 'Close' : 'Select Size'}
+      </button>
+    </div>
   );
 }
 
@@ -708,10 +849,11 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
         title
       }
     }
-    variants(first: 1) {
+    variants(first: 10) {
       nodes {
         id
         availableForSale
+        title
         price {
           ...MoneyCollectionItem
         }

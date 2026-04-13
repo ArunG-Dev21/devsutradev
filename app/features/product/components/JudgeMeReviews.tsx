@@ -167,7 +167,7 @@ export function JudgeMeReviews({reviews}: {reviews: JudgeMeReview[]}) {
                       src={url}
                       alt=""
                       loading="lazy"
-                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl border border-stone-200 dark:border-border shadow-sm shrink-0 transition-transform duration-300 hover:scale-105"
+                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl border border-stone-200 dark:border-border shrink-0 transition-transform duration-300 hover:scale-105"
                     />
                   ))}
                 </div>

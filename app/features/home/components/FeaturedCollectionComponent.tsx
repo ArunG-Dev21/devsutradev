@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Image, Money, CartForm } from '@shopify/hydrogen';
 import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { Link } from 'react-router';
@@ -18,6 +18,7 @@ type ImageNode = {
 type ProductVariant = {
   id: string;
   availableForSale: boolean;
+  title?: string;
   price?: { amount: string; currencyCode: CurrencyCode };
 };
 
@@ -46,23 +47,214 @@ interface FeaturedCollectionProps {
   reviewSummaries?: Record<string, { averageRating: number; reviewCount: number }>;
 }
 
+// ─── Shared ATC icon button style ────────────────────────────────────────────
+function ATCIconButton({
+  isAdding,
+  justAdded,
+  onClick,
+  disabled,
+  ariaLabel = 'Add to cart',
+  size = 'md',
+  buttonType = 'submit',
+}: {
+  isAdding: boolean;
+  justAdded?: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
+  ariaLabel?: string;
+  size?: 'sm' | 'md';
+  buttonType?: 'submit' | 'button';
+}) {
+  const sizeClasses = size === 'sm'
+    ? 'w-8 h-8 sm:w-9 sm:h-9'
+    : 'w-8 h-8 sm:w-12 sm:h-12';
+  const iconSize = size === 'sm'
+    ? 'w-4 h-4 sm:w-5 sm:h-5'
+    : 'w-5 h-5 sm:w-7 sm:h-7';
+
+  return (
+    <button
+      type={buttonType}
+      disabled={disabled || isAdding}
+      onClick={onClick}
+      className={[
+        sizeClasses,
+        'flex items-center justify-center rounded-full shrink-0',
+        'bg-white border border-black transition-all duration-200 ease-out cursor-pointer select-none',
+        'hover:bg-black group/atc',
+        isAdding
+          ? 'opacity-60 scale-[0.97] cursor-not-allowed'
+          : justAdded
+            ? 'scale-[0.97]'
+            : 'active:scale-[0.96]',
+      ].join(' ')}
+      aria-label={ariaLabel}
+    >
+      {isAdding ? (
+        <svg
+          className={`animate-spin ${size === 'sm' ? 'w-3 h-3 sm:w-3.5 h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+        >
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+        </svg>
+      ) : justAdded ? (
+        <svg
+          className={`${size === 'sm' ? 'w-3 h-3 sm:w-3.5 h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+        >
+          <path d="M5 13l4 4L19 7" />
+        </svg>
+      ) : (
+        <img
+          src="/icons/add-bag.png"
+          alt={ariaLabel}
+          className={`${iconSize} object-contain group-hover/atc:invert`}
+        />
+      )}
+    </button>
+  );
+}
+
+// ─── Size pill inner — must be a real component so useEffect works ────────────
+function SizePillInner({
+  fetcher,
+  variant,
+  productTitle,
+  productImage,
+  onAdded,
+}: {
+  fetcher: any;
+  variant: ProductVariant;
+  productTitle: string;
+  productImage?: ImageNode | null;
+  onAdded: () => void;
+}) {
+  const { showNotification } = useCartNotification();
+  const prevState = useRef<string>('idle');
+
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+      showNotification(productTitle, productImage || undefined);
+      onAdded();
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, showNotification, productTitle, productImage, onAdded]);
+
+  const isAdding = fetcher.state !== 'idle';
+
+  return (
+    <button
+      type="submit"
+      disabled={!variant.availableForSale || isAdding}
+      className={[
+        'px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-medium tracking-wide uppercase border transition-all duration-150 cursor-pointer select-none',
+        !variant.availableForSale
+          ? 'border-border text-muted-foreground/40 line-through cursor-not-allowed'
+          : isAdding
+            ? 'border-foreground bg-foreground text-background opacity-70 cursor-not-allowed'
+            : 'border-border text-foreground hover:border-foreground hover:bg-foreground hover:text-background active:scale-95',
+      ].join(' ')}
+      aria-label={`Add size ${variant.title ?? ''} to cart`}
+    >
+      {isAdding ? (
+        <svg className="animate-spin w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        </svg>
+      ) : (
+        variant.title ?? '—'
+      )}
+    </button>
+  );
+}
+
+// ─── Size pill form wrapper ───────────────────────────────────────────────────
+function SizePillForm({
+  variant,
+  productTitle,
+  productImage,
+  productId,
+  onAdded,
+}: {
+  variant: ProductVariant;
+  productTitle: string;
+  productImage?: ImageNode | null;
+  productId: string;
+  onAdded: () => void;
+}) {
+  return (
+    <CartForm
+      route="/cart"
+      action={CartForm.ACTIONS.LinesAdd}
+      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1 }] }}
+      fetcherKey={`add-size-${productId}-${variant.id}`}
+    >
+      {(fetcher) => (
+        <SizePillInner
+          fetcher={fetcher}
+          variant={variant}
+          productTitle={productTitle}
+          productImage={productImage}
+          onAdded={onAdded}
+        />
+      )}
+    </CartForm>
+  );
+}
+
 // ─── Add to Cart Button ───────────────────────────────────────────────────────
 /**
- * Uses CartForm with a unique fetcherKey per product — exactly the same
- * pattern as QuickViewModal. This is why QuickViewModal works and raw
- * useFetcher posted to /cart does not: CartForm targets the cart route's
- * action internally via Hydrogen's cart handler, not the current page action.
+ * If the product has >1 variant, shows an inline size picker row on first click.
+ * Single-variant products add to cart directly.
  */
-function AddToCartButton({ product }: { product: ProductNode }) {
-  const firstVariant = product.variants?.nodes?.[0];
+function AddToCartButton({
+  product,
+  showSizePicker,
+  onToggleSizePicker,
+}: {
+  product: ProductNode;
+  showSizePicker: boolean;
+  onToggleSizePicker: () => void;
+}) {
+  const variants = product.variants?.nodes ?? [];
+  const firstVariant = variants[0];
   const isAvailable =
     firstVariant?.availableForSale ?? product.availableForSale !== false;
+  const hasMultipleVariants = variants.length > 1;
 
   if (!firstVariant || !isAvailable) {
     return (
       <div className="mt-2.5 w-full py-2 text-center text-[9px] font-medium tracking-widest uppercase text-muted-foreground border border-border rounded-full select-none">
         Sold Out
       </div>
+    );
+  }
+
+  if (hasMultipleVariants) {
+    return (
+      <button
+        type="button"
+        onClick={onToggleSizePicker}
+        className={[
+          'w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full shrink-0',
+          'border transition-all duration-200 ease-out cursor-pointer select-none group/atc',
+          showSizePicker
+            ? 'bg-foreground border-foreground text-background'
+            : 'bg-white border-black hover:bg-black hover:text-white',
+        ].join(' ')}
+        aria-label={showSizePicker ? 'Close size picker' : 'Select size'}
+      >
+        {showSizePicker ? (
+          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <img
+            src="/icons/add-bag.png"
+            alt="Select size"
+            className="w-5 h-5 sm:w-7 sm:h-7 object-contain group-hover/atc:invert"
+          />
+        )}
+      </button>
     );
   }
 
@@ -105,50 +297,155 @@ function AddToCartInner({
   const isAdding = fetcher.state !== 'idle';
 
   return (
-    <button
-      type="submit"
-      disabled={isAdding}
+    <ATCIconButton
+      isAdding={isAdding}
+      justAdded={justAdded}
       onClick={() => {
         setJustAdded(true);
         setTimeout(() => setJustAdded(false), 1800);
       }}
-      className={[
-        'w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center rounded-full shrink-0',
-        'bg-white border border-black transition-all duration-200 ease-out cursor-pointer select-none',
-        'hover:bg-black group/atc',
-        isAdding
-          ? 'opacity-60 scale-[0.97] cursor-not-allowed'
-          : justAdded
-            ? 'scale-[0.97]'
-            : 'active:scale-[0.96]',
-      ].join(' ')}
-      aria-label="Add to cart"
+    />
+  );
+}
+
+// ─── Product Card (own size-picker state) ─────────────────────────────────────
+function ProductCard({
+  product,
+  reviewSummary,
+  onQuickView,
+}: {
+  product: ProductNode;
+  reviewSummary?: { averageRating: number; reviewCount: number };
+  onQuickView: () => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [showSizePicker, setShowSizePicker] = useState(false);
+  const isUnavailable = product.availableForSale === false;
+  const secondaryImage = product.images?.nodes?.[1] ?? null;
+  const variants = product.variants?.nodes ?? [];
+
+  const closeSizePicker = useCallback(() => setShowSizePicker(false), []);
+
+  return (
+    <div
+      className="group/card relative bg-card text-card-foreground rounded-2xl overflow-hidden flex flex-col border hover:-translate-y-0.5 transition-all duration-300 ease-out"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {isAdding ? (
-        <svg
-          className="animate-spin w-3.5 h-3.5 sm:w-4 sm:h-4 text-black group-hover/atc:text-white"
-          viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" strokeWidth="2.5"
-        >
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-        </svg>
-      ) : justAdded ? (
-        <svg
-          className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black group-hover/atc:text-white"
-          viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" strokeWidth="2.5"
-          strokeLinecap="round"
-        >
-          <path d="M5 13l4 4L19 7" />
-        </svg>
-      ) : (
-        <img
-          src="/icons/add-bag.png"
-          alt="Add to cart"
-          className="w-5 h-5 sm:w-7 sm:h-7 object-contain group-hover/atc:invert"
-        />
+      {/* ── IMAGE ── */}
+      <Link to={`/products/${product.handle}`} className="block">
+        <div className="relative aspect-square overflow-hidden bg-stone-100 m-1.5 sm:m-2 xl:m-2.5 rounded-xl">
+          {product.featuredImage && (
+            <Image
+              data={product.featuredImage}
+              className="absolute inset-0 w-full h-full object-cover"
+              sizes="(min-width: 1024px) 33vw, 50vw"
+              style={{
+                opacity: isHovered && secondaryImage ? 0 : 1,
+                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                transition: 'opacity 0.55s ease, transform 0.65s ease',
+                willChange: 'opacity, transform',
+                zIndex: 1,
+              }}
+            />
+          )}
+          {secondaryImage && (
+            <Image
+              data={secondaryImage}
+              className="absolute inset-0 w-full h-full object-cover"
+              sizes="(min-width: 1024px) 33vw, 50vw"
+              style={{
+                opacity: isHovered ? 1 : 0,
+                transform: isHovered ? 'scale(1.02)' : 'scale(1.07)',
+                transition: 'opacity 0.55s ease, transform 0.65s ease',
+                willChange: 'opacity, transform',
+                zIndex: 2,
+              }}
+            />
+          )}
+          <div
+            className="absolute inset-0 bg-linear-to-t from-stone-900/15 to-transparent pointer-events-none"
+            style={{ opacity: isHovered ? 1 : 0, transition: 'opacity 0.4s ease', zIndex: 3 }}
+          />
+          {isUnavailable && (
+            <span
+              className="absolute top-2 left-2 text-[8px] sm:text-[9px] font-medium tracking-wider uppercase px-2 py-0.5 sm:px-3 sm:py-1 bg-card/90 text-muted-foreground border border-border rounded-full backdrop-blur-sm"
+              style={{ zIndex: 4 }}
+            >
+              Sold Out
+            </span>
+          )}
+          {reviewSummary && (
+            <StarRating
+              rating={reviewSummary.averageRating}
+              count={reviewSummary.reviewCount}
+              className="absolute top-2 right-2 z-[4]"
+            />
+          )}
+          {!isUnavailable && (
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView(); }}
+              aria-label="Quick view"
+              className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border border-border bg-card/85 hover:bg-foreground hover:text-background backdrop-blur-sm group/eye"
+              style={{
+                opacity: isHovered ? 1 : 0,
+                transform: isHovered ? 'translateY(0px)' : 'translateY(8px)',
+                transition: 'opacity 0.3s ease, transform 0.3s ease, background-color 0.2s ease',
+                zIndex: 4,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="stroke-stone-800 dark:stroke-stone-200 group-hover/eye:stroke-white dark:group-hover/eye:stroke-stone-900 transition-colors duration-150">
+                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </Link>
+
+      {/* ── INFO + ADD TO CART ── */}
+      <div className="relative px-2 sm:px-3 xl:px-4 pb-2 sm:pb-3 xl:pb-4 mt-1 flex items-center gap-1.5 sm:gap-2">
+        <div className="min-w-0 flex-1">
+          <Link to={`/products/${product.handle}`} className="block">
+            <p className="text-xs sm:text-sm xl:text-base font-medium text-foreground line-clamp-2 leading-snug">
+              {product.title}
+            </p>
+            <span className="block text-sm sm:text-base xl:text-lg font-medium text-foreground mt-0.5 leading-none">
+              <Money withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
+            </span>
+          </Link>
+        </div>
+        <div className="shrink-0 flex items-center justify-center">
+          <AddToCartButton
+            product={product}
+            showSizePicker={showSizePicker}
+            onToggleSizePicker={() => setShowSizePicker((p) => !p)}
+          />
+        </div>
+      </div>
+
+      {/* ── INLINE SIZE PICKER ── */}
+      {showSizePicker && variants.length > 1 && (
+        <div className="px-2 sm:px-3 xl:px-4 pb-3 sm:pb-4 border-t border-border/40 pt-2.5">
+          <p className="text-[8px] sm:text-[9px] font-semibold tracking-[0.2em] uppercase text-muted-foreground mb-2">
+            Select Size
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {variants.map((variant) => (
+              <SizePillForm
+                key={variant.id}
+                variant={variant}
+                productTitle={product.title}
+                productImage={product.featuredImage}
+                productId={product.id}
+                onAdded={closeSizePicker}
+              />
+            ))}
+          </div>
+        </div>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -156,8 +453,8 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
   const [sortKey, setSortKey] = useState('price-asc');
   const [quickViewProduct, setQuickViewProduct] = useState<ProductNode | null>(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(6);
+  // hoveredId removed — hover state is now per-card inside ProductCard
 
   const sortButtonRef = useRef<HTMLDivElement>(null);
   const products = [...collection.products.nodes];
@@ -305,146 +602,15 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
         */}
         <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-3 xl:gap-5 lg:grid-cols-2 xl:grid-cols-3">
           {visibleProducts.map((product) => {
-            const isHovered = hoveredId === product.id;
-            const isUnavailable = product.availableForSale === false;
-
-            /**
-             * IMAGE SWAP:
-             * After adding images(first:2) to the query:
-             *   images.nodes[0] === featuredImage  → primary (always shown)
-             *   images.nodes[1]                    → secondary (shown on hover)
-             *
-             * We skip nodes[0] and grab nodes[1] directly.
-             * If undefined, no swap happens — primary just zooms.
-             */
-            const secondaryImage = product.images?.nodes?.[1] ?? null;
-
+            const pid = String(product.id).split('/').pop();
+            const summary = pid ? reviewSummaries?.[pid] : undefined;
             return (
-              <div
+              <ProductCard
                 key={product.id}
-                className="group/card relative bg-card text-card-foreground rounded-2xl overflow-hidden flex flex-col border hover:-translate-y-0.5 transition-all duration-300 ease-out"
-                onMouseEnter={() => setHoveredId(product.id)}
-                onMouseLeave={() => setHoveredId(null)}
-              >
-                {/* ── IMAGE ── */}
-                <Link to={`/products/${product.handle}`} className="block">
-                  <div className="relative aspect-square overflow-hidden bg-stone-100 m-1.5 sm:m-2 xl:m-2.5 rounded-xl">
-
-                    {/* Primary image — fades out when hovered + secondary exists */}
-                    {product.featuredImage && (
-                      <Image
-                        data={product.featuredImage}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        sizes="(min-width: 1024px) 33vw, 50vw"
-                        style={{
-                          opacity: isHovered && secondaryImage ? 0 : 1,
-                          transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                          transition: 'opacity 0.55s ease, transform 0.65s ease',
-                          willChange: 'opacity, transform',
-                          zIndex: 1,
-                        }}
-                      />
-                    )}
-
-                    {/* Secondary image — always rendered, fades in on hover */}
-                    {secondaryImage && (
-                      <Image
-                        data={secondaryImage}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        sizes="(min-width: 1024px) 33vw, 50vw"
-                        style={{
-                          opacity: isHovered ? 1 : 0,
-                          transform: isHovered ? 'scale(1.02)' : 'scale(1.07)',
-                          transition: 'opacity 0.55s ease, transform 0.65s ease',
-                          willChange: 'opacity, transform',
-                          zIndex: 2,
-                        }}
-                      />
-                    )}
-
-                    {/* Gradient vignette */}
-                    <div
-                      className="absolute inset-0 bg-linear-to-t from-stone-900/15 to-transparent pointer-events-none"
-                      style={{
-                        opacity: isHovered ? 1 : 0,
-                        transition: 'opacity 0.4s ease',
-                        zIndex: 3,
-                      }}
-                    />
-
-                    {/* Sold out badge */}
-                    {isUnavailable && (
-                      <span
-                        className="absolute top-2 left-2 text-[8px] sm:text-[9px] font-medium tracking-wider uppercase px-2 py-0.5 sm:px-3 sm:py-1 bg-card/90 text-muted-foreground border border-border rounded-full backdrop-blur-sm"
-                        style={{ zIndex: 4 }}
-                      >
-                        Sold Out
-                      </span>
-                    )}
-
-                    {/* Star Rating badge — top-right of image */}
-                    {(() => {
-                      const pid = String(product.id).split('/').pop();
-                      const summary = pid ? reviewSummaries?.[pid] : undefined;
-                      return summary ? (
-                        <StarRating
-                          rating={summary.averageRating}
-                          count={summary.reviewCount}
-                          className="absolute top-2 right-2 z-[4]"
-                        />
-                      ) : null;
-                    })()}
-
-                    {/* Eye / Quick View — bottom-right of image, slides up on hover */}
-                    {!isUnavailable && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setQuickViewProduct(product);
-                        }}
-                        aria-label="Quick view"
-                        className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border border-border bg-card/85 hover:bg-foreground hover:text-background backdrop-blur-sm group/eye"
-                        style={{
-                          opacity: isHovered ? 1 : 0,
-                          transform: isHovered ? 'translateY(0px)' : 'translateY(8px)',
-                          transition: 'opacity 0.3s ease, transform 0.3s ease, background-color 0.2s ease',
-                          zIndex: 4,
-                        }}
-                      >
-                        <svg
-                          width="14" height="14" viewBox="0 0 24 24"
-                          fill="none" strokeWidth="1.8"
-                          strokeLinecap="round" strokeLinejoin="round"
-                          className="stroke-stone-800 dark:stroke-stone-200 group-hover/eye:stroke-white dark:group-hover/eye:stroke-stone-900 transition-colors duration-150"
-                        >
-                          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                </Link>
-
-                {/* ── INFO + ADD TO CART ── */}
-                <div className="relative px-2 sm:px-3 xl:px-4 pb-2 sm:pb-3 xl:pb-4 mt-1 flex items-center gap-1.5 sm:gap-2">
-                  <div className="min-w-0 flex-1">
-                    <Link to={`/products/${product.handle}`} className="block">
-                      <p className="text-xs sm:text-sm xl:text-base font-medium text-foreground line-clamp-2 leading-snug">
-                        {product.title}
-                      </p>
-                      <span className="block text-sm sm:text-base xl:text-lg font-medium text-foreground mt-0.5 leading-none">
-                        <Money withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
-                      </span>
-                    </Link>
-                  </div>
-
-                  <div className="shrink-0 flex items-center justify-center">
-                    <AddToCartButton product={product} />
-                  </div>
-                </div>
-              </div>
+                product={product}
+                reviewSummary={summary}
+                onQuickView={() => setQuickViewProduct(product)}
+              />
             );
           })}
         </div>

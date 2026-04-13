@@ -229,6 +229,11 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
           price: productPrice,
           variantId: firstVariant?.id ?? null,
           availableForSale: firstVariant?.availableForSale ?? true,
+          variants: (p.variants?.nodes ?? []).map((v: any) => ({
+            id: v.id,
+            availableForSale: v.availableForSale,
+            title: v.title ?? v.id,
+          })),
         };
       });
 
@@ -315,8 +320,8 @@ const FEATURED_COLLECTION_WITH_PRODUCTS_QUERY = `#graphql
           compareAtPriceRange { minVariantPrice { amount currencyCode } }
           featuredImage { url altText width height }
           images(first: 2) { nodes { url altText width height } }
-          variants(first: 1) {
-            nodes { id availableForSale price { amount currencyCode } }
+          variants(first: 10) {
+            nodes { id availableForSale title price { amount currencyCode } }
           }
         }
       }
@@ -436,8 +441,8 @@ const SOCIAL_REELS_QUERY = `#graphql
                 priceRange {
                   minVariantPrice { amount currencyCode }
                 }
-                variants(first: 1) {
-                  nodes { id availableForSale }
+                variants(first: 10) {
+                  nodes { id availableForSale title }
                 }
               }
             }
