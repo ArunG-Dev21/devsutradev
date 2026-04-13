@@ -100,7 +100,7 @@ function ProductSpotlight({
                         className="w-full h-full object-cover rounded-xl transition-transform duration-500 ease-out group-hover/card:scale-105"
                     />
                 ) : (
-                    <div className="w-full h-full bg-linear-to-br from-amber-50 via-orange-50 to-orange-100 dark:from-neutral-800 dark:via-neutral-750 dark:to-neutral-700" />
+                    <div className="w-full h-full bg-linear-to-br from-amber-50 via-lime-50 to-lime-100 dark:from-neutral-800 dark:via-neutral-750 dark:to-neutral-700" />
                 )}
                 {/* Subtle inner glow */}
                 <div className="absolute inset-0 bg-linear-to-t from-background/30 to-transparent pointer-events-none" />
@@ -219,7 +219,7 @@ function ReelTile({ reel }: { reel: ReelItem }) {
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500"
                     />
                 ) : (
-                    <div className="absolute inset-0 bg-linear-to-br from-amber-100 to-orange-200 dark:from-neutral-800 dark:to-neutral-700" />
+                    <div className="absolute inset-0 bg-linear-to-br from-amber-100 to-lime-200 dark:from-neutral-800 dark:to-neutral-700" />
                 )}
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent z-10" />
                 
@@ -303,7 +303,7 @@ function SocialProofMosaic({
                 className="group relative flex items-center justify-between rounded-2xl border px-4 sm:px-5 py-3 sm:py-4 transition-all hover:border-foreground/20 overflow-hidden"
             >
                 {/* Decorative gradient */}
-                <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-amber-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-amber-500/5 via-transparent to-lime-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 <div className="relative z-10 flex items-center gap-2 sm:gap-3 min-w-0">
                     {/* stacked avatars */}
@@ -330,7 +330,7 @@ function SocialProofMosaic({
                                 {r.customerAvatar ? (
                                     <img src={r.customerAvatar} alt={r.customerName} width={80} height={80} sizes="(min-width: 640px) 32px, 28px" className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full bg-linear-to-br from-amber-100 to-orange-200 dark:from-neutral-700 dark:to-neutral-600" />
+                                    <div className="w-full h-full bg-linear-to-br from-amber-100 to-lime-200 dark:from-neutral-700 dark:to-neutral-600" />
                                 )}
                             </div>
                         ))}

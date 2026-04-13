@@ -614,19 +614,18 @@ export default function Product() {
                 )}
 
                 {/* Title — leave space for share button */}
-                <h1 className="text-2xl sm:text-3xl lg:text-[30px] font-semibold text-gray-900 leading-[1.15] mb-2 tracking-tight pr-12">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-gray-900 leading-[1.15] mb-2 tracking-tight pr-12 font-heading">
                   {title}
                 </h1>
 
                 {/* Price */}
                 <div className="flex items-baseline gap-2 mb-3">
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <div className="text-xl sm:text-2xl text-gray-900">
                     <ProductPrice
                       price={selectedVariant?.price}
                       compareAtPrice={selectedVariant?.compareAtPrice}
                     />
                   </div>
-                  <span className="text-[11px] font-medium text-gray-400 uppercase tracking-widest">Incl. all taxes</span>
                 </div>
 
                 {/* Live Rating */}
@@ -634,7 +633,7 @@ export default function Product() {
                   <div className="flex items-center gap-2.5 mb-4">
                     <div className="flex gap-0.5">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <svg key={star} className={`w-3.5 h-3.5 ${star <= Math.round(ratingValue) ? 'text-gold' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <svg key={star} className={`w-5 h-5 ${star <= Math.round(ratingValue) ? 'text-lime-500' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
                         </svg>
                       ))}
@@ -678,42 +677,17 @@ export default function Product() {
               <div className="mx-5 border-t border-stone-100" />
 
               {/* ── Product Form ── */}
-              <div className="px-5 pt-4 pb-2" ref={productFormRef}>
+              <div className="px-5 pt-4 pb-4" ref={productFormRef}>
                 <ProductForm
                   productOptions={productOptions}
                   selectedVariant={selectedVariant}
+                  stockQty={(() => {
+                    const nodes = (product as any).variants?.nodes as any[] | undefined;
+                    const match = nodes?.find((v: any) => v.id === selectedVariant?.id);
+                    return match?.quantityAvailable ?? null;
+                  })()}
                 />
               </div>
-
-              {/* ── Stock count ── */}
-              {(() => {
-                const variantNodes = (product as any).variants?.nodes as any[] | undefined;
-                const matchedVariant = variantNodes?.find((v: any) => v.id === selectedVariant?.id);
-                const qty = matchedVariant?.quantityAvailable;
-                if (qty == null) return null;
-                const isLow = qty <= 5;
-                return (
-                  <div className="px-5 pb-4">
-                    <p className={`text-sm font-semibold ${isLow ? 'text-red-600' : 'text-stone-500'}`}>
-                      {isLow ? (
-                        <span className="flex items-center gap-1.5">
-                          <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                          </svg>
-                          Only {qty} left — order soon!
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 text-stone-400">
-                          <svg className="w-3.5 h-3.5 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                          </svg>
-                          {qty} in stock
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                );
-              })()}
 
             </div>
             {/* ╚══ End bordered product panel ══╝ */}
@@ -1085,7 +1059,7 @@ export default function Product() {
       {/* ── Share Modal (animated bottom-sheet on mobile, centred panel on desktop) ── */}
       {shareOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
           role="dialog"
           aria-modal="true"
           aria-label="Share product"
@@ -1134,7 +1108,7 @@ export default function Product() {
             </div>
 
             {/* Share content */}
-            <div className="px-5 py-5">
+            <div className="px-5 pt-4 pb-6">
               <ProductShare title={title} />
             </div>
           </div>

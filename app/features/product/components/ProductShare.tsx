@@ -52,14 +52,7 @@ export function ProductShare({ title }: { title: string }) {
     };
 
     return (
-        <div className="mt-8 py-6 border-t border-border/60">
-            <div className="flex items-center justify-between mb-4">
-                <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-bold">
-                    Share Product
-                </p>
-                <span className="w-12 h-px bg-border/60 hidden sm:block"></span>
-            </div>
-
+        <div>
             <div className="flex flex-wrap items-center gap-3">
                 {socialLinks.map((link) => (
                     <a

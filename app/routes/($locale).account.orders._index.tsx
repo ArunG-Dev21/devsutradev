@@ -227,7 +227,7 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
 
   const statusColor =
     order.financialStatus === 'PAID' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-      order.financialStatus === 'REFUNDED' ? 'bg-orange-50 text-orange-700 border border-orange-200' :
+      order.financialStatus === 'REFUNDED' ? 'bg-lime-50 text-lime-700 border border-lime-200' :
         'bg-stone-100 text-stone-600 border border-stone-200';
 
   return (

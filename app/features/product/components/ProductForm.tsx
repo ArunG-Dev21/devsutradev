@@ -11,23 +11,42 @@ import type { ProductFragment } from 'storefrontapi.generated';
 export function ProductForm({
   productOptions,
   selectedVariant,
+  stockQty,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
+  stockQty?: number | null;
 }) {
   const navigate = useNavigate();
   const { open } = useAside();
+
+  const isLow = typeof stockQty === 'number' && stockQty <= 5;
+  const firstRenderedIdx = productOptions.findIndex((o) => o.optionValues.length !== 1);
+
   return (
     <div className="space-y-6">
       {/* Variant Options */}
-      {productOptions.map((option) => {
+      {productOptions.map((option, idx) => {
         if (option.optionValues.length === 1) return null;
 
         return (
           <div key={option.name}>
-            <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground mb-3 font-medium">
-              {option.name}
-            </p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs md:text-base tracking-[0.15em]">
+                {option.name.toLowerCase() === 'size' ? 'Choose your size' : option.name}
+              </p>
+              {idx === firstRenderedIdx && stockQty != null && (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-white">
+                  <span className="relative flex h-1.5 w-1.5 shrink-0">
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity ${isLow ? 'bg-red-400' : 'bg-lime-400'}`} />
+                    <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${isLow ? 'bg-red-500' : 'bg-lime-500'}`} />
+                  </span>
+                  <span className={`text-sm font-semibold ${isLow ? 'text-red-500' : 'text-lime-500'}`}>
+                    {isLow ? `Only ${stockQty} left` : `${stockQty} in stock`}
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2">
               {option.optionValues.map((value) => {
                 const {
@@ -43,10 +62,10 @@ export function ProductForm({
 
                 const isColor = !!swatch?.color || !!swatch?.image;
                 const pillClass = isColor
-                  ? `p-0.5 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center ${selected ? 'border-2 border-gray-900' : 'border-2 border-transparent hover:border-gray-300'
+                  ? `p-0.5 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center ${selected ? 'border-2 border-gray-900' : 'border border-transparent hover:border-gray-300'
                   }`
-                  : `min-w-[4rem] px-5 py-3 text-sm font-semibold uppercase rounded-xl transition-all duration-200 cursor-pointer text-center ${selected
-                    ? 'border-2 border-gray-900 bg-white text-gray-900'
+                  : `min-w-[4rem] px-5 py-3 text-sm font-semibold uppercase rounded-full transition-all duration-200 cursor-pointer text-center ${selected
+                    ? 'border-2 border-gray-900 bg-black text-white'
                     : available
                       ? 'border border-gray-300 hover:border-gray-500 text-gray-700 bg-white'
                       : 'border border-gray-200 text-gray-300 bg-gray-50 line-through cursor-not-allowed'

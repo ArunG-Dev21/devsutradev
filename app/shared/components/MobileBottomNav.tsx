@@ -14,10 +14,10 @@ export function MobileBottomNav({ cart }: MobileBottomNavProps) {
 
   const tabs = [
     {
-      id: "profile",
-      label: "Profile",
-      to: "/account",
-      icon: "/icons/account.png",
+      id: "new-arrivals",
+      label: "New Arrivals",
+      to: "/collections/new-arrivals",
+      icon: "/icons/new.png",
     },
     {
       id: "menu",
@@ -26,16 +26,16 @@ export function MobileBottomNav({ cart }: MobileBottomNavProps) {
       icon: "/icons/collection.png",
     },
     {
-      id: "new-arrivals",
-      label: "New Arrivals",
-      to: "/collections/new-arrivals",
-      icon: "/icons/new.png",
-    },
-    {
       id: "cart",
       label: "Cart",
       action: () => open("cart"),
       icon: null,
+    },
+    {
+      id: "profile",
+      label: "Profile",
+      to: "/account",
+      icon: "/icons/account.png",
     },
   ] as const;
 

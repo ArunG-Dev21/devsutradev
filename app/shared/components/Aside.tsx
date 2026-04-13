@@ -67,7 +67,7 @@ export function Aside({
   const hiddenClasses = isLeft ? '-translate-x-full' : 'translate-x-full';
   
   // Make the width < 100vw on mobile so the backdrop is comfortably clickable
-  const widthClass = isLeft ? 'w-full' : 'w-[min(400px,100vw)]';
+  const widthClass = isLeft ? 'w-full' : 'w-full sm:w-[400px]';
 
   return (
     <div
