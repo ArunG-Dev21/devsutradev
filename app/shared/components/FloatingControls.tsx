@@ -261,9 +261,9 @@ function AudioConsentSlider({ onAccept, onSkip }: { onAccept: () => void; onSkip
             style={{
               left: `${n.x}%`,
               bottom: 10,
-              width: 13,
-              height: 13,
-              color: `rgba(255,255,255,0.6)`,
+              width: 40,
+              height: 40,
+              color: `#000`,
               animationName: 'noteFloat',
               animationDuration: '2.2s',
               animationTimingFunction: 'ease-out',
