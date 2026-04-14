@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Link } from 'react-router';
 import { ReelFullScreen } from './ReelFullScreen';
 
 export interface SocialReel {
@@ -25,10 +26,12 @@ export interface SocialReel {
   productTitle?: string | null;
   productImage?: string | null;
   productPrice?: string | null;
+  instagramUrl?: string | null;
 }
 
 interface SocialFeedProps {
   reels: SocialReel[];
+  instagramUrl?: string;
 }
 
 /* ───────────────────────── styles ───────────────────────── */
@@ -162,6 +165,31 @@ const css = `
     flex-shrink: 0;
   }
 
+  /* ── sound toggle ── */
+  .sf-sound-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto;
+    transition: background 0.2s;
+  }
+
+  .sf-sound-btn:hover {
+    background: rgba(0,0,0,0.7);
+  }
+
   /* ── pagination dots ── */
   .sf-dots {
     display: flex;
@@ -187,6 +215,77 @@ const css = `
     background: #1a1a1a;
     opacity: 1;
   }
+
+  /* ── tagged products strip ── */
+  .sf-tagged-products {
+    margin-top: 20px;
+    padding: 0 16px;
+  }
+
+  .sf-tagged-products-inner {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .sf-tagged-products-inner::-webkit-scrollbar { display: none; }
+
+  .sf-product-card {
+    flex-shrink: 0;
+    width: 120px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .sf-product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  }
+
+  .sf-product-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+  }
+
+  .sf-product-info {
+    padding: 8px;
+  }
+
+  .sf-product-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin: 0 0 3px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sf-product-price {
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+    margin: 0;
+  }
+
+  /* ── instagram cta ── */
+  .sf-instagram-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+  }
 `;
 
 /* ───────────────── helpers ───────────────── */
@@ -195,11 +294,42 @@ function getClientX(e: TouchEvent | MouseEvent): number {
   return e.clientX;
 }
 
+/* ── Active card video player ── */
+function ActiveVideoCard({ src, muted }: { src: string; muted: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = muted;
+    videoRef.current.play().catch(() => {});
+  }, [muted]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    videoRef.current.currentTime = 0;
+    videoRef.current.muted = muted;
+    videoRef.current.play().catch(() => {});
+  }, [src]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      loop
+      playsInline
+      muted={muted}
+      autoPlay
+      draggable={false}
+    />
+  );
+}
+
 /* ───────────────────────── component ───────────────────────── */
-export function SocialFeed({ reels }: SocialFeedProps) {
+export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/devasutra/' }: SocialFeedProps) {
   const [activeIndex, setActiveIndex] = useState(() => Math.floor(reels.length / 2));
   const [selectedReelIndex, setSelectedReelIndex] = useState<number | null>(null);
   const [vw, setVw] = useState(1024);
+  const [muted, setMuted] = useState(true);
 
   const trackRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startTime: number; moved: boolean } | null>(null);
@@ -252,7 +382,7 @@ export function SocialFeed({ reels }: SocialFeedProps) {
       if (!dragRef.current) return;
       const { startX, startTime, moved } = dragRef.current;
       dragRef.current = null;
-      if (!moved) return; // was a tap, not a drag — let onClick handle it
+      if (!moved) return;
 
       const endX = 'changedTouches' in e ? e.changedTouches[0]?.clientX ?? startX : e.clientX;
       const dx = endX - startX;
@@ -284,12 +414,9 @@ export function SocialFeed({ reels }: SocialFeedProps) {
     };
   }, [activeIndex, goTo]);
 
-  /* ── card click — completely separate from drag ── */
+  /* ── card click ── */
   const handleCardClick = useCallback(
     (index: number) => {
-      // If drag just happened, dragRef is already null but moved was set.
-      // Since onEnd returns early for taps (moved=false), onClick only fires for taps.
-      // But we also need to block clicks after a drag. Use a simple check:
       if (dragRef.current?.moved) return;
 
       if (index === activeIndex) {
@@ -312,6 +439,8 @@ export function SocialFeed({ reels }: SocialFeedProps) {
   }, [activeIndex, goTo]);
 
   if (!reels || reels.length === 0) return null;
+
+  const activeReel = reels[activeIndex];
 
   /* ── compute transforms ── */
   const getCardStyle = (index: number): React.CSSProperties => {
@@ -349,20 +478,23 @@ export function SocialFeed({ reels }: SocialFeedProps) {
       <div className="sf-viewport">
         <div className="sf-track" ref={trackRef}>
           {reels.map((reel, index) => {
-            const diff = Math.abs(index - activeIndex);
+            const isActive = index === activeIndex;
             return (
               <div
                 key={reel.id}
-                className={`sf-card-wrap${index === activeIndex ? ' is-active' : ''}`}
+                className={`sf-card-wrap${isActive ? ' is-active' : ''}`}
                 style={getCardStyle(index)}
                 onClick={() => handleCardClick(index)}
               >
                 <div className="sf-card">
-                  {reel.thumbnailUrl ? (
+                  {isActive ? (
+                    /* Active card: autoplay video muted */
+                    <ActiveVideoCard src={reel.videoUrl} muted={muted} />
+                  ) : reel.thumbnailUrl ? (
                     <img
                       src={reel.thumbnailUrl}
                       alt={reel.caption || reel.influencerName}
-                      loading={diff <= 2 ? 'eager' : 'lazy'}
+                      loading="lazy"
                       draggable={false}
                     />
                   ) : (
@@ -370,13 +502,33 @@ export function SocialFeed({ reels }: SocialFeedProps) {
                       src={reel.videoUrl}
                       muted
                       playsInline
-                      loop
-                      autoPlay={false}
                       draggable={false}
                     />
                   )}
 
                   <div className="sf-card-overlay" />
+
+                  {/* Sound toggle — only on active card */}
+                  {isActive && (
+                    <button
+                      className="sf-sound-btn"
+                      onClick={(e) => { e.stopPropagation(); setMuted((m) => !m); }}
+                      aria-label={muted ? 'Unmute' : 'Mute'}
+                    >
+                      {muted ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <line x1="23" y1="9" x2="17" y2="15" />
+                          <line x1="17" y1="9" x2="23" y2="15" />
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                        </svg>
+                      )}
+                    </button>
+                  )}
 
                   {reel.products && reel.products.length > 0 && (
                     <div className="sf-badge">
@@ -406,6 +558,52 @@ export function SocialFeed({ reels }: SocialFeedProps) {
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
+      </div>
+
+      {/* Tagged products strip for active reel */}
+      {activeReel?.products && activeReel.products.length > 0 && (
+        <div className="sf-tagged-products">
+          <div className="sf-tagged-products-inner">
+            {activeReel.products.map((product) => (
+              <Link
+                key={product.id}
+                to={`/products/${product.handle}`}
+                className="sf-product-card"
+              >
+                {product.image && (
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="sf-product-img"
+                    loading="lazy"
+                  />
+                )}
+                <div className="sf-product-info">
+                  <p className="sf-product-name">{product.title}</p>
+                  {product.price && (
+                    <p className="sf-product-price">{product.price}</p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Instagram CTA */}
+      <div className="sf-instagram-cta">
+        <a
+          href={instagramUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-[#1a1a1a]/20 bg-white text-[#1a1a1a] text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-200 hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a]"
+          style={{ fontFamily: "'Helvetica Neue', Helvetica, sans-serif" }}
+        >
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+          </svg>
+          Follow on Instagram
+        </a>
       </div>
 
       {selectedReelIndex !== null && (

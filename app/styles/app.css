@@ -13,6 +13,11 @@
   100% { background-position: 100% center; }
 }
 
+@keyframes cart-ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 :root {
   --aside-width: 420px;
   --cart-aside-summary-height-with-discount: 340px;

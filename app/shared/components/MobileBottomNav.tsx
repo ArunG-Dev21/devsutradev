@@ -14,9 +14,9 @@ export function MobileBottomNav({ cart }: MobileBottomNavProps) {
 
   const tabs = [
     {
-      id: "new-arrivals",
-      label: "New Arrivals",
-      to: "/collections/new-arrivals",
+      id: "karungali",
+      label: "Karungali",
+      to: "/collections/karungali",
       icon: "/icons/new.png",
     },
     {
@@ -49,13 +49,14 @@ export function MobileBottomNav({ cart }: MobileBottomNavProps) {
         fixed bottom-0 left-0 right-0
         z-50
         flex items-center justify-around
-        h-17.5
         bg-white dark:bg-black backdrop-blur-xl
         border-t border-border/60
         shadow-[0_-2px_20px_rgba(0,0,0,0.06)]
-        safe-area-pb
       "
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      style={{
+        height: "calc(4.375rem + env(safe-area-inset-bottom))",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
       role="navigation"
       aria-label="Mobile navigation"
     >
@@ -105,7 +106,7 @@ export function MobileBottomNav({ cart }: MobileBottomNavProps) {
               to={tab.to}
               prefetch="intent"
               className={({ isActive: navActive }) =>
-                `${baseClass} ${navActive || isActive ? "text-white" : "text-black"}`
+                `${baseClass} ${navActive || isActive ? "text-foreground" : "text-black dark:text-white"}`
               }
               aria-label={tab.label}
             >

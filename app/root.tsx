@@ -1,4 +1,5 @@
 import { Analytics, getShopAnalytics, useNonce } from '@shopify/hydrogen';
+import { useEffect } from 'react';
 import {
   Outlet,
   useRouteError,
@@ -178,6 +179,37 @@ export function Layout({ children }: { children?: React.ReactNode }) {
   );
 }
 
+function LenisInit() {
+  useEffect(() => {
+    let lenis: any;
+    let raf: number;
+
+    async function init() {
+      const { default: Lenis } = await import('lenis');
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      });
+
+      function onRaf(time: number) {
+        lenis.raf(time);
+        raf = requestAnimationFrame(onRaf);
+      }
+      raf = requestAnimationFrame(onRaf);
+    }
+
+    init();
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      if (lenis) lenis.destroy();
+    };
+  }, []);
+
+  return null;
+}
+
 export default function App() {
   const data = useRouteLoaderData<RootLoader>('root');
 
@@ -191,6 +223,7 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
+      <LenisInit />
       <PageLayout {...data}>
         <Outlet />
       </PageLayout>

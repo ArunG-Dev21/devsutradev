@@ -277,7 +277,7 @@ export function ReelFullScreen({ reels, initialIndex, onClose }: ReelFullScreenP
   const [expandedCaptionId, setExpandedCaptionId] = useState<string | null>(null);
   const [showProductSheetId, setShowProductSheetId] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const [globalMuted, setGlobalMuted] = useState(false);
+  const [globalMuted, setGlobalMuted] = useState(true);
 
   useEffect(() => {
     setIsMounted(true);

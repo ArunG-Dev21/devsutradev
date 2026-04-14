@@ -144,6 +144,9 @@ export default function Contact() {
             method="POST"
           >
             <input type="hidden" name="access_key" value="e4362a3a-74fa-4754-be81-2abed67b1206" />
+            <input type="hidden" name="subject" value="New Contact Form Submission – Devasutra" />
+            <input type="hidden" name="redirect" value="https://web3forms.com/success" />
+            <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
                 <label
@@ -156,7 +159,7 @@ export default function Contact() {
                   type="text"
                   id="name"
                   name="name"
-                  className="w-full  dark:bg-background border border-stone-200 dark:border-border text-stone-900 dark:text-foreground placeholder:text-stone-400 dark:placeholder:text-muted-foreground rounded-lg px-4 py-3 focus:outline-none focus:border-stone-400 dark:focus:border-ring focus:bg-white dark:focus:bg-background transition-colors"
+                  className="w-full dark:bg-background border border-stone-200 dark:border-border text-stone-900 dark:text-foreground placeholder:text-stone-400 dark:placeholder:text-muted-foreground rounded-lg px-4 py-3 focus:outline-none focus:border-stone-400 dark:focus:border-ring focus:bg-white dark:focus:bg-background transition-colors"
                   placeholder="e.g. Anjali Sharma"
                   required
                 />

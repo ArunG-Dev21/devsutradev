@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(npx vite:*)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts|jsx|js\\)$\")",
+      "Bash(find:*)",
+      "Bash(npm list:*)"
     ]
   }
 }

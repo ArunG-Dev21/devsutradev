@@ -158,9 +158,9 @@ export function Header({
 
   return (
     <header ref={headerRef} className="sticky top-0 z-50 bg-background text-foreground transition-all duration-300">
-      <div className={`relative z-20 transition-all duration-300 border-b border-border
+      <div className={`relative z-20 transition-all duration-300 md:border-b md:border-border
         grid ease-in-out
-        ${scrolled ? 'grid-rows-[0fr] opacity-0 border-b-0' : 'grid-rows-[1fr] opacity-100'}
+        ${scrolled ? 'grid-rows-[0fr] opacity-0 md:border-b-0' : 'grid-rows-[1fr] opacity-100'}
       `}>
         <div className={`min-h-0 ${scrolled ? 'overflow-hidden' : 'overflow-visible md:overflow-visible'}`}>
           <div className="container px-3 mx-auto sm:px-6 lg:px-8 py-3 lg:py-4 flex items-center justify-between relative">
@@ -419,7 +419,7 @@ export function HeaderMenu({
         <p className="text-sm uppercase tracking-[0.2em] font-medium text-gold mb-5">
           Browse Collections
         </p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {mobileCollectionCards.map((item) => {
             if (!item) return null;
 
@@ -456,8 +456,8 @@ export function HeaderMenu({
                 <div className="absolute inset-x-0 top-0 h-12 bg-linear-to-b from-black/20 to-transparent" />
 
                 {/* Collection name */}
-                <div className="relative w-full px-4 pb-4">
-                  <p className="text-white text-sm tracking-[0.12em] uppercase leading-tight drop line-clamp-2">
+                <div className="relative w-full px-2.5 pb-2.5">
+                  <p className="text-white text-[10px] tracking-[0.08em] uppercase leading-tight line-clamp-2">
                     {item.title}
                   </p>
                 </div>

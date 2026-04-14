@@ -599,11 +599,11 @@ export default function Product() {
               </button>
 
               {/* ── Main info (padded) ── */}
-              <div className="px-5 pt-5 pb-4">
+              <div className="px-5 pt-5 pb-4 text-center sm:text-left">
 
                 {/* Out of Stock badge */}
                 {!selectedVariant?.availableForSale && (
-                  <div className="flex items-center gap-1.5 mb-3">
+                  <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-3">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] uppercase tracking-wide font-bold bg-red-50 text-red-600 border border-red-200">
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -619,7 +619,7 @@ export default function Product() {
                 </h1>
 
                 {/* Price */}
-                <div className="flex items-baseline gap-2 mb-3">
+                <div className="flex items-baseline justify-center sm:justify-start gap-2 mb-3">
                   <div className="text-xl sm:text-2xl text-gray-900">
                     <ProductPrice
                       price={selectedVariant?.price}
@@ -630,7 +630,7 @@ export default function Product() {
 
                 {/* Live Rating */}
                 {hasRating && (
-                  <div className="flex items-center gap-2.5 mb-4">
+                  <div className="flex items-center justify-center sm:justify-start gap-2.5 mb-4">
                     <div className="flex gap-0.5">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg key={star} className={`w-5 h-5 ${star <= Math.round(ratingValue) ? 'text-lime-500' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
@@ -646,7 +646,7 @@ export default function Product() {
 
                 {/* Tags */}
                 {displayTags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-4">
+                  <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mb-4">
                     {displayTags.map((t) => (
                       <span
                         key={t}

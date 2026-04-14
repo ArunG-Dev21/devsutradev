@@ -255,12 +255,12 @@ function SearchResultsPredictiveProducts({
                   />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-accent transition-colors">
+                  <p className="text-base font-medium text-foreground line-clamp-2 group-hover:text-accent transition-colors">
                     {product.title}
                   </p>
                   <div className="mt-1">
                     {price && (
-                      <span className="text-xs font-semibold text-foreground/80">
+                      <span className="text-sm font-medium text-foreground/70">
                         <Money withoutTrailingZeros data={price} />
                       </span>
                     )}

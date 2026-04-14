@@ -340,6 +340,10 @@ const FEATURED_COLLECTION_WITH_PRODUCTS_QUERY = `#graphql
         id title handle availableForSale
         priceRange { minVariantPrice { amount currencyCode } }
         featuredImage { url altText width height }
+        images(first: 2) { nodes { url altText width height } }
+        variants(first: 10) {
+          nodes { id availableForSale title price { amount currencyCode } }
+        }
       }
     }
   }

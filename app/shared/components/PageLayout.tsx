@@ -68,8 +68,10 @@ export function PageLayout({
           subNavRef={subNavRef}
         />
       )}
-      {!hasCustomBreadcrumbPlacement ? <RouteBreadcrumbBanner variant="contrast" /> : null}
-      <main className='bg- md:pb-0'>{children}</main>
+      <main className='bg- md:pb-0'>
+        {!hasCustomBreadcrumbPlacement ? <RouteBreadcrumbBanner variant="contrast" /> : null}
+        {children}
+      </main>
       <TrustBadgesBar />
       <Footer
         footer={footer}

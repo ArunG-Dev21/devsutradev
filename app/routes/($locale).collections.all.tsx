@@ -262,7 +262,7 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="group flex items-center gap-2 text-left text-xs sm:text-[13px] border border-gray-300 rounded-full px-4 py-2 sm:px-5 sm:py-2.5 bg-white text-gray-800 focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-black"
+        className="group flex items-center gap-2 text-left text-[13px] border border-gray-300 rounded-full px-5 py-2.5 bg-white text-gray-800 focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-black"
       >
         <span className="truncate block"><span className="text-gray-500">Sort by:</span> {activeOption.label}</span>
         <svg
@@ -438,10 +438,10 @@ export default function Collection() {
               <div className="flex items-center gap-3 relative">
                 <button
                   onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                  className={`lg:hidden group flex items-center gap-2 px-5 py-3 border rounded-full text-[13px] text-gray-800 bg-white cursor-pointer transition-all duration-200 select-none ${
+                  className={`lg:hidden group flex items-center gap-2 px-5 py-2.5 border rounded-full text-[13px] text-gray-800 bg-white cursor-pointer transition-all duration-200 select-none ${
                     mobileFiltersOpen
                       ? 'border-gray-800 shadow-md bg-gray-50'
-                      : 'border-gray-200 hover:border-gray-400'
+                      : 'border-gray-300 hover:border-black'
                   }`}
                 >
                   <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
