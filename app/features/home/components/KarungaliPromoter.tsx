@@ -547,8 +547,6 @@ export function KarungaliPromoter({
                     onClose={() => setQuickViewProduct(null)}
                 />
             )}
-
-            <style dangerouslySetInnerHTML={{ __html: `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }` }} />
         </section>
     );
 }

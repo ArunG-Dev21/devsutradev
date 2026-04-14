@@ -18,6 +18,64 @@
   100% { transform: translateX(-50%); }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── CartNotification ── */
+@keyframes cartNotifEnter {
+  0%  { opacity: 0; transform: scale(0.84) translateY(20px); filter: blur(4px); }
+  65% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+@keyframes cartNotifExit {
+  0%   { opacity: 1; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0; transform: scale(0.9) translateY(-10px); filter: blur(3px); }
+}
+.cart-notif-enter { animation: cartNotifEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.cart-notif-exit  { animation: cartNotifExit 0.45s cubic-bezier(0.4, 0, 1, 1) forwards; }
+@keyframes notifProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+/* ── WhyDevasutra – certificate ken burns ── */
+@keyframes cert-kenburns {
+  0%   { transform: scale(1.4) translateX(15%); }
+  50%  { transform: scale(1.4) translateX(-15%); }
+  100% { transform: scale(1.4) translateX(15%); }
+}
+.cert-kenburns-anim {
+  animation: cert-kenburns 8s linear infinite;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+/* ── WhyDevasutra – stats autoscroll ── */
+@keyframes stats-autoscroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.stats-autoscroll {
+  animation: stats-autoscroll 16s linear infinite;
+  will-change: transform;
+}
+
+/* ── SwiperComponent shimmer ── */
+@keyframes swiperShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+:root {
+  --shimmer-color: rgba(0,0,0,0.04);
+  --shimmer-highlight: rgba(0,0,0,0.08);
+}
+.dark {
+  --shimmer-color: rgba(255,255,255,0.04);
+  --shimmer-highlight: rgba(255,255,255,0.08);
+}
+
 :root {
   --aside-width: 420px;
   --cart-aside-summary-height-with-discount: 340px;

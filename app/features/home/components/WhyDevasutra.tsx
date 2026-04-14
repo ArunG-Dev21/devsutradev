@@ -354,24 +354,6 @@ function CertShowcase() {
     return (
         <div className="flex flex-col gap-3">
             <div className="relative aspect-4/3 rounded-xl overflow-hidden bg-muted border border-border">
-                <style>{`
-                    @keyframes cert-kenburns {
-                        0% {
-                            transform: scale(1.4) translateX(15%);
-                        }
-                        50% {
-                            transform: scale(1.4) translateX(-15%);
-                        }
-                        100% {
-                            transform: scale(1.4) translateX(15%);
-                        }
-                    }
-                    .cert-kenburns-anim {
-                        animation: cert-kenburns 8s linear infinite;
-                        will-change: transform;
-                        transform-origin: center center;
-                    }
-                `}</style>
                 <img
                     src="/certificate-card3.png"
                     alt="Lab Certificate – Rudraksha 5 Mukhi"
@@ -493,18 +475,6 @@ export function WhyDevasutra({ reels = [], testimonials = [] }: WhyDevasutraProp
 
       {/* Mobile: Animated horizontal scroll */}
       <div className="block sm:hidden -mx-4 overflow-x-hidden">
-
-        <style>{`
-          @keyframes stats-autoscroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-
-          .stats-autoscroll {
-            animation: stats-autoscroll 16s linear infinite;
-            will-change: transform;
-          }
-        `}</style>
 
         <div
           className="flex gap-3 px-4 whitespace-nowrap stats-autoscroll"

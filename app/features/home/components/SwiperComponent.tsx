@@ -77,26 +77,6 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
         </div>
       )}
 
-      {/* ── Inject keyframes for the shimmer ── */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-            @keyframes swiperShimmer {
-              0%   { background-position: 200% 0; }
-              100% { background-position: -200% 0; }
-            }
-            :root {
-              --shimmer-color: rgba(0,0,0,0.04);
-              --shimmer-highlight: rgba(0,0,0,0.08);
-            }
-            .dark {
-              --shimmer-color: rgba(255,255,255,0.04);
-              --shimmer-highlight: rgba(255,255,255,0.08);
-            }
-          `,
-        }}
-      />
-
       {/* ── Actual Swiper — opacity-0 until ready, then fades in ── */}
       <div
         className="w-full h-full transition-opacity duration-700 ease-out"

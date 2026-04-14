@@ -243,28 +243,6 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
         </div>
       )}
 
-      {/* Keyframes */}
-      <style>{`
-        @keyframes cartNotifEnter {
-          0%  { opacity: 0; transform: scale(0.84) translateY(20px); filter: blur(4px); }
-          65% { opacity: 1; filter: blur(0); }
-          100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
-        }
-        @keyframes cartNotifExit {
-          0%   { opacity: 1; transform: scale(1); filter: blur(0); }
-          100% { opacity: 0; transform: scale(0.9) translateY(-10px); filter: blur(3px); }
-        }
-        .cart-notif-enter {
-          animation: cartNotifEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .cart-notif-exit {
-          animation: cartNotifExit 0.45s cubic-bezier(0.4, 0, 1, 1) forwards;
-        }
-        @keyframes notifProgress {
-          from { width: 100%; }
-          to   { width: 0%; }
-        }
-      `}</style>
     </CartNotificationContext.Provider>
   );
 }
