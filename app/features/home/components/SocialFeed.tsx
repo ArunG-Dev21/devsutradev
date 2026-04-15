@@ -34,267 +34,20 @@ interface SocialFeedProps {
   instagramUrl?: string;
 }
 
-/* ───────────────────────── styles ───────────────────────── */
-const css = `
-  .sf-section {
-    width: 100%;
-    overflow: hidden;
-    padding: 60px 0 80px;
-    background-color: #f5f2ed;
-    user-select: none;
-  }
+/* ── tag SVG (reused in badge + label) ── */
+const TagIcon = ({ className = '' }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7A1.5 1.5 0 0 1 4 5.5 1.5 1.5 0 0 1 5.5 4 1.5 1.5 0 0 1 7 5.5 1.5 1.5 0 0 1 5.5 7z" />
+  </svg>
+);
 
-  .sf-header {
-    text-align: center;
-    margin-bottom: 48px;
-  }
-
-  .sf-subtitle {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #9a8c7e;
-    margin: 0 0 10px;
-  }
-
-  .sf-title {
-    font-family: 'Georgia', 'Times New Roman', serif;
-    font-size: clamp(32px, 5vw, 52px);
-    font-weight: 400;
-    color: #1a1a1a;
-    margin: 0;
-    line-height: 1.1;
-  }
-
-  /* ── track wrapper ── */
-  .sf-viewport {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: pan-y;
-  }
-
-  .sf-track {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    height: clamp(400px, 65vw, 580px);
-    perspective: 1200px;
-    perspective-origin: center center;
-  }
-
-  /* ── individual card ── */
-  .sf-card-wrap {
-    position: absolute;
-    left: 50%;
-    width: clamp(200px, 42vw, 300px);
-    aspect-ratio: 9 / 16;
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                opacity 0.5s ease,
-                filter 0.5s ease;
-    will-change: transform, opacity;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-
-  .sf-card {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 20px;
-    overflow: hidden;
-    background: #1a1a1a;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-    cursor: pointer;
-  }
-
-  .sf-card-wrap.is-active .sf-card {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  }
-
-  .sf-card video,
-  .sf-card img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    pointer-events: none;
-  }
-
-  .sf-card-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      transparent 50%,
-      rgba(0, 0, 0, 0.55) 100%
-    );
-    pointer-events: none;
-  }
-
-  /* ── product badge ── */
-  .sf-badge {
-    position: absolute;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(30, 30, 30, 0.72);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 6px 14px;
-    border-radius: 999px;
-    white-space: nowrap;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    pointer-events: none;
-  }
-
-  .sf-badge-icon {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-  }
-
-  /* ── sound toggle ── */
-  .sf-sound-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    pointer-events: auto;
-    transition: background 0.2s;
-  }
-
-  .sf-sound-btn:hover {
-    background: rgba(0,0,0,0.7);
-  }
-
-  /* ── pagination dots ── */
-  .sf-dots {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 32px;
-  }
-
-  .sf-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: #9a8c7e;
-    opacity: 0.4;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .sf-dot.is-active {
-    width: 20px;
-    background: #1a1a1a;
-    opacity: 1;
-  }
-
-  /* ── tagged products strip ── */
-  .sf-tagged-products {
-    margin-top: 20px;
-    padding: 0 16px;
-  }
-
-  .sf-tagged-products-inner {
-    max-width: 600px;
-    margin: 0 auto;
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    scrollbar-width: none;
-  }
-  .sf-tagged-products-inner::-webkit-scrollbar { display: none; }
-
-  .sf-product-card {
-    flex-shrink: 0;
-    width: 120px;
-    border-radius: 14px;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.08);
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .sf-product-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-  }
-
-  .sf-product-img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    display: block;
-  }
-
-  .sf-product-info {
-    padding: 8px;
-  }
-
-  .sf-product-name {
-    font-size: 11px;
-    font-weight: 500;
-    color: #1a1a1a;
-    line-height: 1.3;
-    margin: 0 0 3px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .sf-product-price {
-    font-size: 11px;
-    font-weight: 600;
-    color: #555;
-    margin: 0;
-  }
-
-  /* ── instagram cta ── */
-  .sf-instagram-cta {
-    display: flex;
-    justify-content: center;
-    margin-top: 32px;
-  }
-`;
-
-/* ───────────────── helpers ───────────────── */
+/* ── helpers ── */
 function getClientX(e: TouchEvent | MouseEvent): number {
   if ('touches' in e) return e.touches[0]?.clientX ?? 0;
   return e.clientX;
 }
 
-/* ── Active card video player ── */
+/* ── active-card video player ── */
 function ActiveVideoCard({ src, muted }: { src: string; muted: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -320,11 +73,12 @@ function ActiveVideoCard({ src, muted }: { src: string; muted: boolean }) {
       muted={muted}
       autoPlay
       draggable={false}
+      className="absolute inset-0 w-full h-full object-cover block pointer-events-none"
     />
   );
 }
 
-/* ───────────────────────── component ───────────────────────── */
+/* ═══════════════════════════════════════════════════════ */
 export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/devasutra/' }: SocialFeedProps) {
   const [activeIndex, setActiveIndex] = useState(() => Math.floor(reels.length / 2));
   const [selectedReelIndex, setSelectedReelIndex] = useState<number | null>(null);
@@ -334,19 +88,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
   const trackRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startTime: number; moved: boolean } | null>(null);
 
-  // Inject styles
-  useEffect(() => {
-    const id = 'sf-carousel-styles';
-    if (!document.getElementById(id)) {
-      const tag = document.createElement('style');
-      tag.id = id;
-      tag.textContent = css;
-      document.head.appendChild(tag);
-    }
-    return () => { document.getElementById(id)?.remove(); };
-  }, []);
-
-  // Track viewport width (SSR-safe)
+  /* track viewport width (SSR-safe) */
   useEffect(() => {
     const update = () => setVw(window.innerWidth);
     update();
@@ -354,7 +96,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  /* ── navigation ── */
+  /* navigation */
   const goTo = useCallback(
     (index: number) => {
       const n = reels.length;
@@ -363,7 +105,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
     [reels.length],
   );
 
-  /* ── swipe via mouse/touch on the track ── */
+  /* swipe / drag */
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
@@ -371,30 +113,20 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
     const onStart = (e: MouseEvent | TouchEvent) => {
       dragRef.current = { startX: getClientX(e), startTime: Date.now(), moved: false };
     };
-
     const onMove = (e: MouseEvent | TouchEvent) => {
       if (!dragRef.current) return;
-      const dx = getClientX(e) - dragRef.current.startX;
-      if (Math.abs(dx) > 8) dragRef.current.moved = true;
+      if (Math.abs(getClientX(e) - dragRef.current.startX) > 8) dragRef.current.moved = true;
     };
-
     const onEnd = (e: MouseEvent | TouchEvent) => {
       if (!dragRef.current) return;
       const { startX, startTime, moved } = dragRef.current;
       dragRef.current = null;
       if (!moved) return;
-
       const endX = 'changedTouches' in e ? e.changedTouches[0]?.clientX ?? startX : e.clientX;
       const dx = endX - startX;
-      const elapsed = Date.now() - startTime;
-      const threshold = 40;
-      const isFlick = Math.abs(dx) > 20 && elapsed < 300;
-
-      if (dx < -threshold || (isFlick && dx < 0)) {
-        goTo(activeIndex + 1);
-      } else if (dx > threshold || (isFlick && dx > 0)) {
-        goTo(activeIndex - 1);
-      }
+      const isFlick = Math.abs(dx) > 20 && Date.now() - startTime < 300;
+      if (dx < -40 || (isFlick && dx < 0)) goTo(activeIndex + 1);
+      else if (dx > 40 || (isFlick && dx > 0)) goTo(activeIndex - 1);
     };
 
     el.addEventListener('mousedown', onStart);
@@ -403,7 +135,6 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
     el.addEventListener('touchstart', onStart, { passive: true });
     el.addEventListener('touchmove', onMove, { passive: true });
     el.addEventListener('touchend', onEnd);
-
     return () => {
       el.removeEventListener('mousedown', onStart);
       el.removeEventListener('mousemove', onMove);
@@ -414,21 +145,17 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
     };
   }, [activeIndex, goTo]);
 
-  /* ── card click ── */
+  /* card click */
   const handleCardClick = useCallback(
     (index: number) => {
       if (dragRef.current?.moved) return;
-
-      if (index === activeIndex) {
-        setSelectedReelIndex(index);
-      } else {
-        goTo(index);
-      }
+      if (index === activeIndex) setSelectedReelIndex(index);
+      else goTo(index);
     },
     [activeIndex, goTo],
   );
 
-  /* ── keyboard ── */
+  /* keyboard */
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') goTo(activeIndex + 1);
@@ -442,53 +169,77 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
 
   const activeReel = reels[activeIndex];
 
-  /* ── compute transforms ── */
+  /* 3-D card transforms (must stay inline — values are dynamic) */
   const getCardStyle = (index: number): React.CSSProperties => {
     const n = reels.length;
     let diff = index - activeIndex;
     if (diff > n / 2) diff -= n;
     if (diff < -n / 2) diff += n;
-
-    const absDiff = Math.abs(diff);
-
-    const cardGap = Math.min(vw * 0.22, 220);
-    const translateX = diff * cardGap;
-    const translateZ = -absDiff * 80;
-    const rotateY = -diff * 18;
-    const scale = absDiff === 0 ? 1 : Math.max(0.75, 1 - absDiff * 0.1);
-    const opacity = absDiff <= 3 ? Math.max(0.3, 1 - absDiff * 0.25) : 0;
-    const zIndex = 10 - absDiff;
-
+    const abs = Math.abs(diff);
+    const gap = Math.min(vw * 0.22, 220);
     return {
-      transform: `translateX(calc(-50% + ${translateX}px)) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
-      opacity,
-      zIndex,
-      pointerEvents: absDiff <= 4 ? 'auto' : 'none',
-      filter: absDiff === 0 ? 'none' : `brightness(${1 - absDiff * 0.08})`,
-    } as React.CSSProperties;
+      transform: `translateX(calc(-50% + ${diff * gap}px)) translateZ(${-abs * 80}px) rotateY(${-diff * 18}deg) scale(${abs === 0 ? 1 : Math.max(0.75, 1 - abs * 0.1)})`,
+      opacity: abs <= 3 ? Math.max(0.3, 1 - abs * 0.25) : 0,
+      zIndex: 10 - abs,
+      pointerEvents: (abs <= 4 ? 'auto' : 'none') as React.CSSProperties['pointerEvents'],
+      filter: abs === 0 ? 'none' : `brightness(${1 - abs * 0.08})`,
+      transition: 'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.5s ease, filter 0.5s ease',
+      willChange: 'transform, opacity',
+    };
   };
 
   return (
-    <section className="sf-section">
-      <div className="sf-header">
-        <p className="sf-subtitle">Community Highlights</p>
-        <h2 className="sf-title">Social Feed</h2>
+    <section className="w-full overflow-hidden py-14 sm:py-16 lg:py-20 bg-[#f5f2ed] select-none">
+
+      {/* ── Header ── */}
+      <div className="text-center mb-10 sm:mb-12 px-4">
+        <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#9a8c7e] mb-2.5">
+          Community Highlights
+        </p>
+        <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-normal text-[#1a1a1a] leading-[1.1]">
+          Social Feed
+        </h2>
       </div>
 
-      <div className="sf-viewport">
-        <div className="sf-track" ref={trackRef}>
+      {/* ── Carousel viewport ── */}
+      <div
+        className="relative w-full overflow-hidden touch-pan-y"
+        style={{ WebkitTapHighlightColor: 'transparent' }}
+      >
+        {/* perspective wrapper */}
+        <div
+          ref={trackRef}
+          className="relative flex items-center justify-center"
+          style={{
+            height: 'clamp(360px, 62vw, 560px)',
+            perspective: '1200px',
+            perspectiveOrigin: 'center center',
+          }}
+        >
           {reels.map((reel, index) => {
             const isActive = index === activeIndex;
             return (
               <div
                 key={reel.id}
-                className={`sf-card-wrap${isActive ? ' is-active' : ''}`}
-                style={getCardStyle(index)}
+                className="absolute left-1/2 overflow-hidden rounded-[20px]"
+                style={{
+                  width: 'clamp(180px, 38vw, 280px)',
+                  aspectRatio: '9/16',
+                  ...getCardStyle(index),
+                }}
                 onClick={() => handleCardClick(index)}
               >
-                <div className="sf-card">
+                {/* inner card */}
+                <div
+                  className={[
+                    'relative w-full h-full rounded-[20px] overflow-hidden bg-[#1a1a1a] cursor-pointer',
+                    isActive
+                      ? 'shadow-[0_20px_60px_rgba(0,0,0,0.30)]'
+                      : 'shadow-[0_8px_32px_rgba(0,0,0,0.18)]',
+                  ].join(' ')}
+                >
+                  {/* media */}
                   {isActive ? (
-                    /* Active card: autoplay video muted */
                     <ActiveVideoCard src={reel.videoUrl} muted={muted} />
                   ) : reel.thumbnailUrl ? (
                     <img
@@ -496,6 +247,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                       alt={reel.caption || reel.influencerName}
                       loading="lazy"
                       draggable={false}
+                      className="absolute inset-0 w-full h-full object-cover block pointer-events-none"
                     />
                   ) : (
                     <video
@@ -503,26 +255,28 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                       muted
                       playsInline
                       draggable={false}
+                      className="absolute inset-0 w-full h-full object-cover block pointer-events-none"
                     />
                   )}
 
-                  <div className="sf-card-overlay" />
+                  {/* gradient overlay */}
+                  <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.55)_100%)] pointer-events-none" />
 
-                  {/* Sound toggle — only on active card */}
+                  {/* sound toggle — active card only */}
                   {isActive && (
                     <button
-                      className="sf-sound-btn"
                       onClick={(e) => { e.stopPropagation(); setMuted((m) => !m); }}
                       aria-label={muted ? 'Unmute' : 'Mute'}
+                      className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/20 text-white flex items-center justify-center cursor-pointer z-10 pointer-events-auto transition-colors duration-200"
                     >
                       {muted ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                           <line x1="23" y1="9" x2="17" y2="15" />
                           <line x1="17" y1="9" x2="23" y2="15" />
                         </svg>
                       ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
                           <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
                         </svg>
@@ -530,15 +284,11 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                     </button>
                   )}
 
+                  {/* product-count badge */}
                   {reel.products && reel.products.length > 0 && (
-                    <div className="sf-badge">
-                      <svg className="sf-badge-icon" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-                      </svg>
-                      <span>
-                        {reel.products.length}{' '}
-                        {reel.products.length === 1 ? 'Product' : 'Products'}
-                      </span>
+                    <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[rgba(30,30,30,0.72)] backdrop-blur-md text-white text-xs font-medium px-3.5 py-1.5 rounded-full whitespace-nowrap border border-white/[0.12] pointer-events-none">
+                      <TagIcon className="w-3.5 h-3.5 shrink-0" />
+                      <span>{reel.products.length} {reel.products.length === 1 ? 'Product' : 'Products'}</span>
                     </div>
                   )}
                 </div>
@@ -548,40 +298,54 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
         </div>
       </div>
 
-      {/* Pagination dots */}
-      <div className="sf-dots">
+      {/* ── Pagination dots ── */}
+      <div className="flex justify-center gap-1.5 mt-5">
         {reels.map((_, i) => (
           <button
             key={i}
-            className={`sf-dot${i === activeIndex ? ' is-active' : ''}`}
             onClick={() => goTo(i)}
             aria-label={`Go to slide ${i + 1}`}
+            className={[
+              'h-1.5 rounded-full border-0 p-0 cursor-pointer transition-all duration-300',
+              i === activeIndex
+                ? 'w-5 bg-[#1a1a1a] opacity-100'
+                : 'w-1.5 bg-[#9a8c7e] opacity-40',
+            ].join(' ')}
           />
         ))}
       </div>
 
-      {/* Tagged products strip for active reel */}
+      {/* ── Tagged products strip ── */}
       {activeReel?.products && activeReel.products.length > 0 && (
-        <div className="sf-tagged-products">
-          <div className="sf-tagged-products-inner">
+        <div className="mt-2.5 px-4 sm:px-6">
+          {/* anchor label */}
+          <div className="flex items-center justify-center gap-1.5 text-[10px] font-semibold tracking-[0.16em] uppercase text-[#9a8c7e] mb-2.5">
+            <TagIcon className="w-3 h-3 shrink-0 opacity-70" />
+            Products in this reel
+          </div>
+
+          {/* scrollable row */}
+          <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar max-w-[600px] mx-auto">
             {activeReel.products.map((product) => (
               <Link
                 key={product.id}
                 to={`/products/${product.handle}`}
-                className="sf-product-card"
+                className="shrink-0 w-[110px] sm:w-[128px] rounded-2xl overflow-hidden bg-white border border-black/[0.08] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)]"
               >
                 {product.image && (
                   <img
                     src={product.image}
                     alt={product.title}
-                    className="sf-product-img"
                     loading="lazy"
+                    className="w-full aspect-square object-cover block"
                   />
                 )}
-                <div className="sf-product-info">
-                  <p className="sf-product-name">{product.title}</p>
+                <div className="p-2">
+                  <p className="text-[11px] font-medium text-[#1a1a1a] leading-snug mb-0.5 line-clamp-2">
+                    {product.title}
+                  </p>
                   {product.price && (
-                    <p className="sf-product-price">{product.price}</p>
+                    <p className="text-[11px] font-semibold text-[#555]">{product.price}</p>
                   )}
                 </div>
               </Link>
@@ -590,14 +354,13 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
         </div>
       )}
 
-      {/* Instagram CTA */}
-      <div className="sf-instagram-cta">
+      {/* ── Instagram CTA ── */}
+      <div className="flex justify-center mt-8 px-4">
         <a
           href={instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-[#1a1a1a]/20 bg-white text-[#1a1a1a] text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-200 hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a]"
-          style={{ fontFamily: "'Helvetica Neue', Helvetica, sans-serif" }}
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
@@ -606,6 +369,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
         </a>
       </div>
 
+      {/* ── Fullscreen overlay ── */}
       {selectedReelIndex !== null && (
         <ReelFullScreen
           reels={reels}
