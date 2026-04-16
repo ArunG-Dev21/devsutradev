@@ -1,5 +1,6 @@
 import { defineConfig, defaultClientConditions, type Plugin } from 'vite';
 import { hydrogen } from '@shopify/hydrogen/vite';
+import { oxygen } from '@shopify/mini-oxygen/vite';
 import { reactRouter } from '@react-router/dev/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
@@ -131,36 +132,26 @@ function oxygenNode(): Plugin[] {
   ];
 }
 
-export default defineConfig({
-  plugins: [
-    tailwindcss(),
-    hydrogen(),
-    oxygenNode(),
-    reactRouter(),
-    tsconfigPaths(),
-  ],
-  build: {
-    // Allow a strict Content-Security-Policy
-    // withtout inlining assets as base64:
-    assetsInlineLimit: 0,
-  },
-  ssr: {
-    noExternal: ['xss'],
-    optimizeDeps: {
-      /**
-       * Include dependencies here if they throw CJS<>ESM errors.
-       * For example, for the following error:
-       *
-       * > ReferenceError: module is not defined
-       * >   at /Users/.../node_modules/example-dep/index.js:1:1
-       *
-       * Include 'example-dep' in the array below.
-       * @see https://vitejs.dev/config/dep-optimization-options
-       */
-      include: ['set-cookie-parser', 'cookie', 'react-router', 'xss'],
+export default defineConfig(({ command }) => {
+  return {
+    plugins: [
+      tailwindcss(),
+      hydrogen(),
+      // Use your custom Node SSR for local dev to prevent workerd crashing on Windows.
+      // Use official Shopify mini-oxygen compiler on Oxygen builds.
+      command === 'serve' ? oxygenNode() : oxygen(),
+      reactRouter(),
+      tsconfigPaths(),
+    ],
+    build: {
+      assetsInlineLimit: 0,
     },
-  },
-  server: {
-    allowedHosts: ['.tryhydrogen.dev', '.ngrok-free.dev'],
-  },
+    ssr: {
+      optimizeDeps: {
+        include: [
+          'typographic-base',
+        ],
+      },
+    },
+  };
 });

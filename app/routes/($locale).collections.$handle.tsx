@@ -383,7 +383,7 @@ export default function Collection() {
     let filteredNodes = collection.products.nodes;
 
     if (activeFilters.length > 0) {
-      filteredNodes = filteredNodes.filter((product) => {
+      filteredNodes = filteredNodes.filter((product: ProductItemFragment) => {
         const price = Number(product.priceRange.minVariantPrice.amount);
 
         return activeFilters.every((filter) => {
@@ -661,7 +661,7 @@ export default function Collection() {
                 </div>
 
                 <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
-                  {relatedArticles.map((article) => (
+                  {relatedArticles.map((article: any) => (
                     <Link
                       key={article.id}
                       to={`/blogs/${article.blog.handle}/${article.handle}`}
