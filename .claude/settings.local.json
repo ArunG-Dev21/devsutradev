@@ -5,7 +5,12 @@
       "Bash(xargs ls:*)",
       "Bash(grep -E \"\\\\.\\(tsx|ts|jsx|js\\)$\")",
       "Bash(find:*)",
-      "Bash(npm list:*)"
+      "Bash(npm list:*)",
+      "Bash(D:/Devasutra/devasutradev/node_modules/miniflare/node_modules/@cloudflare/workerd-windows-64/bin/workerd.exe --version)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)"
     ]
   }
 }

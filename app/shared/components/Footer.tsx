@@ -9,15 +9,16 @@ interface FooterProps {
   publicStoreDomain: string;
 }
 
-export function Footer({
-  footer: footerPromise,
+function FooterContent({
+  footer,
   header,
   publicStoreDomain,
-}: FooterProps) {
+}: {
+  footer: FooterQuery | null;
+  header: HeaderQuery;
+  publicStoreDomain: string;
+}) {
   return (
-    <Suspense>
-      <Await resolve={footerPromise}>
-        {(footer) => (
           <footer className="border-t border-primary-border text-text-main w-full">
             <div className="container mx-auto px-6 sm:px-10 lg:px-16 pt-10 pb-10">
 
@@ -158,6 +159,23 @@ export function Footer({
 
             </div>
           </footer>
+  );
+}
+
+export function Footer({
+  footer: footerPromise,
+  header,
+  publicStoreDomain,
+}: FooterProps) {
+  const fallback = (
+    <FooterContent footer={null} header={header} publicStoreDomain={publicStoreDomain} />
+  );
+
+  return (
+    <Suspense fallback={fallback}>
+      <Await resolve={footerPromise} errorElement={fallback}>
+        {(footer) => (
+          <FooterContent footer={footer} header={header} publicStoreDomain={publicStoreDomain} />
         )}
       </Await>
     </Suspense>

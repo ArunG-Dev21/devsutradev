@@ -1,12 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   init,
   toggle,
-  fadeIn,
   isPlaying,
-  getPreference,
   STATE_EVENT,
-  AUTOPLAY_FAILED_EVENT,
 } from '~/lib/audioController';
 import { useTheme } from '~/context/theme';
 
@@ -14,8 +11,6 @@ export function FloatingControls() {
   const [playing, setPlaying] = useState(false);
   const [visible, setVisible] = useState(true);
   const { toggle: toggleTheme } = useTheme();
-
-  const [showConsent, setShowConsent] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -25,39 +20,13 @@ export function FloatingControls() {
       setPlaying(detail?.playing ?? false);
     };
 
-    const handleAutoplayFailed = () => {
-      setShowConsent(true);
-    };
-
     window.addEventListener(STATE_EVENT, handleStateChange);
-    window.addEventListener(AUTOPLAY_FAILED_EVENT, handleAutoplayFailed);
-
-    const pref = getPreference();
-    if (pref === 'unmuted') {
-      init();
-      fadeIn(1500);
-    } else {
-      setShowConsent(true);
-    }
-
     setPlaying(isPlaying());
 
     return () => {
       window.removeEventListener(STATE_EVENT, handleStateChange);
-      window.removeEventListener(AUTOPLAY_FAILED_EVENT, handleAutoplayFailed);
     };
   }, []);
-
-  const handleConsent = (accept: boolean) => {
-    setShowConsent(false);
-    if (accept) {
-      init();
-      fadeIn(1500);
-      localStorage.setItem('devotion-audio-pref', 'unmuted');
-    } else {
-      localStorage.setItem('devotion-audio-pref', 'muted');
-    }
-  };
 
   /* Scroll visibility logic */
   useEffect(() => {
@@ -161,31 +130,6 @@ export function FloatingControls() {
         </button>
       </div>
 
-      {/* Audio Consent — minimal pill */}
-      {showConsent && (
-        <div className="fixed bottom-24 sm:bottom-16 left-1/2 -translate-x-1/2 z-[999] pointer-events-auto animate-in slide-in-from-bottom-4 fade-in duration-500">
-          <div className="flex items-center gap-3 bg-black/90 border border-white/10 backdrop-blur-md rounded-full px-5 py-3 shadow-2xl">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/60 shrink-0">
-              <path d="M9 18V5l12-2v13" />
-              <circle cx="6" cy="18" r="3" />
-              <circle cx="18" cy="16" r="3" />
-            </svg>
-            <span className="text-[10px] tracking-[0.14em] uppercase text-white/40 whitespace-nowrap">Background music</span>
-            <button
-              onClick={() => handleConsent(true)}
-              className="text-[10px] font-bold tracking-[0.14em] uppercase text-white bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
-            >
-              Play
-            </button>
-            <button
-              onClick={() => handleConsent(false)}
-              className="text-[10px] font-medium tracking-[0.1em] uppercase text-white/35 hover:text-white/60 transition-colors cursor-pointer"
-            >
-              Skip
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 }

@@ -46,7 +46,7 @@ export function CollectionHeroBanner({
               width={1920}
               height={1080}
               sizes="100vw"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover object-left md:object-center"
             />
           ) : (
             <div className="h-full w-full bg-linear-to-br from-stone-950 via-black to-stone-900" />

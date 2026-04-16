@@ -1,4 +1,5 @@
 export { Hero } from './Hero';
+export { MobileCollectionNav } from './MobileCollectionNav';
 export { SplitHero } from './SplitHero';
 export { SwiperComponent } from './SwiperComponent';
 export { FeaturedCollectionComponent } from './FeaturedCollectionComponent';

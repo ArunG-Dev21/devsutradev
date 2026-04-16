@@ -1,5 +1,6 @@
 import { SwiperComponent, type HeroSlide } from './SwiperComponent';
 import { FeaturedCollectionComponent } from './FeaturedCollectionComponent';
+import { MobileCollectionNav } from './MobileCollectionNav';
 import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 
 interface HeroProps {
@@ -55,6 +56,7 @@ export function Hero({ collection, slides, reviewSummaries }: HeroProps) {
       >
         <SwiperComponent slides={slides} />
       </div>
+      <MobileCollectionNav />
       <div className="w-full h-auto lg:h-full lg:overflow-y-auto">
         <FeaturedCollectionComponent collection={collection} reviewSummaries={reviewSummaries} />
       </div>

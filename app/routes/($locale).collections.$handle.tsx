@@ -315,11 +315,14 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="group flex items-center gap-2 text-left text-[13px] border border-gray-300 rounded-full px-5 py-2.5 bg-white text-gray-800 focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-black"
+        className="group flex items-center gap-1.5 sm:gap-2 text-left text-[11px] sm:text-[13px] border border-gray-300 rounded-full px-3 py-1.5 sm:px-5 sm:py-2.5 bg-white text-gray-800 focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-black"
       >
-        <span className="truncate block"><span className="text-gray-500">Sort by:</span> {activeOption.label}</span>
+        <span className="truncate block">
+          <span className="sm:hidden text-gray-500">Sort</span>
+          <span className="hidden sm:inline"><span className="text-gray-500">Sort by:</span> {activeOption.label}</span>
+        </span>
         <svg
-          className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
@@ -459,27 +462,27 @@ export default function Collection() {
 
           <div className="flex-1 min-w-0">
 
-            <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
-              <div className="flex items-center gap-3 relative">
+            <div className="flex items-center justify-between mb-5 gap-2">
+              <div className="flex items-center gap-2 relative">
                 <button
                   onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                  className={`lg:hidden group flex items-center gap-2 px-5 py-2.5 border rounded-full text-[13px] text-gray-800 bg-white cursor-pointer transition-all duration-200 select-none ${
+                  className={`lg:hidden group flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-5 sm:py-2.5 border rounded-full text-[11px] sm:text-[13px] text-gray-800 bg-white cursor-pointer transition-all duration-200 select-none ${
                     mobileFiltersOpen
                       ? 'border-gray-800 shadow-md bg-gray-50'
                       : 'border-gray-300 hover:border-black'
                   }`}
                 >
-                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                   </svg>
                   <span className="font-medium tracking-wide">Filters</span>
                   {activeFilters.length > 0 && (
-                    <span className="bg-black text-white w-4.5 h-4.5 rounded-full flex items-center justify-center text-[9px] font-bold">
+                    <span className="bg-black text-white w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0">
                       {activeFilters.length}
                     </span>
                   )}
                   <svg
-                    className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-300 ml-0.5 ${mobileFiltersOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
+                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 transition-transform duration-300 shrink-0 ${mobileFiltersOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2.5}

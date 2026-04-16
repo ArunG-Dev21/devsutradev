@@ -1,5 +1,4 @@
 export { Aside, useAside } from './Aside';
-export { AudioToggle } from './AudioToggle';
 export { BrandLogo } from './BrandLogo';
 export { default as ContactForm } from './ContactForm';
 export { FloatingControls } from './FloatingControls';

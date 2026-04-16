@@ -86,7 +86,7 @@ function ProductSpotlight({
             to={`/products/${productHandle}`}
             prefetch="intent"
             onClick={onClose}
-            className="group/card absolute z-50 bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 w-44 sm:w-56 rounded-2xl overflow-hidden bg-card ring-1 ring-border/50 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.25)] hover:-translate-y-0.5 transition-all duration-300 ease-out cursor-pointer no-underline"
+            className="group/card absolute z-50 bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 w-44 sm:w-56 rounded-2xl overflow-hidden bg-card ring-1 ring-border/50 hover:-translate-y-0.5 transition-all duration-300 ease-out cursor-pointer no-underline"
         >
             {/* Image area */}
             <div className="relative aspect-square bg-muted overflow-hidden m-2 rounded-xl">
@@ -145,7 +145,6 @@ function Hotspot({
     const [open, setOpen] = useState(initiallyOpen);
     const ref = useRef<HTMLDivElement>(null);
 
-    // Sync state if initiallyOpen changes (e.g., from parent)
     useEffect(() => {
         setOpen(initiallyOpen);
     }, [initiallyOpen]);
@@ -204,9 +203,10 @@ function CustomerTag({ name, avatar }: { name: string; avatar?: string }) {
     );
 }
 
-function ReelTile({ reel }: { reel: ReelItem }) {
+/* ---------------------- Reel Tile ---------------------- */
+function ReelTile({ reel, className = "" }: { reel: ReelItem; className?: string }) {
     return (
-        <div className="relative rounded-2xl h-full min-h-50 sm:min-h-65 shadow-lg group">
+        <div className={`relative rounded-2xl h-full group ${className}`}>
             <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                 {reel.videoUrl ? (
                     <video
@@ -222,7 +222,7 @@ function ReelTile({ reel }: { reel: ReelItem }) {
                     <div className="absolute inset-0 bg-linear-to-br from-amber-100 to-lime-200 dark:from-neutral-800 dark:to-neutral-700" />
                 )}
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent z-10" />
-                
+
                 {/* Verified Badge */}
                 {reel.isVerified && (
                     <div className="absolute top-3 left-3 z-30 flex items-center gap-1 bg-white/20 backdrop-blur-md border border-white/30 rounded-full px-2 py-0.5 shadow-lg">
@@ -248,10 +248,10 @@ function ReelTile({ reel }: { reel: ReelItem }) {
     );
 }
 
-/* ---------------------- Testimonial Tile ---------------------- */
-function ImageTile({ testimonial }: { testimonial: TestimonialItem }) {
+/* ---------------------- Image Tile (Testimonial) ---------------------- */
+function ImageTile({ testimonial, className = "" }: { testimonial: TestimonialItem; className?: string }) {
     return (
-        <div className="relative rounded-2xl h-full min-h-45 sm:min-h-60 shadow-lg group">
+        <div className={`relative rounded-2xl h-full min-h-45 sm:min-h-60 group ${className}`}>
             <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                 <img
                     src={testimonial.avatar}
@@ -263,9 +263,24 @@ function ImageTile({ testimonial }: { testimonial: TestimonialItem }) {
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent z-10" />
             </div>
-            <div className="absolute bottom-2 left-2 z-40 pointer-events-none">
+            <div className="absolute bottom-3 left-3 right-3 z-40 pointer-events-none">
                 <CustomerTag name={testimonial.name} />
-                <p className="text-[10px] text-white/70 italic mt-1 line-clamp-1 pointer-events-auto">{testimonial.text}</p>
+                {testimonial.text && (
+                    <div className="mt-1.5 flex items-start gap-1.5">
+                        {/* Quotation icon */}
+                        <svg
+                            className="w-3 h-3 text-amber-300/80 shrink-0 mt-0.5"
+                            fill="currentColor"
+                            viewBox="0 0 32 32"
+                            aria-hidden="true"
+                        >
+                            <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                        </svg>
+                        <p className="text-[10px] text-white/85 italic line-clamp-2 pointer-events-auto leading-snug">
+                            {testimonial.text}
+                        </p>
+                    </div>
+                )}
             </div>
             <Hotspot
                 productHandle={testimonial.productHandle}
@@ -277,7 +292,99 @@ function ImageTile({ testimonial }: { testimonial: TestimonialItem }) {
     );
 }
 
-/* ---------------------- Social Proof Grid ---------------------- */
+/*
+ * ── Mobile stacked cards — 3:4 aspect, 80/20 overlap ──
+ *
+ * How it works (pure CSS sticky):
+ *  • All cards are SIBLINGS in ONE flat container — no per-card wrappers.
+ *    Per-card wrappers break sticky because the containing-block exits the
+ *    viewport before the next card arrives, causing each card to un-stick
+ *    immediately.
+ *
+ *  • Each card is `position: sticky` with `top` increasing by PEEK_PX per
+ *    card. PEEK_PX ≈ 20 % of the card height (3:4 card at ~94 vw ≈ 450 px
+ *    tall on a 390 px wide phone → 20 % ≈ 90 px).
+ *
+ *  • Cards 2 + get a `marginTop` of `calc(100svh - 125vw)` which places
+ *    each card's natural starting position one full viewport height below
+ *    the previous card's start.  This keeps every card invisible (below
+ *    the fold) until the user scrolls to it, then it glides up and sticks
+ *    — revealing the 20 % peek strip of the card above.
+ */
+type StackItem =
+    | { type: "reel"; id: string; data: ReelItem }
+    | { type: "image"; id: string; data: TestimonialItem };
+
+function MobileStackedSection({
+    reels,
+    testimonials,
+}: {
+    reels: ReelItem[];
+    testimonials: TestimonialItem[];
+}) {
+    const items: StackItem[] = [
+        ...reels.slice(0, 2).map((r) => ({ type: "reel" as const, id: r.id, data: r })),
+        ...testimonials.slice(0, 3).map((t) => ({ type: "image" as const, id: t.id, data: t })),
+    ];
+
+    /*
+     * PEEK_PX  — how many px of the card above remain visible once the next
+     *            card stacks on top.  ~90 px ≈ 20 % of a 450 px tall card.
+     *
+     * HEADER_PX — offset from viewport top for card 1 (clears the mobile
+     *             navbar).  Subsequent cards add PEEK_PX per layer.
+     *
+     * marginTop formula — `calc(100svh - 125vw)`:
+     *   • 125vw  ≈  card height for a 3:4 card at full mobile width
+     *              (card_width ≈ 94 vw → height ≈ 94 vw × 4/3 ≈ 125 vw)
+     *   • 100svh - 125vw  = the gap needed so the card starts exactly one
+     *     viewport height below the previous card, entering from off-screen.
+     */
+    const HEADER_PX = 64;
+    const PEEK_PX   = 24;
+
+    return (
+        /* Single flat container — all sticky siblings share this as their
+           containing block, so none of them un-sticks prematurely.        */
+        <div>
+            {items.map((item, index) => (
+                <div
+                    key={item.id}
+                    className="sticky w-full"
+                    style={{
+                        top: `${HEADER_PX + index * PEEK_PX}px`,
+                        zIndex: index + 1,
+                        marginTop: index === 0 ? 0 : "32px",
+                    }}
+                >
+                    {/* 1:1 aspect-ratio shell */}
+                    <div
+                        className="relative w-full rounded-2xl"
+                        style={{
+                            aspectRatio: "1/1",
+                        }}
+                    >
+                        <div className="absolute inset-0">
+                            {item.type === "reel" ? (
+                                <ReelTile
+                                    reel={{ ...item.data, initiallyOpen: index === 0 }}
+                                    className="rounded-2xl"
+                                />
+                            ) : (
+                                <ImageTile
+                                    testimonial={item.data}
+                                    className="rounded-2xl"
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+/* ---------------------- Social Proof Mosaic ---------------------- */
 function SocialProofMosaic({
     reels = [],
     testimonials = [],
@@ -285,10 +392,67 @@ function SocialProofMosaic({
     reels: ReelItem[];
     testimonials: TestimonialItem[];
 }) {
+    const seeAllLink = (
+        <Link
+            to="/pages/about"
+            prefetch="intent"
+            className="group relative flex items-center justify-between rounded-2xl border px-4 sm:px-5 py-3 sm:py-4 transition-all hover:border-foreground/20 overflow-hidden"
+        >
+            {/* Decorative gradient */}
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-amber-500/5 via-transparent to-lime-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            <div className="relative z-10 flex items-center gap-2 sm:gap-3 min-w-0">
+                {/* stacked avatars */}
+                <div className="flex -space-x-2 shrink-0">
+                    {testimonials.slice(0, 3).map((t, i) => (
+                        <div
+                            key={t.id}
+                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-card overflow-hidden bg-muted"
+                            style={{ zIndex: 3 - i }}
+                        >
+                            {t.avatar ? (
+                                <img src={t.avatar} alt={t.name} width={80} height={80} sizes="(min-width: 640px) 32px, 28px" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-linear-to-br dark:to-neutral-600" />
+                            )}
+                        </div>
+                    ))}
+                    {reels.slice(0, 1).map((r) => (
+                        <div
+                            key={r.id}
+                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-card overflow-hidden bg-muted"
+                            style={{ zIndex: 0 }}
+                        >
+                            {r.customerAvatar ? (
+                                <img src={r.customerAvatar} alt={r.customerName} width={80} height={80} sizes="(min-width: 640px) 32px, 28px" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-linear-to-br from-amber-100 to-lime-200 dark:from-neutral-700 dark:to-neutral-600" />
+                            )}
+                        </div>
+                    ))}
+                </div>
+                <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-semibold text-foreground truncate">Discover Our Story</p>
+                    <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">Learn what makes Devasutra different</p>
+                </div>
+            </div>
+
+            <span className="relative z-10 text-muted-foreground group-hover:text-foreground transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+            </span>
+        </Link>
+    );
+
     return (
         <div className="flex flex-col gap-3 h-full">
-            {/* Mobile: stack vertically; sm+: 2-col mosaic */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 gap-3 flex-1">
+            {/* ── Mobile: stacked sticky cards (< sm) ── */}
+            <div className="sm:hidden flex flex-col gap-3">
+                <MobileStackedSection reels={reels} testimonials={testimonials} />
+                {seeAllLink}
+            </div>
+
+            {/* ── Desktop: 2-col mosaic (sm+) ── */}
+            <div className="hidden sm:grid sm:grid-cols-2 sm:grid-rows-2 gap-3 flex-1">
                 <div className="sm:row-span-2">
                     {reels[0] && <ReelTile reel={{ ...reels[0], initiallyOpen: true }} />}
                 </div>
@@ -296,55 +460,8 @@ function SocialProofMosaic({
                 <div>{testimonials[1] && <ImageTile testimonial={testimonials[1]} />}</div>
             </div>
 
-            {/* See All Reviews link card */}
-            <Link
-                to="/pages/about"
-                prefetch="intent"
-                className="group relative flex items-center justify-between rounded-2xl border px-4 sm:px-5 py-3 sm:py-4 transition-all hover:border-foreground/20 overflow-hidden"
-            >
-                {/* Decorative gradient */}
-                <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-amber-500/5 via-transparent to-lime-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                <div className="relative z-10 flex items-center gap-2 sm:gap-3 min-w-0">
-                    {/* stacked avatars */}
-                    <div className="flex -space-x-2 shrink-0">
-                        {testimonials.slice(0, 3).map((t, i) => (
-                            <div
-                                key={t.id}
-                                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-card overflow-hidden bg-muted"
-                                style={{ zIndex: 3 - i }}
-                            >
-                                {t.avatar ? (
-                                    <img src={t.avatar} alt={t.name} width={80} height={80} sizes="(min-width: 640px) 32px, 28px" className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full bg-linear-to-br dark:to-neutral-600" />
-                                )}
-                            </div>
-                        ))}
-                        {reels.slice(0, 1).map((r) => (
-                            <div
-                                key={r.id}
-                                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-card overflow-hidden bg-muted"
-                                style={{ zIndex: 0 }}
-                            >
-                                {r.customerAvatar ? (
-                                    <img src={r.customerAvatar} alt={r.customerName} width={80} height={80} sizes="(min-width: 640px) 32px, 28px" className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full bg-linear-to-br from-amber-100 to-lime-200 dark:from-neutral-700 dark:to-neutral-600" />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                    <div className="min-w-0">
-                        <p className="text-xs sm:text-sm font-semibold text-foreground truncate">Discover Our Story</p>
-                        <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">Learn what makes Devasutra different</p>
-                    </div>
-                </div>
-
-                <span className="relative z-10 text-muted-foreground group-hover:text-foreground transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
-                </span>
-            </Link>
+            {/* See All — desktop only row */}
+            <div className="hidden sm:block">{seeAllLink}</div>
         </div>
     );
 }
@@ -522,4 +639,3 @@ export function WhyDevasutra({ reels = [], testimonials = [] }: WhyDevasutraProp
         </section>
     );
 }
-

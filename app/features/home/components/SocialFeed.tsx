@@ -176,10 +176,10 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
     if (diff > n / 2) diff -= n;
     if (diff < -n / 2) diff += n;
     const abs = Math.abs(diff);
-    const gap = Math.min(vw * 0.22, 220);
+    const gap = Math.min(vw * 0.35, 300);
     return {
       transform: `translateX(calc(-50% + ${diff * gap}px)) translateZ(${-abs * 80}px) rotateY(${-diff * 18}deg) scale(${abs === 0 ? 1 : Math.max(0.75, 1 - abs * 0.1)})`,
-      opacity: abs <= 3 ? Math.max(0.3, 1 - abs * 0.25) : 0,
+      opacity: abs <= 1 ? (abs === 0 ? 1 : 0.6) : 0,
       zIndex: 10 - abs,
       pointerEvents: (abs <= 4 ? 'auto' : 'none') as React.CSSProperties['pointerEvents'],
       filter: abs === 0 ? 'none' : `brightness(${1 - abs * 0.08})`,
@@ -211,7 +211,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
           ref={trackRef}
           className="relative flex items-center justify-center"
           style={{
-            height: 'clamp(360px, 62vw, 560px)',
+            height: 'clamp(460px, 80vw, 640px)',
             perspective: '1200px',
             perspectiveOrigin: 'center center',
           }}
@@ -223,7 +223,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                 key={reel.id}
                 className="absolute left-1/2 overflow-hidden rounded-[20px]"
                 style={{
-                  width: 'clamp(180px, 38vw, 280px)',
+                  width: 'clamp(260px, 45vw, 360px)',
                   aspectRatio: '9/16',
                   ...getCardStyle(index),
                 }}
@@ -285,10 +285,10 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                   )}
 
                   {/* product-count badge */}
-                  {reel.products && reel.products.length > 0 && (
-                    <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-[rgba(30,30,30,0.72)] backdrop-blur-md text-white text-xs font-medium px-3.5 py-1.5 rounded-full whitespace-nowrap border border-white/[0.12] pointer-events-none">
-                      <TagIcon className="w-3.5 h-3.5 shrink-0" />
-                      <span>{reel.products.length} {reel.products.length === 1 ? 'Product' : 'Products'}</span>
+                  {reel.products && reel.products.length > 0 && !isActive && (
+                    <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[rgba(30,30,30,0.65)] backdrop-blur-md text-white text-[10px] font-medium px-3 py-1 rounded-full whitespace-nowrap border border-white/[0.12] pointer-events-none transition-opacity">
+                      <TagIcon className="w-3 h-3 shrink-0" />
+                      <span>{reel.products.length}</span>
                     </div>
                   )}
                 </div>
@@ -298,8 +298,45 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
         </div>
       </div>
 
+      {/* ── Tagged products dock (Connected to active reel) ── */}
+      {activeReel?.products && activeReel.products.length > 0 && (
+        <div className="relative mt-4 sm:mt-6 z-20 flex flex-col items-center px-4 pointer-events-none transition-all duration-300">
+          <div className="bg-[#f5f2ed]/80 sm:bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.06)] rounded-full p-2 sm:p-2.5 border border-white/60 pointer-events-auto">
+            {/* scrollable row of cute pill cards */}
+            <div className="flex gap-2.5 overflow-x-auto no-scrollbar max-w-[90vw] sm:max-w-[600px] px-1">
+              {activeReel.products.map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/products/${product.handle}`}
+                  className="flex items-center gap-3 shrink-0 w-[170px] sm:w-[190px] p-1.5 pr-4 rounded-full bg-white hover:bg-neutral-50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] cursor-pointer ring-1 ring-black/[0.03]"
+                >
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      loading="lazy"
+                      className="w-10 h-10 rounded-full object-cover block shadow-[0_2px_8px_rgba(0,0,0,0.08)] shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-[#f5f2ed] shrink-0" />
+                  )}
+                  <div className="min-w-0 flex-1 py-0.5 flex flex-col justify-center">
+                    <p className="text-[11px] font-semibold text-[#1a1a1a] truncate leading-tight">
+                      {product.title}
+                    </p>
+                    {product.price && (
+                      <p className="text-[10px] font-medium text-[#777] mt-0.5 leading-tight">{product.price}</p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Pagination dots ── */}
-      <div className="flex justify-center gap-1.5 mt-5">
+      <div className="flex justify-center gap-1.5 mt-8 sm:mt-10 relative z-10">
         {reels.map((_, i) => (
           <button
             key={i}
@@ -314,45 +351,6 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
           />
         ))}
       </div>
-
-      {/* ── Tagged products strip ── */}
-      {activeReel?.products && activeReel.products.length > 0 && (
-        <div className="mt-2.5 px-4 sm:px-6">
-          {/* anchor label */}
-          <div className="flex items-center justify-center gap-1.5 text-[10px] font-semibold tracking-[0.16em] uppercase text-[#9a8c7e] mb-2.5">
-            <TagIcon className="w-3 h-3 shrink-0 opacity-70" />
-            Products in this reel
-          </div>
-
-          {/* scrollable row */}
-          <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar max-w-[600px] mx-auto">
-            {activeReel.products.map((product) => (
-              <Link
-                key={product.id}
-                to={`/products/${product.handle}`}
-                className="shrink-0 w-[110px] sm:w-[128px] rounded-2xl overflow-hidden bg-white border border-black/[0.08] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)]"
-              >
-                {product.image && (
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    loading="lazy"
-                    className="w-full aspect-square object-cover block"
-                  />
-                )}
-                <div className="p-2">
-                  <p className="text-[11px] font-medium text-[#1a1a1a] leading-snug mb-0.5 line-clamp-2">
-                    {product.title}
-                  </p>
-                  {product.price && (
-                    <p className="text-[11px] font-semibold text-[#555]">{product.price}</p>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* ── Instagram CTA ── */}
       <div className="flex justify-center mt-8 px-4">
