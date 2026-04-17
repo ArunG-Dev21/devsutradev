@@ -8,7 +8,6 @@ import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useFetcher, type FetcherWithComponents } from 'react-router';
 import { useCartNotification } from './CartNotification';
-import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper/types';
 import { CartRecommendationsPage } from './CartRecommendationsPage';
@@ -18,7 +17,6 @@ import { CartLineItem, type CartLine } from './CartLineItem';
 import { CartSummary } from './CartSummary';
 import { FREE_SHIPPING_THRESHOLD } from '~/lib/constants';
 import 'swiper/css';
-import 'swiper/css/navigation';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -64,6 +62,35 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
     return [...ids];
   }, [cart?.lines?.nodes]);
 
+  // Fetch Judge.me rating summaries for cart line items
+  const ratingsFetcher = useFetcher<{ summaries: Record<string, { averageRating: number; reviewCount: number }> }>();
+  const lastRatingsKeyRef = useRef<string | null>(null);
+  const cartLineProducts = useMemo(() => {
+    const seen = new Set<string>();
+    const result: { id: string; handle: string }[] = [];
+    for (const line of cart?.lines?.nodes ?? []) {
+      const productId = String((line as any)?.merchandise?.product?.id || '').split('/').pop() || '';
+      const handle = (line as any)?.merchandise?.product?.handle || '';
+      if (productId && handle && !seen.has(productId)) {
+        seen.add(productId);
+        result.push({ id: productId, handle });
+      }
+    }
+    return result;
+  }, [cart?.lines?.nodes]);
+
+  useEffect(() => {
+    if (!cartLineProducts.length) return;
+    const key = cartLineProducts.map((p) => p.id).join(',');
+    if (lastRatingsKeyRef.current === key) return;
+    lastRatingsKeyRef.current = key;
+    const ids = cartLineProducts.map((p) => p.id).join(',');
+    const handles = cartLineProducts.map((p) => p.handle).join(',');
+    void ratingsFetcher.load(`/api/ratings?ids=${encodeURIComponent(ids)}&handles=${encodeURIComponent(handles)}`);
+  }, [cartLineProducts, ratingsFetcher]);
+
+  const cartRatings = ratingsFetcher.data?.summaries ?? {};
+
   const subtotal = parseFloat(cart?.cost?.subtotalAmount?.amount || '0');
   const shippingProgress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
   const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
@@ -108,12 +135,14 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
             if ('parentRelationship' in line && line.parentRelationship?.parent) {
               return null;
             }
+            const pid = String((line as any)?.merchandise?.product?.id || '').split('/').pop() || '';
             return (
               <CartLineItem
                 key={line.id}
                 line={line}
                 layout={layout}
                 childrenMap={childrenMap}
+                reviewSummary={pid ? cartRatings[pid] : undefined}
               />
             );
           })}
@@ -181,7 +210,6 @@ function CartRecommendations({
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(8);
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return;
@@ -201,62 +229,62 @@ function CartRecommendations({
         <p className="text-base tracking-[0.15em] uppercase text-black dark:text-white">
           You may also like
         </p>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => swiper?.slidePrev()}
-            disabled={!swiper || isBeginning}
-            className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-muted transition-colors"
-            aria-label="Previous recommendations"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => swiper?.slideNext()}
-            disabled={!swiper || isEnd}
-            className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-muted transition-colors"
-            aria-label="Next recommendations"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
-            </svg>
-          </button>
-        </div>
+        {products.length > 1 && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => swiper?.slidePrev()}
+              disabled={isBeginning}
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-muted transition-colors"
+              aria-label="Previous recommendations"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => swiper?.slideNext()}
+              disabled={isEnd}
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-muted transition-colors"
+              aria-label="Next recommendations"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
 
-      <Swiper
-        modules={[Navigation]}
-        slidesPerView={1}
-        spaceBetween={12}
-        breakpoints={{
-          0: { slidesPerView: 1, spaceBetween: 12 },
-          640: { slidesPerView: 1, spaceBetween: 12 },
-          1024: { slidesPerView: 1, spaceBetween: 12 },
-        }}
-        onSwiper={(instance) => {
-          setSwiper(instance);
-          setIsBeginning(instance.isBeginning);
-          setIsEnd(instance.isEnd);
-        }}
-        onSlideChange={(instance) => {
-          setIsBeginning(instance.isBeginning);
-          setIsEnd(instance.isEnd);
-        }}
-        className="pb-1"
-      >
-        {products.map((product) => (
-          <SwiperSlide key={product.id}>
-            <RecommendationCard
-              product={product}
-              compact
-              onNavigateAway={onNavigateAway}
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div className="overflow-hidden">
+        <Swiper
+          slidesPerView={1}
+          spaceBetween={12}
+          observer
+          observeParents
+          onSwiper={(instance) => {
+            setSwiper(instance);
+            setIsBeginning(instance.isBeginning);
+            setIsEnd(instance.isEnd);
+          }}
+          onSlideChange={(instance) => {
+            setIsBeginning(instance.isBeginning);
+            setIsEnd(instance.isEnd);
+          }}
+          className="pb-1"
+        >
+          {products.map((product) => (
+            <SwiperSlide key={product.id}>
+              <RecommendationCard
+                product={product}
+                compact
+                onNavigateAway={onNavigateAway}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
     </section>
   );
 }
@@ -272,47 +300,62 @@ function RecommendationCard({
 }) {
   const variantId = product.variant?.id;
   const canAdd = Boolean(variantId && product.variant?.availableForSale);
-  const badgeTag = product.tags?.[0];
 
   return (
-    <div className="group bg-card rounded-2xl overflow-hidden border border-border transition-all duration-300 flex items-stretch relative">
+    <div className="group bg-card rounded-2xl overflow-hidden border border-border transition-all duration-300 flex items-stretch relative h-[120px]">
 
-      {/* IMAGE */}
-      <Link
-        to={`/products/${product.handle}`}
-        onClick={onNavigateAway}
-        className="no-underline block w-28 shrink-0"
-        prefetch="intent"
-      >
-        <div className="h-full bg-muted overflow-hidden relative rounded-l-2xl">
-          {product.featuredImage?.url ? (
-            <img
-              src={product.featuredImage.url}
-              alt={product.featuredImage.altText ?? product.title}
-              width={300}
-              height={300}
-              sizes="112px"
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-muted">
-              <span className="text-4xl opacity-20 text-muted-foreground">*</span>
-            </div>
-          )}
+      {/* IMAGE — with icon-only ATC button on mobile (absolute bottom-right) */}
+      <div className="no-underline block w-32 shrink-0 relative">
+        <Link
+          to={`/products/${product.handle}`}
+          onClick={onNavigateAway}
+          className="no-underline block h-full"
+          prefetch="intent"
+        >
+          <div className="h-full bg-muted overflow-hidden relative rounded-l-2xl">
+            {product.featuredImage?.url ? (
+              <img
+                src={product.featuredImage.url}
+                alt={product.featuredImage.altText ?? product.title}
+                width={300}
+                height={300}
+                sizes="112px"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-muted">
+                <span className="text-4xl opacity-20 text-muted-foreground">*</span>
+              </div>
+            )}
+            {!canAdd && (
+              <div className="absolute top-2 right-2">
+                <span className="px-2 py-0.5 bg-white/90 backdrop-blur text-[9px] font-semibold tracking-wider uppercase rounded-full">
+                  Sold Out
+                </span>
+              </div>
+            )}
+          </div>
+        </Link>
 
-          {!canAdd && (
-            <div className="absolute top-2 right-2">
-              <span className="px-2 py-0.5 bg-white/90 backdrop-blur text-[9px] font-semibold tracking-wider uppercase rounded-full">
-                Sold Out
-              </span>
-            </div>
-          )}
-        </div>
-      </Link>
+        {/* Mobile-only: icon button bottom-right */}
+        {canAdd && variantId && (
+          <div className="absolute bottom-2 right-2 sm:hidden z-10">
+            <CartForm
+              route="/cart"
+              action={CartForm.ACTIONS.LinesAdd}
+              inputs={{ lines: [{ merchandiseId: variantId, quantity: 1, selectedVariant: product.variant }] }}
+            >
+              {(fetcher: FetcherWithComponents<any>) => (
+                <RecommendationIconButton fetcher={fetcher} productTitle={product.title} />
+              )}
+            </CartForm>
+          </div>
+        )}
+      </div>
 
       {/* CONTENT */}
-      <div className="flex flex-col gap-2 flex-1 px-4 py-3">
+      <div className="flex flex-col gap-1.5 flex-1 px-4 py-3">
 
         {/* TITLE */}
         <Link
@@ -321,42 +364,38 @@ function RecommendationCard({
           className="no-underline"
           prefetch="intent"
         >
-          <h3 className="text-lg font-medium text-foreground leading-snug line-clamp-2 group-hover:underline underline-offset-2">
+          <h3 className="text-sm font-medium text-foreground leading-snug line-clamp-2 group-hover:underline underline-offset-2">
             {product.title}
           </h3>
         </Link>
 
-        {/* PRICE + BUTTON */}
-        <div className="flex items-center justify-between">
+        {/* PRICE */}
+        <Money
+          withoutTrailingZeros
+          data={product.priceRange.minVariantPrice}
+          className="text-xl font-light text-foreground"
+        />
 
-          <Money
-            withoutTrailingZeros
-            data={product.priceRange.minVariantPrice}
-            className="text-2xl text-foreground"
-          />
-        </div>
-
-        {canAdd && (
-          <CartForm
-            route="/cart"
-            action={CartForm.ACTIONS.LinesAdd}
-            inputs={{ lines: [{ merchandiseId: variantId!, quantity: 1, selectedVariant: product.variant }] }}
-          >
-            {(fetcher: FetcherWithComponents<any>) => (
-              <RecommendationAddButton
-                fetcher={fetcher}
-                productTitle={product.title}
-              />
-            )}
-          </CartForm>
+        {/* Desktop: full-width Add to Bag button */}
+        {canAdd && variantId && (
+          <div className="mt-auto hidden sm:block">
+            <CartForm
+              route="/cart"
+              action={CartForm.ACTIONS.LinesAdd}
+              inputs={{ lines: [{ merchandiseId: variantId, quantity: 1, selectedVariant: product.variant }] }}
+            >
+              {(fetcher: FetcherWithComponents<any>) => (
+                <RecommendationLongButton fetcher={fetcher} productTitle={product.title} />
+              )}
+            </CartForm>
+          </div>
         )}
-
       </div>
     </div>
   );
 }
 
-function RecommendationAddButton({
+function RecommendationLongButton({
   fetcher,
   productTitle,
 }: {
@@ -373,18 +412,59 @@ function RecommendationAddButton({
     prevState.current = fetcher.state;
   }, [fetcher.state, showNotification, productTitle]);
 
+  const isAdding = fetcher.state !== 'idle';
+
   return (
     <button
       type="submit"
-      disabled={fetcher.state !== 'idle'}
-      className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 rounded-lg text-[11px] uppercase tracking-wider font-bold transition-colors cursor-pointer"
+      disabled={isAdding}
+      className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-black border border-black text-white rounded-full text-[10px] uppercase tracking-widest font-medium hover:bg-stone-800 hover:border-stone-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all duration-200 group/atcbtn"
     >
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <path d="M16 10a4 4 0 0 1-8 0"></path>
-      </svg>
-      Add to Cart
+      {isAdding ? (
+        <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        </svg>
+      ) : (
+        <img src="/icons/add-bag.png" alt="" className="w-3.5 h-3.5 object-contain invert transition-all" />
+      )}
+      {isAdding ? 'Adding…' : 'Add to Bag'}
+    </button>
+  );
+}
+
+function RecommendationIconButton({
+  fetcher,
+  productTitle,
+}: {
+  fetcher: FetcherWithComponents<any>;
+  productTitle: string;
+}) {
+  const { showNotification } = useCartNotification();
+  const prevState = useRef(fetcher.state);
+
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+      showNotification(productTitle);
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, showNotification, productTitle]);
+
+  const isAdding = fetcher.state !== 'idle';
+
+  return (
+    <button
+      type="submit"
+      disabled={isAdding}
+      className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-800 text-gray-800 hover:bg-black hover:border-black disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all duration-200 shadow-md group/iconbtn"
+      aria-label="Add to bag"
+    >
+      {isAdding ? (
+        <svg className="animate-spin w-3.5 h-3.5 text-gray-800 group-hover/iconbtn:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        </svg>
+      ) : (
+        <img src="/icons/add-bag.png" alt="" className="w-4 h-4 object-contain group-hover/iconbtn:invert transition-all" />
+      )}
     </button>
   );
 }

@@ -1,11 +1,12 @@
-import {Link, useLoaderData} from 'react-router';
-import type {Route} from './+types/($locale).blogs._index';
-import {getPaginationVariables, Image} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/features/collection/components/PaginatedResourceSection';
+import { Link, useLoaderData } from 'react-router';
+import type { Route } from './+types/($locale).blogs._index';
+import { getPaginationVariables, Image } from '@shopify/hydrogen';
+import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = () => {
   return [
-    {title: 'Blog - Sacred Wisdom & Guides | Devasutra'},
+    { title: 'Blog - Sacred Wisdom & Guides | Devasutra' },
     {
       name: 'description',
       content:
@@ -17,15 +18,15 @@ export const meta: Route.MetaFunction = () => {
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return {...deferredData, ...criticalData};
+  return { ...deferredData, ...criticalData };
 }
 
-async function loadCriticalData({context, request}: Route.LoaderArgs) {
+async function loadCriticalData({ context, request }: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 12,
   });
 
-  const [{blogs}] = await Promise.all([
+  const [{ blogs }] = await Promise.all([
     context.storefront.query(BLOGS_QUERY, {
       variables: {
         ...paginationVariables,
@@ -33,7 +34,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     }),
   ]);
 
-  return {blogs};
+  return { blogs };
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {
@@ -43,7 +44,7 @@ function loadDeferredData(_args: Route.LoaderArgs) {
 interface BlogNode {
   title: string;
   handle: string;
-  seo?: {title?: string | null; description?: string | null} | null;
+  seo?: { title?: string | null; description?: string | null } | null;
   articles: {
     nodes: Array<{
       id: string;
@@ -58,7 +59,7 @@ interface BlogNode {
         height?: number | null;
       } | null;
       excerpt?: string | null;
-      blog: {handle: string};
+      blog: { handle: string };
     }>;
   };
 }
@@ -102,7 +103,7 @@ function getTopicSummary(blog: BlogNode) {
   return 'Thoughtful articles, rituals, and practical guidance from the Devasutra journal.';
 }
 
-function TopicCard({blog}: {blog: BlogNode}) {
+function TopicCard({ blog }: { blog: BlogNode }) {
   const articleCount = blog.articles.nodes.length;
 
   return (
@@ -253,7 +254,7 @@ function SecondaryArticleCard({
   );
 }
 
-function BlogSection({blog}: {blog: BlogNode}) {
+function BlogSection({ blog }: { blog: BlogNode }) {
   const [featuredArticle, ...secondaryArticles] = blog.articles.nodes;
 
   return (
@@ -313,12 +314,13 @@ function BlogSection({blog}: {blog: BlogNode}) {
 }
 
 export default function Blogs() {
-  const {blogs} = useLoaderData<typeof loader>();
+  const { blogs } = useLoaderData<typeof loader>();
   const blogNodes = blogs.nodes || [];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <section className="border-b border-border/70 bg-muted/20">
+        <RouteBreadcrumbBanner variant="light" />
         <div className="container px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(260px,0.7fr)] lg:items-end">
             <div className="max-w-3xl">
@@ -392,7 +394,7 @@ export default function Blogs() {
 
         <div className="mt-10 space-y-12">
           <PaginatedResourceSection<BlogNode> connection={blogs}>
-            {({node: blog}) => <BlogSection key={blog.handle} blog={blog} />}
+            {({ node: blog }) => <BlogSection key={blog.handle} blog={blog} />}
           </PaginatedResourceSection>
         </div>
       </section>

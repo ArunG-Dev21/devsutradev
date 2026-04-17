@@ -117,50 +117,70 @@ function CartCheckoutActions({
   const { close } = useAside();
   if (!checkoutUrl) return null;
 
+  if (layout === 'aside') {
+    return (
+      <div className="flex gap-2">
+        {/* Checkout — 3/4 width */}
+        {termsAccepted ? (
+          <a
+            href={checkoutUrl}
+            target="_self"
+            className="flex-[3] flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
+          >
+            <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
+            Checkout
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="flex-[3] flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60"
+          >
+            <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
+            Checkout
+          </button>
+        )}
+
+        {/* View bag — 1/4 width */}
+        <Link
+          to="/cart"
+          onClick={close}
+          prefetch="viewport"
+          className="flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 text-center rounded-lg border border-border text-foreground transition-all duration-200 hover:bg-muted"
+          aria-label="View cart"
+        >
+          <svg className='w-5 h-5' viewBox="-0.5 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.9999 9.32007L19.9999 17.3201C19.8507 18.4088 19.3192 19.409 18.5003 20.1418C17.6813 20.8746 16.6285 21.2923 15.5299 21.3201H8.38992C7.29136 21.2923 6.23848 20.8746 5.41957 20.1418C4.60066 19.409 4.0691 18.4088 3.91992 17.3201L2.91992 9.32007" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M3 9.32004C8.81444 7.20973 15.1856 7.20973 21 9.32004" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6.42969 8.34006L9.07969 3.32007" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M17.5699 8.34006L14.9199 3.32007" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="text-[9px] tracking-[0.12em] uppercase font-semibold">View</span>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2">
       {termsAccepted ? (
         <a
           href={checkoutUrl}
           target="_self"
-          className={`flex items-center justify-center gap-2 w-full text-center tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background ${layout === 'aside'
-            ? 'py-2 text-[11px]'
-            : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
-            }`}
+          className="flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 text-center text-[11px] sm:text-sm tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
         >
-          <img src='/icons/rps.png' alt='rupees icon' width={24} height={24} sizes="24px" className='w-6 h-6 ' />
+          <img src='/icons/rps.png' alt='' width={24} height={24} className='w-6 h-6' />
           PROCEED TO CHECKOUT
         </a>
       ) : (
         <button
           type="button"
           disabled
-          className={`flex items-center justify-center gap-2 w-full text-center tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60 ${layout === 'aside'
-            ? 'py-2 text-[11px]'
-            : 'py-2.5 sm:py-3 text-[11px] sm:text-sm'
-            }`}
+          className="flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 text-center text-[11px] sm:text-sm tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60"
         >
-          <img src='/icons/rps.png' alt='rupees icon' width={24} height={24} sizes="24px" className='w-6 h-6 ' />
+          <img src='/icons/rps.png' alt='' width={24} height={24} className='w-6 h-6' />
           PROCEED TO CHECKOUT
         </button>
-      )}
-
-      {layout === 'aside' && (
-        <Link
-          to="/cart"
-          onClick={close}
-          prefetch="viewport"
-          className="flex items-center justify-center gap-2 w-full py-2 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg border border-border text-foreground transition-all duration-200 hover:bg-muted"
-        >
-          <svg className='w-5 h-5' viewBox="-0.5 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20.9999 9.32007L19.9999 17.3201C19.8507 18.4088 19.3192 19.409 18.5003 20.1418C17.6813 20.8746 16.6285 21.2923 15.5299 21.3201H8.38992C7.29136 21.2923 6.23848 20.8746 5.41957 20.1418C4.60066 19.409 4.0691 18.4088 3.91992 17.3201L2.91992 9.32007" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M3 9.32004C8.81444 7.20973 15.1856 7.20973 21 9.32004" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M6.42969 8.34006L9.07969 3.32007" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M17.5699 8.34006L14.9199 3.32007" stroke="#000000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-
-          VIEW CART
-        </Link>
       )}
     </div>
   );

@@ -1,9 +1,10 @@
-import {useLoaderData} from 'react-router';
-import type {Route} from './+types/($locale).pages.$handle';
-import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import { useLoaderData } from 'react-router';
+import type { Route } from './+types/($locale).pages.$handle';
+import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 
 import { generateMeta, truncate } from '~/lib/seo';
 import { sanitizeHtml } from '~/lib/sanitizer';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   const page = (data as any)?.page;
@@ -21,15 +22,15 @@ export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
   const origin = new URL(args.request.url).origin;
-  return {...deferredData, ...criticalData, seoOrigin: origin};
+  return { ...deferredData, ...criticalData, seoOrigin: origin };
 }
 
-async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
+async function loadCriticalData({ context, request, params }: Route.LoaderArgs) {
   if (!params.handle) {
     throw new Error('Missing page handle');
   }
 
-  const [{page}] = await Promise.all([
+  const [{ page }] = await Promise.all([
     context.storefront.query(PAGE_QUERY, {
       variables: {
         handle: params.handle,
@@ -38,10 +39,10 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
   ]);
 
   if (!page) {
-    throw new Response('Not Found', {status: 404});
+    throw new Response('Not Found', { status: 404 });
   }
 
-  redirectIfHandleIsLocalized(request, {handle: params.handle, data: page});
+  redirectIfHandleIsLocalized(request, { handle: params.handle, data: page });
 
   return { page };
 }
@@ -51,13 +52,14 @@ function loadDeferredData(_args: Route.LoaderArgs) {
 }
 
 export default function Page() {
-  const {page} = useLoaderData<typeof loader>();
+  const { page } = useLoaderData<typeof loader>();
 
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/75 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.18),transparent_58%)]" />
+        <RouteBreadcrumbBanner variant="light" className="relative z-10" />
         <div className="container mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
           <div className="mt-4 max-w-3xl">
             <span className="inline-flex items-center rounded-full border border-amber-200/70 bg-amber-50/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900 dark:border-amber-400/20 dark:bg-amber-500/10 dark:text-amber-200">
@@ -99,7 +101,7 @@ export default function Page() {
               [&_blockquote]:my-8 [&_blockquote]:rounded-r-2xl [&_blockquote]:border-l-4 [&_blockquote]:border-amber-700/70 [&_blockquote]:bg-amber-50/50 [&_blockquote]:px-5 [&_blockquote]:py-4 [&_blockquote]:italic [&_blockquote]:text-foreground dark:[&_blockquote]:bg-amber-500/5
               [&_hr]:my-8 [&_hr]:border-border/70
             "
-            dangerouslySetInnerHTML={{__html: sanitizeHtml(page.body)}}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.body) }}
           />
         </div>
       </section>

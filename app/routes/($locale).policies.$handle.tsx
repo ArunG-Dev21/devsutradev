@@ -1,20 +1,21 @@
-import {Link, useLoaderData} from 'react-router';
-import type {Route} from './+types/($locale).policies.$handle';
-import {type Shop} from '@shopify/hydrogen/storefront-api-types';
+import { Link, useLoaderData } from 'react-router';
+import type { Route } from './+types/($locale).policies.$handle';
+import { type Shop } from '@shopify/hydrogen/storefront-api-types';
 import { sanitizeHtml } from '~/lib/sanitizer';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 type SelectedPolicies = keyof Pick<
   Shop,
   'privacyPolicy' | 'shippingPolicy' | 'termsOfService' | 'refundPolicy'
 >;
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.policy.title ?? 'Policy'} | Devasutra`}];
+export const meta: Route.MetaFunction = ({ data }) => {
+  return [{ title: `${data?.policy.title ?? 'Policy'} | Devasutra` }];
 };
 
-export async function loader({params, context}: Route.LoaderArgs) {
+export async function loader({ params, context }: Route.LoaderArgs) {
   if (!params.handle) {
-    throw new Response('No handle was passed in', {status: 404});
+    throw new Response('No handle was passed in', { status: 404 });
   }
 
   const policyName = params.handle.replace(
@@ -36,19 +37,20 @@ export async function loader({params, context}: Route.LoaderArgs) {
   const policy = data.shop?.[policyName];
 
   if (!policy) {
-    throw new Response('Could not find the policy', {status: 404});
+    throw new Response('Could not find the policy', { status: 404 });
   }
 
-  return {policy};
+  return { policy };
 }
 
 export default function Policy() {
-  const {policy} = useLoaderData<typeof loader>();
+  const { policy } = useLoaderData<typeof loader>();
 
   return (
     <div className="min-h-screen bg-background">
       <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/75 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.18),transparent_58%)]" />
+        <RouteBreadcrumbBanner variant="light" className="relative z-10" />
         <div className="container mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
           <Link
             className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/85 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-foreground"
@@ -107,7 +109,7 @@ export default function Policy() {
               [&_img]:my-8 [&_img]:w-full [&_img]:rounded-2xl [&_img]:border [&_img]:border-border/70
               [&_hr]:my-8 [&_hr]:border-border/70
             "
-            dangerouslySetInnerHTML={{__html: sanitizeHtml(policy.body)}}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(policy.body) }}
           />
         </div>
       </section>

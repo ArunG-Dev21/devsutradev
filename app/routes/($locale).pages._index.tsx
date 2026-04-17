@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/($locale).pages._index';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: 'Pages | Devasutra'}];
@@ -26,6 +27,7 @@ export default function PagesIndexRoute() {
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/60 dark:bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neutral-400 rounded-full blur-3xl" />
         </div>
+        <RouteBreadcrumbBanner variant="overlay" className="relative z-10" />
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">Pages</h1>
           <p className="text-sm text-neutral-300 max-w-xl mx-auto">

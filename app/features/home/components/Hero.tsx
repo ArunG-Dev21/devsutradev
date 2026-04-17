@@ -41,23 +41,11 @@ export function Hero({ collection, slides, reviewSummaries }: HeroProps) {
 
   return (
     <section className="flex flex-col lg:grid lg:grid-cols-2 lg:h-[90vh]">
-      <div
-        className="w-full h-[60vh] min-h-[400px] lg:h-[90vh] lg:min-h-0 overflow-hidden"
-        onWheel={(e) => {
-          // Stop scroll events on the Swiper from scrolling the whole page (only relevant on desktop)
-          if (window.innerWidth >= 1024) {
-            e.stopPropagation();
-          }
-        }}
-        onTouchMove={(e) => {
-          // Allow natural mobile scroll but prevent swiper vertical drag from stealing it
-          e.stopPropagation();
-        }}
-      >
+      <div className="w-full h-[60vh] min-h-[400px] lg:h-[90vh] lg:min-h-0 overflow-hidden">
         <SwiperComponent slides={slides} />
       </div>
       <MobileCollectionNav />
-      <div className="w-full h-auto lg:h-full lg:overflow-y-auto">
+      <div className="w-full h-auto lg:h-full lg:overflow-y-auto no-scrollbar">
         <FeaturedCollectionComponent collection={collection} reviewSummaries={reviewSummaries} />
       </div>
     </section>

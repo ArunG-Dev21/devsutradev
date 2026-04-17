@@ -48,14 +48,19 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
     storefront.query(SOCIAL_REELS_QUERY),
   ]);
 
-  // Fetch Judge.me review summaries for featured collection products
+  // Fetch Judge.me review summaries for featured + karungali products
   let reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
   const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
   const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
-  if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string' && collection) {
+  if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string') {
     try {
       const { getJudgeMeBatchSummaries } = await import('~/lib/judgeme.server');
-      const productEntries = (collection.products?.nodes ?? [])
+      const allProducts = [
+        ...(collection?.products?.nodes ?? []),
+        ...(karungaliMaala?.products?.nodes ?? []),
+        ...(karungaliBracelets?.products?.nodes ?? []),
+      ];
+      const productEntries = allProducts
         .map((p: any) => ({
           id: String(p.id).split('/').pop() || '',
           handle: p.handle,
@@ -298,7 +303,7 @@ export default function Homepage() {
       <TrustBadges />
       <WhyDevasutra reels={data.testimonialReels} testimonials={data.testimonials} />
       <link rel="stylesheet" href={socialFeedStyles} />
-      <KarungaliPromoter tabs={data.karungaliTabs} />
+      <KarungaliPromoter tabs={data.karungaliTabs} reviewSummaries={data.reviewSummaries} />
       {data.socialReels && <SocialFeed reels={data.socialReels} />}
     </div>
   );
@@ -339,6 +344,7 @@ const FEATURED_COLLECTION_WITH_PRODUCTS_QUERY = `#graphql
       nodes {
         id title handle availableForSale
         priceRange { minVariantPrice { amount currencyCode } }
+        compareAtPriceRange { minVariantPrice { amount currencyCode } }
         featuredImage { url altText width height }
         images(first: 2) { nodes { url altText width height } }
         variants(first: 10) {

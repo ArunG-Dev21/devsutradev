@@ -77,9 +77,9 @@ function AddToCartInner({
         type="submit"
         onClick={onClick}
         disabled={disabled ?? fetcher.state !== 'idle'}
-        className={`w-full py-4 rounded-full text-[11px] font-medium tracking-[0.2em] uppercase transition-all duration-300 border flex justify-center items-center ${disabled ?? fetcher.state !== 'idle'
+        className={`w-full py-4 rounded-full text-[11px] font-medium tracking-[0.2em] uppercase transition-all duration-300 border flex justify-center items-center gap-2 group ${disabled ?? fetcher.state !== 'idle'
             ? 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
-            : 'bg-stone-900 border-stone-900 dark:bg-white dark:border-white dark:text-black text-stone-50 cursor-pointer'
+            : 'bg-white border-gray-800 text-gray-800 hover:bg-black hover:border-black hover:text-white cursor-pointer'
           }`}
       >
         {children}

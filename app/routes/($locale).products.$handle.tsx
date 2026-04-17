@@ -268,8 +268,9 @@ export default function Product() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(rafId);
+      if (userScrollTimeout.current) clearTimeout(userScrollTimeout.current);
     };
-  }, [images]);
+  }, [images.length]);
 
   // Mobile horizontal scroll sync
   useEffect(() => {
@@ -332,7 +333,6 @@ export default function Product() {
   const [expandedImage, setExpandedImage] = useState<any>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareIn, setShareIn] = useState(false);
-  const [couponCopied, setCouponCopied] = useState(false);
 
   const openShare = () => {
     setShareOpen(true);
@@ -604,11 +604,11 @@ export default function Product() {
                 {/* Out of Stock badge */}
                 {!selectedVariant?.availableForSale && (
                   <div className="flex items-center sm:justify-start gap-1.5 mb-3">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] uppercase tracking-wide font-bold bg-red-50 text-red-600 border border-red-200">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] uppercase tracking-wide font-bold text-[#F14514] border border-black/10">
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                       </svg>
-                      Out of Stock
+                      CURRENTLY UNAVAILABLE
                     </span>
                   </div>
                 )}
@@ -646,13 +646,13 @@ export default function Product() {
 
                 {/* Tags */}
                 {displayTags.length > 0 && (
-                  <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mb-4">
+                  <div className="flex flex-wrap gap-1.5 mb-4">
                     {displayTags.map((t) => (
                       <span
                         key={t}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-stone-50 border border-stone-200 text-[10px] tracking-widest uppercase font-semibold text-stone-500 cursor-default"
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] tracking-widest uppercase bg-[#F14514] text-white"
                       >
-                        {t}
+                        #{t}
                       </span>
                     ))}
                   </div>
@@ -665,11 +665,6 @@ export default function Product() {
                 const label = (product as any).coupon_label?.value as string | undefined;
                 const offer = (product as any).coupon_offer?.value as string | undefined;
                 if (!code) return null;
-                const copy = async () => {
-                  try { await navigator.clipboard.writeText(code); } catch { return; }
-                  setCouponCopied(true);
-                  setTimeout(() => setCouponCopied(false), 2200);
-                };
                 return <CouponCard code={code} label={label} offer={offer} />;
               })()}
 
@@ -1093,8 +1088,10 @@ export default function Product() {
       <StickyAddToCart
         selectedVariant={selectedVariant}
         product={{
+          id: product.id,
           title: product.title,
           featuredImage: images[0] ?? null,
+          variants: (product as any).variants?.nodes ?? [],
         }}
         triggerRef={productFormRef}
         onAddToCartClick={() => open('cart')}
@@ -1113,7 +1110,7 @@ function CouponCard({ code, label, offer }: { code: string; label?: string; offe
         <video
           src="/videos/fire crackers.webm"
           autoPlay loop muted playsInline aria-hidden="true"
-          className="absolute top-0 right-0 w-[55%] h-full object-cover object-center pointer-events-none z-5a"
+          className="absolute top-0 right-0 w-[55%] h-full object-cover object-center pointer-events-none z-0"
         />
 
         {/* Notches */}

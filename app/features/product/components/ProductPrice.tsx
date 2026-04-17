@@ -11,7 +11,7 @@ export function ProductPrice({
   return (
     <div className="product-price">
       {compareAtPrice ? (
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
           <span className="text-2xl lg:text-3xl text-stone-900 dark:text-stone-100 tracking-wide">
             {price ? <Money withoutTrailingZeros data={price} /> : null}
           </span>
@@ -19,7 +19,7 @@ export function ProductPrice({
             <Money withoutTrailingZeros data={compareAtPrice} />
           </s>
           {price && (
-            <span className="px-2 py-1 text-[10px] md:text-lg tracking-widest uppercase rounded-full dark:bg-stone-800 text-[#F14514] border rounded-2xl dark:text-stone-300 dark:border-stone-700">
+            <span className="px-2 py-1 text-[10px] tracking-widest uppercase rounded-full dark:bg-stone-800 text-[#F14514] border rounded-2xl dark:text-stone-300 dark:border-stone-700">
               -
               {Math.round(
                 ((parseFloat(compareAtPrice.amount) -

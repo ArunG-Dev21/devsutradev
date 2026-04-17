@@ -5,6 +5,7 @@ import { CartForm, Image, Money, type OptimisticCartLine } from '@shopify/hydrog
 import { useVariantUrl } from '~/lib/variants';
 import { Link } from 'react-router';
 import { useAside } from '~/shared/components/Aside';
+import { StarRating } from '~/shared/components/StarRating';
 import type { CartApiQueryFragment, CartLineFragment } from 'storefrontapi.generated';
 
 export type CartLine = OptimisticCartLine<CartApiQueryFragment>;
@@ -13,10 +14,12 @@ export function CartLineItem({
   layout,
   line,
   childrenMap,
+  reviewSummary,
 }: {
   layout: CartLayout;
   line: CartLine;
   childrenMap: LineItemChildrenMap;
+  reviewSummary?: { averageRating: number; reviewCount: number };
 }) {
   const { id, merchandise } = line;
 
@@ -54,7 +57,7 @@ export function CartLineItem({
           <Link
             to={lineItemUrl}
             onClick={() => layout === 'aside' && close()}
-            className="shrink-0"
+            className="shrink-0 relative block"
           >
             <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg overflow-hidden">
               <Image
@@ -68,6 +71,13 @@ export function CartLineItem({
                 className="w-full h-full object-cover"
               />
             </div>
+            {layout === 'aside' && reviewSummary && reviewSummary.reviewCount > 0 && (
+              <StarRating
+                rating={reviewSummary.averageRating}
+                count={reviewSummary.reviewCount}
+                className="absolute bottom-1.5 left-1.5 z-10 shadow-sm"
+              />
+            )}
           </Link>
         )}
 
@@ -83,6 +93,27 @@ export function CartLineItem({
               {product.title}
             </p>
           </Link>
+
+          {layout === 'page' && reviewSummary && reviewSummary.reviewCount > 0 && (
+            <div className="flex items-center gap-1.5 mt-1">
+              <div className="flex gap-0.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg
+                    key={star}
+                    className={`w-3.5 h-3.5 ${star <= Math.round(reviewSummary.averageRating) ? 'text-[#F14514]' : 'text-stone-200 dark:text-stone-700'}`}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
+                  </svg>
+                ))}
+              </div>
+              <span className="text-[11px] text-muted-foreground tabular-nums">
+                ({reviewSummary.reviewCount} {reviewSummary.reviewCount === 1 ? 'review' : 'reviews'})
+              </span>
+            </div>
+          )}
 
           {/* Variant options */}
           {inlineOptions.length > 0 && (

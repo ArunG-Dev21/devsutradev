@@ -1,4 +1,5 @@
 import type { MetaFunction } from 'react-router';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: MetaFunction = () => {
   return [{ title: 'About Us | Devasutra' }];
@@ -9,6 +10,9 @@ export default function About() {
     <>
       <section className="bg-white">
         <div className='w-full h-[50vh] sm:h-[65vh] md:h-[75vh] lg:h-[90vh] col-span-2 overflow-hidden relative'>
+          <div className="absolute inset-x-0 top-0 z-20">
+            <RouteBreadcrumbBanner variant="overlay" />
+          </div>
 
           <img src='/icons/hindi-logo.png' alt='' width={520} height={130} sizes="(min-width: 1024px) 520px, (min-width: 768px) 320px, (min-width: 640px) 240px, 160px" className='w-40 sm:w-60 md:w-80 lg:w-130 absolute left-1/2 top-10 sm:top-16 md:top-20 lg:top-24 -translate-x-1/2' />
           <img

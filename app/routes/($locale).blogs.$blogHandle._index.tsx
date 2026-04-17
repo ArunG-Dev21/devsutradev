@@ -1,15 +1,16 @@
-import {Link, useLoaderData} from 'react-router';
-import type {Route} from './+types/($locale).blogs.$blogHandle._index';
-import {Image, getPaginationVariables} from '@shopify/hydrogen';
-import type {ArticleItemFragment} from 'storefrontapi.generated';
-import {PaginatedResourceSection} from '~/features/collection/components/PaginatedResourceSection';
-import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import { Link, useLoaderData } from 'react-router';
+import type { Route } from './+types/($locale).blogs.$blogHandle._index';
+import { Image, getPaginationVariables } from '@shopify/hydrogen';
+import type { ArticleItemFragment } from 'storefrontapi.generated';
+import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
+import { redirectIfHandleIsLocalized } from '~/lib/redirect';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const blog = (data as {blog?: {seo?: {title?: string | null; description?: string | null} | null; title?: string | null}} | undefined)?.blog;
+export const meta: Route.MetaFunction = ({ data }) => {
+  const blog = (data as { blog?: { seo?: { title?: string | null; description?: string | null } | null; title?: string | null } } | undefined)?.blog;
 
   return [
-    {title: `${blog?.seo?.title || blog?.title || 'Blog'} | Devasutra`},
+    { title: `${blog?.seo?.title || blog?.title || 'Blog'} | Devasutra` },
     {
       name: 'description',
       content:
@@ -22,19 +23,19 @@ export const meta: Route.MetaFunction = ({data}) => {
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return {...deferredData, ...criticalData};
+  return { ...deferredData, ...criticalData };
 }
 
-async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
+async function loadCriticalData({ context, request, params }: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 9,
   });
 
   if (!params.blogHandle) {
-    throw new Response('blog not found', {status: 404});
+    throw new Response('blog not found', { status: 404 });
   }
 
-  const [{blog}] = await Promise.all([
+  const [{ blog }] = await Promise.all([
     context.storefront.query(BLOGS_QUERY, {
       variables: {
         blogHandle: params.blogHandle,
@@ -44,12 +45,12 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
   ]);
 
   if (!blog?.articles) {
-    throw new Response('Not found', {status: 404});
+    throw new Response('Not found', { status: 404 });
   }
 
-  redirectIfHandleIsLocalized(request, {handle: params.blogHandle, data: blog});
+  redirectIfHandleIsLocalized(request, { handle: params.blogHandle, data: blog });
 
-  return {blog};
+  return { blog };
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {
@@ -81,7 +82,7 @@ function getCollectionLabel(handle: string) {
     : 'Explore All Products';
 }
 
-function getBlogSummary(blog: {handle?: string | null; seo?: {description?: string | null} | null}) {
+function getBlogSummary(blog: { handle?: string | null; seo?: { description?: string | null } | null }) {
   if (blog.seo?.description) return blog.seo.description;
 
   const handle = blog.handle?.toLowerCase() || '';
@@ -220,8 +221,8 @@ function ArticleCard({
 }
 
 export default function Blog() {
-  const {blog} = useLoaderData<typeof loader>();
-  const {articles} = blog;
+  const { blog } = useLoaderData<typeof loader>();
+  const { articles } = blog;
   const articleCount = articles.nodes.length;
   const collectionHref = getCollectionHrefFromHandle(blog.handle || '');
   const [featuredArticle] = articles.nodes;
@@ -229,6 +230,7 @@ export default function Blog() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <section className="border-b border-border/70 bg-muted/20">
+        <RouteBreadcrumbBanner variant="light" />
         <div className="container px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(260px,0.7fr)] lg:items-end">
             <div className="max-w-3xl">
@@ -318,7 +320,7 @@ export default function Blog() {
 
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
-            {({node: article, index}) =>
+            {({ node: article, index }) =>
               index === 0 ? null : (
                 <ArticleCard
                   article={article}

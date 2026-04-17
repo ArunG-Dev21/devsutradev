@@ -8,6 +8,7 @@ import {
 } from 'react-router';
 import type { Route } from './+types/($locale).account';
 import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetailsQuery';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -61,10 +62,9 @@ export default function AccountLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-
-        {/* Page header */}
-        <div className="mb-10 border-b border-border pb-8">
+      <section className="border-b border-border bg-muted/20">
+        <RouteBreadcrumbBanner variant="light" />
+        <div className="container mx-auto px-4 pb-8 pt-8 sm:px-6 lg:px-8 md:pb-10">
           <p className="text-xs tracking-[0.35em] uppercase text-muted-foreground mb-2 font-medium">
             Sacred Account
           </p>
@@ -72,7 +72,9 @@ export default function AccountLayout() {
             My Account
           </h1>
         </div>
+      </section>
 
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-start">
           {/* Sidebar */}
           <div className="w-full lg:w-72 lg:sticky lg:top-8 shrink-0">
@@ -134,11 +136,10 @@ function AccountMenu() {
             <NavLink
               key={item.name}
               to={item.to}
-              className={`flex items-center gap-3.5 px-5 py-4 text-sm font-medium transition-all duration-200 ${
-                isActive
+              className={`flex items-center gap-3.5 px-5 py-4 text-sm font-medium transition-all duration-200 ${isActive
                   ? 'bg-foreground text-background'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              }`}
+                }`}
             >
               <svg className="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />

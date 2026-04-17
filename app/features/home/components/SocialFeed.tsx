@@ -300,15 +300,15 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
 
       {/* ── Tagged products dock (Connected to active reel) ── */}
       {activeReel?.products && activeReel.products.length > 0 && (
-        <div className="relative mt-4 sm:mt-6 z-20 flex flex-col items-center px-4 pointer-events-none transition-all duration-300">
-          <div className="bg-[#f5f2ed]/80 sm:bg-white/70 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.06)] rounded-full p-2 sm:p-2.5 border border-white/60 pointer-events-auto">
+        <div className="relative mt-4 sm:mt-6 z-20 flex flex-col items-center px-3 pointer-events-none transition-all duration-300">
+          <div className="bg-[#F14514] sm:bg-[#F14514] backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.06)] rounded-full p-1 sm:px-1 sm:py-2 border border-white/60 pointer-events-auto">
             {/* scrollable row of cute pill cards */}
-            <div className="flex gap-2.5 overflow-x-auto no-scrollbar max-w-[90vw] sm:max-w-[600px] px-1">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar max-w-[90vw] sm:max-w-[600px] px-1">
               {activeReel.products.map((product) => (
                 <Link
                   key={product.id}
                   to={`/products/${product.handle}`}
-                  className="flex items-center gap-3 shrink-0 w-[170px] sm:w-[190px] p-1.5 pr-4 rounded-full bg-white hover:bg-neutral-50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] cursor-pointer ring-1 ring-black/[0.03]"
+                  className="flex items-center gap-3 shrink-0 w-[170px] sm:w-[190px] p-1.5 pr-4 rounded-full bg-white hover:bg-neutral-50 cursor-pointer ring-1 ring-black/[0.03]"
                 >
                   {product.image ? (
                     <img

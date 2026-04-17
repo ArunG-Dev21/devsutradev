@@ -1,4 +1,5 @@
 import type { MetaFunction } from 'react-router';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Contact Support | Devasutra' }];
@@ -8,16 +9,21 @@ export default function Contact() {
   return (
     <div className="min-h-screen text-stone-900 dark:bg-background dark:text-foreground overflow-hidden">
       {/* Hero Section */}
-      <section className="relative py-24 px-6 flex flex-col items-center justify-center text-center">
+      <section className="relative px-6 pb-24 pt-6 flex flex-col items-center justify-center text-center">
         {/* Soft Radial Background */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-stone-200/50 via-stone-50 to-stone-50 dark:from-neutral-900/40 dark:via-background dark:to-background -z-10" />
+        <RouteBreadcrumbBanner
+          variant="light"
+          className="mb-12 w-full"
+          containerClassName="px-0 py-0"
+          navClassName="mx-auto justify-center"
+        />
 
         <span className="text-xs font-bold tracking-[0.3em] text-stone-500 dark:text-muted-foreground uppercase mb-6">
           Reach Out
         </span>
         <h1
-          className="text-4xl sm:text-5xl md:text-6xl font-light tracking-wide text-stone-900 dark:text-foreground mb-6"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          className="text-4xl sm:text-5xl font-heading md:text-6xl tracking-wide text-stone-900 dark:text-foreground mb-6"
         >
           We Are Here To Help
         </h1>
@@ -98,25 +104,6 @@ export default function Contact() {
                 </div>
               </li>
             </ul>
-          </div>
-
-          <div className="p-6 bg-stone-900 rounded-2xl text-stone-50 shadow-lg">
-            <h3
-              className="text-xl font-serif mb-3 text-white"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-            >
-              Wholesale Inquiries
-            </h3>
-            <p className="text-stone-400 text-sm leading-relaxed mb-4">
-              For bulk orders of Rudraksha malas or Karungali artifacts for
-              corporate gifting or spiritual centers, please reach out directly.
-            </p>
-            <a
-              href="mailto:wholesale@devasutra.com"
-              className="inline-block text-sm font-bold tracking-widest uppercase border-b border-stone-500 pb-1 hover:border-white transition-colors"
-            >
-              Contact Wholesale
-            </a>
           </div>
         </div>
 
@@ -230,4 +217,3 @@ export default function Contact() {
     </div>
   );
 }
-

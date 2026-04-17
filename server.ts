@@ -26,6 +26,7 @@ export default {
         build: serverBuild,
         mode: process.env.NODE_ENV,
         getLoadContext: () => hydrogenContext,
+        proxyStandardRoutes: false,
       });
 
       const response = await handleRequest(request);
@@ -52,6 +53,10 @@ export default {
 
       return response;
     } catch (error) {
+      if (error instanceof Response) {
+        return error;
+      }
+
       console.error(error);
       return new Response('An unexpected error occurred', {status: 500});
     }

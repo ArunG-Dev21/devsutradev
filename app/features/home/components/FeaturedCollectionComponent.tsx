@@ -490,10 +490,10 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
   const visibleProducts = sortedProducts.slice(0, visibleCount);
 
   return (
-    <div className="relative bg-gray-50 bg-background text-foreground flex flex-col lg:h-full lg:overflow-hidden">
+    <div className="relative bg-background text-foreground flex flex-col">
 
       {/* ── HEADER ── */}
-      <div className="px-4 sm:px-6 md:px-8 lg:px-8 xl:px-14 pt-8 lg:pt-10 xl:pt-12 pb-6 lg:pb-8 xl:pb-10 border-b border-border shrink-0">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-8 xl:px-14 pt-8 lg:pt-10 xl:pt-12 pb-6 lg:pb-8 xl:pb-10 border-b border-border bg-background lg:sticky lg:top-0 z-10">
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-medium leading-tight uppercase tracking-tight mb-2 lg:mb-3 font-heading">
           {collection.title}
         </h2>
@@ -594,7 +594,7 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
       </div>
 
       {/* ── GRID ── */}
-      <div className="px-4 sm:px-6 md:px-8 lg:px-8 xl:px-14 py-4 sm:py-6 xl:py-8 flex-1 lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-8 xl:px-14 py-4 sm:py-6 xl:py-8">
         {/*
           Mobile:  2 columns, compact cards, no horizontal scroll
           Tablet:  3 columns

@@ -1,8 +1,9 @@
-import {useLoaderData, Link} from 'react-router';
-import type {Route} from './+types/($locale).policies._index';
-import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
+import { useLoaderData, Link } from 'react-router';
+import type { Route } from './+types/($locale).policies._index';
+import type { PoliciesQuery, PolicyItemFragment } from 'storefrontapi.generated';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
-export async function loader({context}: Route.LoaderArgs) {
+export async function loader({ context }: Route.LoaderArgs) {
   const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);
 
   const shopPolicies = data.shop;
@@ -15,19 +16,20 @@ export async function loader({context}: Route.LoaderArgs) {
   ].filter((policy): policy is PolicyItemFragment => policy != null);
 
   if (!policies.length) {
-    throw new Response('No policies found', {status: 404});
+    throw new Response('No policies found', { status: 404 });
   }
 
-  return {policies};
+  return { policies };
 }
 
 export default function Policies() {
-  const {policies} = useLoaderData<typeof loader>();
+  const { policies } = useLoaderData<typeof loader>();
 
   return (
     <div className="min-h-screen bg-background">
       <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/80 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.16),transparent_58%)]" />
+        <RouteBreadcrumbBanner variant="light" className="relative z-10" />
         <div className="container mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex items-center rounded-full border border-amber-200/70 bg-amber-50/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900 dark:border-amber-400/20 dark:bg-amber-500/10 dark:text-amber-200">

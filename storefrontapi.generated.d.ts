@@ -527,6 +527,12 @@ export type FeaturedCollectionWithProductsQuery = {
                 'amount' | 'currencyCode'
               >;
             };
+            compareAtPriceRange: {
+              minVariantPrice: Pick<
+                StorefrontAPI.MoneyV2,
+                'amount' | 'currencyCode'
+              >;
+            };
             featuredImage?: StorefrontAPI.Maybe<
               Pick<StorefrontAPI.Image, 'url' | 'altText' | 'width' | 'height'>
             >;
@@ -565,6 +571,12 @@ export type FeaturedCollectionWithProductsQuery = {
             'id' | 'title' | 'handle' | 'availableForSale'
           > & {
             priceRange: {
+              minVariantPrice: Pick<
+                StorefrontAPI.MoneyV2,
+                'amount' | 'currencyCode'
+              >;
+            };
+            compareAtPriceRange: {
               minVariantPrice: Pick<
                 StorefrontAPI.MoneyV2,
                 'amount' | 'currencyCode'
@@ -612,6 +624,12 @@ export type CollectionPreviewFragment = Pick<
         'id' | 'title' | 'handle' | 'availableForSale'
       > & {
         priceRange: {
+          minVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+        };
+        compareAtPriceRange: {
           minVariantPrice: Pick<
             StorefrontAPI.MoneyV2,
             'amount' | 'currencyCode'
@@ -1942,7 +1960,7 @@ interface GeneratedQueryTypes {
     return: FooterQuery;
     variables: FooterQueryVariables;
   };
-  '#graphql\n  query FeaturedCollectionWithProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int!\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: "featured") {\n      id title handle description\n      image { url altText width height }\n      products(first: $first, sortKey: BEST_SELLING) {\n        nodes {\n          id title handle availableForSale\n          priceRange { minVariantPrice { amount currencyCode } }\n          compareAtPriceRange { minVariantPrice { amount currencyCode } }\n          featuredImage { url altText width height }\n          images(first: 2) { nodes { url altText width height } }\n          variants(first: 10) {\n            nodes { id availableForSale title price { amount currencyCode } }\n          }\n        }\n      }\n    }\n    karungaliMaala: collection(handle: "karungali-maala") { ...CollectionPreview }\n    karungaliBracelets: collection(handle: "karungali-bracelets") { ...CollectionPreview }\n  }\n\n  fragment CollectionPreview on Collection {\n    id\n    title\n    handle\n    image { url altText width height }\n    products(first: 8, sortKey: BEST_SELLING) {\n      nodes {\n        id title handle availableForSale\n        priceRange { minVariantPrice { amount currencyCode } }\n        featuredImage { url altText width height }\n        images(first: 2) { nodes { url altText width height } }\n        variants(first: 10) {\n          nodes { id availableForSale title price { amount currencyCode } }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query FeaturedCollectionWithProducts(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int!\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: "featured") {\n      id title handle description\n      image { url altText width height }\n      products(first: $first, sortKey: BEST_SELLING) {\n        nodes {\n          id title handle availableForSale\n          priceRange { minVariantPrice { amount currencyCode } }\n          compareAtPriceRange { minVariantPrice { amount currencyCode } }\n          featuredImage { url altText width height }\n          images(first: 2) { nodes { url altText width height } }\n          variants(first: 10) {\n            nodes { id availableForSale title price { amount currencyCode } }\n          }\n        }\n      }\n    }\n    karungaliMaala: collection(handle: "karungali-maala") { ...CollectionPreview }\n    karungaliBracelets: collection(handle: "karungali-bracelets") { ...CollectionPreview }\n  }\n\n  fragment CollectionPreview on Collection {\n    id\n    title\n    handle\n    image { url altText width height }\n    products(first: 8, sortKey: BEST_SELLING) {\n      nodes {\n        id title handle availableForSale\n        priceRange { minVariantPrice { amount currencyCode } }\n        compareAtPriceRange { minVariantPrice { amount currencyCode } }\n        featuredImage { url altText width height }\n        images(first: 2) { nodes { url altText width height } }\n        variants(first: 10) {\n          nodes { id availableForSale title price { amount currencyCode } }\n        }\n      }\n    }\n  }\n': {
     return: FeaturedCollectionWithProductsQuery;
     variables: FeaturedCollectionWithProductsQueryVariables;
   };

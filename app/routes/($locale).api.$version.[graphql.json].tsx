@@ -14,7 +14,8 @@ export async function action({params, context, request}: Route.ActionArgs) {
       method: 'POST',
       body: request.body,
       headers: request.headers,
-    },
+      duplex: 'half',
+    } as RequestInit & {duplex: 'half'},
   );
 
   return new Response(response.body, {headers: new Headers(response.headers)});

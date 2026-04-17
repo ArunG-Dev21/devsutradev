@@ -13,6 +13,9 @@ interface QuickViewModalProps {
         priceRange: {
             minVariantPrice: { amount: string; currencyCode: CurrencyCode };
         };
+        compareAtPriceRange?: {
+            minVariantPrice: { amount: string; currencyCode: CurrencyCode };
+        } | null;
         variants?: {
             nodes: Array<{ id: string; availableForSale: boolean }>;
         };
@@ -137,8 +140,17 @@ export function QuickViewModal({ product, onClose, reviewSummary }: QuickViewMod
                         </div>
                     )}
 
-                    <div className="text-lg font-normal mb-8 text-muted-foreground">
-                        <Money withoutTrailingZeros data={product.priceRange.minVariantPrice} />
+                    <div className="flex items-baseline gap-2 mb-8">
+                        <span className="text-lg font-normal text-foreground">
+                            <Money withoutTrailingZeros data={product.priceRange.minVariantPrice} />
+                        </span>
+                        {product.compareAtPriceRange?.minVariantPrice &&
+                            parseFloat(product.compareAtPriceRange.minVariantPrice.amount) >
+                            parseFloat(product.priceRange.minVariantPrice.amount) && (
+                            <s className="text-base text-muted-foreground">
+                                <Money withoutTrailingZeros data={product.compareAtPriceRange.minVariantPrice} />
+                            </s>
+                        )}
                     </div>
 
                     <div className="w-8 h-px bg-border mb-8" />

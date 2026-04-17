@@ -19,6 +19,34 @@ declare global {
   interface HydrogenAdditionalContext extends AdditionalContextType { }
 }
 
+function getHeader(request: Request, name: string) {
+  return request.headers.get(name);
+}
+
+function getBuyerIp(request: Request) {
+  const forwardedFor = getHeader(request, 'x-forwarded-for')
+    ?.split(',')[0]
+    ?.trim();
+
+  return (
+    getHeader(request, 'oxygen-buyer-ip') ||
+    getHeader(request, 'cf-connecting-ip') ||
+    getHeader(request, 'x-real-ip') ||
+    forwardedFor ||
+    '127.0.0.1'
+  );
+}
+
+function getStorefrontHeaders(request: Request) {
+  return {
+    requestGroupId: getHeader(request, 'request-id'),
+    buyerIp: getBuyerIp(request),
+    buyerIpSig: getHeader(request, 'X-Shopify-Client-IP-Sig'),
+    cookie: getHeader(request, 'cookie'),
+    purpose: getHeader(request, 'sec-purpose') || getHeader(request, 'purpose'),
+  };
+}
+
 /**
  * Creates Hydrogen context for React Router 7.9.x
  * Returns HydrogenRouterContextProvider with hybrid access patterns
@@ -50,6 +78,9 @@ export async function createHydrogenRouterContext(
       session,
       // Or detect from URL path based on locale subpath, cookies, or any other strategy
       i18n: getLocaleFromRequest(request),
+      storefront: {
+        headers: getStorefrontHeaders(request),
+      },
       cart: {
         queryFragment: CART_QUERY_FRAGMENT,
       },

@@ -1,8 +1,8 @@
-import {Link, useLoaderData} from 'react-router';
-import type {Route} from './+types/($locale).blogs.$blogHandle.$articleHandle';
-import {Image, Money} from '@shopify/hydrogen';
-import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {useEffect, useRef, useState} from 'react';
+import { Link, useLoaderData } from 'react-router';
+import type { Route } from './+types/($locale).blogs.$blogHandle.$articleHandle';
+import { Image, Money } from '@shopify/hydrogen';
+import { redirectIfHandleIsLocalized } from '~/lib/redirect';
+import { useEffect, useRef, useState } from 'react';
 import {
   articleSchema,
   breadcrumbSchema,
@@ -11,9 +11,10 @@ import {
   stripHtml,
   truncate,
 } from '~/lib/seo';
-import {sanitizeHtml} from '~/lib/sanitizer';
+import { sanitizeHtml } from '~/lib/sanitizer';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
-export const meta: Route.MetaFunction = ({data}) => {
+export const meta: Route.MetaFunction = ({ data }) => {
   const article = (data as any)?.article;
   const origin = (data as any)?.seoOrigin || '';
   const blogHandle = (data as any)?.blogHandle || '';
@@ -37,24 +38,24 @@ export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
   const origin = new URL(args.request.url).origin;
-  return {...deferredData, ...criticalData, seoOrigin: origin};
+  return { ...deferredData, ...criticalData, seoOrigin: origin };
 }
 
-async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
-  const {blogHandle, articleHandle} = params;
+async function loadCriticalData({ context, request, params }: Route.LoaderArgs) {
+  const { blogHandle, articleHandle } = params;
 
   if (!articleHandle || !blogHandle) {
-    throw new Response('Not found', {status: 404});
+    throw new Response('Not found', { status: 404 });
   }
 
-  const [{blog}] = await Promise.all([
+  const [{ blog }] = await Promise.all([
     context.storefront.query(ARTICLE_QUERY, {
-      variables: {blogHandle, articleHandle},
+      variables: { blogHandle, articleHandle },
     }),
   ]);
 
   if (!blog?.articleByHandle) {
-    throw new Response(null, {status: 404});
+    throw new Response(null, { status: 404 });
   }
 
   redirectIfHandleIsLocalized(
@@ -79,15 +80,15 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
   let relatedProducts: any[] = [];
 
   try {
-    const {collection} = await context.storefront.query(SIDEBAR_PRODUCTS_QUERY, {
-      variables: {handle: collectionHandle, first: 6},
+    const { collection } = await context.storefront.query(SIDEBAR_PRODUCTS_QUERY, {
+      variables: { handle: collectionHandle, first: 6 },
     });
     relatedProducts = collection?.products?.nodes ?? [];
   } catch {
     // Leave related products empty when the collection query fails.
   }
 
-  return {article, blogHandle, blogTitle: blog.title, relatedProducts};
+  return { article, blogHandle, blogTitle: blog.title, relatedProducts };
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {
@@ -114,10 +115,10 @@ function getCollectionLinkFromArticle(params: {
   const handle = getCollectionHandleFromArticle(params);
 
   if (handle === 'rudraksha') {
-    return {href: '/collections/rudraksha', label: 'Shop Rudraksha Collection'};
+    return { href: '/collections/rudraksha', label: 'Shop Rudraksha Collection' };
   }
 
-  return {href: '/collections/all', label: 'Explore Products'};
+  return { href: '/collections/all', label: 'Explore Products' };
 }
 
 function estimateReadingTime(html: string) {
@@ -149,7 +150,7 @@ function getMeaningfulExcerpt(title: string, excerpt?: string | null) {
   return excerpt;
 }
 
-function ProductCard({product}: {product: any}) {
+function ProductCard({ product }: { product: any }) {
   return (
     <Link
       to={`/products/${product.handle}`}
@@ -180,9 +181,9 @@ function ProductCard({product}: {product: any}) {
 }
 
 export default function Article() {
-  const {article, blogHandle, blogTitle, relatedProducts, seoOrigin} =
+  const { article, blogHandle, blogTitle, relatedProducts, seoOrigin } =
     useLoaderData<typeof loader>();
-  const {title, image, contentHtml, author, tags, excerpt} = article;
+  const { title, image, contentHtml, author, tags, excerpt } = article;
   const meaningfulExcerpt = getMeaningfulExcerpt(title, excerpt);
   const collectionLink = getCollectionLinkFromArticle({
     blogHandle,
@@ -211,7 +212,7 @@ export default function Article() {
       setProgress(nextProgress);
     }
 
-    window.addEventListener('scroll', handleScroll, {passive: true});
+    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);
@@ -232,8 +233,8 @@ export default function Article() {
         dangerouslySetInnerHTML={{
           __html: jsonLd(
             breadcrumbSchema([
-              {name: 'Home', url: `${seoOrigin}/`},
-              {name: 'Blog', url: `${seoOrigin}/blogs`},
+              { name: 'Home', url: `${seoOrigin}/` },
+              { name: 'Blog', url: `${seoOrigin}/blogs` },
               {
                 name: blogTitle || blogHandle,
                 url: `${seoOrigin}/blogs/${blogHandle}`,
@@ -250,64 +251,46 @@ export default function Article() {
       <div className="fixed inset-x-0 top-0 z-40 h-1 bg-transparent" aria-hidden>
         <div
           className="h-full bg-foreground transition-[width] duration-150"
-          style={{width: `${progress}%`}}
+          style={{ width: `${progress}%` }}
         />
       </div>
 
       <section className="border-b border-border/70 bg-muted/20">
+        <RouteBreadcrumbBanner variant="light" />
         <div className="container px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,440px)] lg:items-start">
             <div className="max-w-3xl">
-                <nav
-                  aria-label="Breadcrumb"
-                  className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground"
-                >
-                  <Link
-                    to="/blogs"
-                    className="transition-colors hover:text-foreground"
-                  >
-                    Blogs
-                  </Link>
-                  <span>/</span>
-                  <Link
-                    to={`/blogs/${blogHandle}`}
-                    className="transition-colors hover:text-foreground"
-                  >
-                    {blogTitle || blogHandle}
-                  </Link>
-                </nav>
-
-                {tags && tags.length > 0 ? (
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {tags.map((tag: string) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-border/70 bg-background px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-
-                <h1 className="mt-6 max-w-2xl font-heading text-4xl leading-[1.08] text-foreground sm:text-5xl lg:text-[3.65rem]">
-                  {title}
-                </h1>
-
-                {meaningfulExcerpt ? (
-                  <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-                    {meaningfulExcerpt}
-                  </p>
-                ) : null}
-
-                <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-muted-foreground">
-                  <span className="font-medium uppercase tracking-[0.08em] text-foreground">
-                    {author?.name || 'Devasutra'}
-                  </span>
-                  <span>{publishedDate}</span>
-                  <span>{readingTime} min read</span>
+              {tags && tags.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag: string) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-border/70 bg-background px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
+              ) : null}
+
+              <h1 className="mt-6 max-w-2xl font-heading text-4xl leading-[1.08] text-foreground sm:text-5xl lg:text-[3.65rem]">
+                {title}
+              </h1>
+
+              {meaningfulExcerpt ? (
+                <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
+                  {meaningfulExcerpt}
+                </p>
+              ) : null}
+
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-muted-foreground">
+                <span className="font-medium uppercase tracking-[0.08em] text-foreground">
+                  {author?.name || 'Devasutra'}
+                </span>
+                <span>{publishedDate}</span>
+                <span>{readingTime} min read</span>
               </div>
+            </div>
 
             {image ? (
               <div className="lg:pt-2">
@@ -331,7 +314,7 @@ export default function Article() {
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start">
           <article ref={articleRef} className="min-w-0 max-w-[820px]">
             <div
-              dangerouslySetInnerHTML={{__html: sanitizeHtml(contentHtml)}}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentHtml) }}
               className="
                 prose prose-stone max-w-none text-[1.08rem] leading-8 text-foreground/90 md:text-[1.12rem] md:leading-9
                 prose-headings:font-heading prose-headings:text-foreground

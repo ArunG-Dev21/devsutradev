@@ -13,12 +13,12 @@ export function StarRating({
 }) {
   return (
     <div
-      className={`inline-flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white rounded-full px-2 py-0.5 ${className}`}
+      className={`inline-flex items-center gap-1 bg-white backdrop-blur-sm text-black rounded-full px-2 py-0.5 ${className}`}
       aria-label={`${rating.toFixed(1)} out of 5 stars${typeof count === 'number' ? `, ${count} reviews` : ''}`}
     >
       {/* Single filled star */}
       <svg
-        className="w-3 h-3 text-amber-400 shrink-0"
+        className="w-4 h-4 text-[#F14514] shrink-0"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"
@@ -27,16 +27,16 @@ export function StarRating({
       </svg>
 
       {/* Rating number */}
-      <span className="text-[10px] sm:text-[11px] font-semibold leading-none tabular-nums">
+      <span className="text-sm sm:text-base font-medium leading-none tabular-nums">
         {rating.toFixed(1)}
       </span>
 
-      {/* Optional review count */}
+      {/* Optional review count
       {typeof count === 'number' && (
         <span className="text-[9px] sm:text-[10px] font-normal leading-none opacity-80 tabular-nums">
           ({count})
         </span>
-      )}
+      )} */}
     </div>
   );
 }

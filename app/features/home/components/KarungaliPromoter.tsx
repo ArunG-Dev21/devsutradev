@@ -4,6 +4,7 @@ import { CartForm, Money } from "@shopify/hydrogen";
 import type { CurrencyCode } from "@shopify/hydrogen/storefront-api-types";
 import { useCartNotification } from "~/features/cart/components/CartNotification";
 import { QuickViewModal } from "~/features/product/components/QuickViewModal";
+import { StarRating } from "~/shared/components/StarRating";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,6 +30,7 @@ export interface KarungaliProduct {
     featuredImage?: ImageNode | null;
     images?: { nodes: ImageNode[] };
     priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
+    compareAtPriceRange?: { minVariantPrice: { amount: string; currencyCode: string } } | null;
     variants?: { nodes: ProductVariant[] };
 }
 
@@ -45,6 +47,7 @@ interface KarungaliPromoterProps {
     introText?: string;
     introImages?: string[];
     viewMoreLink?: string;
+    reviewSummaries?: Record<string, { averageRating: number; reviewCount: number }>;
 }
 
 const DEFAULT_TABS: TabData[] = [
@@ -263,9 +266,10 @@ function ATCInner({ fetcher, productTitle, productImage }: { fetcher: any; produ
 
 /* ── Product Card ───────────────────────────────────────────────────────────── */
 function KarungaliProductCard({
-    product, onQuickView,
+    product, reviewSummary, onQuickView,
 }: {
     product: KarungaliProduct;
+    reviewSummary?: { averageRating: number; reviewCount: number };
     onQuickView: () => void;
 }) {
     const [isHovered, setIsHovered] = useState(false);
@@ -323,6 +327,13 @@ function KarungaliProductCard({
                         >
                             Sold Out
                         </span>
+                    )}
+                    {reviewSummary && (
+                        <StarRating
+                            rating={reviewSummary.averageRating}
+                            count={reviewSummary.reviewCount}
+                            className="absolute top-2 right-2 z-[4]"
+                        />
                     )}
                     {!isUnavailable && (
                         <button
@@ -401,6 +412,7 @@ export function KarungaliPromoter({
     introText = "Natural Karungali (Ebony) wood from Tamil Nadu, known for absorbing negative energy and promoting peace and spiritual balance.",
     introImages = ["/karungali-bg.jpg"],
     viewMoreLink = "/collections/karungali",
+    reviewSummaries,
 }: KarungaliPromoterProps) {
     const activeTabs = tabs.length > 0 ? tabs : DEFAULT_TABS;
     const [activeTabId, setActiveTabId] = useState(activeTabs[0]?.id);
@@ -504,13 +516,18 @@ export function KarungaliPromoter({
                         {/* Product Grid */}
                         {activeTab?.products && activeTab.products.length > 0 ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                                {activeTab.products.map((product) => (
-                                    <KarungaliProductCard
-                                        key={product.id}
-                                        product={product}
-                                        onQuickView={() => setQuickViewProduct(product)}
-                                    />
-                                ))}
+                                {activeTab.products.map((product) => {
+                                    const pid = String(product.id).split('/').pop();
+                                    const summary = pid ? reviewSummaries?.[pid] : undefined;
+                                    return (
+                                        <KarungaliProductCard
+                                            key={product.id}
+                                            product={product}
+                                            reviewSummary={summary}
+                                            onQuickView={() => setQuickViewProduct(product)}
+                                        />
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="flex-1 flex flex-col items-center justify-center bg-muted/20 border-2 border-dashed border-border/60 rounded-2xl p-10 text-center min-h-[220px]">
@@ -545,6 +562,10 @@ export function KarungaliPromoter({
                 <QuickViewModal
                     product={quickViewProduct as any}
                     onClose={() => setQuickViewProduct(null)}
+                    reviewSummary={(() => {
+                        const pid = String(quickViewProduct.id).split('/').pop();
+                        return pid ? reviewSummaries?.[pid] : undefined;
+                    })()}
                 />
             )}
         </section>

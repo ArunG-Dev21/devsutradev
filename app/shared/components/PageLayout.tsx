@@ -50,49 +50,57 @@ export function PageLayout({
   const hasCustomBreadcrumbPlacement =
     pathnameWithoutLocale === '/collections' ||
     pathnameWithoutLocale.startsWith('/collections/') ||
-    pathnameWithoutLocale.startsWith('/products/');
+    pathnameWithoutLocale.startsWith('/products/') ||
+    pathnameWithoutLocale === '/blogs' ||
+    pathnameWithoutLocale.startsWith('/blogs/') ||
+    pathnameWithoutLocale === '/pages' ||
+    pathnameWithoutLocale.startsWith('/pages/') ||
+    pathnameWithoutLocale === '/account' ||
+    pathnameWithoutLocale.startsWith('/account/') ||
+    pathnameWithoutLocale === '/policies' ||
+    pathnameWithoutLocale.startsWith('/policies/');
 
   return (
     <Aside.Provider>
       <CartNotificationProvider>
-      <FloatingControls />
-      <CartAside cart={cart} />
-      <SearchAside />
-      <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
-      {header && (
-        <Header
+        <FloatingControls />
+        <CartAside cart={cart} />
+        <SearchAside />
+        <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
+        {header && (
+          <Header
+            header={header}
+            cart={cart}
+            isLoggedIn={isLoggedIn}
+            publicStoreDomain={publicStoreDomain}
+            subNavRef={subNavRef}
+          />
+        )}
+        <main className='bg- md:pb-0'>
+          {!hasCustomBreadcrumbPlacement ? <RouteBreadcrumbBanner variant="contrast" /> : null}
+          {children}
+        </main>
+        <TrustBadgesBar />
+        <Footer
+          footer={footer}
           header={header}
-          cart={cart}
-          isLoggedIn={isLoggedIn}
           publicStoreDomain={publicStoreDomain}
-          subNavRef={subNavRef}
         />
-      )}
-      <main className='bg- md:pb-0'>
-        {!hasCustomBreadcrumbPlacement ? <RouteBreadcrumbBanner variant="contrast" /> : null}
-        {children}
-      </main>
-      <TrustBadgesBar />
-      <Footer
-        footer={footer}
-        header={header}
-        publicStoreDomain={publicStoreDomain}
-      />
-      {/* Mobile spacer: clears MobileBottomNav (all pages) + StickyAddToCart (product pages) */}
-      <div
-        className="md:hidden"
-        style={{
-          height: pathnameWithoutLocale.startsWith('/products/')
-            ? 'calc(8.75rem + env(safe-area-inset-bottom))'
-            : 'calc(4.375rem + env(safe-area-inset-bottom))',
-        }}
-        aria-hidden="true"
-      />
-      {/* Desktop spacer: clears StickyAddToCart bar (product pages only, xl+) */}
-      {pathnameWithoutLocale.startsWith('/products/') && (
-        <div className="hidden xl:block" style={{ height: '4rem' }} aria-hidden="true" />
-      )}
-      <MobileBottomNav cart={cart} />
+        {/* Mobile spacer: clears MobileBottomNav (all pages) + StickyAddToCart (product pages) */}
+        <div
+          className="md:hidden"
+          style={{
+            height: pathnameWithoutLocale.startsWith('/products/')
+              ? 'calc(8.75rem + env(safe-area-inset-bottom))'
+              : 'calc(4.375rem + env(safe-area-inset-bottom))',
+          }}
+          aria-hidden="true"
+        />
+        {/* Desktop spacer: clears StickyAddToCart bar (product pages only, xl+) */}
+        {pathnameWithoutLocale.startsWith('/products/') && (
+          <div className="hidden xl:block" style={{ height: '4rem' }} aria-hidden="true" />
+        )}
+        <MobileBottomNav cart={cart} />
       </CartNotificationProvider>
     </Aside.Provider>
   );
