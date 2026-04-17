@@ -93,56 +93,54 @@ export function Header({
   const [mobileSearchFocused, setMobileSearchFocused] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
-  // Track scroll with hysteresis + a post-transition lock to prevent the
-  // layout shift caused by collapsing the header from re-triggering a toggle.
+  // Accumulate per-frame deltas so smooth-scroll (Lenis) doesn't break detection.
+  // The old per-frame threshold never fired because Lenis spreads movement across
+  // many frames (~5–10px each), so the single-frame delta never reached 40px.
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    let lastScrollY = window.scrollY;
-    let locked = false;           // blocks state changes during CSS transition
-    let lockTimer: ReturnType<typeof setTimeout>;
+    let prevY = window.scrollY;
+    let accumulated = 0;
     let rafId: number;
 
-    const THRESHOLD = 40;         // px of intentional scroll before toggling
-    const LOCK_MS   = 380;        // must be >= CSS transition-duration (300ms) + buffer
-
-    const applyState = (next: boolean) => {
-      setScrolled((prev) => {
-        if (prev === next) return prev;
-        // Lock out further toggles while the header animates
-        locked = true;
-        clearTimeout(lockTimer);
-        lockTimer = setTimeout(() => { locked = false; }, LOCK_MS);
-        return next;
-      });
-    };
+    const COLLAPSE_PX = 50;  // accumulated downward px before hiding first header
+    const EXPAND_PX   = 25;  // accumulated upward px before showing it again
 
     const handleScroll = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
+        const y = window.scrollY;
+        const delta = y - prevY;
+        prevY = y;
 
-        if (!locked) {
-          if (currentScrollY <= 40) {
-            applyState(false);
-          } else if (currentScrollY > lastScrollY + THRESHOLD) {
-            applyState(true);   // intentional downward scroll
-          } else if (currentScrollY < lastScrollY - THRESHOLD) {
-            applyState(false);  // intentional upward scroll
-          }
+        if (y <= 8) {
+          accumulated = 0;
+          setScrolled(false);
+          return;
         }
 
-        lastScrollY = currentScrollY;
+        // Reset accumulation when direction reverses
+        if ((delta > 0 && accumulated < 0) || (delta < 0 && accumulated > 0)) {
+          accumulated = 0;
+        }
+        accumulated += delta;
+
+        if (accumulated > COLLAPSE_PX) {
+          accumulated = 0;
+          setScrolled(true);
+        } else if (accumulated < -EXPAND_PX) {
+          accumulated = 0;
+          setScrolled(false);
+        }
       });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // initial check
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(rafId);
-      clearTimeout(lockTimer);
     };
   }, []);
 
@@ -848,7 +846,7 @@ function MobileSearchBar({
             ? 'max-h-0 opacity-0 -translate-y-4 pointer-events-none'
             : 'max-h-18 opacity-100 translate-y-0'}`}
       >
-        <div className="px-4">
+        <div className="px-4 pb-3">
           <div className="predictive-search p-0">
             <SearchFormPredictive>
               {({ fetchResults, goToSearch, inputRef }) => (

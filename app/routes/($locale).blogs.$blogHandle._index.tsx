@@ -231,7 +231,7 @@ export default function Blog() {
     <div className="min-h-screen bg-background text-foreground">
       <section className="border-b border-border/70 bg-muted/20">
         <RouteBreadcrumbBanner variant="light" />
-        <div className="container px-4 py-12 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(260px,0.7fr)] lg:items-end">
             <div className="max-w-3xl">
               <Link
@@ -297,7 +297,7 @@ export default function Blog() {
         </div>
       </section>
 
-      <section className="container px-4 py-10 sm:px-6 md:py-12 lg:px-8">
+      <section className="container mx-auto px-4 py-10 sm:px-6 md:py-12 lg:px-8">
         {featuredArticle ? (
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">

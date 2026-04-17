@@ -35,9 +35,7 @@ export const meta: Route.MetaFunction = () => {
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const { customerAccount } = context;
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 20,
-  });
+  const paginationVariables = getPaginationVariables(request, { pageBy: 20 });
 
   const url = new URL(request.url);
   const filters = parseOrderFilters(url.searchParams);
@@ -63,71 +61,56 @@ export default function Orders() {
   const { orders } = customer;
 
   return (
-    <div className="account-orders">
-      <div className="mb-8 border-b border-stone-200 pb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div>
+      <div className="mb-8 pb-6 border-b border-border flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-stone-900 tracking-tight">Order History</h2>
-          <p className="text-sm text-stone-500 mt-2">
+          <h2 className="text-2xl font-heading font-medium text-foreground tracking-tight">Order History</h2>
+          <p className="text-sm text-muted-foreground mt-1.5">
             Review your past purchases and track current shipments.
           </p>
         </div>
         <OrderSearchForm currentFilters={filters} />
       </div>
 
-      <OrdersTable orders={orders} filters={filters} />
-    </div>
-  );
-}
-
-function OrdersTable({
-  orders,
-  filters,
-}: {
-  orders: CustomerOrdersFragment['orders'];
-  filters: OrderFilterParams;
-}) {
-  const hasFilters = !!(filters.name || filters.confirmationNumber);
-
-  return (
-    <div aria-live="polite">
-      {orders?.nodes.length ? (
-        <PaginatedResourceSection connection={orders}>
-          {({ node: order }) => <OrderItem key={order.id} order={order} />}
-        </PaginatedResourceSection>
-      ) : (
-        <EmptyOrders hasFilters={hasFilters} />
-      )}
+      <div aria-live="polite">
+        {orders?.nodes.length ? (
+          <PaginatedResourceSection connection={orders}>
+            {({ node: order }) => <OrderItem key={order.id} order={order} />}
+          </PaginatedResourceSection>
+        ) : (
+          <EmptyOrders hasFilters={!!(filters.name || filters.confirmationNumber)} />
+        )}
+      </div>
     </div>
   );
 }
 
 function EmptyOrders({ hasFilters = false }: { hasFilters?: boolean }) {
   return (
-    <div className="p-8 md:p-16 text-center bg-stone-50/80 rounded-3xl flex flex-col items-center justify-center min-h-[400px]">
-      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6">
-        <svg className="w-8 h-8 text-stone-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+    <div className="py-20 text-center border border-dashed border-border rounded-2xl flex flex-col items-center">
+      <div className="w-14 h-14 bg-muted rounded-full flex items-center justify-center mb-5">
+        <svg className="w-7 h-7 text-muted-foreground" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
         </svg>
       </div>
-
       {hasFilters ? (
         <>
-          <p className="text-base font-semibold text-stone-900 mb-2">No orders found.</p>
-          <p className="text-sm text-stone-500 mb-6 max-w-sm">We couldn&apos;t find any orders matching your search criteria.</p>
+          <p className="text-sm font-semibold text-foreground mb-1.5">No orders found</p>
+          <p className="text-sm text-muted-foreground mb-6 max-w-xs">No orders match your search criteria.</p>
           <Link
             to="/account/orders"
-            className="px-6 py-2.5 bg-stone-100 text-stone-900 text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-stone-200 transition-colors inline-block"
+            className="px-5 py-2.5 bg-muted text-foreground text-[11px] font-semibold tracking-widest uppercase rounded-full hover:bg-muted/80 transition-colors"
           >
             Clear Filters
           </Link>
         </>
       ) : (
         <>
-          <p className="text-base font-semibold text-stone-900 mb-2">You haven&apos;t placed any orders yet.</p>
-          <p className="text-sm text-stone-500 mb-6 max-w-sm">When you make a purchase, your order history will appear here.</p>
+          <p className="text-sm font-semibold text-foreground mb-1.5">No orders yet</p>
+          <p className="text-sm text-muted-foreground mb-6 max-w-xs">When you make a purchase, your order history will appear here.</p>
           <Link
             to="/collections"
-            className="px-8 py-3.5 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-neutral-800 transition-colors inline-block"
+            className="px-6 py-3 bg-foreground text-background text-[11px] font-semibold tracking-widest uppercase rounded-full hover:opacity-85 transition-opacity"
           >
             Start Shopping
           </Link>
@@ -137,52 +120,33 @@ function EmptyOrders({ hasFilters = false }: { hasFilters?: boolean }) {
   );
 }
 
-function OrderSearchForm({
-  currentFilters,
-}: {
-  currentFilters: OrderFilterParams;
-}) {
+function OrderSearchForm({ currentFilters }: { currentFilters: OrderFilterParams }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigation = useNavigation();
-  const isSearching =
-    navigation.state !== 'idle' &&
-    navigation.location?.pathname?.includes('orders');
+  const isSearching = navigation.state !== 'idle' && navigation.location?.pathname?.includes('orders');
   const formRef = useRef<HTMLFormElement>(null);
+  const hasFilters = currentFilters.name || currentFilters.confirmationNumber;
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const params = new URLSearchParams();
-
     const name = formData.get(ORDER_FILTER_FIELDS.NAME)?.toString().trim();
-    const confirmationNumber = formData
-      .get(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER)
-      ?.toString()
-      .trim();
-
+    const confirmationNumber = formData.get(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER)?.toString().trim();
     if (name) params.set(ORDER_FILTER_FIELDS.NAME, name);
-    if (confirmationNumber)
-      params.set(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER, confirmationNumber);
-
+    if (confirmationNumber) params.set(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER, confirmationNumber);
     setSearchParams(params);
   };
 
-  const hasFilters = currentFilters.name || currentFilters.confirmationNumber;
-  const inputClass = "w-full md:w-32 lg:w-40 px-0 py-2 border-b border-stone-200 bg-transparent text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-black transition-colors rounded-none text-sm";
+  const inputClass = "w-full sm:w-36 px-0 py-2 border-b border-border bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground transition-colors rounded-none text-sm";
 
   return (
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      className="order-search-form w-full md:w-auto"
-      aria-label="Search orders"
-    >
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+    <form ref={formRef} onSubmit={handleSubmit} className="w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
         <input
           type="search"
           name={ORDER_FILTER_FIELDS.NAME}
           placeholder="Order #"
-          aria-label="Order number"
           defaultValue={currentFilters.name || ''}
           className={inputClass}
         />
@@ -190,16 +154,14 @@ function OrderSearchForm({
           type="search"
           name={ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER}
           placeholder="Confirmation #"
-          aria-label="Confirmation number"
           defaultValue={currentFilters.confirmationNumber || ''}
           className={inputClass}
         />
-
-        <div className="flex items-center gap-2 mt-2 sm:mt-0">
+        <div className="flex items-center gap-2 pt-1 sm:pt-0">
           <button
             type="submit"
             disabled={isSearching}
-            className="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-[11px] font-semibold uppercase tracking-widest bg-foreground text-background rounded-full hover:opacity-85 transition-opacity disabled:opacity-50"
           >
             {isSearching ? '...' : 'Search'}
           </button>
@@ -207,11 +169,8 @@ function OrderSearchForm({
             <button
               type="button"
               disabled={isSearching}
-              onClick={() => {
-                setSearchParams(new URLSearchParams());
-                formRef.current?.reset();
-              }}
-              className="px-4 py-2 text-xs font-semibold uppercase tracking-wider bg-stone-100 text-stone-600 rounded-lg hover:bg-stone-200 transition-colors disabled:opacity-50"
+              onClick={() => { setSearchParams(new URLSearchParams()); formRef.current?.reset(); }}
+              className="px-4 py-2 text-[11px] font-semibold uppercase tracking-widest bg-muted text-foreground rounded-full hover:bg-muted/80 transition-colors disabled:opacity-50"
             >
               Clear
             </button>
@@ -225,60 +184,58 @@ function OrderSearchForm({
 function OrderItem({ order }: { order: OrderItemFragment }) {
   const fulfillmentStatus = flattenConnection(order.fulfillments)[0]?.status;
 
-  const statusColor =
-    order.financialStatus === 'PAID' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-      order.financialStatus === 'REFUNDED' ? 'bg-lime-50 text-lime-700 border border-lime-200' :
-        'bg-stone-100 text-stone-600 border border-stone-200';
+  const statusStyles =
+    order.financialStatus === 'PAID' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+    order.financialStatus === 'REFUNDED' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+    'bg-muted text-muted-foreground border-border';
 
   return (
-    <div className="bg-stone-50/80 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-4">
-      <div className="flex-1 space-y-3">
-        <div className="flex items-center gap-3">
-          <Link to={`/account/orders/${btoa(order.id)}`} className="text-lg font-bold text-stone-900 hover:text-stone-600 transition-colors">
+    <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-3">
+      <div className="flex-1 min-w-0 space-y-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            to={`/account/orders/${btoa(order.id)}`}
+            className="text-base font-semibold text-foreground hover:underline underline-offset-2 transition-colors"
+          >
             Order #{order.number}
           </Link>
-          <span className={`px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full border ${statusColor}`}>
+          <span className={`px-2.5 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded-full border ${statusStyles}`}>
             {order.financialStatus}
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-stone-500">
-          <p className="flex items-center gap-1.5">
-            <svg className="w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
-            </svg>
-            {new Date(order.processedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-
-          <p className="font-semibold text-stone-900 border-l border-stone-200 pl-6">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-muted-foreground">
+          <span>
+            {new Date(order.processedAt).toLocaleDateString(undefined, {
+              year: 'numeric', month: 'long', day: 'numeric',
+            })}
+          </span>
+          <span className="font-semibold text-foreground">
             <Money withoutTrailingZeros data={order.totalPrice} />
-          </p>
-
+          </span>
           {fulfillmentStatus && (
-            <p className="text-xs uppercase tracking-wider font-semibold text-stone-400 border-l border-stone-200 pl-6">
+            <span className="text-xs uppercase tracking-wider font-medium">
               {fulfillmentStatus}
-            </p>
+            </span>
           )}
         </div>
 
         {order.confirmationNumber && (
-          <p className="text-xs text-stone-400 font-mono">
+          <p className="text-xs text-muted-foreground font-mono">
             Confirmation: {order.confirmationNumber}
           </p>
         )}
       </div>
 
-      <div className="sm:self-center shrink-0">
-        <Link
-          to={`/account/orders/${btoa(order.id)}`}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-stone-900 text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-stone-100 transition-colors"
-        >
-          View Details
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-          </svg>
-        </Link>
-      </div>
+      <Link
+        to={`/account/orders/${btoa(order.id)}`}
+        className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 border border-border text-foreground text-[11px] font-semibold tracking-widest uppercase rounded-full hover:bg-muted transition-colors"
+      >
+        View Details
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+      </Link>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import type { Route } from './+types/($locale).cart';
 import type { CartQueryDataReturn } from '@shopify/hydrogen';
 import { CartForm } from '@shopify/hydrogen';
 import { CartMain } from '~/features/cart/components/CartMain';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -117,7 +118,8 @@ export default function Cart() {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header Area */}
       <div className="bg-card border-b border-border">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 md:py-12">
+        <RouteBreadcrumbBanner variant="light" className="bg-transparent" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-5 sm:pb-8 md:pb-12">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-medium uppercase font-heading text-foreground tracking-tight">
             Your Basket
           </h1>

@@ -21,7 +21,6 @@ export const meta: Route.MetaFunction = () => {
 
 export async function loader({ context }: Route.LoaderArgs) {
   context.customerAccount.handleAuthStatus();
-
   return {};
 }
 
@@ -38,16 +37,13 @@ export async function action({ request, context }: Route.ActionArgs) {
     const customer: CustomerUpdateInput = {};
     const validInputKeys = ['firstName', 'lastName'] as const;
     for (const [key, value] of form.entries()) {
-      if (!validInputKeys.includes(key as any)) {
-        continue;
-      }
+      if (!validInputKeys.includes(key as any)) continue;
       if (typeof value === 'string' && value.length) {
         customer[key as (typeof validInputKeys)[number]] = value;
       }
     }
 
-    // update customer and possibly password
-    const { data, errors } = await customerAccount.mutate(
+    const { data: mutationData, errors } = await customerAccount.mutate(
       CUSTOMER_UPDATE_MUTATION,
       {
         variables: {
@@ -57,25 +53,14 @@ export async function action({ request, context }: Route.ActionArgs) {
       },
     );
 
-    if (errors?.length) {
-      throw new Error(errors[0].message);
-    }
-
-    if (!data?.customerUpdate?.customer) {
+    if (errors?.length) throw new Error(errors[0].message);
+    if (!mutationData?.customerUpdate?.customer) {
       throw new Error('Customer profile update failed.');
     }
 
-    return {
-      error: null,
-      customer: data?.customerUpdate?.customer,
-    };
+    return { error: null, customer: mutationData?.customerUpdate?.customer };
   } catch (error: any) {
-    return data(
-      { error: error.message, customer: null },
-      {
-        status: 400,
-      },
-    );
+    return data({ error: error.message, customer: null }, { status: 400 });
   }
 }
 
@@ -85,67 +70,83 @@ export default function AccountProfile() {
   const action = useActionData<ActionResponse>();
   const customer = action?.customer ?? account?.customer;
   const isUpdating = state !== 'idle';
+  const saved = action !== undefined && action.error === null;
+
+  const inputClass =
+    'w-full px-0 py-3 bg-transparent text-foreground border-b border-border focus:outline-none focus:border-foreground transition-colors rounded-none placeholder:text-muted-foreground text-sm';
+  const labelClass =
+    'block text-[11px] font-semibold text-muted-foreground uppercase tracking-widest mb-1.5';
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-8 border-b border-stone-200 pb-6">
-        <h2 className="text-2xl font-bold text-stone-900 tracking-tight">Personal Information</h2>
-        <p className="text-sm text-stone-500 mt-2">
-          Update your contact details to keep your account secure.
+    <div className="max-w-xl">
+      <div className="mb-8 pb-6 border-b border-border">
+        <h2 className="text-2xl font-heading font-medium text-foreground tracking-tight">
+          Personal Information
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1.5">
+          Update your contact details.
         </p>
       </div>
 
-      <Form method="PUT" className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-2">
-            <label htmlFor="firstName" className="block text-xs font-semibold text-stone-700 uppercase tracking-widest">
-              First name
-            </label>
+      {/* Read-only email */}
+      <div className="mb-8 p-4 rounded-xl border border-border bg-muted/20">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Email</p>
+        <p className="text-sm text-foreground">{account?.customer?.emailAddress?.emailAddress}</p>
+      </div>
+
+      <Form method="PUT" className="space-y-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div>
+            <label htmlFor="firstName" className={labelClass}>First name</label>
             <input
               id="firstName"
               name="firstName"
               type="text"
               autoComplete="given-name"
               placeholder="First name"
-              aria-label="First name"
               defaultValue={customer.firstName ?? ''}
               minLength={2}
-              className="w-full px-0 py-3 bg-transparent text-stone-900 border-b border-stone-200 focus:outline-none focus:border-black transition-colors rounded-none placeholder:text-stone-400"
+              className={inputClass}
             />
           </div>
-
-          <div className="space-y-2">
-            <label htmlFor="lastName" className="block text-xs font-semibold text-stone-700 uppercase tracking-widest">
-              Last name
-            </label>
+          <div>
+            <label htmlFor="lastName" className={labelClass}>Last name</label>
             <input
               id="lastName"
               name="lastName"
               type="text"
               autoComplete="family-name"
               placeholder="Last name"
-              aria-label="Last name"
               defaultValue={customer.lastName ?? ''}
               minLength={2}
-              className="w-full px-0 py-3 bg-transparent text-stone-900 border-b border-stone-200 focus:outline-none focus:border-black transition-colors rounded-none placeholder:text-stone-400"
+              className={inputClass}
             />
           </div>
         </div>
 
         {action?.error && (
           <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100 flex items-start gap-3">
-            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
             </svg>
             <p>{action.error}</p>
           </div>
         )}
 
-        <div className="pt-8 flex items-center">
+        {saved && (
+          <div className="p-4 bg-emerald-50 text-emerald-700 rounded-xl text-sm border border-emerald-100 flex items-center gap-3">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            Profile updated successfully.
+          </div>
+        )}
+
+        <div className="pt-2">
           <button
             type="submit"
             disabled={isUpdating}
-            className="px-8 py-3.5 bg-black text-white text-xs font-semibold tracking-widest uppercase rounded-xl hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3 bg-foreground text-background text-[11px] font-semibold tracking-widest uppercase rounded-full hover:opacity-85 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isUpdating ? 'Saving...' : 'Save Changes'}
           </button>

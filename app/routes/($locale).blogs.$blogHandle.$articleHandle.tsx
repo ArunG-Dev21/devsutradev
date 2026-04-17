@@ -257,7 +257,7 @@ export default function Article() {
 
       <section className="border-b border-border/70 bg-muted/20">
         <RouteBreadcrumbBanner variant="light" />
-        <div className="container px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,440px)] lg:items-start">
             <div className="max-w-3xl">
               {tags && tags.length > 0 ? (
@@ -310,7 +310,7 @@ export default function Article() {
         </div>
       </section>
 
-      <div className="container px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start">
           <article ref={articleRef} className="min-w-0 max-w-[820px]">
             <div

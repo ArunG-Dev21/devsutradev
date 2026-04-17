@@ -58,7 +58,9 @@ export function PageLayout({
     pathnameWithoutLocale === '/account' ||
     pathnameWithoutLocale.startsWith('/account/') ||
     pathnameWithoutLocale === '/policies' ||
-    pathnameWithoutLocale.startsWith('/policies/');
+    pathnameWithoutLocale.startsWith('/policies/') ||
+    pathnameWithoutLocale === '/cart' ||
+    pathnameWithoutLocale.startsWith('/cart/');
 
   return (
     <Aside.Provider>
