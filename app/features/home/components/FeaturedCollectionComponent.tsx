@@ -499,7 +499,7 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
         </h2>
 
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <span className="text-xs sm:text-sm xl:text-xl uppercase font-medium tracking-wider text-gold-muted">
+          <span className="text-xs sm:text-sm xl:text-xl uppercase font-medium tracking-wider text-[#F14514]">
             Top Picks This Season
           </span>
 

@@ -24,7 +24,7 @@ export function ProductForm({
   const firstRenderedIdx = productOptions.findIndex((o) => o.optionValues.length !== 1);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Variant Options */}
       {productOptions.map((option, idx) => {
         if (option.optionValues.length === 1) return null;
@@ -38,10 +38,10 @@ export function ProductForm({
               {idx === firstRenderedIdx && stockQty != null && (
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-white">
                   <span className="relative flex h-1.5 w-1.5 shrink-0">
-                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity ${isLow ? 'bg-red-400' : 'bg-lime-400'}`} />
-                    <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${isLow ? 'bg-red-500' : 'bg-lime-500'}`} />
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity ${isLow ? 'bg-red-400' : 'bg-[#F14514]'}`} />
+                    <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${isLow ? 'bg-red-500' : 'bg-[#F14514]'}`} />
                   </span>
-                  <span className={`text-sm font-semibold ${isLow ? 'text-red-500' : 'text-lime-500'}`}>
+                  <span className={`text-sm font-semibold ${isLow ? 'text-red-500' : 'text-[#F14514]'}`}>
                     {isLow ? `Only ${stockQty} left` : `${stockQty} in stock`}
                   </span>
                 </div>
@@ -64,7 +64,7 @@ export function ProductForm({
                 const pillClass = isColor
                   ? `p-0.5 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center ${selected ? 'border-2 border-gray-900' : 'border border-transparent hover:border-gray-300'
                   }`
-                  : `min-w-[4rem] px-5 py-3 text-sm font-semibold uppercase rounded-full transition-all duration-200 cursor-pointer text-center ${selected
+                  : `min-w-[4rem] px-1 py-5 text-[12px] md:text-sm font-medium uppercase rounded-full transition-all duration-200 cursor-pointer text-center ${selected
                     ? 'border-2 border-gray-900 bg-black text-white'
                     : available
                       ? 'border border-gray-300 hover:border-gray-500 text-gray-700 bg-white'
@@ -111,7 +111,7 @@ export function ProductForm({
       })}
 
       {/* Action Buttons */}
-      <div className="flex flex-col xl:flex-row gap-3 pt-2">
+      <div className="flex gap-1 md:gap-3 pt-2">
         <div className="flex-1 w-full flex [&>form]:w-full">
           <AddToCartButton
             disabled={!selectedVariant || !selectedVariant.availableForSale}

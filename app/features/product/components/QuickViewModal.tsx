@@ -119,7 +119,7 @@ export function QuickViewModal({ product, onClose, reviewSummary }: QuickViewMod
                                 {[1, 2, 3, 4, 5].map((star) => (
                                     <svg
                                         key={star}
-                                        className={`w-4 h-4 ${star <= Math.round(reviewSummary.averageRating) ? 'text-gold' : 'text-stone-200 dark:text-stone-700'}`}
+                                        className={`w-4 h-4 ${star <= Math.round(reviewSummary.averageRating) ? 'text-[#F14514]' : 'text-stone-200 dark:text-stone-700'}`}
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"

@@ -316,8 +316,8 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
                     transition-all duration-300
                     border
                     ${isActive
-                      ? 'bg-gold text-white border-gold shadow-md'
-                      : 'text-foreground bg-card border-border hover:border-gold hover:text-gold shadow-xs'
+                      ? 'bg-[#F14514] text-white border-[#F14514] shadow-md'
+                      : 'text-foreground bg-card border-border hover:border-[#F14514] hover:text-[#F14514] shadow-xs'
                     }
                   `
                   }
@@ -416,7 +416,7 @@ export function HeaderMenu({
       className="flex flex-col pt-2"
     >
       <div className="px-6 pb-5 pt-3">
-        <p className="text-sm uppercase tracking-[0.2em] font-medium text-gold mb-5">
+        <p className="text-sm uppercase tracking-[0.2em] font-medium text-[#F14514] mb-5">
           Browse Collections
         </p>
         <div className="grid grid-cols-3 gap-2">
@@ -665,7 +665,7 @@ function DesktopSearchBar() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-gray-800 shrink-0 transition-colors group-focus-within/search:text-gold"
+          className="w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-gray-800 shrink-0 transition-colors group-focus-within/search:text-[#F14514]"
         >
           <path
             strokeLinecap="round"
@@ -848,7 +848,7 @@ function MobileSearchBar({
             ? 'max-h-0 opacity-0 -translate-y-4 pointer-events-none'
             : 'max-h-18 opacity-100 translate-y-0'}`}
       >
-        <div className="px-4 pb-4">
+        <div className="px-4">
           <div className="predictive-search p-0">
             <SearchFormPredictive>
               {({ fetchResults, goToSearch, inputRef }) => (
@@ -1099,7 +1099,7 @@ function HeaderDropdown({ title, items }: { title: string; items: typeof ABOUT_L
   return (
     <div className="relative group">
       {/* Trigger */}
-      <button className="flex items-center gap-1 lg:gap-1.5 text-[10px] md:text-[10px] lg:text-xs xl:text-sm tracking-[0.12em] uppercase text-foreground hover:text-gold transition-colors duration-300 py-1.5 lg:py-2">
+      <button className="flex items-center gap-1 lg:gap-1.5 text-[10px] md:text-[10px] lg:text-xs xl:text-sm tracking-[0.12em] uppercase text-foreground hover:text-[#F14514] transition-colors duration-300 py-1.5 lg:py-2">
         {title}
         <svg className="w-3.5 h-3.5 text-muted-foreground group-hover:rotate-180 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -1119,10 +1119,10 @@ function HeaderDropdown({ title, items }: { title: string; items: typeof ABOUT_L
                 to={item.url}
                 className="flex items-center gap-3.5 px-3 py-2.5 rounded-xl hover:bg-muted/60 transition-colors duration-200 group/item"
               >
-                <div className="text-muted-foreground group-hover/item:text-gold transition-colors">
+                <div className="text-muted-foreground group-hover/item:text-[#F14514] transition-colors">
                   {item.icon}
                 </div>
-                <span className="text-[13px] font-medium text-foreground group-hover/item:text-gold transition-colors">
+                <span className="text-[13px] font-medium text-foreground group-hover/item:text-[#F14514] transition-colors">
                   {item.label}
                 </span>
               </NavLink>

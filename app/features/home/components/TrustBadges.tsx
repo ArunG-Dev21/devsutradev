@@ -4,7 +4,7 @@ export function TrustBadges() {
       {/* Trust / About Section */}
       <section id="about" className="dark:bg-black bg-stone-50 py-20 lg:py-28">
         <div className="mx-auto container px-6 text-center scroll-reveal">
-          <span className="text-gold-muted text-xs font-medium tracking-[0.25em] uppercase">
+          <span className="text-[#F14514] text-xs font-medium tracking-[0.25em] uppercase">
             Our Promise
           </span>
           <h2 className="text-3xl lg:text-5xl font-heading uppercase font-medium text-foreground mt-3 mb-6">
@@ -22,10 +22,10 @@ export function TrustBadges() {
               className="flex flex-col items-center scroll-reveal max-w-sm mx-auto"
               style={{ transitionDelay: '100ms' }}
             >
-              <div className="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-[#404141]/10 flex items-center justify-center mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 text-gold"
+                  className="w-6 h-6 text-[#F14514]"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -50,10 +50,10 @@ export function TrustBadges() {
               className="flex flex-col items-center scroll-reveal max-w-sm mx-auto"
               style={{ transitionDelay: '200ms' }}
             >
-              <div className="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-[#404141]/10 flex items-center justify-center mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 text-gold"
+                  className="w-6 h-6 text-[#F14514]"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -79,10 +79,10 @@ export function TrustBadges() {
               className="flex flex-col items-center scroll-reveal max-w-sm mx-auto"
               style={{ transitionDelay: '300ms' }}
             >
-              <div className="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-[#404141]/10 flex items-center justify-center mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 text-gold"
+                  className="w-6 h-6 text-[#F14514]"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

@@ -555,7 +555,7 @@ export default function Collection() {
                   <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
                     {/* % Off badge — absolute top-right of white card */}
                     {product.variants?.nodes?.[0]?.compareAtPrice && (
-                      <span className="absolute top-0 right-0 px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-lime-300 text-green-800">
+                      <span className="absolute top-0 right-0 px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-orange-300 text-green-800">
                         {Math.round(
                           ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
                             parseFloat(product.priceRange.minVariantPrice.amount)) /

@@ -597,7 +597,7 @@ export default function Collection() {
                         </s>
                       )}
                       {product.variants?.nodes?.[0]?.compareAtPrice && (
-                        <span className="absolute top-0 right-0 ml-auto px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-lime-300 text-green-800">
+                        <span className="absolute top-0 right-0 ml-auto px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-[#F14514] text-white">
                           −
                           {Math.round(
                             ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -

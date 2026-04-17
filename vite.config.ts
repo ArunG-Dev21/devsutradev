@@ -150,6 +150,7 @@ export default defineConfig(({ command }) => {
       optimizeDeps: {
         include: [
           'typographic-base',
+          'xss',
         ],
       },
     },

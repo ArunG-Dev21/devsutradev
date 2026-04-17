@@ -15,11 +15,11 @@ export function ProductPrice({
           <span className="text-2xl lg:text-3xl text-stone-900 dark:text-stone-100 tracking-wide">
             {price ? <Money withoutTrailingZeros data={price} /> : null}
           </span>
-          <s className="text-[10px] md:text-2xl text-stone-400 dark:text-stone-500 tracking-wide">
+          <s className="text-lg sm:text-2xl text-stone-400 dark:text-stone-500 tracking-wide">
             <Money withoutTrailingZeros data={compareAtPrice} />
           </s>
           {price && (
-            <span className="px-2 py-1 text-[10px] md:text-lg tracking-widest uppercase rounded-full dark:bg-stone-800 text-lime-600 border rounded-2xl dark:text-stone-300 dark:border-stone-700">
+            <span className="px-2 py-1 text-[10px] md:text-lg tracking-widest uppercase rounded-full dark:bg-stone-800 text-[#F14514] border rounded-2xl dark:text-stone-300 dark:border-stone-700">
               -
               {Math.round(
                 ((parseFloat(compareAtPrice.amount) -

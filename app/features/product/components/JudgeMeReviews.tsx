@@ -25,7 +25,7 @@ function Stars({rating, size = 'sm'}: {rating: number; size?: 'xs' | 'sm'}) {
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`${dim} ${star <= filled ? 'text-gold' : 'text-stone-200 dark:text-stone-700'}`}
+          className={`${dim} ${star <= filled ? 'text-[#F14514]' : 'text-stone-200 dark:text-stone-700'}`}
           fill="currentColor"
           viewBox="0 0 20 20"
           aria-hidden="true"
@@ -69,109 +69,104 @@ export function JudgeMeReviews({reviews}: {reviews: JudgeMeReview[]}) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
       {normalized.map((review) => {
         const isHighRated = review.rating >= 4;
         return (
           <article
             key={review.id}
-            className="group relative bg-white dark:bg-card border border-stone-100 dark:border-border rounded-2xl overflow-hidden shadow-[0_2px_10px_-3px_rgba(0,0,0,0.06)] dark:shadow-none hover:shadow-[0_8px_28px_-6px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-0.5"
+            className="group relative bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800/60 rounded-[28px] p-6 sm:p-8 overflow-hidden shadow-[0_4px_24px_-8px_rgba(0,0,0,0.04)] dark:shadow-none transition-all duration-500 hover:shadow-[0_12px_40px_-12px_rgba(241,69,20,0.15)] hover:border-[#F14514]/30 hover:-translate-y-1 block h-full flex flex-col"
           >
-            {/* Left accent bar */}
-            <div
-              className={`absolute left-0 top-0 bottom-0 w-[3px] ${
-                review.rating >= 4
-                  ? 'bg-gold'
-                  : review.rating === 3
-                  ? 'bg-gold/60'
-                  : 'bg-stone-300 dark:bg-stone-600'
-              }`}
-            />
+            {/* Ambient Background Glows */}
+            <div className="absolute -top-10 -right-10 w-48 h-48 bg-[#F14514]/10 dark:bg-[#F14514]/15 blur-3xl rounded-full pointer-events-none transition-opacity duration-700 opacity-0 group-hover:opacity-100" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/5 dark:bg-emerald-500/10 blur-3xl rounded-full pointer-events-none transition-opacity duration-700 opacity-0 group-hover:opacity-100" />
 
-            {/* Decorative quote mark */}
+            {/* Giant quote watermark */}
             <div
-              className="absolute top-4 right-5 text-[64px] leading-none text-stone-100 dark:text-stone-800 select-none pointer-events-none"
+              className="absolute -top-6 -left-3 text-[140px] leading-none text-stone-100 dark:text-stone-800/40 select-none pointer-events-none -z-10 transition-colors duration-700 group-hover:text-[#F14514]/5"
               style={{fontFamily: "'Cormorant Garamond', Georgia, serif"}}
               aria-hidden="true"
             >
               &ldquo;
             </div>
 
-            <div className="relative pl-5 pr-5 pt-5 pb-5 sm:pl-6 sm:pt-5 sm:pr-6 sm:pb-6">
-              {/* Top row: avatar + name + stars | date + verified */}
-              <div className="flex items-start justify-between gap-3 mb-4">
-                <div className="flex items-center gap-3 min-w-0">
-                  {/* Avatar */}
-                  <div
-                    className={`w-11 h-11 rounded-full overflow-hidden shrink-0 border-2 ${
-                      isHighRated
-                        ? 'border-gold'
-                        : 'border-stone-200 dark:border-border'
-                    }`}
-                  >
-                    <InitialAvatar name={review.reviewerName} rating={review.rating} />
-                  </div>
-
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-stone-900 dark:text-foreground tracking-widest uppercase leading-tight truncate">
-                      {review.reviewerName}
-                    </p>
-                    <div className="mt-1.5">
-                      <Stars rating={review.rating} size="xs" />
-                    </div>
-                    {review.dateLabel && (
-                      <p className="text-[10px] text-stone-400 dark:text-muted-foreground tracking-wider uppercase mt-1">
-                        {review.dateLabel}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Verified badge */}
-                <div className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded-full shrink-0">
-                  <svg
-                    className="w-3 h-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                  </svg>
-                  <span className="text-[9px] font-bold tracking-widest uppercase">Verified</span>
-                </div>
+            {/* Content Container */}
+            <div className="relative z-10 flex flex-col h-full flex-1">
+              
+              {/* Header: Stars & Date */}
+              <div className="flex items-center justify-between mb-5">
+                <Stars rating={review.rating} size="sm" />
+                {review.dateLabel && (
+                  <span className="text-[9px] sm:text-[10px] tracking-[0.25em] font-medium uppercase text-stone-400 dark:text-stone-500 bg-stone-50 dark:bg-stone-800/50 px-2 py-1 rounded-full">
+                    {review.dateLabel}
+                  </span>
+                )}
               </div>
 
-              {/* Review title */}
-              {review.title && (
-                <p className="text-[12px] font-bold tracking-widest uppercase text-stone-800 dark:text-foreground mb-2">
-                  {review.title}
+              {/* Body: Title & Text */}
+              <div className="flex-1 mb-6">
+                {review.title && (
+                  <h4 className="text-sm font-bold tracking-widest uppercase text-stone-900 dark:text-stone-100 mb-3">
+                    {review.title}
+                  </h4>
+                )}
+                <p
+                  className="text-stone-700 dark:text-stone-300 leading-[1.8] text-[1.0625rem] sm:text-lg italic"
+                  style={{fontFamily: "'Cormorant Garamond', Georgia, serif"}}
+                >
+                  &ldquo;{review.body}&rdquo;
                 </p>
-              )}
+              </div>
 
-              {/* Review body */}
-              <p
-                className="text-stone-600 dark:text-muted-foreground leading-relaxed italic"
-                style={{fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.0625rem'}}
-              >
-                &ldquo;{review.body}&rdquo;
-              </p>
-
-              {/* Photo strip */}
+              {/* Photos (if any) */}
               {review.pictureUrls.length > 0 && (
-                <div className="flex gap-2 overflow-x-auto pt-4 pb-0.5 no-scrollbar">
+                <div className="flex gap-2.5 overflow-x-auto pb-4 no-scrollbar">
                   {review.pictureUrls.slice(0, 6).map((url) => (
                     <img
                       key={url}
                       src={url}
                       alt=""
                       loading="lazy"
-                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl border border-stone-200 dark:border-border shrink-0 transition-transform duration-300 hover:scale-105"
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl border border-stone-200/50 dark:border-stone-800 shrink-0 transition-transform duration-300 hover:scale-110 shadow-sm"
                     />
                   ))}
                 </div>
               )}
+
+              {/* Footer: User profile & Verified */}
+              <div className="pt-5 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between flex-wrap gap-4 mt-auto">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden shrink-0 shadow-md border-[2.5px] transition-colors duration-500 ${
+                      isHighRated
+                        ? 'border-[#F14514] group-hover:border-[#F14514]/80'
+                        : 'border-white dark:border-stone-800 group-hover:border-stone-200'
+                    }`}
+                  >
+                    <InitialAvatar name={review.reviewerName} rating={review.rating} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] sm:text-xs font-bold text-stone-900 dark:text-white tracking-[0.15em] uppercase leading-tight">
+                      {review.reviewerName}
+                    </p>
+                    {isHighRated && (
+                      <p className="text-[9px] text-[#F14514] font-semibold tracking-widest uppercase mt-0.5 opacity-90">
+                        Valued Client
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Verified badge */}
+                <div className="relative flex items-center shrink-0 group/badge">
+                  <img
+                    src="/icons/verified.svg"
+                    alt="Verified"
+                    className="relative w-16 sm:w-20 md:w-24 h-auto shrink-0 transition-transform duration-500 hover:scale-105 drop-shadow-md z-10"
+                  />
+                </div>
+              </div>
+
             </div>
           </article>
         );

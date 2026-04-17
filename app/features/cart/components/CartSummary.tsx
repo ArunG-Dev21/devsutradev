@@ -197,11 +197,11 @@ function CartDiscounts({
       {validCodes.map((code) => (
         <div key={code} className="flex items-center justify-between px-3 py-2.5 bg-black rounded-xl">
           <div className="flex items-center gap-2">
-            <svg className="w-3.5 h-3.5 text-lime-500 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <svg className="w-3.5 h-3.5 text-[#F14514] shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
-            <code className="font-mono font-bold text-xs tracking-widest text-lime-400">{code}</code>
-            <span className="text-[9px] font-semibold uppercase tracking-wide text-lime-600">applied</span>
+            <code className="font-mono font-bold text-xs tracking-widest text-[#F14514]">{code}</code>
+            <span className="text-[9px] font-semibold uppercase tracking-wide text-[#F14514]">applied</span>
           </div>
           <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
             <button type="submit" className="text-[10px] text-white/40 hover:text-white/80 transition cursor-pointer">
@@ -357,7 +357,7 @@ function CartDiscountsAside({
               )}
 
               {/* Right: Apply */}
-              <span className="text-[9px] font-bold uppercase tracking-wider bg-lime-600 text-white rounded px-1.5 py-1 shrink-0 self-center">
+              <span className="text-[9px] font-bold uppercase tracking-wider bg-[#F14514] text-white rounded px-1.5 py-1 shrink-0 self-center">
                 Apply
               </span>
             </div>
@@ -369,11 +369,11 @@ function CartDiscountsAside({
       {appliedCodes.map((code) => (
         <div key={code} className="flex items-center justify-between px-3 py-2.5 bg-black rounded-xl">
           <div className="flex items-center gap-2">
-            <svg className="w-3.5 h-3.5 text-lime-500 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <svg className="w-3.5 h-3.5 text-[#F14514] shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
-            <code className="font-mono font-bold text-[11px] tracking-widest text-lime-400">{code}</code>
-            <span className="text-[9px] font-semibold uppercase tracking-wide text-lime-600">applied</span>
+            <code className="font-mono font-bold text-[11px] tracking-widest text-[#F14514]">{code}</code>
+            <span className="text-[9px] font-semibold uppercase tracking-wide text-[#F14514]">applied</span>
           </div>
           <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
             <button type="submit" className="text-[10px] text-white/40 hover:text-white/80 transition cursor-pointer">

@@ -68,7 +68,7 @@ export function MobileCollectionNav() {
                     className={`
                       text-[10px] tracking-[0.07em] uppercase font-semibold text-center leading-tight whitespace-nowrap
                       transition-colors duration-200
-                      ${isActive ? 'text-gold' : 'text-foreground group-hover:text-gold'}
+                      ${isActive ? 'text-[#F14514]' : 'text-foreground group-hover:text-[#F14514]'}
                     `}
                   >
                     {item.title}

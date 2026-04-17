@@ -420,7 +420,7 @@ export default function Product() {
                       <p className="text-sm font-bold tracking-widest text-white uppercase">{expandedImage.name}</p>
                       <div className="flex gap-0.5 mt-0.5">
                         {[1, 2, 3, 4, 5].map((star) => (
-                          <svg key={star} className={`w-3.5 h-3.5 ${star <= expandedImage.rating ? 'text-gold' : 'text-stone-600'}`} fill="currentColor" viewBox="0 0 20 20">
+                          <svg key={star} className={`w-3.5 h-3.5 ${star <= expandedImage.rating ? 'text-[#F14514]' : 'text-stone-600'}`} fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
                           </svg>
                         ))}
@@ -444,7 +444,7 @@ export default function Product() {
       )}
 
       {/* Main Content */}
-      <main className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 md:py-12">
+      <main className="container mx-auto px-3 sm:px-6 lg:px-8 md:py-12">
 
         {/* Breadcrumb */}
         <RouteBreadcrumbBanner
@@ -457,7 +457,7 @@ export default function Product() {
         <div className="grid lg:grid-cols-[55%_1fr] gap-10 lg:gap-14 lg:items-start">
 
           {/* ── LEFT: Image Gallery ── */}
-          <div className="flex flex-col lg:flex-row gap-5 relative w-full overflow-hidden lg:overflow-visible lg:sticky lg:top-[96px] lg:h-[max-content]">
+          <div className="flex flex-col lg:flex-row gap-2 lg:gap-5 relative w-full overflow-hidden lg:overflow-visible lg:sticky lg:top-[96px] lg:h-[max-content]">
 
             {/* Desktop Thumbnails (Sticky sidebar) */}
             {images.length > 1 && (
@@ -509,13 +509,13 @@ export default function Product() {
 
             {/* Main Stage (Stacked natively on Desktop, Snap scroll on Mobile) */}
             {/* Main Image Scroll */}
-            <div ref={mainScrollRef} className="flex-1 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none gap-3 lg:gap-6 no-scrollbar pb-4 lg:pb-0">
+            <div ref={mainScrollRef} className="flex-1 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none gap-3 lg:gap-6 no-scrollbar">
               {images.map((img, idx) => (
                 <div
                   key={img.url}
                   ref={(el) => (imageRefs.current[idx] = el)}
                   data-index={idx}
-                  className="w-full shrink-0 snap-center rounded-[24px] bg-[#F6F6F6] aspect-[4/5] sm:aspect-square relative flex items-center justify-center"
+                  className="w-full shrink-0 snap-center rounded-[24px] bg-[#F6F6F6] aspect-[3/2] sm:aspect-square relative flex items-center justify-center"
                 >
                   <Image
                     data={img}
@@ -599,11 +599,11 @@ export default function Product() {
               </button>
 
               {/* ── Main info (padded) ── */}
-              <div className="px-5 pt-5 pb-4 text-center sm:text-left">
+              <div className="px-5 pt-5 pb-4">
 
                 {/* Out of Stock badge */}
                 {!selectedVariant?.availableForSale && (
-                  <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-3">
+                  <div className="flex items-center sm:justify-start gap-1.5 mb-3">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] uppercase tracking-wide font-bold bg-red-50 text-red-600 border border-red-200">
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -614,12 +614,12 @@ export default function Product() {
                 )}
 
                 {/* Title — leave space for share button */}
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-gray-900 leading-[1.15] mb-2 tracking-tight pr-12 font-heading">
+                <h1 className="text-3xl sm:text-3xl lg:text-4xl font-medium text-gray-900 leading-[1.15] mb-2 tracking-tight pr-12 font-heading">
                   {title}
                 </h1>
 
                 {/* Price */}
-                <div className="flex items-baseline justify-center sm:justify-start gap-2 mb-3">
+                <div className="flex items-baseline gap-2 mb-3">
                   <div className="text-xl sm:text-2xl text-gray-900">
                     <ProductPrice
                       price={selectedVariant?.price}
@@ -630,10 +630,10 @@ export default function Product() {
 
                 {/* Live Rating */}
                 {hasRating && (
-                  <div className="flex items-center justify-center sm:justify-start gap-2.5 mb-4">
+                  <div className="flex items-center gap-2.5 mb-4">
                     <div className="flex gap-0.5">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <svg key={star} className={`w-5 h-5 ${star <= Math.round(ratingValue) ? 'text-lime-500' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <svg key={star} className={`w-5 h-5 ${star <= Math.round(ratingValue) ? 'text-[#F14514]' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
                         </svg>
                       ))}
@@ -847,7 +847,7 @@ export default function Product() {
                       {/* Score + stars */}
                       <div className="flex-shrink-0 flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-2 sm:border-r sm:border-stone-200 sm:dark:border-stone-700 sm:pr-8">
                         <span
-                          className="text-6xl font-bold text-gold dark:text-gold leading-none"
+                          className="text-6xl font-bold text-[#F14514] dark:text-[#F14514] leading-none"
                           style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                         >
                           {ratingLabel}
@@ -855,7 +855,7 @@ export default function Product() {
                         <div className="flex flex-col sm:items-start gap-1.5">
                           <div className="flex gap-0.5">
                             {[1, 2, 3, 4, 5].map((s) => (
-                              <svg key={s} className={`w-4 h-4 ${s <= Math.round(ratingValue) ? 'text-gold' : 'text-stone-300 dark:text-stone-700'}`} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                              <svg key={s} className={`w-4 h-4 ${s <= Math.round(ratingValue) ? 'text-[#F14514]' : 'text-stone-300 dark:text-stone-700'}`} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
                               </svg>
                             ))}
@@ -876,12 +876,12 @@ export default function Product() {
                           return (
                             <div key={stars} className="flex items-center gap-2.5">
                               <span className="text-stone-500 dark:text-stone-400 text-[11px] tabular-nums w-3 shrink-0 text-right">{stars}</span>
-                              <svg className="w-3 h-3 text-gold shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                              <svg className="w-3 h-3 text-[#F14514] shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
                               </svg>
                               <div className="flex-1 h-1.5 rounded-full bg-stone-200 dark:bg-stone-800 overflow-hidden">
                                 <div
-                                  className="h-full rounded-full bg-gold transition-all duration-700"
+                                  className="h-full rounded-full bg-[#F14514] transition-all duration-700"
                                   style={{ width: `${pct}%` }}
                                 />
                               </div>
@@ -941,7 +941,7 @@ export default function Product() {
               </div>
               <div className="relative">
                 {/* Vertical connector line */}
-                <div className="absolute left-4.75 top-8 bottom-8 w-px bg-linear-to-b from-gold/60 via-gold/30 to-transparent dark:from-gold/40 dark:via-gold/15" />
+                <div className="absolute left-4.75 top-8 bottom-8 w-px bg-linear-to-b from-[#F14514]/40 via-[#F14514]/20 to-transparent dark:from-[#F14514]/40 dark:via-[#F14514]/15" />
                 <div className="space-y-4">
                   {[
                     { step: '01', title: 'Cleanse before wearing', desc: 'Wash the rudraksha with clean water on a Monday morning before first use.' },
@@ -951,8 +951,8 @@ export default function Product() {
                   ].map((item) => (
                     <div key={item.step} className="flex gap-5 items-start group hover:-translate-y-0.5 transition-all duration-300">
                       {/* Step circle */}
-                      <div className="relative z-10 w-10 h-10 rounded-full bg-white dark:bg-card border-2 border-gold dark:border-gold flex items-center justify-center shrink-0 group-hover:border-gold transition-all duration-300">
-                        <span className="text-[11px] font-bold text-gold dark:text-gold tracking-wide">
+                      <div className="relative z-10 w-10 h-10 rounded-full bg-white dark:bg-card border-2 border-[#F14514] dark:border-[#F14514] flex items-center justify-center shrink-0 group-hover:border-[#F14514] transition-all duration-300">
+                        <span className="text-[11px] font-bold text-[#F14514] dark:text-[#F14514] tracking-wide">
                           {item.step}
                         </span>
                       </div>
@@ -1121,7 +1121,7 @@ function CouponCard({ code, label, offer }: { code: string; label?: string; offe
         <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white z-10" />
 
         {/* Festival Offer badge */}
-        <span className="absolute right-0 top-0 z-[2] text-[9px] tracking-[0.14em] uppercase bg-lime-600 text-white rounded-bl-lg rounded-tr-xl px-2 py-0.5">
+        <span className="absolute right-0 top-0 z-[2] text-[9px] tracking-[0.14em] uppercase bg-[#F14514] text-white rounded-bl-lg rounded-tr-xl px-2 py-0.5">
           ✦ Festival Offer ✦
         </span>
 

@@ -422,7 +422,7 @@ export function KarungaliPromoter({
             <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
                 {/* ── Section Header ── */}
                 <div className="text-center mb-10 md:mb-14">
-                    <p className="text-xs text-gold-muted tracking-[0.45em] uppercase mb-3 font-medium">
+                    <p className="text-xs text-[#F14514] tracking-[0.45em] uppercase mb-3 font-medium">
                         Handcrafted Heritage
                     </p>
                     <h2 className="text-3xl md:text-4xl uppercase font-medium lg:text-5xl font-heading leading-tight">
