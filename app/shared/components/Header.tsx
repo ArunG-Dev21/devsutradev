@@ -655,7 +655,7 @@ function DesktopSearchBar() {
     <div ref={containerRef} className="hidden md:block relative group/search">
       <form
         onSubmit={handleSubmit}
-        className="flex items-center bg-transparent rounded-[30px] px-3 md:px-4 lg:px-5 py-2 md:py-2 lg:py-2.5 2xl:py-3 gap-2 lg:gap-3 w-44 md:w-44 lg:w-64 xl:w-[22rem] 2xl:w-[28rem] transition-all duration-300 border border-gray-300 hover:border-gold focus-within:!border-gold focus-within:shadow-[0_0_0_1px_#BC9251]"
+        className="flex items-center bg-transparent rounded-[30px] px-3 md:px-4 lg:px-5 py-2 md:py-2 lg:py-2.5 2xl:py-3 gap-2 lg:gap-3 w-44 md:w-44 lg:w-64 xl:w-[22rem] 2xl:w-[28rem] transition-all duration-300 border border-gray-300 hover:border-[#F14514] focus-within:!border-[#F14514] focus-within:shadow-[0_0_0_1px_#F14514]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

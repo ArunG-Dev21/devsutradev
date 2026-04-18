@@ -416,12 +416,12 @@ export function StickyAddToCart({
         <>
             {/* ── Mobile: bottom sticky (below xl) ── */}
             <div
-                className={`xl:hidden fixed left-0 right-0 z-50 transition-transform duration-300 ease-out ${
+                className={`xl:hidden fixed left-2 right-2 z-50 transition-transform duration-300 ease-out ${
                     isVisible ? "translate-y-0" : "translate-y-full"
                 }`}
-                style={{ bottom: "calc(4.375rem + env(safe-area-inset-bottom))" }}
+                style={{ bottom: "calc(4.375rem + env(safe-area-inset-bottom) + 6px)" }}
             >
-                <div className="bg-white/95 dark:bg-card/95 backdrop-blur-xl border-t border-stone-200 dark:border-border shadow-[0_-4px_20px_rgba(0,0,0,0.08)] safe-bottom">
+                <div className="bg-white/95 dark:bg-card/95 backdrop-blur-xl border border-stone-200 dark:border-border shadow-[0_4px_24px_rgba(0,0,0,0.12)] rounded-xl overflow-hidden">
                     
                     {/* Inline Size Picker (slides up inside the sticky bar container) */}
                     {showSizePicker && variants.length > 1 && (
@@ -447,7 +447,7 @@ export function StickyAddToCart({
                         </div>
                     )}
 
-                    <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="px-2 py-2.5 flex items-center gap-3">
                         {/* Product image */}
                         {product.featuredImage && (
                             <div className="w-14 h-14 rounded-lg overflow-hidden border border-stone-200 dark:border-border flex-shrink-0">
@@ -489,16 +489,16 @@ export function StickyAddToCart({
 
             {/* ── Desktop: bottom sticky (xl and above) ── */}
             <div
-                className={`hidden xl:block fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${
+                className={`hidden xl:flex xl:justify-center fixed bottom-0 left-0 right-0 z-40 pointer-events-none transition-transform duration-300 ease-out ${
                     isVisible ? 'translate-y-0' : 'translate-y-full'
                 }`}
             >
-                <div className="bg-white/95 dark:bg-card/95 backdrop-blur-xl border-t border-stone-200 dark:border-border shadow-[0_-4px_20px_rgba(0,0,0,0.06)] relative text-foreground">
-                    
+                <div className="w-full max-w-2xl pointer-events-auto bg-white/95 dark:bg-card/95 backdrop-blur-xl border border-b-0 border-stone-200 dark:border-border shadow-[0_-4px_24px_rgba(0,0,0,0.10)] relative text-foreground rounded-t-xl overflow-hidden">
+
                     {/* Inline Size Picker */}
                     {showSizePicker && variants.length > 1 && (
-                        <div className="absolute bottom-full left-0 right-0 bg-white/95 dark:bg-card/95 px-6 lg:px-8 py-3 border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.06)] border-b text-foreground">
-                             <div className="container mx-auto flex items-center gap-4">
+                        <div className="absolute bottom-full left-0 right-0 bg-white/95 dark:bg-card/95 px-6 py-3 border border-b-0 border-stone-200 dark:border-border shadow-[0_-4px_20px_rgba(0,0,0,0.06)] text-foreground rounded-t-xl">
+                            <div className="flex items-center gap-4">
                                 <p className="text-[10px] font-semibold tracking-[0.2em] uppercase opacity-70">
                                     Select Size:
                                 </p>
@@ -517,11 +517,11 @@ export function StickyAddToCart({
                                         />
                                     ))}
                                 </div>
-                             </div>
+                            </div>
                         </div>
                     )}
 
-                    <div className="container mx-auto px-6 lg:px-8 py-3 flex items-center justify-between gap-6">
+                    <div className="px-6 py-3 flex items-center justify-between gap-6">
                         {/* Left: product info */}
                         <div className="flex items-center gap-4 min-w-0 flex-1">
                             {product.featuredImage && (

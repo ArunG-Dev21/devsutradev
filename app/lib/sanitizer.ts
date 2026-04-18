@@ -32,3 +32,19 @@ export function sanitizeHtml(html: string | undefined | null): string {
   if (!html) return '';
   return sanitizer.process(html);
 }
+
+/**
+ * Cleans up whitespace noise that Shopify's rich-text editor emits:
+ * empty <p> tags, <p><br></p> spacers, &nbsp;-only paragraphs, and
+ * consecutive <br> chains. Call this after sanitizeHtml.
+ */
+export function cleanShopifyHtml(html: string): string {
+  if (!html) return '';
+  return html
+    .replace(/<p[^>]*>\s*<\/p>/gi, '')
+    .replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '')
+    .replace(/<p[^>]*>\s*&nbsp;\s*<\/p>/gi, '')
+    .replace(/(<br\s*\/?>[\s\n]*){2,}/gi, '<br>')
+    .replace(/<p([^>]*)>\s*<br\s*\/?>\s*/gi, '<p$1>')
+    .replace(/\s*<br\s*\/?>\s*<\/p>/gi, '</p>');
+}

@@ -11,7 +11,7 @@ import {
   stripHtml,
   truncate,
 } from '~/lib/seo';
-import { sanitizeHtml } from '~/lib/sanitizer';
+import { sanitizeHtml, cleanShopifyHtml } from '~/lib/sanitizer';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -314,27 +314,45 @@ export default function Article() {
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start">
           <article ref={articleRef} className="min-w-0 max-w-[820px]">
             <div
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentHtml) }}
+              dangerouslySetInnerHTML={{ __html: cleanShopifyHtml(sanitizeHtml(contentHtml)) }}
               className="
-                prose prose-stone max-w-none text-[1.08rem] leading-8 text-foreground/90 md:text-[1.12rem] md:leading-9
-                prose-headings:font-heading prose-headings:text-foreground
-                prose-headings:tracking-tight
-                prose-h2:mt-14 prose-h2:text-[2.05rem] prose-h2:font-normal prose-h2:leading-tight
-                prose-h3:mt-10 prose-h3:text-[1.6rem] prose-h3:font-normal prose-h3:leading-snug
-                prose-p:my-0 prose-p:text-[1.08rem] prose-p:leading-8 prose-p:text-foreground/90 md:prose-p:text-[1.12rem] md:prose-p:leading-9
-                prose-a:text-foreground prose-a:underline prose-a:underline-offset-4
-                prose-strong:text-foreground
-                prose-ul:my-6 prose-ul:pl-6 prose-ol:my-6 prose-ol:pl-6
-                prose-li:my-2 prose-li:pl-1 prose-li:text-foreground/90
-                prose-blockquote:my-8 prose-blockquote:border-l-border prose-blockquote:pl-5 prose-blockquote:text-lg prose-blockquote:text-foreground/80
+                prose prose-stone max-w-none
+                text-[1.06rem] leading-[1.85] text-foreground/90
+                md:text-[1.1rem]
+
+                prose-headings:font-heading prose-headings:text-foreground prose-headings:tracking-tight
+                prose-h2:mt-12 prose-h2:mb-4 prose-h2:text-[1.85rem] prose-h2:font-normal prose-h2:leading-tight
+                prose-h3:mt-9 prose-h3:mb-3 prose-h3:text-[1.45rem] prose-h3:font-normal prose-h3:leading-snug
+                prose-h4:mt-7 prose-h4:mb-2 prose-h4:text-[1.15rem] prose-h4:font-medium
+
+                prose-p:my-0 prose-p:text-[1.06rem] prose-p:leading-[1.85] prose-p:text-foreground/90
+                md:prose-p:text-[1.1rem]
+
+                prose-a:text-foreground prose-a:underline prose-a:underline-offset-4 prose-a:decoration-foreground/30
+                prose-strong:font-semibold prose-strong:text-foreground
+
+                prose-ul:my-5 prose-ul:pl-5
+                prose-ol:my-5 prose-ol:pl-5
+                prose-li:my-1 prose-li:text-foreground/90
+
+                prose-blockquote:my-8 prose-blockquote:border-l-2 prose-blockquote:border-foreground/20
+                prose-blockquote:pl-5 prose-blockquote:text-foreground/75
+
                 prose-hr:my-10 prose-hr:border-border
-                prose-img:my-8 prose-img:max-h-[460px] prose-img:w-full prose-img:rounded-2xl prose-img:border prose-img:border-border/70 prose-img:object-cover
-                prose-figcaption:text-sm prose-figcaption:text-muted-foreground
+
+                prose-img:my-8 prose-img:max-h-[480px] prose-img:w-full prose-img:rounded-2xl
+                prose-img:border prose-img:border-border/70 prose-img:object-cover
+                prose-figcaption:mt-2 prose-figcaption:text-sm prose-figcaption:text-center prose-figcaption:text-muted-foreground
+
                 prose-table:block prose-table:w-full prose-table:overflow-x-auto
                 prose-th:border prose-th:border-border prose-th:bg-muted/40 prose-th:px-3 prose-th:py-2
                 prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2
-                [&_p+p]:mt-6
-                [&_br]:block [&_br]:h-3 [&_br]:content-['']
+
+                [&_p+p]:mt-5
+                [&_p:empty]:hidden
+
+                [&>p:first-of-type]:text-[1.15rem] [&>p:first-of-type]:leading-[1.78] [&>p:first-of-type]:text-foreground/80
+                md:[&>p:first-of-type]:text-[1.2rem]
               "
             />
 

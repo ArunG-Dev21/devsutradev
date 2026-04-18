@@ -166,6 +166,11 @@ function AccountMenu() {
           <Form method="POST" action="/account/logout">
             <button
               type="submit"
+              onClick={(e) => {
+                if (!window.confirm('Are you sure you want to sign out?')) {
+                  e.preventDefault();
+                }
+              }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-red-600 hover:bg-red-50/60 dark:hover:bg-red-950/20 transition-all duration-200 text-left cursor-pointer"
             >
               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
