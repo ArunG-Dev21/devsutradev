@@ -94,22 +94,34 @@ export function Header({
   const headerRef = useRef<HTMLElement>(null);
 
   // Accumulate per-frame deltas so smooth-scroll (Lenis) doesn't break detection.
-  // The old per-frame threshold never fired because Lenis spreads movement across
-  // many frames (~5–10px each), so the single-frame delta never reached 40px.
+  // A transition lock prevents the oscillation loop caused by the search-bar
+  // collapsing/expanding changing the header height, which can nudge scrollY
+  // back across the trigger threshold and flip the state in an infinite cycle.
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     let prevY = window.scrollY;
     let accumulated = 0;
     let rafId: number;
+    let lockTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const COLLAPSE_PX = 50;  // accumulated downward px before hiding first header
-    const EXPAND_PX   = 25;  // accumulated upward px before showing it again
+    const COLLAPSE_PX = 50;  // accumulated downward px before hiding
+    const EXPAND_PX   = 25;  // accumulated upward px before showing
+    const LOCK_MS     = 420; // slightly longer than the 300ms CSS transition
 
     const handleScroll = () => {
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         const y = window.scrollY;
+
+        // While locked: keep prevY fresh and reset accumulated so there is no
+        // phantom delta when the lock expires, but do not change state.
+        if (lockTimer !== null) {
+          prevY = y;
+          accumulated = 0;
+          return;
+        }
+
         const delta = y - prevY;
         prevY = y;
 
@@ -128,9 +140,11 @@ export function Header({
         if (accumulated > COLLAPSE_PX) {
           accumulated = 0;
           setScrolled(true);
+          lockTimer = setTimeout(() => { lockTimer = null; }, LOCK_MS);
         } else if (accumulated < -EXPAND_PX) {
           accumulated = 0;
           setScrolled(false);
+          lockTimer = setTimeout(() => { lockTimer = null; }, LOCK_MS);
         }
       });
     };
@@ -141,6 +155,7 @@ export function Header({
     return () => {
       window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(rafId);
+      if (lockTimer) clearTimeout(lockTimer);
     };
   }, []);
 

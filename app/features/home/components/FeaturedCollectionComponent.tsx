@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Image, Money, CartForm } from '@shopify/hydrogen';
 import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { Link } from 'react-router';
@@ -334,7 +334,7 @@ function ProductCard({
     >
       {/* ── IMAGE ── */}
       <Link to={`/products/${product.handle}`} className="block">
-        <div className="relative aspect-square overflow-hidden bg-stone-100 m-1.5 sm:m-2 xl:m-2.5 rounded-xl">
+        <div className="relative aspect-[1/0.90] overflow-hidden bg-stone-100 m-1.5 sm:m-2 xl:m-2.5 rounded-lg">
           {product.featuredImage && (
             <Image
               data={product.featuredImage}
@@ -453,13 +453,13 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
   const [sortKey, setSortKey] = useState('price-asc');
   const [quickViewProduct, setQuickViewProduct] = useState<ProductNode | null>(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(6);
   // hoveredId removed — hover state is now per-card inside ProductCard
 
   const sortButtonRef = useRef<HTMLDivElement>(null);
-  const products = [...collection.products.nodes];
+  const scrollerRef = useRef<HTMLDivElement>(null);
 
-  const sortedProducts = (() => {
+  const sortedProducts = useMemo(() => {
+    const products = [...collection.products.nodes];
     switch (sortKey) {
       case 'price-asc':
         return products.sort((a, b) =>
@@ -478,7 +478,7 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
       default:
         return products;
     }
-  })();
+  }, [collection.products.nodes, sortKey]);
 
   const sortOptions = [
     { value: 'price-asc', label: 'Price: Low → High' },
@@ -487,20 +487,49 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
     { value: 'za', label: 'Name: Z → A' },
   ];
 
-  const visibleProducts = sortedProducts.slice(0, visibleCount);
+  const getProductScrollStep = useCallback(() => {
+    const scroller = scrollerRef.current;
+    const firstCard = scroller?.querySelector<HTMLElement>('[data-featured-product-card]');
+    const gap = scroller ? parseFloat(window.getComputedStyle(scroller).columnGap || '0') : 0;
+
+    return firstCard && scroller
+      ? firstCard.offsetWidth + gap
+      : Math.max(240, (scroller?.clientWidth ?? 320) * 0.75);
+  }, []);
+
+  const scrollProductsRight = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    scroller.scrollBy({ left: getProductScrollStep(), behavior });
+  }, [getProductScrollStep]);
+
+  const scrollProductsLeft = useCallback(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    scroller.scrollBy({ left: -getProductScrollStep(), behavior: 'smooth' });
+  }, [getProductScrollStep]);
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    scroller.scrollLeft = 0;
+  }, [sortKey]);
 
   return (
     <div className="relative bg-background text-foreground flex flex-col">
 
       {/* ── HEADER ── */}
-      <div className="px-4 sm:px-6 md:px-8 lg:px-8 xl:px-14 pt-8 lg:pt-10 xl:pt-12 pb-6 lg:pb-8 xl:pb-10 border-b border-border bg-background lg:sticky lg:top-0 z-10">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-6 2xl:px-14 pt-8 lg:pt-6 2xl:pt-12 bg-background lg:sticky lg:top-0 z-10">
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-medium leading-tight uppercase tracking-tight mb-2 lg:mb-3 font-heading">
           {collection.title}
         </h2>
 
         <div className="flex items-center justify-between flex-wrap gap-3">
           <span className="text-xs sm:text-sm xl:text-xl uppercase font-medium tracking-wider text-[#F14514]">
-            Top Picks This Season
+            PICK FROM OUR BEST
           </span>
 
 <div className="relative" ref={sortButtonRef}>
@@ -567,7 +596,6 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
               key={option.value}
               onClick={() => {
                 setSortKey(option.value);
-                setVisibleCount(6);
                 setIsSortOpen(false);
               }}
               className={`
@@ -593,48 +621,37 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
         </div>
       </div>
 
-      {/* ── GRID ── */}
-      <div className="px-4 sm:px-6 md:px-8 lg:px-8 xl:px-14 py-4 sm:py-6 xl:py-8">
-        {/*
-          Mobile:  2 columns, compact cards, no horizontal scroll
-          Tablet:  3 columns
-          Desktop: 3 columns
-        */}
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-3 xl:gap-5 lg:grid-cols-2 xl:grid-cols-3">
-          {visibleProducts.map((product) => {
+      {/* ── HORIZONTAL PRODUCT RAIL ── */}
+      <div className="px-3 sm:px-6 md:px-8 lg:px-6 2xl:px-14 py-4 sm:py-6 2xl:py-8">
+        <div
+          ref={scrollerRef}
+          className="grid grid-flow-col grid-rows-2 auto-cols-[calc((100%_-_0.75rem)/2)] xl:auto-cols-[calc((100%_-_2.5rem)/3)] gap-3 sm:gap-4 2xl:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory"
+          aria-label={`${collection.title} products`}
+        >
+          {sortedProducts.map((product) => {
             const pid = String(product.id).split('/').pop();
             const summary = pid ? reviewSummaries?.[pid] : undefined;
             return (
-              <ProductCard
+              <div
                 key={product.id}
-                product={product}
-                reviewSummary={summary}
-                onQuickView={() => setQuickViewProduct(product)}
-              />
+                data-featured-product-card
+                className="min-w-0 snap-start"
+              >
+                <ProductCard
+                  product={product}
+                  reviewSummary={summary}
+                  onQuickView={() => setQuickViewProduct(product)}
+                />
+              </div>
             );
           })}
         </div>
 
-        {/* ── VIEW MORE BUTTON ── */}
-        {visibleCount < sortedProducts.length && (
-          <div className="mt-8 sm:mt-10 flex justify-center">
-            <button
-              onClick={() => setVisibleCount(sortedProducts.length)}
-              className="px-8 py-3 w-full sm:w-auto rounded-full text-[10px] font-medium tracking-widest uppercase text-foreground bg-transparent border border-border hover:bg-foreground hover:text-background transition-all duration-300 cursor-pointer"
-            >
-              View More ({sortedProducts.length - visibleCount} remaining)
-            </button>
-          </div>
-        )}
-
         {/* ── FOOTER ── */}
-        <div className="mt-8 sm:mt-10 pt-5 flex items-center justify-between border-t border-border">
-          <span className="text-[10px] tracking-widest uppercase text-black">
-            {sortedProducts.length} products
-          </span>
+        <div className="mt-4 flex items-center gap-2 sm:gap-3">
           <Link
             to={`/collections/${collection.handle}`}
-            className="group inline-flex items-center gap-2.5 rounded-full border border-foreground/12 bg-background/85 px-4 py-2.5 sm:px-5 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.18em] text-foreground/85 shadow-[0_10px_28px_-22px_rgba(0,0,0,0.55)] transition-all duration-200 hover:border-foreground/20 hover:bg-muted/55 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:ring-offset-2"
+            className="group inline-flex min-w-0 flex-1 items-center justify-center gap-2.5 rounded-full border border-foreground/12 bg-background/85 px-4 py-2.5 sm:px-5 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.18em] text-foreground/85 shadow-[0_10px_28px_-22px_rgba(0,0,0,0.55)] transition-all duration-200 hover:border-foreground/20 hover:bg-muted/55 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:ring-offset-2"
           >
             <span className="truncate">Explore Full Collection</span>
             <svg
@@ -649,6 +666,30 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link>
+          {sortedProducts.length > 2 && (
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={scrollProductsLeft}
+                className="w-10 h-10 rounded-full border border-border bg-background text-foreground flex items-center justify-center hover:bg-foreground hover:text-background transition-colors duration-200"
+                aria-label="Show previous products"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollProductsRight()}
+                className="w-10 h-10 rounded-full border border-foreground bg-foreground text-background flex items-center justify-center hover:bg-background hover:text-foreground transition-colors duration-200"
+                aria-label="Show two more products"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -295,7 +295,7 @@ function FilterSidebar({
 
 /* ───────── Page ───────── */
 
-function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange: (nextSort: string) => void }) {
+function CustomSortDropdown({ sort, onSortChange, variant = 'default' }: { sort: string; onSortChange: (nextSort: string) => void; variant?: 'default' | 'mobile' }) {
   const [isOpen, setIsOpen] = useState(false);
   const activeOption = SORT_OPTIONS.find((o) => o.value === sort) || SORT_OPTIONS[0];
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -311,29 +311,47 @@ function CustomSortDropdown({ sort, onSortChange }: { sort: string; onSortChange
   }, []);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className={variant === 'mobile' ? 'flex-1 min-w-0 relative' : 'relative'} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="group flex items-center gap-1.5 sm:gap-2 text-left text-[11px] sm:text-[13px] border border-gray-300 rounded-full px-3 py-1.5 sm:px-5 sm:py-2.5 bg-white text-gray-800 focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-black"
+        className={variant === 'mobile'
+          ? `w-full flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium cursor-pointer select-none rounded-r-2xl transition-colors ${isOpen ? 'bg-gray-50 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`
+          : 'group flex items-center gap-1.5 sm:gap-2 text-left text-[11px] sm:text-[13px] border border-black/10 rounded-full px-3 py-1.5 sm:px-5 sm:py-2.5 bg-white text-gray-800 focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-black'
+        }
       >
-        <span className="truncate block">
-          <span className="sm:hidden text-gray-500">Sort</span>
-          <span className="hidden sm:inline"><span className="text-gray-500">Sort by:</span> {activeOption.label}</span>
-        </span>
-        <svg
-          className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-        </svg>
+        {variant === 'mobile' ? (
+          <>
+            <svg className="w-3.5 h-3.5 shrink-0 opacity-60" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M7 12h10M11 18h2" />
+            </svg>
+            <span>Sort</span>
+            {sort !== 'featured' && <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />}
+            <svg className={`w-3 h-3 text-gray-400 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+          </>
+        ) : (
+          <>
+            <span className="truncate block">
+              <span className="sm:hidden text-gray-500">Sort</span>
+              <span className="hidden sm:inline"><span className="text-gray-500">Sort by:</span> {activeOption.label}</span>
+            </span>
+            <svg
+              className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+          </>
+        )}
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 right-0 w-52 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="absolute z-50 right-0 w-52 mt-2 bg-white border border-black/10 rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
           <div className="py-1 max-h-60 overflow-auto">
             {SORT_OPTIONS.map((option) => (
               <button
@@ -462,51 +480,42 @@ export default function Collection() {
 
           <div className="flex-1 min-w-0">
 
-            <div className="flex items-center justify-between mb-5 gap-2">
-              <div className="flex items-center gap-2 relative">
-                <button
-                  onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                  className={`lg:hidden group flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-5 sm:py-2.5 border rounded-full text-[11px] sm:text-[13px] text-gray-800 bg-white cursor-pointer transition-all duration-200 select-none ${
-                    mobileFiltersOpen
-                      ? 'border-gray-800 shadow-md bg-gray-50'
-                      : 'border-gray-300 hover:border-black'
-                  }`}
-                >
-                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                  </svg>
-                  <span className="font-medium tracking-wide">Filters</span>
-                  {activeFilters.length > 0 && (
-                    <span className="bg-black text-white w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0">
-                      {activeFilters.length}
-                    </span>
-                  )}
-                  <svg
-                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 transition-transform duration-300 shrink-0 ${mobileFiltersOpen ? 'rotate-180' : 'group-hover:translate-y-px'}`}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                  </svg>
-                </button>
-                <p className="hidden lg:block text-lg sm:text-3xl text-gray-900 tracking-tight">Explore Our {collection.title} Collection</p>
-
-                {/* Mobile Filters Dropdown */}
-                {mobileFiltersOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-white rounded-2xl shadow-xl z-50 lg:hidden border border-gray-100">
-                    <FilterSidebar
-                      activeFilters={activeFilters}
-                      onToggleFilter={toggleFilter}
-                      isMobile={true}
-                    />
-                  </div>
-                )}
+            <div className="mb-5">
+              {/* Row 1: heading + sort (sort hidden on mobile) */}
+              <div className="flex items-center justify-between gap-3 mb-8 sm:mb-3 lg:mb-0">
+                <p className="text-xl lg:text-3xl text-center mx-auto sm:mx-0 sm:text-left text-gray-900 tracking-tight">Explore Our {collection.title} Collection</p>
+                <div className="hidden lg:block shrink-0">
+                  <CustomSortDropdown sort={sort} onSortChange={setSort} />
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <CustomSortDropdown sort={sort} onSortChange={setSort} />
+              {/* Row 2: unified filter+sort pill — mobile only */}
+              <div className="flex lg:hidden items-stretch border border-black/10 rounded-2xl bg-white overflow-visible">
+                <div className="relative flex-1 min-w-0">
+                  <button
+                    onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+                    className={`w-full flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium cursor-pointer select-none rounded-l-2xl transition-colors ${mobileFiltersOpen ? 'bg-gray-50 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                  >
+                    <svg className="w-3.5 h-3.5 shrink-0 opacity-60" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                    </svg>
+                    <span>Filters</span>
+                    {activeFilters.length > 0 && (
+                      <span className="w-4 h-4 rounded-full bg-black text-white text-[9px] font-bold flex items-center justify-center shrink-0">{activeFilters.length}</span>
+                    )}
+                  </button>
+                  {mobileFiltersOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-white rounded-2xl z-50">
+                      <FilterSidebar
+                        activeFilters={activeFilters}
+                        onToggleFilter={toggleFilter}
+                        isMobile={true}
+                      />
+                    </div>
+                  )}
+                </div>
+                <span className="w-px bg-gray-200 self-stretch my-2" aria-hidden />
+                <CustomSortDropdown sort={sort} onSortChange={setSort} variant="mobile" />
               </div>
             </div>
 
@@ -515,7 +524,7 @@ export default function Collection() {
                 {activeFilters.map((filter) => (
                   <span
                     key={filter}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 text-gray-800 text-xs rounded-full"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-black/10 text-gray-800 text-xs rounded-full"
                   >
                     {filter}
                     <button

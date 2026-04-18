@@ -25,7 +25,7 @@ export function PaginatedResourceSection<NodesType>({
 
         return (
           <div className="flex flex-col">
-            <div className="flex justify-center py-4">
+            <div className="flex justify-center">
               <PreviousLink className="inline-flex items-center gap-2 px-6 py-2.5 bg-stone-900 text-white text-xs font-semibold tracking-[0.15em] uppercase rounded-full shadow-md hover:bg-stone-800 transition-all duration-300 cursor-pointer">
                 {isLoading ? (
                   <span className="inline-flex items-center gap-2">

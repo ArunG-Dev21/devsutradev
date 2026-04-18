@@ -69,22 +69,17 @@ export function JudgeMeReviews({reviews}: {reviews: JudgeMeReview[]}) {
   );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+    <div className="grid grid-cols-1 gap-5 sm:gap-6">
       {normalized.map((review) => {
         const isHighRated = review.rating >= 4;
         return (
           <article
             key={review.id}
-            className="group relative bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800/60 rounded-[28px] p-6 sm:p-8 overflow-hidden shadow-[0_4px_24px_-8px_rgba(0,0,0,0.04)] dark:shadow-none transition-all duration-500 hover:shadow-[0_12px_40px_-12px_rgba(241,69,20,0.15)] hover:border-[#F14514]/30 hover:-translate-y-1 block h-full flex flex-col"
+            className="relative bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800/60 rounded-[28px] p-6 sm:p-8 overflow-hidden dark:shadow-none transition-all duration-500 hover:border-[#F14514]/30 h-full flex flex-col"
           >
-            {/* Ambient Background Glows */}
-            <div className="absolute -top-10 -right-10 w-48 h-48 bg-[#F14514]/10 dark:bg-[#F14514]/15 blur-3xl rounded-full pointer-events-none transition-opacity duration-700 opacity-0 group-hover:opacity-100" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-500/5 dark:bg-emerald-500/10 blur-3xl rounded-full pointer-events-none transition-opacity duration-700 opacity-0 group-hover:opacity-100" />
-
             {/* Giant quote watermark */}
             <div
-              className="absolute -top-6 -left-3 text-[140px] leading-none text-stone-100 dark:text-stone-800/40 select-none pointer-events-none -z-10 transition-colors duration-700 group-hover:text-[#F14514]/5"
-              style={{fontFamily: "'Cormorant Garamond', Georgia, serif"}}
+              className="absolute -top-6 -left-2 text-[140px] font-heading leading-none select-none pointer-events-none z-10 transition-colors duration-700 text-[#F14514]/30"
               aria-hidden="true"
             >
               &ldquo;
@@ -97,7 +92,7 @@ export function JudgeMeReviews({reviews}: {reviews: JudgeMeReview[]}) {
               <div className="flex items-center justify-between mb-5">
                 <Stars rating={review.rating} size="sm" />
                 {review.dateLabel && (
-                  <span className="text-[9px] sm:text-[10px] tracking-[0.25em] font-medium uppercase text-stone-400 dark:text-stone-500 bg-stone-50 dark:bg-stone-800/50 px-2 py-1 rounded-full">
+                  <span className="text-[9px] sm:text-[10px] tracking-[0.25em] font-medium uppercase text-black dark:text-stone-500 dark:bg-stone-800/50 px-2 py-1 rounded-full">
                     {review.dateLabel}
                   </span>
                 )}
@@ -111,8 +106,7 @@ export function JudgeMeReviews({reviews}: {reviews: JudgeMeReview[]}) {
                   </h4>
                 )}
                 <p
-                  className="text-stone-700 dark:text-stone-300 leading-[1.8] text-[1.0625rem] sm:text-lg italic"
-                  style={{fontFamily: "'Cormorant Garamond', Georgia, serif"}}
+                  className="text-stone-700 dark:text-stone-300 leading-[1.8] text-sm sm:text-base xl:text-2xl italic font-heading"
                 >
                   &ldquo;{review.body}&rdquo;
                 </p>
@@ -162,7 +156,7 @@ export function JudgeMeReviews({reviews}: {reviews: JudgeMeReview[]}) {
                   <img
                     src="/icons/verified.svg"
                     alt="Verified"
-                    className="relative w-10 sm:w-12 md:w-14 h-auto shrink-0 transition-transform duration-500 hover:scale-105 drop-shadow-md z-10"
+                    className="relative w-10 sm:w-12 md:w-14 h-auto shrink-0 transition-transform duration-500 drop-shadow-md z-10"
                   />
                 </div>
               </div>

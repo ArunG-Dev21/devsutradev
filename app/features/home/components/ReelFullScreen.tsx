@@ -49,13 +49,12 @@ function ReelSizePillInner({
         fontWeight: 600,
         letterSpacing: '0.08em',
         textTransform: 'uppercase' as const,
-        border: '1.5px solid rgba(255,255,255,0.35)',
-        background: isAdding ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.12)',
-        color: variant.availableForSale ? '#fff' : 'rgba(255,255,255,0.3)',
+        border: `1.5px solid ${isAdding ? '#1a1a1a' : 'rgba(0,0,0,0.22)'}`,
+        background: isAdding ? '#1a1a1a' : 'transparent',
+        color: !variant.availableForSale ? 'rgba(0,0,0,0.28)' : isAdding ? '#fff' : '#1a1a1a',
         cursor: variant.availableForSale && !isAdding ? 'pointer' : 'not-allowed',
         transition: 'all 0.15s ease',
         textDecoration: !variant.availableForSale ? 'line-through' : 'none',
-        backdropFilter: 'blur(4px)',
       }}
       aria-label={`Add size ${variant.title}`}
     >
@@ -218,26 +217,28 @@ function ReelATCButton({
           onClick={() => setShowSizes((s) => !s)}
           style={{
             width: 36, height: 36, borderRadius: '50%',
-            background: '#fff',
+            background: showSizes ? '#1a1a1a' : '#fff',
             border: '1.5px solid rgba(0,0,0,0.85)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', flexShrink: 0,
             transition: 'background 0.2s',
           }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.background = '#000';
-            const img = (e.currentTarget as HTMLElement).querySelector('img');
-            if (img) img.style.filter = 'invert(1)';
+            if (!showSizes) {
+              (e.currentTarget as HTMLElement).style.background = '#000';
+              const img = (e.currentTarget as HTMLElement).querySelector('img');
+              if (img) img.style.filter = 'invert(1)';
+            }
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.background = '#fff';
+            (e.currentTarget as HTMLElement).style.background = showSizes ? '#1a1a1a' : '#fff';
             const img = (e.currentTarget as HTMLElement).querySelector('img');
             if (img) img.style.filter = 'none';
           }}
           aria-label={showSizes ? 'Close size picker' : 'Select size'}
         >
           {showSizes ? (
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
               <path d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (

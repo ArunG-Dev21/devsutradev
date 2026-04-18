@@ -257,9 +257,9 @@ export default function Article() {
 
       <section className="border-b border-border/70 bg-muted/20">
         <RouteBreadcrumbBanner variant="light" />
-        <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,440px)] lg:items-start">
-            <div className="max-w-3xl">
+        <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-5">
+            <div className="w-full lg:w-1/2">
               {tags && tags.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag: string) => (
@@ -293,12 +293,12 @@ export default function Article() {
             </div>
 
             {image ? (
-              <div className="lg:pt-2">
+              <div className="w-full lg:w-1/2 lg:pt-2">
                 <div className="overflow-hidden rounded-[28px] border border-border/70 bg-card shadow-[0_20px_60px_-42px_rgba(0,0,0,0.28)]">
                   <div className="relative aspect-[4/3] bg-muted">
                     <Image
                       data={image}
-                      sizes="(min-width: 1024px) 440px, 100vw"
+                      sizes="(min-width: 1024px) 50vw, 100vw"
                       loading="eager"
                       className="h-full w-full object-cover"
                     />

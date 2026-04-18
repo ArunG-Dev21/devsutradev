@@ -60,7 +60,7 @@ export function CollectionHeroBanner({
         <div
           className={cn(
             'relative container mx-auto flex min-h-[300px] px-4 py-14 sm:min-h-[360px] sm:px-6 lg:min-h-[420px] lg:px-8',
-            breadcrumbInside ? 'pt-24 sm:pt-28 lg:pt-32' : '',
+            breadcrumbInside ? 'pt-14 sm:pt-14' : '',
           )}
         >
           <div
@@ -75,27 +75,26 @@ export function CollectionHeroBanner({
                 isRightAligned ? 'text-left lg:max-w-xl' : 'text-center',
               )}
             >
-              <p className="text-[10px] font-medium uppercase tracking-[0.42em] text-white/75 sm:text-[11px]">
+              <p className="text-[10px] font-medium uppercase text-center tracking-[0.42em] text-white/75 sm:text-[11px]">
                 {eyebrow}
               </p>
-              <h1 className="mt-4 font-heading text-4xl font-medium uppercase leading-[0.95] tracking-[0.04em] text-white sm:text-5xl lg:text-7xl">
+              <h1 className="mt-4 font-heading text-4xl font-medium text-center uppercase leading-[0.95] tracking-[0.04em] text-white sm:text-5xl lg:text-7xl">
                 {title}
               </h1>
-              <p className="mt-5 max-w-xl text-sm leading-7 text-white/80 sm:text-base">
+              <p className="mt-5 max-w-xl text-sm leading-7 text-center text-white/80 sm:text-base">
                 {description}
               </p>
 
               {highlights.length > 0 ? (
                 <div
                   className={cn(
-                    'mt-7 flex flex-wrap gap-2.5',
-                    isRightAligned ? '' : 'justify-center',
+                    'mt-7 flex flex-wrap justify-center gap-2.5',
                   )}
                 >
                   {highlights.map((item) => (
                     <span
                       key={item}
-                      className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/85 backdrop-blur-sm"
+                      className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-[10px] uppercase tracking-[0.22em] text-white/85 backdrop-blur-xs"
                     >
                       {item}
                     </span>

@@ -1226,7 +1226,6 @@ function RecommendedProducts({ products }: { products: any[] }) {
                   withoutTrailingZeros
                   data={product.priceRange.minVariantPrice}
                   className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black leading-none"
-                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
                 />
               </div>
 

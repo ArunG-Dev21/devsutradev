@@ -182,28 +182,15 @@ export function Layout({ children }: { children?: React.ReactNode }) {
 function LenisInit() {
   useEffect(() => {
     let lenis: any;
-    let raf: number;
 
     async function init() {
       const { default: Lenis } = await import('lenis');
-      lenis = new Lenis({
-        duration: 0.7,
-        easing: (t: number) => 1 - Math.pow(1 - t, 3),
-        smoothWheel: true,
-        allowNestedScroll: true,
-      });
-
-      function onRaf(time: number) {
-        lenis.raf(time);
-        raf = requestAnimationFrame(onRaf);
-      }
-      raf = requestAnimationFrame(onRaf);
+      lenis = new Lenis({ autoRaf: true });
     }
 
     init();
 
     return () => {
-      if (raf) cancelAnimationFrame(raf);
       if (lenis) lenis.destroy();
     };
   }, []);

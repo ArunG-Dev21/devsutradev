@@ -416,10 +416,9 @@ export function StickyAddToCart({
         <>
             {/* ── Mobile: bottom sticky (below xl) ── */}
             <div
-                className={`xl:hidden fixed left-2 right-2 z-50 transition-transform duration-300 ease-out ${
+                className={`lg:hidden fixed left-2 right-2 z-50 transition-transform duration-300 ease-out bottom-[calc(4.375rem_+_env(safe-area-inset-bottom)_+_6px)] md:bottom-2 ${
                     isVisible ? "translate-y-0" : "translate-y-full"
                 }`}
-                style={{ bottom: "calc(4.375rem + env(safe-area-inset-bottom) + 6px)" }}
             >
                 <div className="bg-white/95 dark:bg-card/95 backdrop-blur-xl border border-stone-200 dark:border-border shadow-[0_4px_24px_rgba(0,0,0,0.12)] rounded-xl overflow-hidden">
                     
@@ -489,7 +488,7 @@ export function StickyAddToCart({
 
             {/* ── Desktop: bottom sticky (xl and above) ── */}
             <div
-                className={`hidden xl:flex xl:justify-center fixed bottom-0 left-0 right-0 z-40 pointer-events-none transition-transform duration-300 ease-out ${
+                className={`hidden lg:flex lg:justify-center fixed bottom-0 left-0 right-0 z-40 pointer-events-none transition-transform duration-300 ease-out ${
                     isVisible ? 'translate-y-0' : 'translate-y-full'
                 }`}
             >
