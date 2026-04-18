@@ -62,14 +62,14 @@ export default function Orders() {
 
   return (
     <div>
-      <div className="mb-8 pb-6 border-b border-border flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-heading font-medium text-foreground tracking-tight">Order History</h2>
-          <p className="text-sm text-muted-foreground mt-1.5">
-            Review your past purchases and track current shipments.
-          </p>
+      <div className="mb-8 pb-6 border-b border-border">
+        <h2 className="text-2xl font-heading font-medium text-foreground tracking-tight text-center">Order History</h2>
+        <p className="text-sm text-muted-foreground mt-1.5 text-center">
+          Review your past purchases and track current shipments.
+        </p>
+        <div className="mt-5 flex justify-center">
+          <OrderSearchForm currentFilters={filters} />
         </div>
-        <OrderSearchForm currentFilters={filters} />
       </div>
 
       <div aria-live="polite">

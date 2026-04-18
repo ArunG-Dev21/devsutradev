@@ -54,14 +54,14 @@ function ActiveVideoCard({ src, muted }: { src: string; muted: boolean }) {
   useEffect(() => {
     if (!videoRef.current) return;
     videoRef.current.muted = muted;
-    videoRef.current.play().catch(() => {});
+    videoRef.current.play().catch(() => { });
   }, [muted]);
 
   useEffect(() => {
     if (!videoRef.current) return;
     videoRef.current.currentTime = 0;
     videoRef.current.muted = muted;
-    videoRef.current.play().catch(() => {});
+    videoRef.current.play().catch(() => { });
   }, [src]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -79,7 +79,7 @@ function ActiveVideoCard({ src, muted }: { src: string; muted: boolean }) {
 }
 
 /* ═══════════════════════════════════════════════════════ */
-export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/devasutra/' }: SocialFeedProps) {
+export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/deva.sutra/' }: SocialFeedProps) {
   const [activeIndex, setActiveIndex] = useState(() => Math.floor(reels.length / 2));
   const [selectedReelIndex, setSelectedReelIndex] = useState<number | null>(null);
   const [vw, setVw] = useState(1024);
@@ -298,42 +298,80 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
         </div>
       </div>
 
-      {/* ── Tagged products dock (Connected to active reel) ── */}
-      {activeReel?.products && activeReel.products.length > 0 && (
-        <div className="relative mt-4 sm:mt-6 z-20 flex flex-col items-center px-3 pointer-events-none transition-all duration-300">
-          <div className="bg-[#F14514] sm:bg-[#F14514] backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.06)] rounded-full p-1 sm:px-1 sm:py-2 border border-white/60 pointer-events-auto">
-            {/* scrollable row of cute pill cards */}
-            <div className="flex gap-2 overflow-x-auto no-scrollbar max-w-[90vw] sm:max-w-[600px] px-1">
-              {activeReel.products.map((product) => (
-                <Link
-                  key={product.id}
-                  to={`/products/${product.handle}`}
-                  className="flex items-center gap-3 shrink-0 w-[170px] sm:w-[190px] p-1.5 pr-4 rounded-full bg-white hover:bg-neutral-50 cursor-pointer ring-1 ring-black/[0.03]"
-                >
-                  {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      loading="lazy"
-                      className="w-10 h-10 rounded-full object-cover block shadow-[0_2px_8px_rgba(0,0,0,0.08)] shrink-0"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-[#f5f2ed] shrink-0" />
-                  )}
-                  <div className="min-w-0 flex-1 py-0.5 flex flex-col justify-center">
-                    <p className="text-[11px] font-semibold text-[#1a1a1a] truncate leading-tight">
-                      {product.title}
-                    </p>
-                    {product.price && (
-                      <p className="text-[10px] font-medium text-[#777] mt-0.5 leading-tight">{product.price}</p>
-                    )}
-                  </div>
-                </Link>
-              ))}
+{/* ── Tagged products dock (Premium Glass Style) ── */}
+{activeReel?.products?.length > 0 && (
+  <div className="relative mt-5 sm:mt-7 z-20 flex justify-center px-3 pointer-events-none">
+    
+    {/* Glass container */}
+    <div className="
+      pointer-events-auto
+      backdrop-blur-xl
+      border border-black/10
+      rounded-full
+      px-2 py-2 sm:px-3 sm:py-3
+      max-w-[92vw] sm:max-w-[680px]
+      transition-all duration-300
+    ">
+
+      <div className="flex gap-3 overflow-x-auto no-scrollbar">
+
+        {activeReel.products.map((product) => (
+          <Link
+            key={product.id}
+            to={`/products/${product.handle}`}
+            className="
+              group flex items-center gap-3
+              shrink-0 w-[180px] sm:w-[200px]
+              px-2 py-2 rounded-full
+              transition-all duration-200
+              border border-black/10
+              shadow-inner
+            "
+          >
+            {/* Image */}
+            <div className="relative">
+              {product.image ? (
+                <img
+                  src={product.image}
+                  alt={product.title}
+                  loading="lazy"
+                  className="
+                    w-11 h-11 rounded-full object-cover
+                    shadow-[0_4px_12px_rgba(0,0,0,0.12)]
+                    group-hover:scale-105 transition
+                  "
+                />
+              ) : (
+                <div className="w-11 h-11 rounded-full bg-[#f5f2ed]" />
+              )}
             </div>
-          </div>
-        </div>
-      )}
+
+            {/* Text */}
+            <div className="min-w-0 flex flex-col justify-center">
+              <p className="
+                text-[12px] font-semibold text-[#111]
+                truncate leading-tight
+                tracking-tight
+              ">
+                {product.title}
+              </p>
+
+              {product.price && (
+                <p className="
+                  text-[11px] font-medium text-orange-600
+                  mt-[2px]
+                ">
+                  {product.price}
+                </p>
+              )}
+            </div>
+          </Link>
+        ))}
+
+      </div>
+    </div>
+  </div>
+)}
 
       {/* ── Pagination dots ── */}
       <div className="flex justify-center gap-1.5 mt-8 sm:mt-10 relative z-10">

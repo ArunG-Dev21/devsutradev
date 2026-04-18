@@ -162,7 +162,7 @@ export function JudgeMeReviews({reviews}: {reviews: JudgeMeReview[]}) {
                   <img
                     src="/icons/verified.svg"
                     alt="Verified"
-                    className="relative w-16 sm:w-20 md:w-24 h-auto shrink-0 transition-transform duration-500 hover:scale-105 drop-shadow-md z-10"
+                    className="relative w-10 sm:w-12 md:w-14 h-auto shrink-0 transition-transform duration-500 hover:scale-105 drop-shadow-md z-10"
                   />
                 </div>
               </div>

@@ -79,7 +79,7 @@ export default function AccountProfile() {
 
   return (
     <div className="max-w-xl">
-      <div className="mb-8 pb-6 border-b border-border">
+      <div className="mb-8 pb-6 border-b border-border text-center">
         <h2 className="text-2xl font-heading font-medium text-foreground tracking-tight">
           Personal Information
         </h2>

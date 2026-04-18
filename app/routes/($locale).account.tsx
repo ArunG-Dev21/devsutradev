@@ -62,10 +62,11 @@ export default function AccountLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Banner */}
       <section className="border-b border-border bg-muted/20">
         <RouteBreadcrumbBanner variant="light" />
-        <div className="container mx-auto px-4 pb-8 pt-8 sm:px-6 lg:px-8 md:pb-10">
-          <p className="text-xs tracking-[0.35em] uppercase text-muted-foreground mb-2 font-medium">
+        <div className="container mx-auto px-4 py-10 sm:py-14 sm:px-6 lg:px-8 text-center">
+          <p className="text-xs tracking-[0.35em] uppercase text-muted-foreground mb-3 font-medium">
             Sacred Account
           </p>
           <h1 className="text-3xl md:text-4xl font-medium font-heading uppercase tracking-tight">
@@ -74,16 +75,17 @@ export default function AccountLayout() {
         </div>
       </section>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-start">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start">
+
           {/* Sidebar */}
-          <div className="w-full lg:w-72 lg:sticky lg:top-8 shrink-0">
+          <div className="w-full lg:w-60 xl:w-64 lg:sticky lg:top-8 shrink-0">
             {/* Avatar card */}
-            <div className="rounded-2xl border border-border bg-card p-5 mb-4 flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-foreground text-background flex items-center justify-center text-lg font-semibold shrink-0 select-none">
+            <div className="rounded-2xl border border-border bg-card px-5 py-6 mb-3 flex flex-col items-center text-center gap-3">
+              <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-semibold select-none shrink-0">
                 {initials}
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 w-full">
                 <p className="font-semibold text-foreground text-sm leading-snug truncate">{displayName}</p>
                 <p className="text-xs text-muted-foreground truncate mt-0.5">
                   {customer?.emailAddress?.emailAddress || ''}
@@ -127,7 +129,12 @@ function AccountMenu() {
 
   return (
     <nav role="navigation" className="rounded-2xl border border-border bg-card overflow-hidden">
-      <div className="divide-y divide-border">
+      <div className="px-4 pt-4 pb-1">
+        <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-muted-foreground/70 px-1">
+          Navigation
+        </p>
+      </div>
+      <div className="p-2 space-y-0.5">
         {MENU_ITEMS.map((item) => {
           const isActive =
             location.pathname.includes(item.to) ||
@@ -136,17 +143,18 @@ function AccountMenu() {
             <NavLink
               key={item.name}
               to={item.to}
-              className={`flex items-center gap-3.5 px-5 py-4 text-sm font-medium transition-all duration-200 ${isActive
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                isActive
                   ? 'bg-foreground text-background'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+              }`}
             >
-              <svg className="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
               </svg>
               {item.name}
               {isActive && (
-                <svg className="ml-auto w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <svg className="ml-auto w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>
               )}
@@ -154,18 +162,19 @@ function AccountMenu() {
           );
         })}
 
-        {/* Sign out — same visual weight but red tint on hover */}
-        <Form method="POST" action="/account/logout">
-          <button
-            type="submit"
-            className="w-full flex items-center gap-3.5 px-5 py-4 text-sm font-medium text-muted-foreground hover:text-red-600 hover:bg-red-50/50 dark:hover:bg-red-950/20 transition-all duration-200 text-left cursor-pointer"
-          >
-            <svg className="w-4.5 h-4.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
-            </svg>
-            Sign Out
-          </button>
-        </Form>
+        <div className="pt-1 border-t border-border/60 mt-1">
+          <Form method="POST" action="/account/logout">
+            <button
+              type="submit"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-red-600 hover:bg-red-50/60 dark:hover:bg-red-950/20 transition-all duration-200 text-left cursor-pointer"
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+              </svg>
+              Sign Out
+            </button>
+          </Form>
+        </div>
       </div>
     </nav>
   );

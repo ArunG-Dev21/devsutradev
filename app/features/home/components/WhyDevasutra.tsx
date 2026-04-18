@@ -224,14 +224,13 @@ function ReelTile({ reel, className = "" }: { reel: ReelItem; className?: string
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent z-10" />
 
                 {/* Verified Badge */}
-                {reel.isVerified && (
-                    <div className="absolute top-3 left-3 z-30 flex items-center gap-1 bg-white/20 backdrop-blur-md border border-white/30 rounded-full px-2 py-0.5 shadow-lg">
-                        <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth={3.5} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                        </svg>
-                        <span className="text-[9px] font-bold text-white uppercase tracking-wider">Verified</span>
-                    </div>
-                )}
+                <div className="absolute top-2 right-2 z-30 flex items-center shrink-0 group/badge">
+                    <img
+                        src="/icons/verified.svg"
+                        alt="Verified"
+                        className="relative w-10 sm:w-12 md:w-14 h-auto shrink-0 transition-transform duration-500 hover:scale-105 drop-shadow-md z-10"
+                    />
+                </div>
             </div>
             <div className="absolute bottom-2 left-2 z-40 pointer-events-none">
                 <CustomerTag name={reel.customerName} avatar={reel.customerAvatar} />
@@ -262,6 +261,15 @@ function ImageTile({ testimonial, className = "" }: { testimonial: TestimonialIt
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500 pointer-events-auto"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent z-10" />
+                
+                {/* Verified Badge */}
+                <div className="absolute top-2 right-2 z-30 flex items-center shrink-0 group/badge">
+                    <img
+                        src="/icons/verified.svg"
+                        alt="Verified"
+                        className="relative w-10 sm:w-12 md:w-14 h-auto shrink-0 transition-transform duration-500 hover:scale-105 drop-shadow-md z-10"
+                    />
+                </div>
             </div>
             <div className="absolute bottom-3 left-3 right-3 z-40 pointer-events-none">
                 <CustomerTag name={testimonial.name} />

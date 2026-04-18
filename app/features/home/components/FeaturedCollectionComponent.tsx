@@ -411,7 +411,7 @@ function ProductCard({
             <p className="text-xs sm:text-sm xl:text-base font-medium text-foreground line-clamp-2 leading-snug">
               {product.title}
             </p>
-            <span className="block text-sm sm:text-base xl:text-lg font-medium text-foreground mt-0.5 leading-none">
+            <span className="block text-sm sm:text-base xl:text-lg font-medium text-foreground mt-1.5 leading-none">
               <Money withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
             </span>
           </Link>

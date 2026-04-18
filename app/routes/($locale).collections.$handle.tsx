@@ -534,94 +534,12 @@ export default function Collection() {
               resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8"
             >
               {({ node: product, index }) => (
-                <div
+                <CollectionHandleCard
                   key={product.id}
-                  className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all h-full"
-                >
-                  <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
-                    {product.tags && product.tags.includes('New') && (
-                      <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded shadow-inner z-10 transition-opacity">
-                        New
-                      </span>
-                    )}
-
-                    <a href={`/products/${product.handle}`} className="block w-full h-full">
-                      {product.featuredImage ? (
-                        <Image
-                          data={product.featuredImage}
-                          className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105"
-                          sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
-                          loading={index < 8 ? 'eager' : 'lazy'}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-transparent">
-                          <span className="text-5xl opacity-20 text-gray-400">
-                            ✦
-                          </span>
-                        </div>
-                      )}
-                    </a>
-
-                    {/* Star Rating badge — top-right of image */}
-                    {(() => {
-                      const pid = String(product.id).split('/').pop();
-                      const summary = pid ? (reviewSummaries as any)?.[pid] : null;
-                      return summary ? (
-                        <StarRating
-                          rating={summary.averageRating}
-                          count={summary.reviewCount}
-                          className="absolute top-2 right-2 z-10"
-                        />
-                      ) : null;
-                    })()}
-                  </div>
-
-                  <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
-                    <a href={`/products/${product.handle}`} className="block">
-                      <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
-                        {product.title}
-                      </h3>
-                    </a>
-
-                    <div className="flex items-center gap-2">
-                      <Money
-                        data={product.priceRange.minVariantPrice}
-                        withoutTrailingZeros
-                        className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black leading-none"
-                      />
-                      {product.variants?.nodes?.[0]?.compareAtPrice && (
-                        <s 
-                          className="text-[12px] sm:text-[16px] text-gray-400 font-medium whitespace-nowrap"
-                        >
-                          <Money withoutTrailingZeros data={product.variants.nodes[0].compareAtPrice} />
-                        </s>
-                      )}
-                      {product.variants?.nodes?.[0]?.compareAtPrice && (
-                        <span className="absolute top-0 right-0 ml-auto px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-[#F14514] text-white">
-                          −
-                          {Math.round(
-                            ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
-                              parseFloat(product.priceRange.minVariantPrice.amount)) /
-                              parseFloat(product.variants.nodes[0].compareAtPrice.amount)) *
-                            100,
-                          )}
-                          %
-                        </span>
-                      )}
-                      {!product.variants?.nodes?.[0]?.compareAtPrice &&
-                        product.priceRange.maxVariantPrice.amount !==
-                          product.priceRange.minVariantPrice.amount && (
-                          <span className="text-[10px] text-gray-400 block -ml-1">onwards</span>
-                        )}
-                    </div>
-
-                    <div className="mt-auto pt-2">
-                      <CollectionProductATC
-                        product={product}
-                      />
-                    </div>
-                  </div>
-                </div>
+                  product={product}
+                  index={index}
+                  reviewSummaries={reviewSummaries}
+                />
               )}
             </PaginatedResourceSection>
 
@@ -710,6 +628,127 @@ export default function Collection() {
           },
         }}
       />
+    </div>
+  );
+}
+
+function CollectionHandleCard({
+  product,
+  index,
+  reviewSummaries,
+}: {
+  product: any;
+  index: number;
+  reviewSummaries: any;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  const secondaryImage = product.images?.nodes?.[1] ?? null;
+
+  return (
+    <div
+      className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all h-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
+        {product.tags && product.tags.includes('New') && (
+          <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded shadow-inner z-10 transition-opacity">
+            New
+          </span>
+        )}
+
+        <a href={`/products/${product.handle}`} className="absolute inset-0 block">
+          {product.featuredImage && (
+            <Image
+              data={product.featuredImage}
+              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply"
+              sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
+              loading={index < 8 ? 'eager' : 'lazy'}
+              style={{
+                opacity: isHovered && secondaryImage ? 0 : 1,
+                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                transition: 'opacity 0.55s ease, transform 0.65s ease',
+                willChange: 'opacity, transform',
+                zIndex: 1,
+              }}
+            />
+          )}
+          {secondaryImage && (
+            <Image
+              data={secondaryImage}
+              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply"
+              sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
+              loading="lazy"
+              style={{
+                opacity: isHovered ? 1 : 0,
+                transform: isHovered ? 'scale(1.02)' : 'scale(1.07)',
+                transition: 'opacity 0.55s ease, transform 0.65s ease',
+                willChange: 'opacity, transform',
+                zIndex: 2,
+              }}
+            />
+          )}
+          {!product.featuredImage && (
+            <div className="w-full h-full flex items-center justify-center bg-transparent">
+              <span className="text-5xl opacity-20 text-gray-400">✦</span>
+            </div>
+          )}
+        </a>
+
+        {(() => {
+          const pid = String(product.id).split('/').pop();
+          const summary = pid ? reviewSummaries?.[pid] : null;
+          return summary ? (
+            <StarRating
+              rating={summary.averageRating}
+              count={summary.reviewCount}
+              className="absolute top-2 right-2 z-10"
+            />
+          ) : null;
+        })()}
+      </div>
+
+      <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
+        <a href={`/products/${product.handle}`} className="block">
+          <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
+            {product.title}
+          </h3>
+        </a>
+
+        <div className="flex items-center gap-2">
+          <Money
+            data={product.priceRange.minVariantPrice}
+            withoutTrailingZeros
+            className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black leading-none"
+          />
+          {product.variants?.nodes?.[0]?.compareAtPrice && (
+            <s className="text-[12px] sm:text-[16px] text-gray-400 font-medium whitespace-nowrap">
+              <Money withoutTrailingZeros data={product.variants.nodes[0].compareAtPrice} />
+            </s>
+          )}
+          {product.variants?.nodes?.[0]?.compareAtPrice && (
+            <span className="absolute top-0 right-0 ml-auto px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-[#F14514] text-white">
+              −
+              {Math.round(
+                ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
+                  parseFloat(product.priceRange.minVariantPrice.amount)) /
+                  parseFloat(product.variants.nodes[0].compareAtPrice.amount)) *
+                100,
+              )}
+              %
+            </span>
+          )}
+          {!product.variants?.nodes?.[0]?.compareAtPrice &&
+            product.priceRange.maxVariantPrice.amount !==
+              product.priceRange.minVariantPrice.amount && (
+              <span className="text-[10px] text-gray-400 block -ml-1">onwards</span>
+            )}
+        </div>
+
+        <div className="mt-auto pt-2">
+          <CollectionProductATC product={product} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -925,6 +964,15 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
       url
       width
       height
+    }
+    images(first: 2) {
+      nodes {
+        id
+        altText
+        url
+        width
+        height
+      }
     }
     priceRange {
       minVariantPrice {
