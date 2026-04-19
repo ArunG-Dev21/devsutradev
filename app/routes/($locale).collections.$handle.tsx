@@ -76,7 +76,14 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     blog: { handle: string };
   }> = [];
 
-  if (handle.toLowerCase() === 'rudraksha') {
+  const BLOG_KEYWORD_MAP: Record<string, string> = {
+    rudraksha: 'rudraksha',
+    karungali: 'karungali',
+    bracelets: 'bracelet',
+  };
+
+  const blogKeyword = BLOG_KEYWORD_MAP[handle.toLowerCase()];
+  if (blogKeyword) {
     const blogData = await storefront.query(COLLECTION_BLOG_POSTS_QUERY, {
       variables: {},
     });
@@ -84,10 +91,9 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     const allArticles =
       blogData?.blogs?.nodes?.flatMap((blogNode: any) => blogNode.articles?.nodes ?? []) ?? [];
 
-    const keyword = handle.toLowerCase();
     const filtered = allArticles.filter((article: any) => {
       const haystack = `${article.title ?? ''} ${article.handle ?? ''} ${article.excerpt ?? ''}`.toLowerCase();
-      return haystack.includes(keyword);
+      return haystack.includes(blogKeyword);
     });
 
     const selected = filtered.length > 0 ? filtered : allArticles;
@@ -278,13 +284,13 @@ function FilterSidebar({
 
       {!isMobile && (
         <div className="mt-8 pt-6 border-t border-gray-100">
-          <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200 relative overflow-hidden group">
+          <div className="bg-linear-to-br from-[#f14514] to-[#d4370d] rounded-xl p-4 text-center border border-gray-200 relative overflow-hidden group">
             <div className="relative z-10">
-              <p className="text-[11px] tracking-widest uppercase text-black font-bold mb-1.5 flex items-center justify-center gap-1.5">
+              <p className="text-sm tracking-widest uppercase text-white font-semibold mb-1.5 flex items-center justify-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
                 Free Shipping
               </p>
-              <p className="text-xs text-gray-500">On all orders above ₹999</p>
+              <p className="text-xs text-white">On all orders above ₹999</p>
             </div>
           </div>
         </div>
@@ -568,7 +574,7 @@ export default function Collection() {
               </div>
             )}
 
-            {collection.handle.toLowerCase() === 'rudraksha' && relatedArticles.length > 0 && (
+            {relatedArticles.length > 0 && (
               <section className="mt-14 border-t border-gray-200 pt-10">
                 <div className="flex items-end justify-between gap-4 mb-6">
                   <div>
@@ -576,7 +582,7 @@ export default function Collection() {
                       Read and Learn
                     </p>
                     <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
-                      Rudraksha Journal
+                      {collection.title} Journal
                     </h2>
                   </div>
                   <Link
@@ -736,7 +742,7 @@ function CollectionHandleCard({
             </s>
           )}
           {product.variants?.nodes?.[0]?.compareAtPrice && (
-            <span className="absolute top-0 right-0 ml-auto px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-[#F14514] text-white">
+            <span className="absolute top-0 right-0 ml-auto px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-linear-to-br from-[#f14514] to-[#d4370d] text-white">
               −
               {Math.round(
                 ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -

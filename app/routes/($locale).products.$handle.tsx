@@ -650,7 +650,7 @@ export default function Product() {
                     {displayTags.map((t) => (
                       <span
                         key={t}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] tracking-widest uppercase bg-[#F14514] text-white"
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] tracking-widest uppercase bg-linear-to-br from-[#f14514] to-[#d4370d] text-white"
                       >
                         #{t}
                       </span>
@@ -1118,7 +1118,7 @@ function CouponCard({ code, label, offer }: { code: string; label?: string; offe
         <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white z-10" />
 
         {/* Festival Offer badge */}
-        <span className="absolute right-0 top-0 z-[2] text-[9px] tracking-[0.14em] uppercase bg-[#F14514] text-white rounded-bl-lg rounded-tr-xl px-2 py-0.5">
+        <span className="absolute right-0 top-0 z-[2] text-[9px] tracking-[0.14em] uppercase bg-linear-to-br from-[#f14514] to-[#d4370d] text-white rounded-bl-lg rounded-tr-xl px-2 py-0.5">
           ✦ Festival Offer ✦
         </span>
 
@@ -1167,14 +1167,8 @@ function RecommendedProducts({ products }: { products: any[] }) {
 
   return (
     <section className="mt-20 md:mt-32 pt-16 relative">
-      {/* Decorative section divider */}
-      <div className="absolute top-0 left-0 right-0">
-        <div className="h-px bg-linear-to-r from-transparent via-stone-300 dark:via-border to-transparent" />
-        <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-background px-4 flex items-center gap-2">
-          <div className="w-6 h-px bg-stone-300 dark:bg-border" />
-          <div className="w-1.5 h-1.5 bg-stone-300 dark:bg-border rotate-45" />
-          <div className="w-6 h-px bg-stone-300 dark:bg-border" />
-        </div>
+      <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none">
+        <img src="/line-art.png" alt="" className="w-auto h-auto max-w-full pointer-events-none" />
       </div>
 
       <div className="text-center mb-12">

@@ -10,7 +10,8 @@
       "Bash(echo \"Exit: $?\")",
       "Bash(npm --version)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git diff *)"
     ]
   }
 }

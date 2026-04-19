@@ -492,11 +492,11 @@ export function StickyAddToCart({
                     isVisible ? 'translate-y-0' : 'translate-y-full'
                 }`}
             >
-                <div className="w-full max-w-2xl pointer-events-auto bg-white/95 dark:bg-card/95 backdrop-blur-xl border border-b-0 border-stone-200 dark:border-border shadow-[0_-4px_24px_rgba(0,0,0,0.10)] relative text-foreground rounded-t-xl overflow-hidden">
+                <div className="w-full max-w-2xl pointer-events-auto bg-white/95 dark:bg-card/95 backdrop-blur-xl border border-b-0 border-stone-200 dark:border-border shadow-[0_-4px_24px_rgba(0,0,0,0.10)] relative text-foreground rounded-t-xl">
 
                     {/* Inline Size Picker */}
                     {showSizePicker && variants.length > 1 && (
-                        <div className="absolute bottom-full left-0 right-0 bg-white/95 dark:bg-card/95 px-6 py-3 border border-b-0 border-stone-200 dark:border-border shadow-[0_-4px_20px_rgba(0,0,0,0.06)] text-foreground rounded-t-xl">
+                        <div className="absolute left-0 right-0 bottom-[105%] bg-white/95 dark:bg-card/95 px-6 py-3 border border-b-0 border-stone-200 dark:border-border shadow-[0_-4px_20px_rgba(0,0,0,0.06)] text-foreground rounded-xl">
                             <div className="flex items-center gap-4">
                                 <p className="text-[10px] font-semibold tracking-[0.2em] uppercase opacity-70">
                                     Select Size:

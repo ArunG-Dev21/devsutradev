@@ -119,7 +119,7 @@ export default function Cart() {
       {/* Header Area */}
       <div className="bg-card border-b border-border">
         <RouteBreadcrumbBanner variant="light" className="bg-transparent" />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-5 sm:pb-8 md:pb-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-5 sm:pb-8 md:pb-12 text-center">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-medium uppercase font-heading text-foreground tracking-tight">
             Your Basket
           </h1>

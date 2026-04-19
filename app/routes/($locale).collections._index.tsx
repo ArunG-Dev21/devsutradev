@@ -25,7 +25,7 @@ export async function loader(args: Route.LoaderArgs) {
 
 async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
-    pageBy: 4,
+    pageBy: 8,
   });
 
   const [{collections}] = await Promise.all([
@@ -58,10 +58,10 @@ export default function Collections() {
         breadcrumbPlacement="inside-top"
       />
 
-      <div className="container mx-auto px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+      <div className="container mx-auto px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <PaginatedResourceSection<CollectionFragment>
           connection={collections}
-          resourcesClassName="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12"
+          resourcesClassName="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4"
         >
           {({node: collection, index}) => (
             <CollectionItem
@@ -85,53 +85,40 @@ function CollectionItem({
 }) {
   return (
     <Link
-      className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card text-card-foreground transition-all duration-300 hover:-translate-y-1.5"
-      key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
+      className="group flex flex-col bg-[#f6f6f6] dark:bg-card rounded-[22px] p-2 sm:p-2.5 transition-all duration-300 hover:-translate-y-1"
     >
-      <div className="relative aspect-[2/1] overflow-hidden border-b border-border bg-neutral-900">
+      {/* Image — contained inside padding, never edge-to-edge */}
+      <div className="relative aspect-square overflow-hidden rounded-[16px] sm:rounded-[18px] mb-2 sm:mb-2.5 bg-neutral-200 dark:bg-muted">
         {collection?.image ? (
           <Image
             alt={collection.image.altText || collection.title}
             data={collection.image}
-            loading={index < 2 ? 'eager' : 'lazy'}
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading={index < 4 ? 'eager' : 'lazy'}
+            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 50vw"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-neutral-100">
-            <span className="text-6xl text-muted-foreground/20">*</span>
+          <div className="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-muted/60">
+            <span className="text-4xl opacity-20 text-muted-foreground">✦</span>
           </div>
         )}
-
-        <div className="pointer-events-none absolute left-4 top-4 h-6 w-6 rounded-tl border-l-2 border-t-2 border-white/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        <div className="pointer-events-none absolute bottom-4 right-4 h-6 w-6 rounded-br border-b-2 border-r-2 border-white/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-4 p-6 text-center sm:flex-row sm:items-start sm:text-left md:p-8">
-        <div>
-          <h3 className="mb-2 text-2xl font-bold tracking-tight text-foreground">
+      {/* Content card */}
+      <div className="bg-white dark:bg-background rounded-[16px] sm:rounded-[18px] px-3 py-3 sm:px-4 flex items-center justify-between border border-black/[0.06] dark:border-border gap-2">
+        <div className="min-w-0">
+          <h3 className="text-sm sm:text-base font-semibold text-foreground leading-tight truncate">
             {collection.title}
           </h3>
-          <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            Explore Collection
+          <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-medium mt-0.5">
+            Explore
           </p>
         </div>
-
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-all duration-300 group-hover:border-foreground group-hover:bg-foreground group-hover:text-background">
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-            />
+        <span className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 flex items-center justify-center rounded-full border border-border text-foreground transition-all duration-300 group-hover:bg-foreground group-hover:text-background group-hover:border-foreground">
+          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
           </svg>
         </span>
       </div>

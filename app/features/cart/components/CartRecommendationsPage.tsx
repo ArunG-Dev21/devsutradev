@@ -61,13 +61,8 @@ export function CartRecommendationsPage({ excludeProductIds }: { excludeProductI
 
   return (
     <section className="mt-16 md:mt-24 pt-14 relative">
-      <div className="absolute top-0 left-0 right-0">
-        <div className="h-px bg-linear-to-r from-transparent via-stone-300 dark:via-border to-transparent" />
-        <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-4 flex items-center gap-2">
-          <div className="w-6 h-px bg-stone-300 dark:bg-border" />
-          <div className="w-1.5 h-1.5 bg-stone-300 dark:bg-border rotate-45" />
-          <div className="w-6 h-px bg-stone-300 dark:bg-border" />
-        </div>
+      <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none">
+        <img src="/line-art.png" alt="" className="w-auto h-auto max-w-full pointer-events-none" />
       </div>
 
       <div className="text-center mb-10">

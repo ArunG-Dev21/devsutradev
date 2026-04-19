@@ -10,7 +10,6 @@ import { Link, useFetcher, type FetcherWithComponents } from 'react-router';
 import { useCartNotification } from './CartNotification';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper/types';
-import { CartRecommendationsPage } from './CartRecommendationsPage';
 import type { CartApiQueryFragment } from 'storefrontapi.generated';
 import { useAside } from '~/shared/components/Aside';
 import { CartLineItem, type CartLine } from './CartLineItem';
@@ -97,80 +96,102 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
   const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
   return (
-    <div
-      className={`h-full flex ${layout === 'page' && cartHasItems
-        ? 'flex-col lg:flex-row gap-6 lg:gap-0 items-start'
-        : 'flex-col'
-        } bg-transparent text-foreground`}
-    >
-      {layout === 'aside' && cartHasItems && (
-        <div className="px-5 py-3.5 bg-card border-b border-border">
-          {remaining > 0 ? (
-            <>
-              <p className="text-[11px] text-muted-foreground mb-2 tracking-wide">
-                Add <span className="font-bold text-foreground">Rs {remaining.toFixed(0)}</span>{' '}
-                more for free shipping
-              </p>
-              <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-foreground rounded-full transition-all duration-500"
-                  style={{ width: `${shippingProgress}%` }}
+    <div className="h-full flex flex-col bg-transparent text-foreground">
+
+      {layout === 'aside' ? (
+        /* ── ASIDE LAYOUT ── */
+        <>
+          {cartHasItems && (
+            <div className="px-5 py-3.5 bg-card border-b border-border">
+              {remaining > 0 ? (
+                <>
+                  <p className="text-[11px] text-muted-foreground mb-2 tracking-wide">
+                    Add <span className="font-bold text-foreground">Rs {remaining.toFixed(0)}</span>{' '}
+                    more for free shipping
+                  </p>
+                  <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-foreground rounded-full transition-all duration-500"
+                      style={{ width: `${shippingProgress}%` }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-shipping-gradient">
+                  You qualify for free shipping
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="flex-1 min-h-0 overflow-y-auto px-5">
+            <CartEmpty hidden={linesCount} layout={layout} />
+            <ul className="pt-3 space-y-3 pb-2">
+              {(cart?.lines?.nodes ?? []).map((line) => {
+                if ('parentRelationship' in line && line.parentRelationship?.parent) return null;
+                const pid = String((line as any)?.merchandise?.product?.id || '').split('/').pop() || '';
+                return (
+                  <CartLineItem
+                    key={line.id}
+                    line={line}
+                    layout={layout}
+                    childrenMap={childrenMap}
+                    reviewSummary={pid ? cartRatings[pid] : undefined}
+                  />
+                );
+              })}
+            </ul>
+            {cartHasItems && (
+              <div className="mt-6 mb-2">
+                <CartRecommendations
+                  layout="aside"
+                  excludeProductIds={cartProductIds}
+                  onNavigateAway={() => close()}
                 />
               </div>
-            </>
-          ) : (
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-shipping-gradient">
-              You qualify for free shipping
-            </p>
-          )}
-        </div>
-      )}
-
-      <div
-        className={`flex-1 min-h-0 overflow-y-auto ${layout === 'aside' ? 'px-5' : 'w-full lg:w-3/5 xl:w-2/3'
-          }`}
-      >
-        <CartEmpty hidden={linesCount} layout={layout} />
-        <ul className={layout === 'aside' ? 'pt-3 space-y-3 pb-2' : ''}>
-          {(cart?.lines?.nodes ?? []).map((line) => {
-            if ('parentRelationship' in line && line.parentRelationship?.parent) {
-              return null;
-            }
-            const pid = String((line as any)?.merchandise?.product?.id || '').split('/').pop() || '';
-            return (
-              <CartLineItem
-                key={line.id}
-                line={line}
-                layout={layout}
-                childrenMap={childrenMap}
-                reviewSummary={pid ? cartRatings[pid] : undefined}
-              />
-            );
-          })}
-        </ul>
-
-        {cartHasItems && (
-          <div className={`${layout === 'aside' ? 'mt-6 mb-2' : 'mt-10'}`}>
-            {layout === 'aside' ? (
-              <CartRecommendations
-                layout={layout}
-                excludeProductIds={cartProductIds}
-                onNavigateAway={() => layout === 'aside' && close()}
-              />
-            ) : (
-              <CartRecommendationsPage excludeProductIds={cartProductIds} />
             )}
           </div>
-        )}
-      </div>
 
-      {cartHasItems && (
-        <div
-          className={`${layout === 'page' ? 'w-full lg:w-2/5 xl:w-1/3 lg:sticky lg:top-8' : ''
-            }`}
-        >
-          <CartSummary cart={cart} layout={layout} />
-        </div>
+          {cartHasItems && <CartSummary cart={cart} layout={layout} />}
+        </>
+      ) : (
+        /* ── PAGE LAYOUT ── */
+        <>
+          <div className={cartHasItems ? 'flex flex-col lg:flex-row gap-6 lg:gap-0 items-start' : 'flex flex-col'}>
+            <div className={cartHasItems ? 'w-full lg:w-3/5 xl:w-2/3' : 'w-full'}>
+              <CartEmpty hidden={linesCount} layout={layout} />
+              <ul>
+                {(cart?.lines?.nodes ?? []).map((line) => {
+                  if ('parentRelationship' in line && line.parentRelationship?.parent) return null;
+                  const pid = String((line as any)?.merchandise?.product?.id || '').split('/').pop() || '';
+                  return (
+                    <CartLineItem
+                      key={line.id}
+                      line={line}
+                      layout={layout}
+                      childrenMap={childrenMap}
+                      reviewSummary={pid ? cartRatings[pid] : undefined}
+                    />
+                  );
+                })}
+              </ul>
+            </div>
+
+            {cartHasItems && (
+              <div className="w-full lg:w-2/5 xl:w-1/3 lg:sticky lg:top-8">
+                <CartSummary cart={cart} layout={layout} />
+              </div>
+            )}
+          </div>
+
+          {cartHasItems && (
+            <CartRecommendations
+              layout="page"
+              excludeProductIds={cartProductIds}
+              onNavigateAway={() => {}}
+            />
+          )}
+        </>
       )}
     </div>
   );
@@ -204,7 +225,7 @@ function CartRecommendations({
   onNavigateAway: () => void;
 }) {
   const fetcher = useFetcher<{ products: RecommendedProduct[] }>();
-  const limit = layout === 'aside' ? 8 : 8;
+  const limit = 8;
   const exclude = excludeProductIds.join(',');
   const loadKey = `${limit}:${exclude}`;
   const lastLoadedKeyRef = useRef<string | null>(null);
@@ -224,13 +245,35 @@ function CartRecommendations({
   const products = fetcher.data?.products ?? [];
   if (products.length === 0) return null;
 
+  const isPage = layout === 'page';
+
   return (
-    <section>
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-base tracking-[0.15em] uppercase text-black dark:text-white">
-          You may also like
-        </p>
-        {products.length > 1 && (
+    <section className={isPage ? 'mt-16 md:mt-24 pt-14 relative' : ''}>
+      {isPage && (
+        <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none">
+          <img src="/line-art.png" alt="" className="w-auto h-auto max-w-full pointer-events-none" />
+        </div>
+      )}
+
+      <div className={`flex items-center ${isPage ? 'justify-center mb-10 flex-col gap-3' : 'justify-between mb-3'}`}>
+        {isPage ? (
+          <>
+            <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
+              Handpicked For You
+            </p>
+            <h2
+              className="text-3xl md:text-4xl font-light text-foreground"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            >
+              You May Also Like
+            </h2>
+          </>
+        ) : (
+          <p className="text-base tracking-[0.15em] uppercase text-black dark:text-white">
+            You may also like
+          </p>
+        )}
+        {!isPage && products.length > 1 && (
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -258,12 +301,43 @@ function CartRecommendations({
         )}
       </div>
 
+      {isPage && products.length > 1 && (
+        <div className="flex items-center justify-end gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => swiper?.slidePrev()}
+            disabled={isBeginning}
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-muted transition-colors"
+            aria-label="Previous recommendations"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => swiper?.slideNext()}
+            disabled={isEnd}
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted-foreground disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer hover:bg-muted transition-colors"
+            aria-label="Next recommendations"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       <div className="overflow-hidden">
         <Swiper
           slidesPerView={1}
           spaceBetween={12}
           observer
           observeParents
+          breakpoints={isPage ? {
+            1024: { slidesPerView: 2, spaceBetween: 20 },
+            1280: { slidesPerView: 3, spaceBetween: 20 },
+          } : undefined}
           onSwiper={(instance) => {
             setSwiper(instance);
             setIsBeginning(instance.isBeginning);
@@ -339,20 +413,6 @@ function RecommendationCard({
           </div>
         </Link>
 
-        {/* Mobile-only: icon button bottom-right */}
-        {canAdd && variantId && (
-          <div className="absolute bottom-2 right-2 sm:hidden z-10">
-            <CartForm
-              route="/cart"
-              action={CartForm.ACTIONS.LinesAdd}
-              inputs={{ lines: [{ merchandiseId: variantId, quantity: 1, selectedVariant: product.variant }] }}
-            >
-              {(fetcher: FetcherWithComponents<any>) => (
-                <RecommendationIconButton fetcher={fetcher} productTitle={product.title} />
-              )}
-            </CartForm>
-          </div>
-        )}
       </div>
 
       {/* CONTENT */}
@@ -377,9 +437,9 @@ function RecommendationCard({
           className="text-xl font-light text-foreground"
         />
 
-        {/* Desktop: full-width Add to Bag button */}
+        {/* Add to Bag button — shown on all screen sizes */}
         {canAdd && variantId && (
-          <div className="mt-auto hidden sm:block">
+          <div className="mt-auto">
             <CartForm
               route="/cart"
               action={CartForm.ACTIONS.LinesAdd}
@@ -433,42 +493,6 @@ function RecommendationLongButton({
   );
 }
 
-function RecommendationIconButton({
-  fetcher,
-  productTitle,
-}: {
-  fetcher: FetcherWithComponents<any>;
-  productTitle: string;
-}) {
-  const { showNotification } = useCartNotification();
-  const prevState = useRef(fetcher.state);
-
-  useEffect(() => {
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
-      showNotification(productTitle);
-    }
-    prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle]);
-
-  const isAdding = fetcher.state !== 'idle';
-
-  return (
-    <button
-      type="submit"
-      disabled={isAdding}
-      className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-800 text-gray-800 hover:bg-black hover:border-black disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all duration-200 shadow-md group/iconbtn"
-      aria-label="Add to bag"
-    >
-      {isAdding ? (
-        <svg className="animate-spin w-3.5 h-3.5 text-gray-800 group-hover/iconbtn:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
-        </svg>
-      ) : (
-        <img src="/icons/add-bag.png" alt="" className="w-4 h-4 object-contain group-hover/iconbtn:invert transition-all" />
-      )}
-    </button>
-  );
-}
 
 function CartEmpty({
   hidden = false,

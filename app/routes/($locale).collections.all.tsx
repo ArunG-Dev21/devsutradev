@@ -623,7 +623,7 @@ function CollectionAllCard({
 
       <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
         {product.variants?.nodes?.[0]?.compareAtPrice && (
-          <span className="absolute top-0 right-0 px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-[#F14514] text-white">
+          <span className="absolute top-0 right-0 px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-linear-to-br from-[#f14514] to-[#d4370d] text-white">
             {Math.round(
               ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
                 parseFloat(product.priceRange.minVariantPrice.amount)) /

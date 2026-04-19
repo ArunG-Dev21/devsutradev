@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from 'react-router';
+import { Link, useLoaderData, useFetcher } from 'react-router';
 import type { Route } from './+types/($locale).blogs.$blogHandle.$articleHandle';
 import { Image, Money } from '@shopify/hydrogen';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
@@ -34,11 +34,59 @@ export const meta: Route.MetaFunction = ({ data }) => {
   });
 };
 
+export async function action({ request, context }: Route.ActionArgs) {
+  const form = await request.formData();
+  const articleId = String(form.get('articleId') ?? '').trim();
+  const blogId = String(form.get('blogId') ?? '').trim();
+  const name = String(form.get('name') ?? '').trim();
+  const email = String(form.get('email') ?? '').trim();
+  const body = String(form.get('body') ?? '').trim();
+
+  if (!name || !email || !body || !articleId || !blogId) {
+    return { error: 'All fields are required.' };
+  }
+
+  const adminToken = (context.env as any).SHOPIFY_ADMIN_API_ACCESS_TOKEN as string | undefined;
+  if (!adminToken) {
+    return { error: 'Comment submission is not configured.' };
+  }
+
+  // GIDs are like gid://shopify/Article/123456 — extract the numeric portion
+  const numericArticleId = articleId.split('/').pop();
+  const numericBlogId = blogId.split('/').pop();
+
+  const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
+  const res = await fetch(
+    `https://${shopDomain}/admin/api/2024-10/comments.json`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Access-Token': adminToken,
+      },
+      body: JSON.stringify({
+        comment: {
+          body,
+          author: name,
+          email,
+          article_id: numericArticleId,
+          blog_id: numericBlogId,
+        },
+      }),
+    },
+  );
+
+  if (res.status === 201) return { ok: true };
+
+  const json = await res.json().catch(() => ({}));
+  const msg = (json as any)?.errors?.base?.[0] ?? 'Failed to submit comment.';
+  return { error: msg };
+}
+
 export async function loader(args: Route.LoaderArgs) {
-  const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
   const origin = new URL(args.request.url).origin;
-  return { ...deferredData, ...criticalData, seoOrigin: origin };
+  return { ...criticalData, seoOrigin: origin };
 }
 
 async function loadCriticalData({ context, request, params }: Route.LoaderArgs) {
@@ -60,65 +108,43 @@ async function loadCriticalData({ context, request, params }: Route.LoaderArgs) 
 
   redirectIfHandleIsLocalized(
     request,
-    {
-      handle: articleHandle,
-      data: blog.articleByHandle,
-    },
-    {
-      handle: blogHandle,
-      data: blog,
-    },
+    { handle: articleHandle, data: blog.articleByHandle },
+    { handle: blogHandle, data: blog },
   );
 
   const article = blog.articleByHandle;
-  const collectionHandle = getCollectionHandleFromArticle({
-    blogHandle,
-    title: article.title,
-    contentHtml: article.contentHtml,
-  });
+  const collectionHandle = getCollectionHandle(blogHandle, article.title, article.contentHtml);
 
   let relatedProducts: any[] = [];
-
   try {
     const { collection } = await context.storefront.query(SIDEBAR_PRODUCTS_QUERY, {
       variables: { handle: collectionHandle, first: 6 },
     });
     relatedProducts = collection?.products?.nodes ?? [];
   } catch {
-    // Leave related products empty when the collection query fails.
+    // silently ignore
   }
 
-  return { article, blogHandle, blogTitle: blog.title, relatedProducts };
+  return { article, blogHandle, blogTitle: blog.title, blogId: blog.id, relatedProducts };
 }
 
-function loadDeferredData(_args: Route.LoaderArgs) {
-  return {};
-}
+const COLLECTION_MAP: Record<string, { href: string; label: string; keyword: string }> = {
+  rudraksha: { href: '/collections/rudraksha', label: 'Shop Rudraksha', keyword: 'rudraksha' },
+  karungali: { href: '/collections/karungali', label: 'Shop Karungali', keyword: 'karungali' },
+  bracelets: { href: '/collections/bracelets', label: 'Shop Bracelets', keyword: 'bracelet' },
+};
 
-function getCollectionHandleFromArticle(params: {
-  blogHandle: string;
-  title: string;
-  contentHtml: string;
-}) {
-  const haystack =
-    `${params.blogHandle} ${params.title} ${params.contentHtml}`.toLowerCase();
-
-  if (haystack.includes('rudraksha')) return 'rudraksha';
+function getCollectionHandle(blogHandle: string, title: string, contentHtml: string) {
+  const haystack = `${blogHandle} ${title} ${contentHtml}`.toLowerCase();
+  for (const [handle, { keyword }] of Object.entries(COLLECTION_MAP)) {
+    if (haystack.includes(keyword)) return handle;
+  }
   return 'all';
 }
 
-function getCollectionLinkFromArticle(params: {
-  blogHandle: string;
-  title: string;
-  contentHtml: string;
-}) {
-  const handle = getCollectionHandleFromArticle(params);
-
-  if (handle === 'rudraksha') {
-    return { href: '/collections/rudraksha', label: 'Shop Rudraksha Collection' };
-  }
-
-  return { href: '/collections/all', label: 'Explore Products' };
+function getCollectionLink(blogHandle: string, title: string, contentHtml: string) {
+  const handle = getCollectionHandle(blogHandle, title, contentHtml);
+  return COLLECTION_MAP[handle] ?? { href: '/collections/all', label: 'Explore All Products' };
 }
 
 function estimateReadingTime(html: string) {
@@ -127,105 +153,171 @@ function estimateReadingTime(html: string) {
 }
 
 function formatDate(date: string) {
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('en-IN', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   }).format(new Date(date));
 }
 
-function getMeaningfulExcerpt(title: string, excerpt?: string | null) {
-  if (!excerpt) return null;
-
-  const normalize = (value: string) =>
-    value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-
-  const normalizedTitle = normalize(title);
-  const normalizedExcerpt = normalize(excerpt);
-
-  if (!normalizedExcerpt || normalizedExcerpt === normalizedTitle) {
-    return null;
-  }
-
-  return excerpt;
-}
-
-function ProductCard({ product }: { product: any }) {
+/* ──────────── Sidebar product card ──────────── */
+function SidebarProductCard({ product }: { product: any }) {
   return (
     <Link
       to={`/products/${product.handle}`}
-      className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background p-3 transition-colors hover:border-foreground/20 hover:bg-accent/20"
       prefetch="intent"
+      className="group block rounded-2xl bg-[#f6f6f6] p-2 transition-all hover:-translate-y-0.5 hover:shadow-sm"
     >
-      {product.featuredImage ? (
-        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
+      <div className="aspect-square overflow-hidden rounded-xl bg-white">
+        {product.featuredImage ? (
           <Image
             data={product.featuredImage}
             aspectRatio="1/1"
-            sizes="80px"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            sizes="(min-width: 1280px) 180px, 40vw"
+            className="h-full w-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-[1.05]"
           />
-        </div>
-      ) : null}
-
-      <div className="min-w-0">
-        <h3 className="line-clamp-2 text-sm font-medium leading-6 text-foreground">
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="text-4xl opacity-20 text-gray-300">✦</span>
+          </div>
+        )}
+      </div>
+      <div className="mt-1.5 rounded-xl border border-black/10 bg-white p-3">
+        <h3 className="line-clamp-2 text-sm font-medium leading-snug text-gray-900">
           {product.title}
         </h3>
-        <div className="mt-2 text-sm text-muted-foreground">
-          <Money data={product.priceRange.minVariantPrice} />
+        <div className="mt-1.5 flex items-center justify-between gap-2">
+          <Money
+            data={product.priceRange.minVariantPrice}
+            className="text-sm font-semibold text-gray-900"
+          />
+          <span className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-gray-400 transition-colors group-hover:text-gray-900">
+            View →
+          </span>
         </div>
       </div>
     </Link>
   );
 }
 
+/* ──────────── Comment form ──────────── */
+function CommentForm({ articleId, blogId }: { articleId: string; blogId: string }) {
+  const fetcher = useFetcher<typeof action>();
+  const isSubmitting = fetcher.state !== 'idle';
+  const result = fetcher.data;
+
+  if (result?.ok) {
+    return (
+      <div className="mt-10 rounded-2xl border border-gray-200 bg-gray-50 px-6 py-10 text-center">
+        <svg className="mx-auto mb-3 h-8 w-8 text-gray-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        <p className="font-medium text-gray-900">Comment submitted!</p>
+        <p className="mt-1 text-sm text-gray-500">It will appear after review.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-10 border-t border-gray-200 pt-10">
+      <h2 className="text-xl font-semibold text-gray-900">Leave a comment</h2>
+      <fetcher.Form method="post" className="mt-6 space-y-4">
+        <input type="hidden" name="articleId" value={articleId} />
+        <input type="hidden" name="blogId" value={blogId} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="comment-name" className="block text-xs font-medium uppercase tracking-[0.16em] text-gray-500 mb-1.5">
+              Name *
+            </label>
+            <input
+              id="comment-name"
+              name="name"
+              type="text"
+              required
+              placeholder="Your name"
+              className="block w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label htmlFor="comment-email" className="block text-xs font-medium uppercase tracking-[0.16em] text-gray-500 mb-1.5">
+              Email *
+            </label>
+            <input
+              id="comment-email"
+              name="email"
+              type="email"
+              required
+              placeholder="you@email.com"
+              className="block w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="comment-body" className="block text-xs font-medium uppercase tracking-[0.16em] text-gray-500 mb-1.5">
+            Comment *
+          </label>
+          <textarea
+            id="comment-body"
+            name="body"
+            required
+            rows={4}
+            placeholder="Share your thoughts…"
+            className="block w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
+          />
+        </div>
+        {result?.error ? (
+          <p className="text-sm text-red-500">{result.error}</p>
+        ) : null}
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-xs text-gray-400">Comments are moderated.</p>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded-full bg-gray-900 px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-opacity hover:opacity-80 disabled:opacity-50"
+          >
+            {isSubmitting ? 'Submitting…' : 'Post comment'}
+          </button>
+        </div>
+      </fetcher.Form>
+    </div>
+  );
+}
+
+/* ──────────── Page ──────────── */
 export default function Article() {
-  const { article, blogHandle, blogTitle, relatedProducts, seoOrigin } =
+  const { article, blogHandle, blogTitle, blogId, relatedProducts, seoOrigin } =
     useLoaderData<typeof loader>();
-  const { title, image, contentHtml, author, tags, excerpt } = article;
-  const meaningfulExcerpt = getMeaningfulExcerpt(title, excerpt);
-  const collectionLink = getCollectionLinkFromArticle({
-    blogHandle,
-    title,
-    contentHtml,
-  });
+  const { title, image, contentHtml, author, tags } = article;
+  const collectionLink = getCollectionLink(blogHandle, title, contentHtml);
   const readingTime = estimateReadingTime(contentHtml);
-  const publishedDate = formatDate(article.publishedAt);
 
   const articleRef = useRef<HTMLElement>(null);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    function handleScroll() {
+    function onScroll() {
       const el = articleRef.current;
       if (!el) return;
-
       const rect = el.getBoundingClientRect();
-      const total = el.scrollHeight;
       const scrolled = Math.max(0, -rect.top);
-      const nextProgress =
+      const total = el.scrollHeight;
+      setProgress(
         total > window.innerHeight
           ? Math.min(100, (scrolled / (total - window.innerHeight)) * 100)
-          : 0;
-
-      setProgress(nextProgress);
+          : 0,
+      );
     }
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-white text-gray-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLd(
-            articleSchema(article as any, blogHandle, article.handle, seoOrigin),
-          ),
+          __html: jsonLd(articleSchema(article as any, blogHandle, article.handle, seoOrigin)),
         }}
       />
       <script
@@ -235,204 +327,167 @@ export default function Article() {
             breadcrumbSchema([
               { name: 'Home', url: `${seoOrigin}/` },
               { name: 'Blog', url: `${seoOrigin}/blogs` },
-              {
-                name: blogTitle || blogHandle,
-                url: `${seoOrigin}/blogs/${blogHandle}`,
-              },
-              {
-                name: title,
-                url: `${seoOrigin}/blogs/${blogHandle}/${article.handle}`,
-              },
+              { name: blogTitle || blogHandle, url: `${seoOrigin}/blogs/${blogHandle}` },
+              { name: title, url: `${seoOrigin}/blogs/${blogHandle}/${article.handle}` },
             ]),
           ),
         }}
       />
 
-      <div className="fixed inset-x-0 top-0 z-40 h-1 bg-transparent" aria-hidden>
-        <div
-          className="h-full bg-foreground transition-[width] duration-150"
-          style={{ width: `${progress}%` }}
-        />
+      {/* Reading progress */}
+      <div className="fixed inset-x-0 top-0 z-50 h-[3px]" aria-hidden>
+        <div className="h-full bg-gray-900 transition-[width] duration-100" style={{ width: `${progress}%` }} />
       </div>
 
-      <section className="border-b border-border/70 bg-muted/20">
-        <RouteBreadcrumbBanner variant="light" />
-        <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-5">
-            <div className="w-full lg:w-1/2">
-              {tags && tags.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag: string) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-border/70 bg-background px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
+      <RouteBreadcrumbBanner variant="light" />
 
-              <h1 className="mt-6 max-w-2xl font-heading text-4xl leading-[1.08] text-foreground sm:text-5xl lg:text-[3.65rem]">
-                {title}
-              </h1>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
-              {meaningfulExcerpt ? (
-                <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-                  {meaningfulExcerpt}
-                </p>
-              ) : null}
+          {/* ── Article ── */}
+          <div className="min-w-0 flex-1 max-w-6xl">
+            {/* Back link */}
+            <Link
+              to={`/blogs/${blogHandle}`}
+              className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-gray-900 transition-colors mb-6"
+            >
+              <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              {blogTitle || 'Blog'}
+            </Link>
 
-              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-muted-foreground">
-                <span className="font-medium uppercase tracking-[0.08em] text-foreground">
-                  {author?.name || 'Devasutra'}
-                </span>
-                <span>{publishedDate}</span>
-                <span>{readingTime} min read</span>
+            {/* Tags */}
+            {tags && tags.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {tags.map((tag: string) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-gray-400"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
+            ) : null}
+
+            {/* Title */}
+            <h1 className="text-3xl font-semibold leading-tight tracking-tight text-gray-900 sm:text-4xl md:text-[2.5rem]">
+              {title}
+            </h1>
+
+            {/* Meta */}
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-gray-200 pb-6 text-sm text-gray-400">
+              {author?.name ? <span className="font-medium text-gray-600">{author.name}</span> : null}
+              <span>{formatDate(article.publishedAt)}</span>
+              <span>{readingTime} min read</span>
             </div>
 
+            {/* Hero image */}
             {image ? (
-              <div className="w-full lg:w-1/2 lg:pt-2">
-                <div className="overflow-hidden rounded-[28px] border border-border/70 bg-card shadow-[0_20px_60px_-42px_rgba(0,0,0,0.28)]">
-                  <div className="relative aspect-[4/3] bg-muted">
-                    <Image
-                      data={image}
-                      sizes="(min-width: 1024px) 50vw, 100vw"
-                      loading="eager"
-                      className="h-full w-full object-cover"
-                    />
+              <div className="mt-6 overflow-hidden rounded-2xl bg-gray-100">
+                <Image
+                  data={image}
+                  sizes="(min-width: 1280px) 70vw, 100vw"
+                  loading="eager"
+                  className="aspect-16/8 w-full object-cover"
+                />
+              </div>
+            ) : null}
+
+            {/* Article body */}
+            <article ref={articleRef}>
+              <div
+                dangerouslySetInnerHTML={{ __html: cleanShopifyHtml(sanitizeHtml(contentHtml)) }}
+                className="article-body mt-8"
+              />
+
+              {/* Tags at bottom */}
+              {tags && tags.length > 0 ? (
+                <div className="mt-10 border-t border-gray-200 pt-6">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-3">Tags</p>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag: string) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-gray-400"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </section>
+              ) : null}
 
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start">
-          <article ref={articleRef} className="min-w-0 max-w-[820px]">
-            <div
-              dangerouslySetInnerHTML={{ __html: cleanShopifyHtml(sanitizeHtml(contentHtml)) }}
-              className="
-                prose prose-stone max-w-none
-                text-[1.06rem] leading-[1.85] text-foreground/90
-                md:text-[1.1rem]
-
-                prose-headings:font-heading prose-headings:text-foreground prose-headings:tracking-tight
-                prose-h2:mt-12 prose-h2:mb-4 prose-h2:text-[1.85rem] prose-h2:font-normal prose-h2:leading-tight
-                prose-h3:mt-9 prose-h3:mb-3 prose-h3:text-[1.45rem] prose-h3:font-normal prose-h3:leading-snug
-                prose-h4:mt-7 prose-h4:mb-2 prose-h4:text-[1.15rem] prose-h4:font-medium
-
-                prose-p:my-0 prose-p:text-[1.06rem] prose-p:leading-[1.85] prose-p:text-foreground/90
-                md:prose-p:text-[1.1rem]
-
-                prose-a:text-foreground prose-a:underline prose-a:underline-offset-4 prose-a:decoration-foreground/30
-                prose-strong:font-semibold prose-strong:text-foreground
-
-                prose-ul:my-5 prose-ul:pl-5
-                prose-ol:my-5 prose-ol:pl-5
-                prose-li:my-1 prose-li:text-foreground/90
-
-                prose-blockquote:my-8 prose-blockquote:border-l-2 prose-blockquote:border-foreground/20
-                prose-blockquote:pl-5 prose-blockquote:text-foreground/75
-
-                prose-hr:my-10 prose-hr:border-border
-
-                prose-img:my-8 prose-img:max-h-[480px] prose-img:w-full prose-img:rounded-2xl
-                prose-img:border prose-img:border-border/70 prose-img:object-cover
-                prose-figcaption:mt-2 prose-figcaption:text-sm prose-figcaption:text-center prose-figcaption:text-muted-foreground
-
-                prose-table:block prose-table:w-full prose-table:overflow-x-auto
-                prose-th:border prose-th:border-border prose-th:bg-muted/40 prose-th:px-3 prose-th:py-2
-                prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2
-
-                [&_p+p]:mt-5
-                [&_p:empty]:hidden
-
-                [&>p:first-of-type]:text-[1.15rem] [&>p:first-of-type]:leading-[1.78] [&>p:first-of-type]:text-foreground/80
-                md:[&>p:first-of-type]:text-[1.2rem]
-              "
-            />
-
-            {tags && tags.length > 0 ? (
-              <div className="mt-12 border-t border-border/70 pt-8">
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Tags
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {tags.map((tag: string) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-border/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+              {/* Mobile product cards */}
+              {relatedProducts.length > 0 ? (
+                <div className="mt-10 border-t border-gray-200 pt-8 lg:hidden">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-base font-semibold text-gray-900">You might also like</h3>
+                    <Link
+                      to={collectionLink.href}
+                      className="text-[10px] uppercase tracking-[0.18em] text-gray-400 hover:text-gray-900 transition-colors"
                     >
-                      {tag}
-                    </span>
+                      View all
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {relatedProducts.slice(0, 6).map((p: any) => (
+                      <SidebarProductCard key={p.id} product={p} />
+                    ))}
+                  </div>
+                  <div className="mt-4 text-center">
+                    <Link
+                      to={collectionLink.href}
+                      className="inline-flex items-center justify-center rounded-full border border-gray-900 px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-900 transition-colors hover:bg-gray-900 hover:text-white"
+                    >
+                      {collectionLink.label}
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Comment form */}
+              <CommentForm articleId={article.id} blogId={blogId} />
+            </article>
+          </div>
+
+          {/* ── Sidebar ── */}
+          <aside className="hidden lg:block w-56 xl:w-72 shrink-0 sticky top-28 self-start">
+            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+                <h2 className="text-sm font-semibold text-gray-900 tracking-wide">
+                  Related Products
+                </h2>
+                <Link
+                  to={collectionLink.href}
+                  className="text-[10px] uppercase tracking-wider text-gray-400 hover:text-gray-900 transition-colors"
+                >
+                  View all
+                </Link>
+              </div>
+
+              {relatedProducts.length > 0 ? (
+                <div className="space-y-3">
+                  {relatedProducts.slice(0, 5).map((product: any) => (
+                    <SidebarProductCard key={product.id} product={product} />
                   ))}
                 </div>
-              </div>
-            ) : null}
+              ) : (
+                <p className="text-sm text-gray-400 text-center py-6">
+                  No related products found.
+                </p>
+              )}
 
-            <div className="mt-12 rounded-[24px] border border-border/70 bg-muted/20 p-6 sm:p-8 xl:hidden">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Discover our collection
-              </p>
-              <h2 className="mt-3 font-heading text-2xl text-foreground">
-                Explore Sacred Products
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                Hand-picked, blessed, and chosen for a more intentional spiritual practice.
-              </p>
               <Link
                 to={collectionLink.href}
-                className="mt-6 inline-flex items-center justify-center rounded-full bg-foreground px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-background transition-opacity hover:opacity-85"
+                className="mt-4 flex items-center justify-center rounded-full bg-gray-900 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white transition-opacity hover:opacity-80"
               >
                 {collectionLink.label}
               </Link>
             </div>
-
-            <div className="mt-12 border-t border-border/70 pt-8">
-              <Link
-                to={`/blogs/${blogHandle}`}
-                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground transition-colors hover:text-muted-foreground"
-              >
-                <span>{'<-'}</span>
-                <span>Back to {blogTitle || 'Blog'}</span>
-              </Link>
-            </div>
-          </article>
-
-          <aside className="hidden xl:block">
-            <div className="sticky top-28 rounded-[24px] border border-border/70 bg-muted/20 p-6">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                Related products
-              </p>
-
-              {relatedProducts.length > 0 ? (
-                <div className="mt-6 space-y-4">
-                  {relatedProducts.map((product: any) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              ) : (
-                <div className="mt-6 rounded-2xl border border-border/70 bg-background p-5">
-                  <p className="text-sm leading-7 text-muted-foreground">
-                    Explore the collection connected to this article for pieces chosen to match the same intention and practice.
-                  </p>
-                </div>
-              )}
-
-              <div className="mt-6 border-t border-border/70 pt-6">
-                <Link
-                  to={collectionLink.href}
-                  className="inline-flex items-center justify-center rounded-full bg-foreground px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-background transition-opacity hover:opacity-85"
-                >
-                  {collectionLink.label}
-                </Link>
-              </div>
-            </div>
           </aside>
+
         </div>
       </div>
     </div>
@@ -447,9 +502,11 @@ const ARTICLE_QUERY = `#graphql
     $language: LanguageCode
   ) @inContext(language: $language, country: $country) {
     blog(handle: $blogHandle) {
+      id
       handle
       title
       articleByHandle(handle: $articleHandle) {
+        id
         handle
         title
         contentHtml

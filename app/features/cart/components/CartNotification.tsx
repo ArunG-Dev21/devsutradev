@@ -119,21 +119,14 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className={`pointer-events-auto w-[min(360px,calc(100vw-2rem))] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.22)] overflow-hidden ${
+              className={`pointer-events-auto w-[min(360px,calc(100vw-2rem))] rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.14)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] bg-white dark:bg-[#111] border border-stone-200 dark:border-white/[0.09] ${
                 notif.exiting ? "cart-notif-exit" : "cart-notif-enter"
               }`}
-              style={{
-                background: "#111",
-                border: "1px solid rgba(255,255,255,0.09)",
-              }}
             >
               {/* Body */}
               <div className="flex items-start gap-3 px-4 pt-4 pb-3">
                 {/* Image */}
-                <div
-                  className="shrink-0 w-14 h-14 rounded-xl overflow-hidden"
-                  style={{ border: "1px solid rgba(255,255,255,0.08)" }}
-                >
+                <div className="shrink-0 w-14 h-14 rounded-xl overflow-hidden border border-stone-200 dark:border-white/[0.08]">
                   {notif.image ? (
                     <img
                       src={notif.image.url}
@@ -143,14 +136,11 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center"
-                      style={{ background: "rgba(255,255,255,0.05)" }}
-                    >
+                    <div className="w-full h-full flex items-center justify-center bg-stone-100 dark:bg-white/5">
                       <img
                         src="/icons/add-bag.png"
                         alt=""
-                        className="w-6 h-6 opacity-30 invert"
+                        className="w-6 h-6 opacity-30 dark:invert"
                       />
                     </div>
                   )}
@@ -160,10 +150,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
                 <div className="flex-1 min-w-0">
                   {/* Label */}
                   <div className="flex items-center gap-1.5 mb-1">
-                    <span
-                      className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full shrink-0"
-                      style={{ background: "#22c55e" }}
-                    >
+                    <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full shrink-0 bg-green-500">
                       <svg
                         width="7"
                         height="7"
@@ -177,29 +164,13 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
                         <path d="M5 13l4 4L19 7" />
                       </svg>
                     </span>
-                    <span
-                      style={{
-                        fontSize: 9,
-                        fontWeight: 700,
-                        letterSpacing: "0.2em",
-                        textTransform: "uppercase",
-                        color: "rgba(255,255,255,0.45)",
-                      }}
-                    >
+                    <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-stone-500 dark:text-white/45">
                       Added to bag
                     </span>
                   </div>
 
                   {/* Title */}
-                  <p
-                    className="line-clamp-2 mb-2.5"
-                    style={{
-                      color: "#fff",
-                      fontWeight: 500,
-                      fontSize: 13,
-                      lineHeight: 1.4,
-                    }}
-                  >
+                  <p className="line-clamp-2 mb-2.5 text-[13px] font-medium leading-[1.4] text-stone-900 dark:text-white">
                     {notif.title}
                   </p>
 
@@ -207,25 +178,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
                   <button
                     type="button"
                     onClick={() => handleViewCart(notif.id)}
-                    className="inline-flex items-center gap-1.5 cursor-pointer active:scale-95 group/btn"
-                    style={{
-                      padding: "5px 12px",
-                      borderRadius: 99,
-                      background: "#fff",
-                      color: "#000",
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      border: "none",
-                      transition: "background 0.15s",
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.background = "#e5e5e5";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.background = "#fff";
-                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full text-[10px] font-bold tracking-[0.14em] uppercase cursor-pointer active:scale-95 transition-colors duration-150 group/btn bg-stone-900 text-white hover:bg-stone-700 dark:bg-white dark:text-black dark:hover:bg-stone-200"
                     aria-label="View cart"
                   >
                     View Bag
@@ -251,26 +204,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
                 <button
                   type="button"
                   onClick={() => dismiss(notif.id)}
-                  className="shrink-0 flex items-center justify-center cursor-pointer transition-all mt-0.5"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.07)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    color: "rgba(255,255,255,0.4)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(255,255,255,0.14)";
-                    (e.currentTarget as HTMLElement).style.color = "#fff";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(255,255,255,0.07)";
-                    (e.currentTarget as HTMLElement).style.color =
-                      "rgba(255,255,255,0.4)";
-                  }}
+                  className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-colors mt-0.5 bg-stone-100 dark:bg-white/[0.07] border border-stone-300 dark:border-white/10 text-stone-400 dark:text-white/40 hover:bg-stone-200 dark:hover:bg-white/[0.14] hover:text-stone-700 dark:hover:text-white"
                   aria-label="Dismiss"
                 >
                   <svg
@@ -288,14 +222,10 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
               </div>
 
               {/* Progress bar */}
-              <div
-                className="h-[2px] mx-4 mb-3 rounded-full overflow-hidden"
-                style={{ background: "rgba(255,255,255,0.07)" }}
-              >
+              <div className="h-[2px] mx-4 mb-3 rounded-full overflow-hidden bg-stone-200 dark:bg-white/[0.07]">
                 <div
-                  className="h-full origin-left rounded-full"
+                  className="h-full origin-left rounded-full bg-stone-500 dark:bg-white/40"
                   style={{
-                    background: "rgba(255,255,255,0.4)",
                     animation: `notifProgress ${AUTO_DISMISS_MS}ms linear forwards`,
                     animationDelay: notif.exiting ? "99999s" : "0ms",
                   }}
