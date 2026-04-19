@@ -36,18 +36,18 @@
   to   { opacity: 1; }
 }
 
-/* ── CartNotification ── */
+/* ── CartNotification (stacked toasts) ── */
 @keyframes cartNotifEnter {
-  0%   { opacity: 0; transform: translateX(calc(100% + 1rem)); }
+  0%   { opacity: 0; transform: translateX(100%) scale(0.95); }
   60%  { opacity: 1; }
-  100% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
 }
 @keyframes cartNotifExit {
   0%   { opacity: 1; transform: translateX(0) scale(1); }
-  100% { opacity: 0; transform: translateX(calc(100% + 1rem)) scale(0.96); }
+  100% { opacity: 0; transform: translateX(40%) scale(0.95); }
 }
 .cart-notif-enter { animation: cartNotifEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.cart-notif-exit  { animation: cartNotifExit 0.35s cubic-bezier(0.4, 0, 1, 1) forwards; }
+.cart-notif-exit  { animation: cartNotifExit 0.3s cubic-bezier(0.4, 0, 1, 1) forwards; }
 @keyframes notifProgress {
   from { width: 100%; }
   to   { width: 0%; }

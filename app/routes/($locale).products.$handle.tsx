@@ -315,6 +315,12 @@ export default function Product() {
   useEffect(() => {
     if (!thumbnailContainerRef.current) return;
     const container = thumbnailContainerRef.current;
+
+    if (selectedImageIndex === 0) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     const activeThumb = container.children[selectedImageIndex] as HTMLElement;
     if (!activeThumb) return;
 
@@ -323,8 +329,8 @@ export default function Product() {
     const containerScrollTop = container.scrollTop;
     const containerVisible = container.clientHeight;
 
-    if (thumbTop < containerScrollTop) {
-      container.scrollTo({ top: thumbTop, behavior: 'smooth' });
+    if (thumbTop < containerScrollTop + 8) {
+      container.scrollTo({ top: Math.max(0, thumbTop - 8), behavior: 'smooth' });
     } else if (thumbBottom > containerScrollTop + containerVisible) {
       container.scrollTo({ top: thumbBottom - containerVisible, behavior: 'smooth' });
     }
@@ -1094,7 +1100,7 @@ export default function Product() {
           variants: (product as any).variants?.nodes ?? [],
         }}
         triggerRef={productFormRef}
-        onAddToCartClick={() => open('cart')}
+        onAddToCartClick={() => {}}
       />
     </div>
   );
@@ -1166,24 +1172,23 @@ function RecommendedProducts({ products }: { products: any[] }) {
   if (displayProducts.length === 0) return null;
 
   return (
-    <section className="mt-20 md:mt-32 pt-16 relative">
+    <section className="mt-10 md:mt-16 pt-12 md:pt-16 pb-10 md:pb-14 relative">
       <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none">
         <img src="/line-art.png" alt="" className="w-auto h-auto max-w-full pointer-events-none" />
       </div>
 
-      <div className="text-center mb-12">
+      <div className="text-center mb-8 md:mb-10">
         <p className="text-[10px] tracking-[0.3em] uppercase text-stone-400 dark:text-muted-foreground mb-3">
           Handpicked For You
         </p>
         <h2
-          className="text-3xl md:text-4xl font-light text-stone-900 dark:text-foreground"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          className="text-3xl md:text-4xl font-light text-stone-900 dark:text-foreground font-heading"
         >
           You May Also Like
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {displayProducts.map((product: any, index: number) => (
           <div
             key={product.id}

@@ -50,7 +50,7 @@ export default function Policy() {
     <div className="min-h-screen bg-background">
       <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/75 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.18),transparent_58%)]" />
-        <RouteBreadcrumbBanner variant="light" className="relative z-10" />
+        <RouteBreadcrumbBanner variant="light" className="relative z-10 !bg-transparent" />
         <div className="container mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
           <Link
             className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/85 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-foreground"

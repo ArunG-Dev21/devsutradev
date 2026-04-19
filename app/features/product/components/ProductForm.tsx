@@ -5,7 +5,6 @@ import type {
   ProductOptionValueSwatch,
 } from '@shopify/hydrogen/storefront-api-types';
 import { AddToCartButton } from '~/features/cart/components/AddToCartButton';
-import { useAside } from '~/shared/components/Aside';
 import type { ProductFragment } from 'storefrontapi.generated';
 
 export function ProductForm({
@@ -18,7 +17,6 @@ export function ProductForm({
   stockQty?: number | null;
 }) {
   const navigate = useNavigate();
-  const { open } = useAside();
 
   const isLow = typeof stockQty === 'number' && stockQty <= 5;
   const firstRenderedIdx = productOptions.findIndex((o) => o.optionValues.length !== 1);
@@ -115,7 +113,6 @@ export function ProductForm({
         <div className="flex-1 w-full flex [&>form]:w-full">
           <AddToCartButton
             disabled={!selectedVariant || !selectedVariant.availableForSale}
-            onClick={() => open('cart')}
             lines={
               selectedVariant
                 ? [

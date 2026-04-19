@@ -85,14 +85,15 @@ function SizePillInner({
   onAdded: () => void;
 }) {
   const { showNotification } = useCartNotification();
-  const prevState = useRef<string>('idle');
+  const wasSubmitted = useRef(false);
 
   useEffect(() => {
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+    if (fetcher.state === 'submitting') wasSubmitted.current = true;
+    if (wasSubmitted.current && fetcher.state === 'idle') {
+      wasSubmitted.current = false;
       showNotification(productTitle, productImage || undefined);
       onAdded();
     }
-    prevState.current = fetcher.state;
   }, [fetcher.state, showNotification, productTitle, productImage, onAdded]);
 
   const isAdding = fetcher.state !== 'idle';
@@ -236,15 +237,15 @@ function AddToCartLongInner({
   onCartOpen: () => void;
 }) {
   const { showNotification } = useCartNotification();
-  const prevState = useRef(fetcher.state);
+  const wasSubmitted = useRef(false);
 
   useEffect(() => {
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+    if (fetcher.state === 'submitting') wasSubmitted.current = true;
+    if (wasSubmitted.current && fetcher.state === 'idle') {
+      wasSubmitted.current = false;
       showNotification(productTitle, productImage || undefined);
-      onCartOpen();
     }
-    prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle, productImage, onCartOpen]);
+  }, [fetcher.state, showNotification, productTitle, productImage]);
 
   const isAdding = fetcher.state !== 'idle';
 
@@ -346,15 +347,15 @@ function AddToCartInner({
 }) {
   const [justAdded, setJustAdded] = useState(false);
   const { showNotification } = useCartNotification();
-  const prevState = useRef(fetcher.state);
+  const wasSubmitted = useRef(false);
 
   useEffect(() => {
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+    if (fetcher.state === 'submitting') wasSubmitted.current = true;
+    if (wasSubmitted.current && fetcher.state === 'idle') {
+      wasSubmitted.current = false;
       showNotification(productTitle, productImage || undefined);
-      onCartOpen();
     }
-    prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle, productImage, onCartOpen]);
+  }, [fetcher.state, showNotification, productTitle, productImage]);
 
   const isAdding = fetcher.state !== 'idle';
 
@@ -435,10 +436,7 @@ export function StickyAddToCart({
                                             productTitle={product.title}
                                             productImage={product.featuredImage}
                                             productId={product.id}
-                                            onAdded={() => {
-                                                setShowSizePicker(false);
-                                                onAddToCartClick();
-                                            }}
+                                            onAdded={() => setShowSizePicker(false)}
                                         />
                                     ))}
                                 </div>
@@ -509,10 +507,7 @@ export function StickyAddToCart({
                                             productTitle={product.title}
                                             productImage={product.featuredImage}
                                             productId={product.id}
-                                            onAdded={() => {
-                                                setShowSizePicker(false);
-                                                onAddToCartClick();
-                                            }}
+                                            onAdded={() => setShowSizePicker(false)}
                                         />
                                     ))}
                                 </div>

@@ -185,13 +185,14 @@ function RecommendationAddButton({
   productTitle: string;
 }) {
   const { showNotification } = useCartNotification();
-  const prevState = useRef(fetcher.state);
+  const wasSubmitted = useRef(false);
 
   useEffect(() => {
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+    if (fetcher.state === 'submitting') wasSubmitted.current = true;
+    if (wasSubmitted.current && fetcher.state === 'idle') {
+      wasSubmitted.current = false;
       showNotification(productTitle);
     }
-    prevState.current = fetcher.state;
   }, [fetcher.state, showNotification, productTitle]);
 
   const isAdding = fetcher.state !== 'idle';

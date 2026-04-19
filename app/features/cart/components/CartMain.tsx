@@ -248,7 +248,7 @@ function CartRecommendations({
   const isPage = layout === 'page';
 
   return (
-    <section className={isPage ? 'mt-16 md:mt-24 pt-14 relative' : ''}>
+    <section className={isPage ? 'mt-12 md:mt-16 pt-12 md:pt-16 pb-10 md:pb-14 relative' : ''}>
       {isPage && (
         <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none">
           <img src="/line-art.png" alt="" className="w-auto h-auto max-w-full pointer-events-none" />
@@ -335,8 +335,9 @@ function CartRecommendations({
           observer
           observeParents
           breakpoints={isPage ? {
-            1024: { slidesPerView: 2, spaceBetween: 20 },
-            1280: { slidesPerView: 3, spaceBetween: 20 },
+            640: { slidesPerView: 2, spaceBetween: 16 },
+            1024: { slidesPerView: 3, spaceBetween: 20 },
+            1280: { slidesPerView: 4, spaceBetween: 24 },
           } : undefined}
           onSwiper={(instance) => {
             setSwiper(instance);
@@ -464,13 +465,14 @@ function RecommendationLongButton({
   productTitle: string;
 }) {
   const { showNotification } = useCartNotification();
-  const prevState = useRef(fetcher.state);
+  const wasSubmitted = useRef(false);
 
   useEffect(() => {
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+    if (fetcher.state === 'submitting') wasSubmitted.current = true;
+    if (wasSubmitted.current && fetcher.state === 'idle') {
+      wasSubmitted.current = false;
       showNotification(productTitle);
     }
-    prevState.current = fetcher.state;
   }, [fetcher.state, showNotification, productTitle]);
 
   const isAdding = fetcher.state !== 'idle';

@@ -3,6 +3,7 @@ import type { Route } from './+types/($locale).search';
 import { getPaginationVariables, Analytics } from '@shopify/hydrogen';
 import { SearchForm } from '~/features/search/components/SearchForm';
 import { SearchResults } from '~/features/search/components/SearchResults';
+import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 import {
   type RegularSearchReturn,
   type PredictiveSearchReturn,
@@ -44,10 +45,24 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="bg-background text-foreground min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto">
-        <h1 className="text-4xl md:text-6xl font-heading tracking-tight text-foreground text-center mb-10">Search</h1>
-        <div className="max-w-2xl mx-auto mb-16">
+    <div className="bg-background text-foreground min-h-screen">
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/80 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.16),transparent_58%)]" />
+        <RouteBreadcrumbBanner variant="light" className="relative z-10 !bg-transparent" />
+        <div className="container mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16 lg:px-8 text-center">
+          <h1 className="font-heading text-4xl font-medium uppercase tracking-tight text-foreground sm:text-5xl md:text-6xl">
+            Search
+          </h1>
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
+            Find sacred items, articles, and collections across Devasutra.
+          </p>
+        </div>
+      </section>
+
+      {/* ── CONTENT ── */}
+      <div className="container mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <div className="max-w-2xl mx-auto mb-14">
           <SearchForm>
             {({ inputRef }) => (
               <div className="relative flex items-center transition-shadow duration-300 rounded-full">
@@ -59,7 +74,7 @@ export default function SearchPage() {
                   type="text"
                   className="w-full bg-background border border-border rounded-full py-4 pl-8 pr-16 text-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring transition-all appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
                 />
-                <button type="submit" aria-label="Search" className="absolute right-2 p-3 bg-linear-to-br from-[#f14514] to-[#d4370d] text-white rounded-full transition-all flex items-center justify-center cursor-pointer hover:from-[#d4370d] hover:to-[#f14514] hover:scale-105 active:scale-95" >
+                <button type="submit" aria-label="Search" className="absolute right-2 p-3 bg-linear-to-br from-[#f14514] to-[#d4370d] text-white rounded-full transition-all flex items-center justify-center cursor-pointer hover:from-[#d4370d] hover:to-[#f14514] hover:scale-105 active:scale-95">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

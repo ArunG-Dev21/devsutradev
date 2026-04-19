@@ -197,6 +197,7 @@ function CartDiscounts({
   const validCodes = allEntries.filter((d) => d.applicable).map((d) => d.code);
   const invalidCodes = allEntries.filter((d) => !d.applicable).map((d) => d.code);
   const allCodes = allEntries.map((d) => d.code);
+  const [inputCode, setInputCode] = useState('');
 
   const couponInfoMap = useMemo(() => {
     const map: Record<string, { label?: string; offer?: string }> = {};
@@ -209,51 +210,107 @@ function CartDiscounts({
     return map;
   }, [cartLines]);
 
-  if (allEntries.length === 0) return null;
+  useEffect(() => {
+    if (inputCode && validCodes.some((c) => c.toUpperCase() === inputCode.toUpperCase())) {
+      setInputCode('');
+    }
+  }, [validCodes, inputCode]);
+
+  const codesWithInput = inputCode.trim()
+    ? [...validCodes, inputCode.trim().toUpperCase()]
+    : validCodes;
 
   return (
-    <div className="mb-3 flex flex-col gap-2">
+    <div className="mb-4 sm:mb-5 flex flex-col gap-2">
+
+      {/* Input slot — shows inline error when an invalid code exists */}
+      {invalidCodes.length > 0 ? (
+        (() => {
+          const code = invalidCodes[0];
+          const info = couponInfoMap[code.toUpperCase()];
+          const reason = info?.offer ?? info?.label ?? 'Not applicable to your current cart';
+          return (
+            <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-1">
+              <svg
+                className="w-3.5 h-3.5 text-yellow-500 shrink-0"
+                viewBox="0 0 24 24" fill="currentColor"
+              >
+                <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1 min-w-0">
+                <code className="font-mono text-[11px] sm:text-xs font-semibold tracking-widest text-black">{code}</code>
+                <p className="text-[9px] sm:text-[10px] text-black/60 leading-none mt-0.5 truncate">{reason}</p>
+              </div>
+              <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
+                <button type="submit" className="text-[9px] font-bold uppercase tracking-wider text-[#F14514] cursor-pointer shrink-0">
+                  Remove
+                </button>
+              </UpdateDiscountForm>
+            </div>
+          );
+        })()
+      ) : (
+        <CartForm
+          route="/cart"
+          action={CartForm.ACTIONS.DiscountCodesUpdate}
+          inputs={{ discountCodes: codesWithInput }}
+        >
+          {(fetcher: FetcherWithComponents<any>) => {
+            const isApplying = fetcher.state !== 'idle';
+            return (
+              <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-2 transition-colors focus-within:border-foreground/30 focus-within:bg-muted/40">
+                <svg
+                  className="w-3.5 h-3.5 text-muted-foreground shrink-0"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+                </svg>
+                <input
+                  type="text"
+                  value={inputCode}
+                  onChange={(e) => setInputCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && inputCode.trim()) {
+                      e.currentTarget.form?.requestSubmit();
+                    }
+                  }}
+                  placeholder="Enter coupon code"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className="flex-1 min-w-0 bg-transparent text-xs font-mono tracking-wider uppercase placeholder:text-muted-foreground placeholder:normal-case placeholder:tracking-normal outline-none text-foreground"
+                />
+                <button
+                  type="submit"
+                  disabled={!inputCode.trim() || isApplying}
+                  className="text-[9px] font-bold uppercase tracking-wider text-[#F14514] disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer transition-opacity shrink-0"
+                >
+                  {isApplying ? '…' : 'Apply'}
+                </button>
+              </div>
+            );
+          }}
+        </CartForm>
+      )}
+
       {/* Applied valid codes */}
       {validCodes.map((code) => (
-        <div key={code} className="flex items-center justify-between px-3 py-2.5 bg-black rounded-xl">
+        <div key={code} className="flex items-center justify-between px-3 py-2 bg-green-50 border border-green-200 rounded-xl dark:bg-green-950/30 dark:border-green-800/50">
           <div className="flex items-center gap-2">
-            <svg className="w-3.5 h-3.5 text-[#F14514] shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <svg className="w-3.5 h-3.5 text-green-600 dark:text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
-            <code className="font-mono font-bold text-xs tracking-widest text-[#F14514]">{code}</code>
-            <span className="text-[9px] font-semibold uppercase tracking-wide text-[#F14514]">applied</span>
+            <code className="font-mono font-bold text-[11px] tracking-widest text-green-700 dark:text-green-400">{code}</code>
+            <span className="text-[9px] font-semibold uppercase tracking-wide text-green-600 dark:text-green-500">applied</span>
           </div>
           <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
-            <button type="submit" className="text-[10px] text-white/40 hover:text-white/80 transition cursor-pointer">
+            <button type="submit" className="text-[10px] uppercase text-green-500/60 hover:text-red-500 transition cursor-pointer">
               Remove
             </button>
           </UpdateDiscountForm>
         </div>
       ))}
-
-      {/* Invalid codes */}
-      {invalidCodes.map((code) => {
-        const info = couponInfoMap[code.toUpperCase()];
-        const reason = info?.offer ?? info?.label ?? 'Not applicable to your current cart';
-        return (
-          <div key={code} className="flex items-start justify-between gap-3 px-3 py-2.5 bg-zinc-950 border border-red-900/60 rounded-xl">
-            <div className="flex flex-col gap-0.5 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-400 shrink-0">
-                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <code className="text-xs font-mono font-bold text-red-400">{code}</code>
-              </div>
-              <p className="text-[10px] text-red-500/80 leading-snug pl-[18px]">{reason}</p>
-            </div>
-            <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
-              <button type="submit" className="text-[10px] text-red-500/60 hover:text-red-400 transition cursor-pointer shrink-0 mt-0.5">
-                Remove
-              </button>
-            </UpdateDiscountForm>
-          </div>
-        );
-      })}
     </div>
   );
 }
@@ -340,49 +397,76 @@ function CartDiscountsAside({
   return (
     <div className="mb-3 flex flex-col gap-2">
 
-      {/* ── Manual coupon input ── */}
-      <CartForm
-        route="/cart"
-        action={CartForm.ACTIONS.DiscountCodesUpdate}
-        inputs={{ discountCodes: codesWithInput }}
-      >
-        {(fetcher: FetcherWithComponents<any>) => {
-          const isApplying = fetcher.state !== 'idle';
+      {/* ── Input slot: shows error inline when there's an invalid code, otherwise shows the input ── */}
+      {invalidCodes.length > 0 ? (
+        (() => {
+          const code = invalidCodes[0];
+          const info = couponInfoMap[code.toUpperCase()];
+          const reason = info?.offer ?? info?.label ?? 'Not applicable to your current cart';
           return (
-            <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-2 transition-colors focus-within:border-foreground/30 focus-within:bg-muted/40">
+            <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-2">
               <svg
-                className="w-3.5 h-3.5 text-muted-foreground shrink-0"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}
+                className="w-6 h-6 text-[#f14514] shrink-0"
+                viewBox="0 0 24 24" fill="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+                <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
               </svg>
-              <input
-                type="text"
-                value={inputCode}
-                onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && inputCode.trim()) {
-                    e.currentTarget.form?.requestSubmit();
-                  }
-                }}
-                placeholder="Enter coupon code"
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                className="flex-1 min-w-0 bg-transparent text-xs font-mono tracking-wider uppercase placeholder:text-muted-foreground placeholder:normal-case placeholder:tracking-normal outline-none text-foreground"
-              />
-              <button
-                type="submit"
-                disabled={!inputCode.trim() || isApplying}
-                className="text-[9px] font-bold uppercase tracking-wider text-[#F14514] disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer transition-opacity shrink-0"
-              >
-                {isApplying ? '…' : 'Apply'}
-              </button>
+              <div className="flex flex-1 flex-col justify-between min-w-0">
+                <code className="font-mono text-[11px] font-semibold tracking-widest text-black">{code}</code>
+                <p className="text-xs text-black/60 leading-none truncate">{reason}</p>
+              </div>
+              <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
+                <button type="submit" className="text-[9px] font-bold uppercase tracking-wider text-[#F14514] cursor-pointer shrink-0">
+                  Remove
+                </button>
+              </UpdateDiscountForm>
             </div>
           );
-        }}
-      </CartForm>
+        })()
+      ) : (
+        <CartForm
+          route="/cart"
+          action={CartForm.ACTIONS.DiscountCodesUpdate}
+          inputs={{ discountCodes: codesWithInput }}
+        >
+          {(fetcher: FetcherWithComponents<any>) => {
+            const isApplying = fetcher.state !== 'idle';
+            return (
+              <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-2 transition-colors focus-within:border-foreground/30 focus-within:bg-muted/40">
+                <svg
+                  className="w-6 h-6 text-[#f14514] shrink-0"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+                </svg>
+                <input
+                  type="text"
+                  value={inputCode}
+                  onChange={(e) => setInputCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && inputCode.trim()) {
+                      e.currentTarget.form?.requestSubmit();
+                    }
+                  }}
+                  placeholder="Enter coupon code"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className="flex-1 min-w-0 bg-transparent text-xs font-mono tracking-wider uppercase placeholder:text-muted-foreground placeholder:normal-case placeholder:tracking-normal outline-none text-foreground"
+                />
+                <button
+                  type="submit"
+                  disabled={!inputCode.trim() || isApplying}
+                  className="text-[9px] font-medium uppercase text-[#F14514] disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer transition-opacity shrink-0"
+                >
+                  {isApplying ? '…' : 'Apply'}
+                </button>
+              </div>
+            );
+          }}
+        </CartForm>
+      )}
 
       {/* Unapplied product coupons — mini ticket, tap to apply */}
       {unapplied.map(({ code, label, offer }) => (
@@ -443,32 +527,6 @@ function CartDiscountsAside({
         </div>
       ))}
 
-      {/* Invalid codes */}
-      {invalidCodes.map((code) => {
-        const info = couponInfoMap[code.toUpperCase()];
-        const reason = info?.offer ?? info?.label ?? 'Not applicable to your current cart';
-        return (
-          <div key={code} className="flex items-center gap-3 px-3 py-2.5  border border-dashed border-black rounded-md dark:bg-red-950/30 dark:border-red-800/50">
-            {/* Warning icon — sized to match combined text height */}
-            <svg
-              className="w-7 h-7 shrink-0 text-yellow-400 dark:text-yellow-400"
-              viewBox="0 0 24 24" fill="currentColor"
-            >
-              <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
-            </svg>
-            {/* Code + reason stacked */}
-            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-              <code className="font-mono text-[11px] font-semibold tracking-widest text-black dark:text-black">{code}</code>
-              <p className="text-[10px] text-black dark:text-black leading-snug">{reason}</p>
-            </div>
-            <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
-              <button type="submit" className="text-[9px] font-bold uppercase text-[#F14514] hover:text-[#F14514] transition cursor-pointer shrink-0">
-                Remove
-              </button>
-            </UpdateDiscountForm>
-          </div>
-        );
-      })}
     </div>
   );
 }

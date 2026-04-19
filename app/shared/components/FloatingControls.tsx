@@ -126,6 +126,8 @@ export function FloatingControls() {
             <path d="M17.66 17.66l1.41 1.41" />
             <path d="M2 12h2" />
             <path d="M20 12h2" />
+            <path d="M4.93 19.07l1.41-1.41" />
+            <path d="M17.66 6.34l1.41-1.41" />
           </svg>
         </button>
       </div>

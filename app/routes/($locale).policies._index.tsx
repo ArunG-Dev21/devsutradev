@@ -29,7 +29,7 @@ export default function Policies() {
     <div className="min-h-screen bg-background">
       <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/80 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.16),transparent_58%)]" />
-        <RouteBreadcrumbBanner variant="light" className="relative z-10" />
+        <RouteBreadcrumbBanner variant="light" className="relative z-10 !bg-transparent" />
         <div className="container mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex items-center rounded-full border border-amber-200/70 bg-amber-50/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900 dark:border-amber-400/20 dark:bg-amber-500/10 dark:text-amber-200">

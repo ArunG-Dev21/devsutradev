@@ -56,14 +56,14 @@ function AddToCartInner({
   children: React.ReactNode;
 }) {
   const { showNotification } = useCartNotification();
-  const prevState = useRef(fetcher.state);
+  const wasSubmitted = useRef(false);
 
   useEffect(() => {
-    // Trigger notification when fetcher transitions from loading/submitting to idle
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+    if (fetcher.state === 'submitting') wasSubmitted.current = true;
+    if (wasSubmitted.current && fetcher.state === 'idle') {
+      wasSubmitted.current = false;
       showNotification(productTitle, productImage);
     }
-    prevState.current = fetcher.state;
   }, [fetcher.state, showNotification, productTitle, productImage]);
 
   return (

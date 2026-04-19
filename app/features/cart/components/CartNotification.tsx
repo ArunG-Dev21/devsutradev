@@ -7,227 +7,196 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { useAside } from "~/shared/components/Aside";
+import { useNavigate } from "react-router";
 
 type CartNotificationContextValue = {
   showNotification: (productTitle?: string, productImage?: { url: string; altText?: string | null }) => void;
 };
 
 const CartNotificationContext =
-  createContext<CartNotificationContextValue | undefined>(undefined);
-const fallbackCartNotificationContext: CartNotificationContextValue = {
-  showNotification: () => {},
-};
-let hasWarnedMissingCartNotificationProvider = false;
+  createContext<CartNotificationContextValue | null>(null);
 
 type NotificationItem = {
   id: string;
   title: string;
   image?: { url: string; altText?: string | null };
-  exiting?: boolean;
+  exiting: boolean;
 };
 
-const MAX_VISIBLE = 1;
 const AUTO_DISMISS_MS = 4500;
-const STAGGER_MS = 300;
+const EXIT_DURATION_MS = 320;
+const MAX_VISIBLE = 5;
 
 export function CartNotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const queueRef = useRef<NotificationItem[]>([]);
-  const processingRef = useRef(false);
-  const { open: openAside } = useAside();
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const navigate = useNavigate();
 
-  const dismiss = useCallback((id: string) => {
+  const clearTimerForId = useCallback((id: string) => {
+    const t = timersRef.current.get(id);
+    if (t) {
+      clearTimeout(t);
+      timersRef.current.delete(id);
+    }
+  }, []);
+
+  const removeNotification = useCallback((id: string) => {
+    clearTimerForId(id);
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  }, [clearTimerForId]);
+
+  const startExit = useCallback((id: string) => {
+    clearTimerForId(id);
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, exiting: true } : n))
     );
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }, 400);
-  }, []);
+    const exitTimer = setTimeout(() => removeNotification(id), EXIT_DURATION_MS);
+    timersRef.current.set(`exit-${id}`, exitTimer);
+  }, [clearTimerForId, removeNotification]);
 
-  const processQueue = useCallback(() => {
-    if (processingRef.current) return;
-    processingRef.current = true;
-
-    const flush = () => {
-      const next = queueRef.current.shift();
-      if (!next) {
-        processingRef.current = false;
-        return;
-      }
-
-      setNotifications((prev) => {
-        if (prev.filter((n) => !n.exiting).length >= MAX_VISIBLE) {
-          const oldest = prev.find((n) => !n.exiting);
-          if (oldest) {
-            setTimeout(() => {
-              setNotifications((p) => p.filter((n) => n.id !== oldest.id));
-            }, 400);
-            return [...prev.map((n) => n.id === oldest.id ? { ...n, exiting: true } : n), next];
-          }
-        }
-        return [...prev, next];
-      });
-
-      setTimeout(() => dismiss(next.id), AUTO_DISMISS_MS);
-      setTimeout(flush, STAGGER_MS);
-    };
-
-    flush();
-  }, [dismiss]);
+  const dismiss = useCallback((id: string) => {
+    startExit(id);
+  }, [startExit]);
 
   const showNotification = useCallback(
     (title?: string, image?: { url: string; altText?: string | null }) => {
-      const finalTitle = title && title !== "Product" ? title : "Product";
-      const id = Math.random().toString(36).substring(2, 9);
-      queueRef.current.push({ id, title: finalTitle, image });
-      processQueue();
+      const id = Math.random().toString(36).slice(2, 9);
+      const item: NotificationItem = {
+        id,
+        title: title || 'Product',
+        image,
+        exiting: false,
+      };
+
+      setNotifications((prev) => {
+        // If we've hit the max visible, remove the oldest (bottom)
+        const next = [...prev, item];
+        if (next.length > MAX_VISIBLE) {
+          const removed = next.shift();
+          if (removed) clearTimerForId(removed.id);
+        }
+        return next;
+      });
+
+      // Schedule auto-dismiss
+      const timer = setTimeout(() => startExit(id), AUTO_DISMISS_MS);
+      timersRef.current.set(id, timer);
     },
-    [processQueue]
+    [startExit, clearTimerForId]
   );
 
-  const handleViewCart = useCallback(
-    (id: string) => {
-      dismiss(id);
-      openAside("cart");
-    },
-    [dismiss, openAside]
-  );
+  const handleViewCart = useCallback((id: string) => {
+    dismiss(id);
+    void navigate('/cart');
+  }, [dismiss, navigate]);
 
+  // Escape key dismisses all
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        queueRef.current = [];
-        setNotifications([]);
+      if (e.key === 'Escape') {
+        setNotifications((prev) => prev.map((n) => ({ ...n, exiting: true })));
+        setTimeout(() => setNotifications([]), EXIT_DURATION_MS);
       }
     };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  // Cleanup all timers on unmount
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach((t) => clearTimeout(t));
+      timersRef.current.clear();
+    };
   }, []);
 
   return (
     <CartNotificationContext.Provider value={{ showNotification }}>
       {children}
 
-      {/* ── Top-right toast stack ── */}
       {notifications.length > 0 && (
         <div
           aria-live="polite"
-          className="fixed top-4 right-4 z-[110000] flex flex-col items-end gap-2.5 pointer-events-none"
+          className="fixed top-4 right-4 z-[110000] flex flex-col-reverse items-end gap-3 pointer-events-none"
+          style={{ maxHeight: 'calc(100vh - 2rem)' }}
         >
-          {notifications.map((notif) => (
+          {notifications.map((notif, index) => (
             <div
               key={notif.id}
-              className={`pointer-events-auto w-[min(360px,calc(100vw-2rem))] rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.14)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] bg-white dark:bg-[#111] border border-stone-200 dark:border-white/[0.09] ${
-                notif.exiting ? "cart-notif-exit" : "cart-notif-enter"
+              className={`pointer-events-auto w-[min(380px,calc(100vw-2rem))] rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-white dark:bg-[#111] border border-stone-100 dark:border-white/8 ${
+                notif.exiting ? 'cart-notif-exit' : 'cart-notif-enter'
               }`}
+              style={{
+                transformOrigin: 'top right',
+              }}
             >
-              {/* Body */}
-              <div className="flex items-start gap-3 px-4 pt-4 pb-3">
-                {/* Image */}
-                <div className="shrink-0 w-14 h-14 rounded-xl overflow-hidden border border-stone-200 dark:border-white/[0.08]">
-                  {notif.image ? (
-                    <img
-                      src={notif.image.url}
-                      alt={notif.image.altText || notif.title}
-                      width={56}
-                      height={56}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-stone-100 dark:bg-white/5">
-                      <img
-                        src="/icons/add-bag.png"
-                        alt=""
-                        className="w-6 h-6 opacity-30 dark:invert"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Text */}
-                <div className="flex-1 min-w-0">
-                  {/* Label */}
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full shrink-0 bg-green-500">
-                      <svg
-                        width="7"
-                        height="7"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth={3.5}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 13l4 4L19 7" />
-                      </svg>
-                    </span>
-                    <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-stone-500 dark:text-white/45">
-                      Added to bag
-                    </span>
-                  </div>
-
-                  {/* Title */}
-                  <p className="line-clamp-2 mb-2.5 text-[13px] font-medium leading-[1.4] text-stone-900 dark:text-white">
-                    {notif.title}
-                  </p>
-
-                  {/* CTA */}
-                  <button
-                    type="button"
-                    onClick={() => handleViewCart(notif.id)}
-                    className="inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full text-[10px] font-bold tracking-[0.14em] uppercase cursor-pointer active:scale-95 transition-colors duration-150 group/btn bg-stone-900 text-white hover:bg-stone-700 dark:bg-white dark:text-black dark:hover:bg-stone-200"
-                    aria-label="View cart"
-                  >
-                    View Bag
-                    <svg
-                      className="group-hover/btn:translate-x-0.5 transition-transform"
-                      width="10"
-                      height="10"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                      />
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 pt-3 pb-2.5 border-b border-stone-100 dark:border-white/6">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center w-4.5 h-4.5 rounded-full bg-green-500 shrink-0">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 13l4 4L19 7" />
                     </svg>
-                  </button>
+                  </span>
+                  <span className="text-[12px] font-medium tracking-widest text-black dark:text-white">
+                    Added to Bag
+                  </span>
                 </div>
-
-                {/* Dismiss */}
                 <button
                   type="button"
                   onClick={() => dismiss(notif.id)}
-                  className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-colors mt-0.5 bg-stone-100 dark:bg-white/[0.07] border border-stone-300 dark:border-white/10 text-stone-400 dark:text-white/40 hover:bg-stone-200 dark:hover:bg-white/[0.14] hover:text-stone-700 dark:hover:text-white"
+                  className="w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-stone-100 dark:bg-white/[0.07] hover:bg-stone-200 dark:hover:bg-white/[0.14] text-stone-400 dark:text-white/40 hover:text-stone-700 dark:hover:text-white"
                   aria-label="Dismiss"
                 >
-                  <svg
-                    width="10"
-                    height="10"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                    strokeLinecap="round"
-                  >
+                  <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
                     <path d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
 
+              {/* Body */}
+              <div className="flex items-center gap-3.5 px-4 py-3">
+                <div className="shrink-0 w-[68px] h-[68px] rounded-lg overflow-hidden bg-stone-50 dark:bg-white/5 border border-stone-100 dark:border-white/[0.07]">
+                  {notif.image ? (
+                    <img
+                      src={notif.image.url}
+                      alt={notif.image.altText || notif.title}
+                      width={68}
+                      height={68}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <img src="/icons/add-bag.png" alt="" className="w-6 h-6 opacity-20 dark:invert" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] font-semibold leading-snug line-clamp-2 text-stone-900 dark:text-white mb-2.5">
+                    {notif.title}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleViewCart(notif.id)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[9px] font-bold tracking-[0.16em] uppercase cursor-pointer transition-all duration-150 active:scale-95 bg-stone-900 text-white hover:bg-stone-700 dark:bg-white dark:text-black dark:hover:bg-stone-100"
+                  >
+                    View Bag
+                    <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
               {/* Progress bar */}
-              <div className="h-[2px] mx-4 mb-3 rounded-full overflow-hidden bg-stone-200 dark:bg-white/[0.07]">
+              <div className="h-[2px] bg-stone-100 dark:bg-white/6">
                 <div
-                  className="h-full origin-left rounded-full bg-stone-500 dark:bg-white/40"
+                  key={notif.id}
+                  className="h-full origin-left bg-stone-700 dark:bg-white/40"
                   style={{
                     animation: `notifProgress ${AUTO_DISMISS_MS}ms linear forwards`,
-                    animationDelay: notif.exiting ? "99999s" : "0ms",
+                    animationDelay: notif.exiting ? '99999s' : '0ms',
                   }}
                 />
               </div>
@@ -241,16 +210,9 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
 
 export function useCartNotification() {
   const ctx = useContext(CartNotificationContext);
-
   if (!ctx) {
-    if (import.meta.env.DEV && !hasWarnedMissingCartNotificationProvider) {
-      hasWarnedMissingCartNotificationProvider = true;
-      console.warn(
-        "useCartNotification was rendered without a CartNotificationProvider; notifications will be skipped for this render."
-      );
-    }
-    return fallbackCartNotificationContext;
+    // Return a silent fallback so components outside the provider don't crash
+    return { showNotification: () => {} } as CartNotificationContextValue;
   }
-
   return ctx;
 }

@@ -59,6 +59,7 @@ export function PageLayout({
     pathnameWithoutLocale.startsWith('/account/') ||
     pathnameWithoutLocale === '/policies' ||
     pathnameWithoutLocale.startsWith('/policies/') ||
+    pathnameWithoutLocale === '/search' ||
     pathnameWithoutLocale === '/cart' ||
     pathnameWithoutLocale.startsWith('/cart/');
 
@@ -82,7 +83,10 @@ export function PageLayout({
           {!hasCustomBreadcrumbPlacement ? <RouteBreadcrumbBanner variant="contrast" /> : null}
           {children}
         </main>
-        <TrustBadgesBar />
+        <div className="bg-black border-t border-white/8 border-b border-b-white/10 flex flex-col md:flex-row items-center">
+          <StartupIndiaBadge />
+          <TrustBadgesBar />
+        </div>
         <Footer
           footer={footer}
           header={header}
@@ -105,6 +109,26 @@ export function PageLayout({
         <MobileBottomNav cart={cart} />
       </CartNotificationProvider>
     </Aside.Provider>
+  );
+}
+
+function StartupIndiaBadge() {
+  return (
+    <div className="shrink-0 py-4 px-6 flex items-center justify-center gap-5 border border-white/15 m-3 rounded-lg">
+      <img
+        src="/icons/start-up-india.png"
+        alt="Startup India — DPIIT Recognised"
+        width={180}
+        height={42}
+        className="h-12 w-auto shrink-0 object-contain"
+        loading="lazy"
+      />
+      <div className="border-l border-white/15 pl-5">
+        <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white">
+          Trusted by Govt. of India
+        </p>
+      </div>
+    </div>
   );
 }
 
