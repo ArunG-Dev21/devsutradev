@@ -151,8 +151,9 @@ function ReelATCInner({
       aria-label={`Add ${productTitle} to bag`}
     >
       {isAdding ? (
-        <svg style={{ animation: 'spin 1s linear infinite' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        <svg style={{ animation: 'spin 1s linear infinite' }} width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="#000" strokeOpacity="0.25" strokeWidth="2.5" />
+          <path d="M12 3a9 9 0 0 1 9 9" stroke="#000" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
       ) : justAdded ? (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round">
@@ -295,9 +296,18 @@ export function ReelFullScreen({ reels, initialIndex, onClose }: ReelFullScreenP
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = 'hidden';
 
+    // Pause the page-level Lenis smooth-scroll while the modal is open so
+    // wheel / touch events reach the inner vertical snap container instead
+    // of being hijacked to scroll the window behind the modal.
+    const lenis = (window as any).__lenis as
+      | { stop: () => void; start: () => void }
+      | undefined;
+    lenis?.stop?.();
+
     return () => {
       clearTimeout(timer);
       document.body.style.overflow = originalStyle;
+      lenis?.start?.();
     };
   }, [initialIndex]);
 
@@ -318,7 +328,7 @@ export function ReelFullScreen({ reels, initialIndex, onClose }: ReelFullScreenP
   if (!isMounted) return null;
 
   const modalContent = (
-    <div className="reel-modal">
+    <div className="reel-modal" data-lenis-prevent>
       <div
         className="reel-modal-bg"
         style={{ backgroundImage: `url(${reels[activeReelIndex]?.thumbnailUrl || reels[activeReelIndex]?.products?.[0]?.image || ''})` }}
@@ -333,7 +343,7 @@ export function ReelFullScreen({ reels, initialIndex, onClose }: ReelFullScreenP
       </button>
 
       {/* Vertical scroll container */}
-      <div className="reel-modal-container" ref={containerRef} onScroll={handleScroll}>
+      <div className="reel-modal-container" ref={containerRef} onScroll={handleScroll} data-lenis-prevent>
         {reels.map((reel, index) => {
           const isCaptionExpanded = expandedCaptionId === reel.id;
           const isSheetOpen = showProductSheetId === reel.id;

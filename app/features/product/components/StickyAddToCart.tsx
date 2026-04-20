@@ -129,19 +129,21 @@ function SizePillForm({
   productImage,
   productId,
   onAdded,
+  keyScope,
 }: {
   variant: any;
   productTitle: string;
   productImage?: any;
   productId: string;
   onAdded: () => void;
+  keyScope: 'mobile' | 'desktop';
 }) {
   return (
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesAdd}
       inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1 }] }}
-      fetcherKey={`add-size-sticky-${productId}-${variant.id}`}
+      fetcherKey={`add-size-sticky-${keyScope}-${productId}-${variant.id}`}
     >
       {(fetcher) => (
         <SizePillInner
@@ -437,6 +439,7 @@ export function StickyAddToCart({
                                             productImage={product.featuredImage}
                                             productId={product.id}
                                             onAdded={() => setShowSizePicker(false)}
+                                            keyScope="mobile"
                                         />
                                     ))}
                                 </div>
@@ -508,6 +511,7 @@ export function StickyAddToCart({
                                             productImage={product.featuredImage}
                                             productId={product.id}
                                             onAdded={() => setShowSizePicker(false)}
+                                            keyScope="desktop"
                                         />
                                     ))}
                                 </div>

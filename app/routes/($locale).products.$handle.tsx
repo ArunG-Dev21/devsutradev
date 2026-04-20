@@ -486,9 +486,9 @@ export default function Product() {
                       <button
                         key={img.url}
                         onClick={() => scrollToImage(idx)}
-                        className={`shrink-0 w-24 h-24 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer border-[2.5px] ${idx === selectedImageIndex
-                          ? 'border-gray-900 shadow-md'
-                          : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
+                        className={`shrink-0 w-20 h-20 rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer border-[2.5px] ${idx === selectedImageIndex
+                          ? 'border-white ring-1 ring-black/10 shadow-[0_4px_16px_rgba(0,0,0,0.12)]'
+                          : 'border-transparent opacity-80 hover:opacity-100 hover:border-white/60'
                           }`}
                         aria-pressed={idx === selectedImageIndex}
                       >

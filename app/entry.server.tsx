@@ -23,6 +23,16 @@ export default async function handleRequest(
     baseUri: ["'self'"],
     frameAncestors: ["'none'"],
     formAction: ["'self'", 'https://*.shopify.com', 'https://*.myshopify.com'],
+    connectSrc: [
+      "'self'",
+      'https://monorail-edge.shopifysvc.com',
+      'https://cdn.shopify.com',
+      'https://*.shopify.com',
+      'https://*.myshopify.com',
+      'https://judge.me',
+      'https://api.judge.me',
+      'https://cdn.judge.me',
+    ],
     styleSrc: [
       "'self'",
       'https://cdn.shopify.com',

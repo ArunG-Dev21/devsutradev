@@ -171,12 +171,14 @@ export function Header({
 
   return (
     <header ref={headerRef} className="sticky top-0 z-50 bg-background text-foreground transition-all duration-300">
-      <div className={`relative z-20 transition-all duration-300 md:border-b md:border-border
-        grid ease-in-out
-        ${scrolled ? 'grid-rows-[0fr] opacity-0 md:border-b-0' : 'grid-rows-[1fr] opacity-100'}
-      `}>
-        <div className={`min-h-0 ${scrolled ? 'overflow-hidden' : 'overflow-visible md:overflow-visible'}`}>
-          <div className="container px-3 mx-auto sm:px-6 lg:px-8 py-3 lg:py-4 flex items-center justify-between relative">
+      <div
+        className={`relative z-20 md:border-b md:border-border transition-[max-height,opacity,border-color] duration-300 ease-out ${
+          scrolled
+            ? 'max-h-0 opacity-0 md:border-b-0 pointer-events-none overflow-hidden'
+            : 'max-h-[120px] opacity-100 overflow-visible'
+        }`}
+      >
+        <div className="container px-3 mx-auto sm:px-6 lg:px-8 py-3 lg:py-4 flex items-center justify-between relative">
 
             {/* 1. Left Section — hamburger (mobile) | search bar (desktop) */}
             <div className="flex items-center gap-3 shrink-0 z-10">
@@ -211,17 +213,7 @@ export function Header({
             <div className="flex items-center justify-end gap-2 md:gap-2 lg:gap-3 xl:gap-5 shrink-0 z-10">
 
               {/* Account and Cart Icons */}
-              <HeaderCtas
-                isLoggedIn={isLoggedIn}
-                cart={cart}
-                scrolled={scrolled}
-                onSearchOpen={() => {
-                  setMobileSearchFocused(true);
-                  setTimeout(() => {
-                    document.getElementById('mobile-search-input')?.focus();
-                  }, 50);
-                }}
-              />
+              <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
 
               {/* Vertical Decorative Divider */}
               <div className="hidden md:block w-px h-6 bg-border/80 mx-1 lg:mx-2" />
@@ -235,8 +227,6 @@ export function Header({
 
           </div>
         </div>
-      </div>
-
       {/* Mobile inline search bar — collapses on scroll, but forces open if focused */}
       <MobileSearchBar
         scrolled={scrolled}
@@ -522,36 +512,9 @@ export function HeaderMenu({
 function HeaderCtas({
   isLoggedIn,
   cart,
-  scrolled,
-  onSearchOpen,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & {
-  scrolled: boolean;
-  onSearchOpen: () => void;
-}) {
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
   return (
     <nav className="flex items-center gap-3 md:gap-5 ml-auto md:ml-0">
-      {/* Mobile search icon — only appears when scrolled (search bar collapsed) */}
-      <button
-        onClick={onSearchOpen}
-        className={`md:hidden text-foreground transition-all duration-300 cursor-pointer
-          ${scrolled ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none w-0 overflow-hidden'}`}
-        aria-label="Search"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-6 h-6"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.3-4.3" />
-        </svg>
-      </button>
-
       {/* Account — desktop only (mobile uses bottom nav) */}
       <NavLink
         to="/account"
@@ -587,7 +550,7 @@ function HeaderMenuMobileToggle() {
   return (
     <button
       onClick={() => open('mobile')}
-      className="p-1.5 border border-border rounded-full hover:text-accent transition cursor-pointer flex items-center justify-center"
+      className="p-1.5 border border-black dark:border-white rounded-full hover:text-accent transition cursor-pointer flex items-center justify-center"
       aria-label="Open menu"
     >
       <svg
@@ -857,10 +820,10 @@ function MobileSearchBar({
   return (
     <>
       <div
-        className={`md:hidden overflow-visible transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
+        className={`md:hidden overflow-hidden transition-[max-height,opacity,transform] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
           ${scrolled && !isFocused
-            ? 'max-h-0 opacity-0 -translate-y-4 pointer-events-none'
-            : 'max-h-18 opacity-100 translate-y-0'}`}
+            ? 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
+            : 'max-h-[72px] opacity-100 translate-y-0'}`}
       >
         <div className="px-4 pb-3">
           <div className="predictive-search p-0">
@@ -1021,7 +984,7 @@ function CartBadge({ count }: { count: number | null }) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className="relative p-1.5 border border-border dark:border-white rounded-full text-foreground transition cursor-pointer flex items-center justify-center"
+      className="relative p-1.5 border border-black dark:border-white rounded-full text-foreground transition cursor-pointer flex items-center justify-center"
       aria-label={`Cart with ${count ?? 0} items`}
     >
       <img
@@ -1121,7 +1084,7 @@ function HeaderDropdown({ title, items }: { title: string; items: typeof ABOUT_L
       </button>
 
       {/* Dropdown Card */}
-      <div className="absolute top-full left-0 mt-3 w-64 bg-card border border-border rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top group-hover:translate-y-0 translate-y-3 z-50">
+      <div className="absolute top-full left-0 mt-3 w-64 bg-card border border-border rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top group-hover:translate-y-0 translate-y-3 z-[60]">
 
         {/* Top Floating Arrow */}
         <div className="absolute -top-[7px] left-6 w-3.5 h-3.5 bg-card border-l border-t border-border rotate-45" />

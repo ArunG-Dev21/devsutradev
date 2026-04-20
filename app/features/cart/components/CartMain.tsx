@@ -10,6 +10,7 @@ import { Link, useFetcher, type FetcherWithComponents } from 'react-router';
 import { useCartNotification } from './CartNotification';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper/types';
+import { A11y } from 'swiper/modules';
 import type { CartApiQueryFragment } from 'storefrontapi.generated';
 import { useAside } from '~/shared/components/Aside';
 import { CartLineItem, type CartLine } from './CartLineItem';
@@ -236,12 +237,28 @@ function CartRecommendations({
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
 
-  // Re-measure after the aside slide-in transition finishes (500ms)
+  // Re-measure after the aside slide-in transition finishes, and again after
+  // products load (two rAF ticks let the drawer settle before measuring).
   useEffect(() => {
-    if (!swiper || layout !== 'aside' || !isCartOpen) return;
-    const timer = setTimeout(() => swiper.update(), 520);
-    return () => clearTimeout(timer);
-  }, [isCartOpen, swiper, layout]);
+    if (!swiper || swiper.destroyed) return;
+    if (layout === 'aside' && !isCartOpen) return;
+    let raf1 = 0;
+    let raf2 = 0;
+    const t1 = setTimeout(() => {
+      if (swiper.destroyed) return;
+      swiper.update();
+      raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => {
+          if (!swiper.destroyed) swiper.update();
+        });
+      });
+    }, layout === 'aside' ? 520 : 60);
+    return () => {
+      clearTimeout(t1);
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [isCartOpen, swiper, layout, fetcher.data?.products?.length]);
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return;
@@ -338,39 +355,42 @@ function CartRecommendations({
         </div>
       )}
 
-      <div className="overflow-hidden">
-        <Swiper
-          slidesPerView={1}
-          spaceBetween={12}
-          observer
-          observeParents
-          breakpoints={isPage ? {
-            640: { slidesPerView: 2, spaceBetween: 16 },
-            1024: { slidesPerView: 3, spaceBetween: 20 },
-            1280: { slidesPerView: 4, spaceBetween: 24 },
-          } : undefined}
-          onSwiper={(instance) => {
-            setSwiper(instance);
-            setIsBeginning(instance.isBeginning);
-            setIsEnd(instance.isEnd);
-          }}
-          onSlideChange={(instance) => {
-            setIsBeginning(instance.isBeginning);
-            setIsEnd(instance.isEnd);
-          }}
-          className="pb-1"
-        >
-          {products.map((product) => (
-            <SwiperSlide key={product.id}>
-              <RecommendationCard
-                product={product}
-                compact
-                onNavigateAway={onNavigateAway}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
+      <Swiper
+        modules={[A11y]}
+        slidesPerView={1}
+        spaceBetween={12}
+        watchOverflow
+        resizeObserver
+        breakpoints={isPage ? {
+          640: { slidesPerView: 2, spaceBetween: 16 },
+          1024: { slidesPerView: 3, spaceBetween: 20 },
+          1280: { slidesPerView: 4, spaceBetween: 24 },
+        } : undefined}
+        onSwiper={(instance) => {
+          setSwiper(instance);
+          setIsBeginning(instance.isBeginning);
+          setIsEnd(instance.isEnd);
+        }}
+        onSlideChange={(instance) => {
+          setIsBeginning(instance.isBeginning);
+          setIsEnd(instance.isEnd);
+        }}
+        onResize={(instance) => {
+          setIsBeginning(instance.isBeginning);
+          setIsEnd(instance.isEnd);
+        }}
+        className="pb-1 w-full"
+      >
+        {products.map((product) => (
+          <SwiperSlide key={product.id} className="h-auto">
+            <RecommendationCard
+              product={product}
+              compact
+              onNavigateAway={onNavigateAway}
+            />
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </section>
   );
 }
@@ -494,8 +514,9 @@ function RecommendationLongButton({
       className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-black border border-black text-white rounded-full text-[10px] uppercase tracking-widest font-medium hover:bg-stone-800 hover:border-stone-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all duration-200 group/atcbtn"
     >
       {isAdding ? (
-        <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2.5" />
+          <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
       ) : (
         <img src="/icons/add-bag.png" alt="" className="w-3.5 h-3.5 object-contain invert transition-all" />

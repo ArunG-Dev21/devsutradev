@@ -496,7 +496,7 @@ export default function Collection() {
               </div>
 
               {/* Row 2: unified filter+sort pill — mobile only */}
-              <div className="flex lg:hidden items-stretch border border-black/10 rounded-2xl bg-white overflow-visible">
+              <div className="flex lg:hidden items-stretch border border-black dark:border-white/30 rounded-2xl bg-white overflow-visible">
                 <div className="relative flex-1 min-w-0">
                   <button
                     onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
@@ -796,7 +796,7 @@ function CollectionAddButton({
       className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-card border border-border text-foreground text-xs sm:text-base rounded-full transition-colors group-hover:bg-foreground group-hover:text-background disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
       aria-label="Add to bag"
     >
-      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 dark:invert group-hover:invert group-hover:brightness-0 dark:group-hover:brightness-100 transition-all" />
+      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 dark:invert group-hover:invert dark:group-hover:invert-0 group-hover:brightness-0 dark:group-hover:brightness-100 transition-all" />
       {availableForSale ? 'Add to Bag' : 'Sold Out'}
     </button>
   );
@@ -844,8 +844,9 @@ function CollectionSizePillInner({
       aria-label={`Add size ${variant.title ?? ''}`}
     >
       {isAdding ? (
-        <svg className="animate-spin inline-block w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        <svg className="animate-spin inline-block w-3 h-3" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
+          <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
         </svg>
       ) : (
         variant.title ?? '—'

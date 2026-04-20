@@ -252,19 +252,29 @@ function ReelTile({ reel, className = "" }: { reel: ReelItem; className?: string
 
 /* ---------------------- Image Tile (Testimonial) ---------------------- */
 function ImageTile({ testimonial, className = "" }: { testimonial: TestimonialItem; className?: string }) {
+    const hasAvatar = !!testimonial.avatar && testimonial.avatar.length > 0;
     return (
-        <div className={`relative rounded-2xl h-full min-h-45 sm:min-h-60 group ${className}`}>
-            <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-                <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    width={800}
-                    height={800}
-                    sizes="(min-width: 640px) 50vw, 100vw"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500 pointer-events-auto"
-                />
+        <div className={`relative rounded-2xl h-full min-h-[180px] sm:min-h-[240px] group ${className}`}>
+            <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none bg-muted">
+                {hasAvatar ? (
+                    <img
+                        src={testimonial.avatar}
+                        alt={testimonial.name}
+                        width={800}
+                        height={800}
+                        loading="lazy"
+                        decoding="async"
+                        sizes="(min-width: 640px) 50vw, 100vw"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500 pointer-events-auto"
+                        onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        }}
+                    />
+                ) : (
+                    <div className="absolute inset-0 bg-linear-to-br from-amber-100 via-orange-100 to-amber-200 dark:from-neutral-800 dark:via-neutral-750 dark:to-neutral-700" />
+                )}
                 <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent z-10" />
-                
+
                 {/* Verified Badge */}
                 <div className="absolute top-2 right-2 z-30 flex items-center shrink-0 group/badge">
                     <img

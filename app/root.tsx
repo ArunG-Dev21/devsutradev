@@ -166,12 +166,15 @@ export function Layout({ children }: { children?: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+        <meta name="format-detection" content="telephone=no" />
         <ThemeScript nonce={nonce} />
-<link rel="stylesheet" href={tailwindCss}></link>
-        <link rel="stylesheet" href={resetStyles}></link>
-        <link rel="stylesheet" href={appStyles}></link>
-        <link rel="stylesheet" href={lenisStyles}></link>
+        <link rel="stylesheet" href={tailwindCss} />
+        <link rel="stylesheet" href={resetStyles} />
+        <link rel="stylesheet" href={appStyles} />
+        <link rel="stylesheet" href={lenisStyles} />
         <Meta />
         <Links />
       </head>
@@ -213,6 +216,9 @@ function LenisInit() {
         prevent: (node) =>
           node.closest('[data-lenis-prevent]') !== null,
       });
+      // Expose for modals that need to stop()/start() while open so their
+      // internal scroll containers receive wheel/touch events natively.
+      (window as any).__lenis = lenis;
     }
 
     init();
@@ -220,6 +226,9 @@ function LenisInit() {
     return () => {
       cancelled = true;
       if (lenis) lenis.destroy();
+      if ((window as any).__lenis === lenis) {
+        delete (window as any).__lenis;
+      }
     };
   }, []);
 

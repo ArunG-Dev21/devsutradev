@@ -182,7 +182,7 @@ input[type="text"] {
 
 .search-results-item a {
   display: flex;
-  flex: row;
+  flex-direction: row;
   align-items: center;
   gap: 1rem;
 }
@@ -441,7 +441,6 @@ input[type="text"] {
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
-  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

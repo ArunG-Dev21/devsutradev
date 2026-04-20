@@ -742,8 +742,9 @@ function CollectionAllSizePillInner({
       aria-label={`Add size ${variant.title ?? ''}`}
     >
       {isAdding ? (
-        <svg className="animate-spin inline-block w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" />
+        <svg className="animate-spin inline-block w-3 h-3" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
+          <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
         </svg>
       ) : (
         variant.title ?? '—'

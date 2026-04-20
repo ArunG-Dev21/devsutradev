@@ -199,16 +199,32 @@ function CartDiscounts({
   const allCodes = allEntries.map((d) => d.code);
   const [inputCode, setInputCode] = useState('');
 
-  const couponInfoMap = useMemo(() => {
-    const map: Record<string, { label?: string; offer?: string }> = {};
+  const availableCoupons = useMemo(() => {
+    const seen = new Set<string>();
+    const result: { code: string; label?: string; offer?: string }[] = [];
     for (const line of cartLines ?? []) {
       const code = (line as any)?.merchandise?.product?.coupon_code?.value as string | undefined;
       const label = (line as any)?.merchandise?.product?.coupon_label?.value as string | undefined;
       const offer = (line as any)?.merchandise?.product?.coupon_offer?.value as string | undefined;
-      if (code) map[code.toUpperCase()] = { label, offer };
+      if (code && !seen.has(code)) {
+        seen.add(code);
+        result.push({ code, label, offer });
+      }
+    }
+    return result;
+  }, [cartLines]);
+
+  const couponInfoMap = useMemo(() => {
+    const map: Record<string, { label?: string; offer?: string }> = {};
+    for (const { code, label, offer } of availableCoupons) {
+      map[code.toUpperCase()] = { label, offer };
     }
     return map;
-  }, [cartLines]);
+  }, [availableCoupons]);
+
+  const unapplied = availableCoupons.filter(
+    (c) => !validCodes.some((v) => v.toUpperCase() === c.code.toUpperCase()),
+  );
 
   useEffect(() => {
     if (inputCode && validCodes.some((c) => c.toUpperCase() === inputCode.toUpperCase())) {
@@ -258,7 +274,7 @@ function CartDiscounts({
           {(fetcher: FetcherWithComponents<any>) => {
             const isApplying = fetcher.state !== 'idle';
             return (
-              <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-2 transition-colors focus-within:border-foreground/30 focus-within:bg-muted/40">
+              <div className="flex items-center gap-2 rounded-md border border-dashed border-black dark:border-white px-3 py-2 transition-colors focus-within:border-foreground/30 focus-within:bg-muted/40">
                 <svg
                   className="w-3.5 h-3.5 text-muted-foreground shrink-0"
                   fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}
@@ -293,6 +309,47 @@ function CartDiscounts({
           }}
         </CartForm>
       )}
+
+      {/* Unapplied product coupons — tap to apply */}
+      {unapplied.map(({ code, label, offer }) => (
+        <UpdateDiscountForm key={code} discountCodes={[...validCodes, code]}>
+          <button
+            type="submit"
+            className="relative flex items-stretch w-full rounded-xl bg-black hover:bg-zinc-900 transition cursor-pointer"
+          >
+            <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-background z-10" />
+            <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-background z-10" />
+            <div className="flex items-center px-3 py-3 shrink-0">
+              <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="#000" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+                </svg>
+              </div>
+            </div>
+            <div className="self-stretch w-0 border-l border-dashed border-white/40" />
+            <div className="flex-1 flex items-stretch gap-2 px-3 py-2.5 min-w-0">
+              <div className="flex flex-col justify-center gap-1 shrink-0">
+                {label && (
+                  <p className="coupon-label-animated text-[11px] sm:text-xs font-semibold leading-tight">{label}</p>
+                )}
+                <span className="font-mono font-bold text-[11px] sm:text-xs tracking-widest text-white/90 border border-dashed border-white/40 rounded px-1.5 py-0.5 self-start">{code}</span>
+              </div>
+              {offer && (
+                <div className="flex-1 overflow-hidden flex items-center min-w-0">
+                  <div className="flex whitespace-nowrap animate-[cart-ticker_6s_linear_infinite]">
+                    <span className="text-[10px] sm:text-[11px] text-white/60 pr-8">{offer}</span>
+                    <span className="text-[10px] sm:text-[11px] text-white/60 pr-8" aria-hidden="true">{offer}</span>
+                  </div>
+                </div>
+              )}
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#F14514] text-white rounded px-2 py-1 shrink-0 self-center">
+                Apply
+              </span>
+            </div>
+          </button>
+        </UpdateDiscountForm>
+      ))}
 
       {/* Applied valid codes */}
       {validCodes.map((code) => (
@@ -432,7 +489,7 @@ function CartDiscountsAside({
           {(fetcher: FetcherWithComponents<any>) => {
             const isApplying = fetcher.state !== 'idle';
             return (
-              <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-2 transition-colors focus-within:border-foreground/30 focus-within:bg-muted/40">
+              <div className="flex items-center gap-2 rounded-md border border-dashed border-black dark:border-white px-3 py-2 transition-colors focus-within:border-foreground/30 focus-within:bg-muted/40">
                 <svg
                   className="w-6 h-6 text-[#f14514] shrink-0"
                   fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}
