@@ -18,10 +18,23 @@ import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
+import lenisStyles from 'lenis/dist/lenis.css?url';
 import { PageLayout } from './shared/components/PageLayout';
 import { ThemeProvider, ThemeScript } from '~/context/theme';
+import { generateMeta, SEO_DEFAULTS } from '~/lib/seo';
 
 export type RootLoader = typeof loader;
+
+export const meta: Route.MetaFunction = ({ data }) => {
+  const origin = (data as any)?.seoOrigin || '';
+  return generateMeta({
+    title: `${SEO_DEFAULTS.siteName} | ${SEO_DEFAULTS.tagline}`,
+    description: SEO_DEFAULTS.defaultDescription,
+    canonical: origin || '/',
+    ogType: 'website',
+    ogImage: origin ? `${origin}/logo-branding.png` : undefined,
+  });
+};
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -65,16 +78,7 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {
-      rel: 'preconnect',
-      href: 'https://fonts.googleapis.com',
-    },
-    {
-      rel: 'preconnect',
-      href: 'https://fonts.gstatic.com',
-      crossOrigin: 'anonymous',
-    },
-    { rel: 'icon', type: 'image/svg+xml', href: favicon },
+{ rel: 'icon', type: 'image/svg+xml', href: favicon },
   ];
 }
 
@@ -91,6 +95,7 @@ export async function loader(args: Route.LoaderArgs) {
     ...deferredData,
     ...criticalData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    seoOrigin: new URL(args.request.url).origin,
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
@@ -163,14 +168,14 @@ export function Layout({ children }: { children?: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <ThemeScript nonce={nonce} />
-        <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"/>
-        <link rel="stylesheet" href={tailwindCss}></link>
+<link rel="stylesheet" href={tailwindCss}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
+        <link rel="stylesheet" href={lenisStyles}></link>
         <Meta />
         <Links />
       </head>
-      <body className="font-body antialiased bg-[#FAF9F6] text-stone-900">
+      <body className="font-body antialiased text-stone-900">
         <ThemeProvider>{children}</ThemeProvider>
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
@@ -181,16 +186,39 @@ export function Layout({ children }: { children?: React.ReactNode }) {
 
 function LenisInit() {
   useEffect(() => {
+    // Honor reduced-motion: skip smooth-scroll entirely so the browser's
+    // native (instant) scroll is used.
+    if (
+      typeof window === 'undefined' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+
     let lenis: any;
+    let cancelled = false;
 
     async function init() {
       const { default: Lenis } = await import('lenis');
-      lenis = new Lenis({ autoRaf: true });
+      if (cancelled) return;
+      lenis = new Lenis({
+        autoRaf: true,
+        lerp: 0.1,
+        wheelMultiplier: 1,
+        // Native touch scroll is smoother than synthesised on mobile.
+        syncTouch: false,
+        // Lenis already auto-skips elements with [data-lenis-prevent], but be
+        // explicit so internal scroll containers (modals, search results,
+        // social-feed snap rails) never get hijacked by the page-level loop.
+        prevent: (node) =>
+          node.closest('[data-lenis-prevent]') !== null,
+      });
     }
 
     init();
 
     return () => {
+      cancelled = true;
       if (lenis) lenis.destroy();
     };
   }, []);

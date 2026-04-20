@@ -2,8 +2,18 @@ import { useLoaderData, Link } from 'react-router';
 import type { Route } from './+types/($locale).policies._index';
 import type { PoliciesQuery, PolicyItemFragment } from 'storefrontapi.generated';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
+import { generateMeta } from '~/lib/seo';
 
-export async function loader({ context }: Route.LoaderArgs) {
+export const meta: Route.MetaFunction = ({ data }) => {
+  const origin = (data as any)?.seoOrigin || '';
+  return generateMeta({
+    title: 'Legal & Policies | Devasutra',
+    description: 'Read Devasutra privacy, shipping, refund, subscription, and service policies.',
+    canonical: `${origin}/policies`,
+  });
+};
+
+export async function loader({ context, request }: Route.LoaderArgs) {
   const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);
 
   const shopPolicies = data.shop;
@@ -19,7 +29,7 @@ export async function loader({ context }: Route.LoaderArgs) {
     throw new Response('No policies found', { status: 404 });
   }
 
-  return { policies };
+  return { policies, seoOrigin: new URL(request.url).origin };
 }
 
 export default function Policies() {
@@ -27,12 +37,11 @@ export default function Policies() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/80 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.16),transparent_58%)]" />
+      <section className="relative overflow-hidden border-b border-border/70 bg-background">
         <RouteBreadcrumbBanner variant="light" className="relative z-10 !bg-transparent" />
-        <div className="container mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+        <div className="container mx-auto max-w-6xl px-3 py-16 sm:px-6 md:py-24 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center rounded-full border border-amber-200/70 bg-amber-50/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900 dark:border-amber-400/20 dark:bg-amber-500/10 dark:text-amber-200">
+            <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
               Devasutra Policies
             </span>
             <h1 className="mt-5 font-heading text-4xl font-medium uppercase tracking-[0.04em] text-foreground sm:text-5xl md:text-6xl">
@@ -46,7 +55,7 @@ export default function Policies() {
           <div className="mx-auto mt-12 grid max-w-5xl gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {policies.map((policy, index) => (
               <Link
-                className="group relative overflow-hidden rounded-[26px] border border-border/70 bg-card/95 p-6 text-card-foreground shadow-[0_18px_45px_-32px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:border-foreground/25"
+                className="group relative overflow-hidden rounded-[26px] border border-border/70 bg-card/95 p-6 text-card-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_18px_45px_-32px_rgba(0,0,0,0.35)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_45px_-32px_rgba(0,0,0,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-foreground/25"
                 key={policy.id}
                 to={`/policies/${policy.handle}`}
               >

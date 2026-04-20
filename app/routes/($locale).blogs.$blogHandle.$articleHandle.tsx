@@ -166,15 +166,15 @@ function SidebarProductCard({ product }: { product: any }) {
     <Link
       to={`/products/${product.handle}`}
       prefetch="intent"
-      className="group block rounded-2xl bg-[#f6f6f6] p-2 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+      className="group block rounded-2xl bg-muted/60 p-2 transition-all hover:-translate-y-0.5 hover:shadow-sm"
     >
-      <div className="aspect-square overflow-hidden rounded-xl bg-white">
+      <div className="aspect-square overflow-hidden rounded-xl bg-background">
         {product.featuredImage ? (
           <Image
             data={product.featuredImage}
             aspectRatio="1/1"
             sizes="(min-width: 1280px) 180px, 40vw"
-            className="h-full w-full object-cover mix-blend-multiply transition-transform duration-500 group-hover:scale-[1.05]"
+            className="h-full w-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-500 group-hover:scale-[1.05]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
@@ -182,16 +182,16 @@ function SidebarProductCard({ product }: { product: any }) {
           </div>
         )}
       </div>
-      <div className="mt-1.5 rounded-xl border border-black/10 bg-white p-3">
-        <h3 className="line-clamp-2 text-sm font-medium leading-snug text-gray-900">
+      <div className="mt-1.5 rounded-xl border border-border/50 bg-card p-3">
+        <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground">
           {product.title}
         </h3>
         <div className="mt-1.5 flex items-center justify-between gap-2">
           <Money
             data={product.priceRange.minVariantPrice}
-            className="text-sm font-semibold text-gray-900"
+            className="text-sm font-semibold text-foreground"
           />
-          <span className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-gray-400 transition-colors group-hover:text-gray-900">
+          <span className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-muted-foreground transition-colors group-hover:text-foreground">
             View →
           </span>
         </div>
@@ -273,7 +273,7 @@ function CommentForm({ articleId, blogId }: { articleId: string; blogId: string 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-full bg-gray-900 px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-opacity hover:opacity-80 disabled:opacity-50"
+            className="rounded-full bg-foreground px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-background transition-opacity hover:opacity-80 disabled:opacity-50"
           >
             {isSubmitting ? 'Submitting…' : 'Post comment'}
           </button>
@@ -295,25 +295,41 @@ export default function Article() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    function onScroll() {
+    let rafId = 0;
+    let lastProgress = -1;
+
+    function compute() {
+      rafId = 0;
       const el = articleRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const scrolled = Math.max(0, -rect.top);
       const total = el.scrollHeight;
-      setProgress(
+      const next =
         total > window.innerHeight
           ? Math.min(100, (scrolled / (total - window.innerHeight)) * 100)
-          : 0,
-      );
+          : 0;
+      // Only re-render when the rounded progress actually moves a percent.
+      const rounded = Math.round(next);
+      if (rounded !== lastProgress) {
+        lastProgress = rounded;
+        setProgress(rounded);
+      }
+    }
+    function onScroll() {
+      if (rafId) return;
+      rafId = requestAnimationFrame(compute);
     }
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
+    compute();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-background text-foreground">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -336,10 +352,10 @@ export default function Article() {
 
       {/* Reading progress */}
       <div className="fixed inset-x-0 top-0 z-50 h-[3px]" aria-hidden>
-        <div className="h-full bg-gray-900 transition-[width] duration-100" style={{ width: `${progress}%` }} />
+        <div className="h-full bg-foreground transition-[width] duration-100" style={{ width: `${progress}%` }} />
       </div>
 
-      <RouteBreadcrumbBanner variant="light" />
+      <RouteBreadcrumbBanner variant="light" className="!bg-transparent border-b border-border/30" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
@@ -349,7 +365,7 @@ export default function Article() {
             {/* Back link */}
             <Link
               to={`/blogs/${blogHandle}`}
-              className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-gray-900 transition-colors mb-6"
+              className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors mb-6"
             >
               <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
@@ -426,7 +442,7 @@ export default function Article() {
                     <h3 className="text-base font-semibold text-gray-900">You might also like</h3>
                     <Link
                       to={collectionLink.href}
-                      className="text-[10px] uppercase tracking-[0.18em] text-gray-400 hover:text-gray-900 transition-colors"
+                      className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors"
                     >
                       View all
                     </Link>
@@ -439,7 +455,7 @@ export default function Article() {
                   <div className="mt-4 text-center">
                     <Link
                       to={collectionLink.href}
-                      className="inline-flex items-center justify-center rounded-full border border-gray-900 px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-900 transition-colors hover:bg-gray-900 hover:text-white"
+                      className="inline-flex items-center justify-center rounded-full border border-foreground px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground transition-colors hover:bg-foreground hover:text-background"
                     >
                       {collectionLink.label}
                     </Link>
@@ -454,14 +470,14 @@ export default function Article() {
 
           {/* ── Sidebar ── */}
           <aside className="hidden lg:block w-56 xl:w-72 shrink-0 sticky top-28 self-start">
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
-                <h2 className="text-sm font-semibold text-gray-900 tracking-wide">
+            <div className="rounded-2xl border border-border bg-card p-4">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/50">
+                <h2 className="text-sm font-semibold text-foreground tracking-wide">
                   Related Products
                 </h2>
                 <Link
                   to={collectionLink.href}
-                  className="text-[10px] uppercase tracking-wider text-gray-400 hover:text-gray-900 transition-colors"
+                  className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
                 >
                   View all
                 </Link>
@@ -474,14 +490,14 @@ export default function Article() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-400 text-center py-6">
+                <p className="text-sm text-muted-foreground text-center py-6">
                   No related products found.
                 </p>
               )}
 
               <Link
                 to={collectionLink.href}
-                className="mt-4 flex items-center justify-center rounded-full bg-gray-900 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white transition-opacity hover:opacity-80"
+                className="mt-4 flex items-center justify-center rounded-full bg-foreground px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-background transition-opacity hover:opacity-80"
               >
                 {collectionLink.label}
               </Link>

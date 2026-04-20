@@ -7,6 +7,11 @@
 
 @import "tw-animate-css";
 
+@import '@fontsource-variable/cormorant/wght.css';
+@import '@fontsource-variable/cormorant/wght-italic.css';
+@import '@fontsource-variable/montserrat/wght.css';
+@import '@fontsource-variable/montserrat/wght-italic.css';
+
 
 /*---break---
  */
@@ -15,9 +20,9 @@
 
 /* Design System Tokens */
 @theme {
-  --font-heading: 'Cormorant', serif;
-  --font-subheading: 'Montserrat', sans-serif;
-  --font-body: 'Montserrat', sans-serif;
+  --font-heading: 'Cormorant Variable', serif;
+  --font-subheading: 'Montserrat Variable', sans-serif;
+  --font-body: 'Montserrat Variable', sans-serif;
 }
 
 @utility text-glow {
@@ -281,6 +286,61 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .dark .bg-white,
+  .dark .bg-gray-50,
+  .dark .bg-stone-50 {
+    background-color: var(--color-card);
+  }
+
+  .dark .bg-gray-100,
+  .dark .bg-stone-100 {
+    background-color: var(--color-muted);
+  }
+
+  .dark .text-gray-900,
+  .dark .text-stone-900,
+  .dark .text-black {
+    color: var(--color-foreground);
+  }
+
+  .dark .text-gray-800,
+  .dark .text-gray-700,
+  .dark .text-stone-700,
+  .dark .text-gray-600,
+  .dark .text-stone-600,
+  .dark .text-gray-500,
+  .dark .text-stone-500 {
+    color: var(--color-muted-foreground);
+  }
+
+  .dark .border-gray-100,
+  .dark .border-gray-200,
+  .dark .border-gray-300,
+  .dark .border-stone-100,
+  .dark .border-stone-200,
+  .dark .border-stone-300 {
+    border-color: var(--color-border);
+  }
+
+  /* About page: preserve explicit black/white design in dark mode */
+  .dark [data-about].bg-white,
+  .dark [data-about] .bg-white {
+    background-color: white;
+  }
+  .dark [data-about] .bg-gray-50,
+  .dark [data-about] .bg-stone-50 {
+    background-color: oklch(0.985 0 0);
+  }
+  .dark [data-about].text-black,
+  .dark [data-about] .text-black {
+    color: black;
+  }
+  .dark [data-about] .border-neutral-100 {
+    border-color: #f5f5f5;
   }
 }
 

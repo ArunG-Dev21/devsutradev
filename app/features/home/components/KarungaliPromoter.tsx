@@ -86,7 +86,7 @@ function ATCIconButton({
             onClick={onClick}
             className={[
                 "w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full shrink-0",
-                "bg-white border border-black transition-all duration-200 ease-out cursor-pointer select-none",
+                "bg-white border border-black dark:border-white transition-all duration-200 ease-out cursor-pointer select-none",
                 "hover:bg-black group/atc",
                 isAdding ? "opacity-60 scale-[0.97] cursor-not-allowed" : justAdded ? "scale-[0.97]" : "active:scale-[0.96]",
             ].join(" ")}
@@ -103,7 +103,7 @@ function ATCIconButton({
                     <path d="M5 13l4 4L19 7" />
                 </svg>
             ) : (
-                <img src="/icons/add-bag.png" alt={ariaLabel} className="w-4 h-4 sm:w-5 sm:h-5 object-contain group-hover/atc:invert" />
+                <img src="/icons/add-bag.png" alt={ariaLabel} className="w-4 h-4 sm:w-5 sm:h-5 object-contain dark:invert dark:brightness-0 group-hover/atc:invert" />
             )}
         </button>
     );
@@ -214,7 +214,7 @@ function AddToCartButton({
                     "border transition-all duration-200 ease-out cursor-pointer select-none group/atc",
                     showSizePicker
                         ? "bg-foreground border-foreground text-background"
-                        : "bg-white border-black hover:bg-black hover:text-white",
+                        : "bg-white border-black dark:border-white hover:bg-black hover:text-white",
                 ].join(" ")}
                 aria-label={showSizePicker ? "Close size picker" : "Select size"}
             >
@@ -223,7 +223,7 @@ function AddToCartButton({
                         <path d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 ) : (
-                    <img src="/icons/add-bag.png" alt="Select size" className="w-4 h-4 sm:w-5 sm:h-5 object-contain group-hover/atc:invert" />
+                    <img src="/icons/add-bag.png" alt="Select size" className="w-4 h-4 sm:w-5 sm:h-5 object-contain dark:invert dark:brightness-0 group-hover/atc:invert" />
                 )}
             </button>
         );
@@ -476,10 +476,10 @@ export function KarungaliPromoter({
                                 </Link>
                                 {introImages.length > 1 && (
                                     <div className="flex items-center gap-1.5 ml-auto">
-                                        <button onClick={prevImg} className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition text-white">
+                                        <button onClick={prevImg} aria-label="Previous image" className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition text-white">
                                             <ChevronIcon direction="left" className="w-3.5 h-3.5" />
                                         </button>
-                                        <button onClick={nextImg} className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition text-white">
+                                        <button onClick={nextImg} aria-label="Next image" className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition text-white">
                                             <ChevronIcon className="w-3.5 h-3.5" />
                                         </button>
                                         <span className="text-white/60 text-[11px] ml-1.5 tabular-nums font-medium">

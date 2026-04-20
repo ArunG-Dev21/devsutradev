@@ -71,7 +71,7 @@ export function CartRecommendationsPage({ excludeProductIds }: { excludeProductI
         </p>
         <h2
           className="text-3xl md:text-4xl font-light text-foreground"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
         >
           You May Also Like
         </h2>
@@ -152,7 +152,7 @@ function RecommendationCard({
           withoutTrailingZeros
           data={product.priceRange.minVariantPrice}
           className="text-base sm:text-xl font-medium text-black leading-none"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
         />
 
         <div className="mt-auto pt-2">

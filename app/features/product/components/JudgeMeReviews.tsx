@@ -46,7 +46,7 @@ function InitialAvatar({name, rating}: {name: string; rating: number}) {
     >
       <span
         className="text-stone-600 dark:text-stone-300 text-lg font-bold leading-none"
-        style={{fontFamily: "'Cormorant Garamond', Georgia, serif"}}
+        style={{fontFamily: "'Cormorant Variable', Georgia, serif"}}
       >
         {letter}
       </span>

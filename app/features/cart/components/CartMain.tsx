@@ -47,7 +47,7 @@ function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
 
 export function CartMain({ layout, cart: originalCart }: CartMainProps) {
   const cart = useOptimisticCart(originalCart);
-  const { close } = useAside();
+  const { close, type: asideType } = useAside();
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
@@ -147,6 +147,7 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
                   layout="aside"
                   excludeProductIds={cartProductIds}
                   onNavigateAway={() => close()}
+                  isCartOpen={asideType === 'cart'}
                 />
               </div>
             )}
@@ -219,10 +220,12 @@ function CartRecommendations({
   layout,
   excludeProductIds,
   onNavigateAway,
+  isCartOpen = true,
 }: {
   layout: CartLayout;
   excludeProductIds: string[];
   onNavigateAway: () => void;
+  isCartOpen?: boolean;
 }) {
   const fetcher = useFetcher<{ products: RecommendedProduct[] }>();
   const limit = 8;
@@ -232,6 +235,13 @@ function CartRecommendations({
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+
+  // Re-measure after the aside slide-in transition finishes (500ms)
+  useEffect(() => {
+    if (!swiper || layout !== 'aside' || !isCartOpen) return;
+    const timer = setTimeout(() => swiper.update(), 520);
+    return () => clearTimeout(timer);
+  }, [isCartOpen, swiper, layout]);
 
   useEffect(() => {
     if (fetcher.state !== 'idle') return;
@@ -263,7 +273,7 @@ function CartRecommendations({
             </p>
             <h2
               className="text-3xl md:text-4xl font-light text-foreground"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+              style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
             >
               You May Also Like
             </h2>

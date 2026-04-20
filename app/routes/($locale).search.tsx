@@ -47,10 +47,9 @@ export default function SearchPage() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/80 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.16),transparent_58%)]" />
+      <section className="relative overflow-hidden border-b border-border/70 bg-background">
         <RouteBreadcrumbBanner variant="light" className="relative z-10 !bg-transparent" />
-        <div className="container mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16 lg:px-8 text-center">
+        <div className="container mx-auto max-w-6xl px-3 py-10 sm:px-6 md:py-16 lg:px-8 text-center">
           <h1 className="font-heading text-4xl font-medium uppercase tracking-tight text-foreground sm:text-5xl md:text-6xl">
             Search
           </h1>
@@ -61,7 +60,7 @@ export default function SearchPage() {
       </section>
 
       {/* ── CONTENT ── */}
-      <div className="container mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <div className="container mx-auto max-w-6xl px-3 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="max-w-2xl mx-auto mb-14">
           <SearchForm>
             {({ inputRef }) => (

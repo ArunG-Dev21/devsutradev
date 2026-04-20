@@ -168,6 +168,7 @@ function Hotspot({
         <div ref={ref} className="absolute z-40" style={{ top, left, transform: "translate(-50%,-50%)" }}>
             <button
                 onClick={() => setOpen((v) => !v)}
+                aria-label={open ? `Close ${productTitle}` : `View ${productTitle}`}
                 className="relative w-8 h-8 flex items-center justify-center focus:outline-none"
             >
                 <span className="absolute inset-0 rounded-full bg-white/30 animate-ping" />
@@ -216,6 +217,8 @@ function ReelTile({ reel, className = "" }: { reel: ReelItem; className?: string
                         loop
                         muted
                         playsInline
+                        preload="metadata"
+                        poster={reel.thumbnailUrl || undefined}
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500"
                     />
                 ) : (
@@ -272,7 +275,7 @@ function ImageTile({ testimonial, className = "" }: { testimonial: TestimonialIt
                 </div>
             </div>
             <div className="absolute bottom-3 left-3 right-3 z-40 pointer-events-none">
-                <CustomerTag name={testimonial.name} />
+                <CustomerTag name={testimonial.name} avatar={testimonial.avatar} />
                 {testimonial.text && (
                     <div className="mt-1.5 flex items-start gap-1.5">
                         {/* Quotation icon */}
@@ -485,6 +488,7 @@ function CertShowcase() {
                     width={800}
                     height={600}
                     sizes="(min-width: 768px) 33vw, 100vw"
+                    loading="lazy"
                     className="cert-kenburns-anim w-full h-full object-cover"
                 />
                 {/* Subtle vignette overlay */}

@@ -189,14 +189,14 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
   };
 
   return (
-    <section className="w-full overflow-hidden py-14 sm:py-16 lg:py-20 bg-[#f5f2ed] select-none">
+    <section className="w-full overflow-hidden py-14 sm:py-16 lg:py-20 select-none">
 
       {/* ── Header ── */}
       <div className="text-center mb-10 sm:mb-12 px-4">
-        <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-[#9a8c7e] mb-2.5">
+        <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-muted-foreground mb-2.5">
           Community Highlights
         </p>
-        <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-normal text-[#1a1a1a] leading-[1.1]">
+        <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-normal text-foreground leading-[1.1]">
           Social Feed
         </h2>
       </div>
@@ -254,6 +254,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                       src={reel.videoUrl}
                       muted
                       playsInline
+                      preload="none"
                       draggable={false}
                       className="absolute inset-0 w-full h-full object-cover block pointer-events-none"
                     />
@@ -306,7 +307,8 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
     <div className="
       pointer-events-auto
       backdrop-blur-xl
-      border border-black/10
+      bg-background/70 dark:bg-card/70
+      border border-border/60
       rounded-full
       px-2 py-2 sm:px-3 sm:py-3
       max-w-[92vw] sm:max-w-[680px]
@@ -324,8 +326,8 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
               shrink-0 w-[180px] sm:w-[200px]
               px-2 py-2 rounded-full
               transition-all duration-200
-              border border-black/10
-              shadow-inner
+              bg-background/50 dark:bg-card/50
+              border border-border/50
             "
           >
             {/* Image */}
@@ -342,14 +344,14 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                   "
                 />
               ) : (
-                <div className="w-11 h-11 rounded-full bg-[#f5f2ed]" />
+                <div className="w-11 h-11 rounded-full bg-muted" />
               )}
             </div>
 
             {/* Text */}
             <div className="min-w-0 flex flex-col justify-center">
               <p className="
-                text-[12px] font-semibold text-[#111]
+                text-[12px] font-semibold text-foreground
                 truncate leading-tight
                 tracking-tight
               ">
@@ -380,13 +382,17 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
             key={i}
             onClick={() => goTo(i)}
             aria-label={`Go to slide ${i + 1}`}
-            className={[
-              'h-1.5 rounded-full border-0 p-0 cursor-pointer transition-all duration-300',
-              i === activeIndex
-                ? 'w-5 bg-[#1a1a1a] opacity-100'
-                : 'w-1.5 bg-[#9a8c7e] opacity-40',
-            ].join(' ')}
-          />
+            className="flex items-center justify-center border-0 bg-transparent p-0 cursor-pointer min-w-[24px] min-h-[24px]"
+          >
+            <span
+              className={[
+                'h-1.5 rounded-full transition-all duration-300 block',
+                i === activeIndex
+                  ? 'w-5 bg-foreground opacity-100'
+                  : 'w-1.5 bg-muted-foreground opacity-40',
+              ].join(' ')}
+            />
+          </button>
         ))}
       </div>
 
@@ -396,7 +402,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
           href={instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-[#1a1a1a]/20 bg-white text-[#1a1a1a] text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-200 hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a]"
+          className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-border bg-card text-foreground text-[11px] font-semibold tracking-[0.18em] uppercase transition-all duration-200 hover:bg-foreground hover:text-background hover:border-foreground"
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />

@@ -18,9 +18,19 @@ function FooterContent({
   header: HeaderQuery;
   publicStoreDomain: string;
 }) {
+  const latestArticles = ((footer as any)?.blogs?.nodes ?? [])
+    .flatMap((blog: any) =>
+      (blog?.articles?.nodes ?? []).map((article: any) => ({
+        ...article,
+        blogHandle: blog.handle,
+      })),
+    )
+    .sort((a: any, b: any) => String(b.publishedAt).localeCompare(String(a.publishedAt)))
+    .slice(0, 3);
+
   return (
-          <footer className="border-t border-primary-border text-text-main w-full">
-            <div className="container mx-auto px-6 sm:px-10 lg:px-16 pt-10 pb-10">
+          <footer className="border-t border-primary-border dark:border-border text-text-main dark:text-foreground w-full bg-background">
+            <div className="container mx-auto px-3 sm:px-10 lg:px-16 pt-10 pb-10">
 
               {/* ───────────── Main Section ───────────── */}
               <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16 mb-16">
@@ -65,13 +75,13 @@ function FooterContent({
 
                 {/* RIGHT — Links */}
                 <div className="w-full lg:w-[60%] lg:pl-16 text-center lg:text-left">
-                  <div className="grid grid-cols-2 gap-8 lg:gap-14">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-8 lg:gap-14">
 
                     {/* Quick Links */}
                     <div className="flex flex-col items-center lg:items-start">
-                      <h4 className="text-sm font-bold uppercase tracking-wider mb-5 text-text-main">
+                      <h3 className="text-sm font-bold uppercase tracking-wider mb-5 text-text-main">
                         Quick Links
-                      </h4>
+                      </h3>
                       <ul className="space-y-3">
                         {[
                           { title: 'Home', url: '/' },
@@ -96,9 +106,9 @@ function FooterContent({
 
                     {/* Policies */}
                     <div className="flex flex-col items-center lg:items-start">
-                      <h4 className="text-sm font-bold uppercase tracking-wider mb-5 text-text-main">
+                      <h3 className="text-sm font-bold uppercase tracking-wider mb-5 text-text-main">
                         Policies
-                      </h4>
+                      </h3>
                       <ul className="space-y-3">
                         {footer?.menu
                           ? footer.menu.items.map((item) => {
@@ -137,6 +147,34 @@ function FooterContent({
                               </NavLink>
                             </li>
                           ))}
+                      </ul>
+                    </div>
+
+                    {/* Latest Blog Posts */}
+                    <div className="flex flex-col items-center lg:items-start col-span-2 md:col-span-1">
+                      <h3 className="text-sm font-bold uppercase tracking-wider mb-5 text-text-main dark:text-foreground">
+                        Latest Reads
+                      </h3>
+                      <ul className="space-y-3">
+                        {(latestArticles.length ? latestArticles : FALLBACK_BLOG_LINKS).map((article: any) => {
+                          const title = article.title || formatArticleHandle(article.handle);
+                          const url = article.blogHandle
+                            ? `/blogs/${article.blogHandle}/${article.handle}`
+                            : article.url;
+
+                          return (
+                            <li key={url} className="flex justify-center lg:justify-start w-full">
+                              <NavLink
+                                to={url}
+                                prefetch="intent"
+                                className="text-text-muted dark:text-muted-foreground hover:text-text-main dark:hover:text-foreground text-[13px] transition-colors duration-300 relative group flex items-center w-fit"
+                              >
+                                <span className="absolute -left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[14px] leading-none mt-[1px]">&#8227;</span>
+                                <span className="group-hover:translate-x-1.5 transition-transform duration-300 block">{formatArticleTitle(title)}</span>
+                              </NavLink>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
 
@@ -189,3 +227,17 @@ const FALLBACK_POLICY_LINKS = [
   { title: 'Shipping Policy', url: '/policies/shipping-policy' },
   { title: 'Terms of Service', url: '/policies/terms-of-service' },
 ];
+
+const FALLBACK_BLOG_LINKS = [
+  { title: 'Blog', url: '/blogs' },
+];
+
+function formatArticleHandle(handle: string) {
+  return String(handle || '')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatArticleTitle(title: string) {
+  return String(title || '').replace(/-/g, ' ');
+}

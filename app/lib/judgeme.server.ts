@@ -1,4 +1,7 @@
 const JUDGEME_API_ORIGIN = 'https://judge.me';
+const SUMMARY_CACHE_TTL_MS = 1000 * 60 * 15;
+const summaryCache = new Map<string, { expiresAt: number; summary: JudgeMeSummary | null }>();
+const summaryInflight = new Map<string, Promise<JudgeMeSummary | null>>();
 
 export type JudgeMeSummary = {
   averageRating: number;
@@ -238,26 +241,48 @@ export async function getJudgeMeBatchSummaries(options: {
     api_token: apiToken,
   });
 
-  const fetches = products.map(async ({ id, handle }) => {
-    try {
-      const badgeUrl = new URL('/api/v1/widgets/preview_badge', JUDGEME_API_ORIGIN);
-      const params = new URLSearchParams(baseParams);
-      params.set('external_id', id);
-      params.set('handle', handle);
-      badgeUrl.search = params.toString();
+  const uniqueProducts = Array.from(
+    new Map(products.map((product) => [product.id, product])).values(),
+  );
 
-      const response = await fetchTextOrJson(badgeUrl);
-      const html =
-        typeof response === 'string'
-          ? response
-          : extractFirstStringField(response, ['badge', 'html', 'widget', 'preview_badge']) ?? '';
-      const summary = html ? parsePreviewBadgeSummary(html) : null;
-      if (summary && summary.reviewCount > 0) {
-        result.set(id, summary);
-      }
-    } catch {
-      // ignore individual failures
+  const fetches = uniqueProducts.map(async ({ id, handle }) => {
+    const cacheKey = `${shopDomain}:${id}`;
+    const now = Date.now();
+    const cached = summaryCache.get(cacheKey);
+    if (cached && cached.expiresAt > now) {
+      if (cached.summary && cached.summary.reviewCount > 0) result.set(id, cached.summary);
+      return;
     }
+
+    let inflight = summaryInflight.get(cacheKey);
+    if (!inflight) {
+      inflight = (async () => {
+        try {
+          const badgeUrl = new URL('/api/v1/widgets/preview_badge', JUDGEME_API_ORIGIN);
+          const params = new URLSearchParams(baseParams);
+          params.set('external_id', id);
+          params.set('handle', handle);
+          badgeUrl.search = params.toString();
+
+          const response = await fetchTextOrJson(badgeUrl);
+          const html =
+            typeof response === 'string'
+              ? response
+              : extractFirstStringField(response, ['badge', 'html', 'widget', 'preview_badge']) ?? '';
+          return html ? parsePreviewBadgeSummary(html) : null;
+        } catch {
+          return null;
+        }
+      })();
+      summaryInflight.set(cacheKey, inflight);
+    }
+
+    const summary = await inflight.finally(() => summaryInflight.delete(cacheKey));
+    summaryCache.set(cacheKey, {
+      expiresAt: now + SUMMARY_CACHE_TTL_MS,
+      summary,
+    });
+    if (summary && summary.reviewCount > 0) result.set(id, summary);
   });
 
   await Promise.allSettled(fetches);

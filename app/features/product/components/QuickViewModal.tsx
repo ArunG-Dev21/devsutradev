@@ -112,7 +112,7 @@ export function QuickViewModal({ product, onClose, reviewSummary }: QuickViewMod
                         Quick View
                     </p>
 
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-light mb-3 text-foreground leading-tight" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-light mb-3 text-foreground leading-tight" style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}>
                         {product.title}
                     </h3>
 

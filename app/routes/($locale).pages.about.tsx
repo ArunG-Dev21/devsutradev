@@ -8,7 +8,7 @@ export const meta: MetaFunction = () => {
 export default function About() {
   return (
     <>
-      <section className="bg-white">
+      <section className="bg-white" data-about>
         <div className='w-full h-[50vh] sm:h-[65vh] md:h-[75vh] lg:h-[90vh] col-span-2 overflow-hidden relative'>
           <div className="absolute inset-x-0 top-0 z-20 mix-blend-difference">
             <RouteBreadcrumbBanner variant="overlay" />

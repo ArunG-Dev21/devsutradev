@@ -31,7 +31,10 @@ export async function loader({ request, context }: { request: Request; context: 
     for (const [id, summary] of summaryMap) {
       summaries[id] = summary;
     }
-    return data({ summaries });
+    return data(
+      { summaries },
+      { headers: { 'Cache-Control': 'public, max-age=300, stale-while-revalidate=900' } },
+    );
   } catch {
     return data({ summaries: {} });
   }

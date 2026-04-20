@@ -359,7 +359,7 @@ export default function Product() {
   const rootData = useRouteLoaderData('root') as any;
 
   return (
-    <div className="min-h-screen text-gray-900 bg-white">
+    <div className="min-h-screen text-gray-900 dark:text-foreground bg-white dark:bg-background">
       {/* Product JSON-LD */}
       <script
         type="application/ld+json"
@@ -419,7 +419,7 @@ export default function Product() {
                       <Image data={expandedImage.customer_image} className="w-10 h-10 rounded-full object-cover border border-white/20" width={40} height={40} sizes="40px" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-stone-800 border border-white/10 flex items-center justify-center">
-                        <span className="text-stone-300 text-lg font-light" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>{expandedImage.name.charAt(0)}</span>
+                        <span className="text-stone-300 text-lg font-light" style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}>{expandedImage.name.charAt(0)}</span>
                       </div>
                     )}
                     <div>
@@ -471,7 +471,7 @@ export default function Product() {
                 <div className="sticky top-24 flex flex-col items-center gap-2">
                   <button
                     onClick={() => scrollThumbnails('up')}
-                    className="w-full py-2 rounded-full border border-black/30 bg-white flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer"
+                    className="w-full py-2 rounded-full border border-black/30 dark:border-white/30 bg-white flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
@@ -503,7 +503,7 @@ export default function Product() {
 
                   <button
                     onClick={() => scrollThumbnails('down')}
-                    className="w-full py-2 rounded-full border border-black/30 bg-white flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer"
+                    className="w-full py-2 rounded-full border border-black/30 dark:border-white/30 bg-white flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-all cursor-pointer"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -637,15 +637,19 @@ export default function Product() {
                 {/* Live Rating */}
                 {hasRating && (
                   <div className="flex items-center gap-2.5 mb-4">
-                    <div className="flex gap-0.5">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-foreground tabular-nums">
+                      {ratingLabel}
+                    </span>
+                    <div className="flex gap-0.5" aria-hidden="true">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <svg key={star} className={`w-5 h-5 ${star <= Math.round(ratingValue) ? 'text-[#F14514]' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <svg key={star} className={`w-4 h-4 ${star <= Math.round(ratingValue) ? 'text-[#F14514]' : 'text-gray-200 dark:text-stone-700'}`} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
                         </svg>
                       ))}
                     </div>
-                    <a href="#reviews" className="text-[11px] text-gray-500 tracking-wider uppercase font-medium hover:text-gray-900 transition-colors">
-                      {ratingLabel} &middot; {ratingCount} review{ratingCount !== 1 ? 's' : ''}
+                    <span className="h-4 w-px bg-stone-300 dark:bg-border" aria-hidden="true" />
+                    <a href="#reviews" className="text-[11px] text-gray-500 dark:text-muted-foreground tracking-wider uppercase font-medium hover:text-gray-900 dark:hover:text-foreground transition-colors">
+                      {ratingCount} review{ratingCount !== 1 ? 's' : ''}
                     </a>
                   </div>
                 )}
@@ -675,13 +679,15 @@ export default function Product() {
               })()}
 
               {/* ── Divider ── */}
-              <div className="mx-5 border-t border-stone-100" />
+              <div className="mx-5 border-t border-stone-100 dark:border-border" />
 
               {/* ── Product Form ── */}
               <div className="px-5 pt-4 pb-4" ref={productFormRef}>
                 <ProductForm
                   productOptions={productOptions}
                   selectedVariant={selectedVariant}
+                  productTitle={title}
+                  productImage={images[0] ?? null}
                   stockQty={(() => {
                     const nodes = (product as any).variants?.nodes as any[] | undefined;
                     const match = nodes?.find((v: any) => v.id === selectedVariant?.id);
@@ -729,16 +735,16 @@ export default function Product() {
               ];
 
               return (
-                <div className="mb-10 border border-gray-200 rounded-xl overflow-hidden bg-white divide-y divide-gray-200">
+                <div className="mb-10 border border-gray-200 dark:border-border rounded-xl overflow-hidden bg-white dark:bg-card divide-y divide-gray-200 dark:divide-border">
                   {sections.map((section) => (
                     <details key={section.id} open={section.defaultOpen} className="group">
-                      <summary className="flex items-center justify-between cursor-pointer px-5 py-4 select-none list-none outline-none hover:bg-gray-50 transition-colors duration-200">
-                        <h3 className="text-sm font-bold text-gray-900 tracking-wide">
+                      <summary className="flex items-center justify-between cursor-pointer px-5 py-4 select-none list-none outline-none hover:bg-gray-50 dark:hover:bg-muted/30 transition-colors duration-200">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-foreground tracking-wide">
                           {section.title}
                         </h3>
                         <div className="flex items-center justify-center shrink-0 ml-4">
                           <svg
-                            className="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180"
+                            className="w-4 h-4 text-gray-400 dark:text-muted-foreground transition-transform duration-300 group-open:rotate-180"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth={2.5}
@@ -748,10 +754,10 @@ export default function Product() {
                           </svg>
                         </div>
                       </summary>
-                      <div className="px-5 pb-5 pt-3 text-sm text-gray-600 leading-relaxed border-t border-gray-100">
+                      <div className="px-5 pb-5 pt-3 text-sm text-gray-600 dark:text-muted-foreground leading-relaxed border-t border-gray-100 dark:border-border">
                         {section.html ? (
                           <div
-                            className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-a:text-gray-900 underline-offset-4"
+                            className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-foreground prose-a:text-gray-900 dark:prose-a:text-foreground dark:prose-invert underline-offset-4"
                             dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.html) }}
                           />
                         ) : (
@@ -784,7 +790,7 @@ export default function Product() {
                   </p>
                   <h3
                     className="text-2xl sm:text-[28px] font-light text-stone-900 dark:text-foreground leading-tight"
-                    style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                    style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
                   >
                     Customer Reviews
                   </h3>
@@ -849,21 +855,24 @@ export default function Product() {
                       <div className="flex-shrink-0 flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-2 sm:border-r sm:border-stone-200 sm:dark:border-stone-700 sm:pr-8">
                         <span
                           className="text-6xl font-bold text-[#F14514] dark:text-[#F14514] leading-none"
-                          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                          style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
                         >
                           {ratingLabel}
                         </span>
                         <div className="flex flex-col sm:items-start gap-1.5">
-                          <div className="flex gap-0.5">
+                          <div className="flex items-center gap-2">
+                          <div className="flex gap-0.5" aria-hidden="true">
                             {[1, 2, 3, 4, 5].map((s) => (
                               <svg key={s} className={`w-4 h-4 ${s <= Math.round(ratingValue) ? 'text-[#F14514]' : 'text-stone-300 dark:text-stone-700'}`} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292Z" />
                               </svg>
                             ))}
                           </div>
+                          <span className="h-4 w-px bg-stone-300 dark:bg-stone-700" aria-hidden="true" />
                           <p className="text-stone-400 dark:text-stone-500 text-[10px] tracking-widest uppercase">
                             {ratingCount} review{ratingCount !== 1 ? 's' : ''}
                           </p>
+                          </div>
                         </div>
                       </div>
 
@@ -1174,7 +1183,7 @@ function RecommendedProducts({ products }: { products: any[] }) {
   return (
     <section className="mt-10 md:mt-16 pt-12 md:pt-16 pb-10 md:pb-14 relative">
       <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none">
-        <img src="/line-art.png" alt="" className="w-auto h-auto max-w-full pointer-events-none" />
+        <img src="/line-art.png" alt="" className="w-auto h-auto max-w-full pointer-events-none dark:brightness-0 dark:invert" />
       </div>
 
       <div className="text-center mb-8 md:mb-10">
@@ -1192,7 +1201,7 @@ function RecommendedProducts({ products }: { products: any[] }) {
         {displayProducts.map((product: any, index: number) => (
           <div
             key={product.id}
-            className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all h-full"
+            className="group bg-[#f6f6f6] dark:bg-muted border border-transparent dark:border-border rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all h-full"
           >
             {/* Image */}
             <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
@@ -1200,7 +1209,7 @@ function RecommendedProducts({ products }: { products: any[] }) {
                 {product.featuredImage ? (
                   <Image
                     data={product.featuredImage}
-                    className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-105"
                     loading={index < 2 ? 'eager' : 'lazy'}
                     sizes="(min-width: 1024px) 25vw, 50vw"
                   />
@@ -1212,10 +1221,10 @@ function RecommendedProducts({ products }: { products: any[] }) {
               </Link>
             </div>
 
-            {/* White detail card */}
-            <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
+            {/* Detail card */}
+            <div className="bg-white dark:bg-card rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 dark:border-border/40 relative z-10">
               <Link to={`/products/${product.handle}`} prefetch="intent" className="block">
-                <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
+                <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black dark:text-foreground">
                   {product.title}
                 </h3>
               </Link>
@@ -1224,7 +1233,7 @@ function RecommendedProducts({ products }: { products: any[] }) {
                 <Money
                   withoutTrailingZeros
                   data={product.priceRange.minVariantPrice}
-                  className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black leading-none"
+                  className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black dark:text-foreground leading-none"
                 />
               </div>
 
@@ -1278,10 +1287,10 @@ function RelatedProductAddButton({
     <button
       type="submit"
       disabled={isDisabled}
-      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-800 text-gray-800 text-xs sm:text-base rounded-full group-hover:bg-black/90 group-hover:text-white disabled:cursor-not-allowed cursor-pointer transition-all duration-300 ease-in-out"
+      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-card border border-gray-800 dark:border-border text-gray-800 dark:text-foreground text-xs sm:text-base rounded-full group-hover:bg-black/90 dark:group-hover:bg-foreground group-hover:text-white dark:group-hover:text-background disabled:cursor-not-allowed cursor-pointer transition-all duration-300 ease-in-out"
       aria-label="Add to bag"
     >
-      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 group-hover:invert group-hover:brightness-0 transition-all" />
+      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 dark:invert dark:brightness-0 group-hover:invert group-hover:brightness-0 transition-all" />
       {availableForSale ? 'Add to Bag' : 'Sold Out'}
     </button>
   );

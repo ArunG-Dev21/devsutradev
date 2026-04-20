@@ -26,10 +26,9 @@ export default async function handleRequest(
     styleSrc: [
       "'self'",
       'https://cdn.shopify.com',
-      'https://fonts.googleapis.com',
       "'unsafe-inline'",
     ],
-    fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+    fontSrc: ["'self'", 'data:'],
     imgSrc: [
       "'self'",
       'data:',

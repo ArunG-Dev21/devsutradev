@@ -217,6 +217,7 @@ const BLOGS_QUERY = `#graphql
             }
             blog {
               handle
+              title
             }
           }
         }

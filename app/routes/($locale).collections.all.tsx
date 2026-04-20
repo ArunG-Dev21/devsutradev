@@ -156,9 +156,9 @@ function FilterSidebar({
   onClearAll?: () => void;
 }) {
   return (
-    <div className={`bg-white border border-gray-200 overflow-hidden ${isMobile ? 'p-4 rounded-2xl' : 'rounded-[24px] p-5 sm:p-6'}`}>
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
-        <h2 className="text-sm font-semibold text-gray-900 tracking-wide">
+    <div className={`bg-card border border-border overflow-hidden ${isMobile ? 'p-4 rounded-2xl' : 'rounded-[24px] p-5 sm:p-6'}`}>
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-border/50">
+        <h2 className="text-sm font-semibold text-foreground tracking-wide">
           Filters
         </h2>
         {activeFilters.length > 0 && (
@@ -167,7 +167,7 @@ function FilterSidebar({
               if (onClearAll) onClearAll();
               else activeFilters.forEach(onToggleFilter);
             }}
-            className="text-[11px] text-gray-500 hover:text-black transition-colors underline-offset-4 hover:underline"
+            className="text-[11px] text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
           >
             Clear all
           </button>
@@ -177,7 +177,7 @@ function FilterSidebar({
       <div className="space-y-6 lg:space-y-8">
         {FILTER_GROUPS.map((group) => (
           <div key={group.label}>
-            <p className="text-[13px] text-gray-900 font-medium mb-3">
+            <p className="text-[13px] text-foreground font-medium mb-3">
               {group.label}
             </p>
             <div className="space-y-2 lg:space-y-3">
@@ -193,8 +193,8 @@ function FilterSidebar({
                   >
                     <div
                       className={`w-4 h-4 rounded-sm border shrink-0 flex items-center justify-center transition-all duration-200 ${isActive
-                        ? 'bg-black border-black'
-                        : 'border-gray-300 bg-white group-hover:border-black'
+                        ? 'bg-foreground border-foreground'
+                        : 'border-border bg-background group-hover:border-foreground'
                         }`}
                     >
                       {isActive && (
@@ -211,8 +211,8 @@ function FilterSidebar({
                     </div>
                     <span
                       className={`text-xs lg:text-[13px] transition-colors ${isActive
-                        ? 'text-black font-medium'
-                        : 'text-gray-600 group-hover:text-black'
+                        ? 'text-foreground font-medium'
+                        : 'text-muted-foreground group-hover:text-foreground'
                         }`}
                     >
                       {opt.label}
@@ -226,10 +226,10 @@ function FilterSidebar({
       </div>
 
       {!isMobile && (
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200 relative overflow-hidden group">
+        <div className="mt-8 pt-6 border-t border-border/50">
+          <div className="bg-muted/50 rounded-xl p-4 text-center border border-border/50 relative overflow-hidden group">
             <div className="relative z-10">
-              <p className="text-[11px] tracking-widest uppercase text-black font-bold mb-1.5 flex items-center justify-center gap-1.5">
+              <p className="text-[11px] tracking-widest uppercase text-foreground font-bold mb-1.5 flex items-center justify-center gap-1.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
                 Free Shipping
               </p>
@@ -263,8 +263,8 @@ function CustomSortDropdown({ sort, onSortChange, variant = 'default' }: { sort:
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={variant === 'mobile'
-          ? `w-full flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium cursor-pointer select-none rounded-r-2xl transition-colors ${isOpen ? 'bg-gray-50 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`
-          : 'group flex items-center gap-1.5 sm:gap-2 text-left text-[11px] sm:text-[13px] border border-gray-300 rounded-full px-3 py-1.5 sm:px-5 sm:py-2.5 bg-white text-gray-800 focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-black'
+          ? `w-full flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium cursor-pointer select-none rounded-r-2xl transition-colors ${isOpen ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`
+          : 'group flex items-center gap-1.5 sm:gap-2 text-left text-[11px] sm:text-[13px] border border-border rounded-full px-3 py-1.5 sm:px-5 sm:py-2.5 bg-background text-foreground focus:outline-none cursor-pointer transition-all duration-200 select-none hover:border-foreground'
         }
       >
         {variant === 'mobile' ? (
@@ -273,7 +273,7 @@ function CustomSortDropdown({ sort, onSortChange, variant = 'default' }: { sort:
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M7 12h10M11 18h2" />
             </svg>
             <span>Sort</span>
-            {sort !== 'featured' && <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0" />}
+            {sort !== 'featured' && <span className="w-1.5 h-1.5 rounded-full bg-foreground shrink-0" />}
             <svg className={`w-3 h-3 text-gray-400 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
             </svg>
@@ -289,7 +289,7 @@ function CustomSortDropdown({ sort, onSortChange, variant = 'default' }: { sort:
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 right-0 w-52 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="absolute z-50 right-0 w-52 mt-2 bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
           <div className="py-1 max-h-60 overflow-auto">
             {SORT_OPTIONS.map((option) => (
               <button
@@ -299,13 +299,13 @@ function CustomSortDropdown({ sort, onSortChange, variant = 'default' }: { sort:
                   setIsOpen(false);
                 }}
                 className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] transition-colors ${sort === option.value
-                  ? 'bg-gray-50 font-medium text-black'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-black'
+                  ? 'bg-muted font-medium text-foreground'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   }`}
               >
                 <span>{option.label}</span>
                 {sort === option.value && (
-                  <svg className="w-3.5 h-3.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="m4.5 12.75 6 6 9-13.5" />
                   </svg>
                 )}
@@ -419,7 +419,7 @@ export default function Collection() {
   }, [activeCategoryHandles, activePriceFilters]);
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-background text-foreground">
       <CollectionHeroBanner
         eyebrow={ALL_PRODUCTS_HERO.eyebrow}
         title={ALL_PRODUCTS_HERO.title}
@@ -449,29 +449,29 @@ export default function Collection() {
             <div className="mb-5">
               {/* Row 1: heading + sort (sort hidden on mobile) */}
               <div className="flex items-center justify-between gap-3 mb-8 sm:mb-3 lg:mb-0">
-                <p className="text-xl lg:text-3xl text-center mx-auto sm:mx-0 sm:text-left text-gray-900 tracking-tight">Browsing all products</p>
+                <p className="text-xl lg:text-3xl text-center mx-auto sm:mx-0 sm:text-left text-foreground tracking-tight">Browsing all products</p>
                 <div className="hidden lg:block shrink-0">
                   <CustomSortDropdown sort={sort} onSortChange={handleSortChange} />
                 </div>
               </div>
 
               {/* Row 2: unified filter+sort pill — mobile only */}
-              <div className="flex lg:hidden items-stretch border border-gray-200 rounded-2xl bg-white shadow-sm overflow-visible">
+              <div className="flex lg:hidden items-stretch border border-border rounded-2xl bg-card shadow-sm overflow-visible">
                 <div className="relative flex-1 min-w-0">
                   <button
                     onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                    className={`w-full flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium cursor-pointer select-none rounded-l-2xl transition-colors ${mobileFiltersOpen ? 'bg-gray-50 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                    className={`w-full flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-medium cursor-pointer select-none rounded-l-2xl transition-colors ${mobileFiltersOpen ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
                   >
                     <svg className="w-3.5 h-3.5 shrink-0 opacity-60" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                     </svg>
                     <span>Filters</span>
                     {activeFilterIds.length > 0 && (
-                      <span className="w-4 h-4 rounded-full bg-black text-white text-[9px] font-bold flex items-center justify-center shrink-0">{activeFilterIds.length}</span>
+                      <span className="w-4 h-4 rounded-full bg-foreground text-background text-[9px] font-bold flex items-center justify-center shrink-0">{activeFilterIds.length}</span>
                     )}
                   </button>
                   {mobileFiltersOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-white rounded-2xl z-50 border border-gray-100">
+                    <div className="absolute top-full left-0 mt-2 w-70 sm:w-80 max-h-[70vh] overflow-y-auto bg-card rounded-2xl z-50 border border-border">
                       <FilterSidebar
                         activeFilters={activeFilterIds.map(id => labelById[id] ?? id)}
                         onToggleFilter={filterLabel => {
@@ -484,7 +484,7 @@ export default function Collection() {
                     </div>
                   )}
                 </div>
-                <span className="w-px bg-gray-200 self-stretch my-2" aria-hidden />
+                <span className="w-px bg-border self-stretch my-2" aria-hidden />
                 <CustomSortDropdown sort={sort} onSortChange={handleSortChange} variant="mobile" />
               </div>
             </div>
@@ -494,12 +494,12 @@ export default function Collection() {
                 {activeFilterIds.map((filterId) => (
                   <span
                     key={filterId}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 text-gray-800 text-xs rounded-full"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted border border-border text-foreground text-xs rounded-full"
                   >
                     {labelById[filterId] ?? filterId}
                     <button
                       onClick={() => toggleFilter(filterId)}
-                      className="text-gray-400 hover:text-black transition-colors leading-none"
+                      className="text-muted-foreground hover:text-foreground transition-colors leading-none"
                     >
                       x
                     </button>
@@ -524,15 +524,15 @@ export default function Collection() {
             </PaginatedResourceSection>
 
             {productFilterFn && !(products?.nodes ?? []).some(productFilterFn) && (
-              <div className="text-center py-24 bg-gray-50 rounded-3xl mt-4 border border-gray-100">
-                <span className="text-6xl text-gray-300 block mb-4">✦</span>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No products found</h3>
-                <p className="text-sm text-gray-500 mb-6">
+              <div className="text-center py-24 bg-muted/50 rounded-3xl mt-4 border border-border">
+                <span className="text-6xl text-muted-foreground block mb-4">✦</span>
+                <h3 className="text-xl font-bold text-foreground mb-2">No products found</h3>
+                <p className="text-sm text-muted-foreground mb-6">
                   Try adjusting your filters or browse all categories.
                 </p>
                 <a
                   href="/collections/all"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-xs font-semibold tracking-wide rounded-full hover:bg-neutral-800 transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-xs font-semibold tracking-wide rounded-full hover:opacity-80 transition-opacity"
                 >
                   Clear Filters
                 </a>
@@ -559,7 +559,7 @@ function CollectionAllCard({
 
   return (
     <div
-      className="group bg-[#f6f6f6] rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all hover h-full"
+      className="group bg-muted rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all hover h-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -574,7 +574,7 @@ function CollectionAllCard({
           {product.featuredImage && (
             <Image
               data={product.featuredImage}
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply"
+              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal"
               sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
               loading={index < 8 ? 'eager' : 'lazy'}
               style={{
@@ -589,7 +589,7 @@ function CollectionAllCard({
           {secondaryImage && (
             <Image
               data={secondaryImage}
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply"
+              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal"
               sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
               loading="lazy"
               style={{
@@ -621,7 +621,7 @@ function CollectionAllCard({
         })()}
       </div>
 
-      <div className="bg-white rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 relative z-10">
+      <div className="bg-card rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-border/40 relative z-10">
         {product.variants?.nodes?.[0]?.compareAtPrice && (
           <span className="absolute top-0 right-0 px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-linear-to-br from-[#f14514] to-[#d4370d] text-white">
             {Math.round(
@@ -633,7 +633,7 @@ function CollectionAllCard({
           </span>
         )}
         <a href={`/products/${product.handle}`} className="block">
-          <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black">
+          <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-foreground">
             {product.title}
           </h3>
         </a>
@@ -642,7 +642,7 @@ function CollectionAllCard({
           <Money
             data={product.priceRange.minVariantPrice}
             withoutTrailingZeros
-            className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black leading-none"
+            className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-foreground leading-none"
           />
           {product.variants?.nodes?.[0]?.compareAtPrice && (
             <s
@@ -691,10 +691,10 @@ function CollectionAllAddButton({
     <button
       type="submit"
       disabled={!availableForSale || fetcher.state !== 'idle'}
-      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-800 text-gray-800 text-xs sm:text-base rounded-full transition-colors group-hover:bg-black/90 group-hover:text-white disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
+      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-card border border-border text-foreground text-xs sm:text-base rounded-full transition-colors group-hover:bg-foreground group-hover:text-background disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
       aria-label="Add to bag"
     >
-      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 group-hover:invert group-hover:brightness-0 transition-all" />
+      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 dark:invert group-hover:invert group-hover:brightness-0 dark:group-hover:brightness-100 transition-all" />
       {availableForSale ? 'Add to Bag' : 'Sold Out'}
     </button>
   );
@@ -734,10 +734,10 @@ function CollectionAllSizePillInner({
       className={[
         'px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-medium tracking-wide uppercase border transition-all duration-150 cursor-pointer select-none',
         !variant.availableForSale
-          ? 'border-gray-200 text-gray-300 line-through cursor-not-allowed'
+          ? 'border-border text-muted-foreground/40 line-through cursor-not-allowed'
           : isAdding
-            ? 'border-gray-900 bg-gray-900 text-white opacity-70 cursor-not-allowed'
-            : 'border-gray-300 text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white active:scale-95',
+            ? 'border-foreground bg-foreground text-background opacity-70 cursor-not-allowed'
+            : 'border-border text-foreground hover:border-foreground hover:bg-foreground hover:text-background active:scale-95',
       ].join(' ')}
       aria-label={`Add size ${variant.title ?? ''}`}
     >
@@ -796,7 +796,7 @@ function CollectionAllProductATC({ product }: { product: any }) {
 
   if (!isAvailable) {
     return (
-      <button disabled className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-400 text-xs sm:text-base rounded-full cursor-not-allowed">
+      <button disabled className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-card border border-border text-muted-foreground text-xs sm:text-base rounded-full cursor-not-allowed">
         Sold Out
       </button>
     );
@@ -843,17 +843,17 @@ function CollectionAllProductATC({ product }: { product: any }) {
       <button
         type="button"
         onClick={() => setShowSizes((s) => !s)}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-800 text-gray-800 text-xs sm:text-base rounded-full transition-colors group-hover:bg-black/90 group-hover:text-white disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out ${
+        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-base rounded-full transition-colors disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out ${
           showSizes
-            ? 'bg-black border-white text-white'
-            : 'bg-white border-black text-black hover:bg-black hover:text-white'
+            ? 'bg-foreground border-foreground text-background'
+            : 'bg-card border border-border text-foreground hover:bg-foreground hover:text-background'
         }`}
         aria-label="Select size"
       >
         <img
           src="/icons/add-bag.png"
           alt=""
-          className={`w-4 h-4 md:w-6 md:h-6 shrink-0 transition-all ${showSizes ? '' : 'group-hover:invert group-hover:brightness-0'}`}
+          className={`w-4 h-4 md:w-6 md:h-6 shrink-0 transition-all dark:invert ${showSizes ? '' : 'group-hover:invert group-hover:brightness-0 dark:group-hover:brightness-100'}`}
         />
         {showSizes ? 'Close' : 'Select Size'}
       </button>

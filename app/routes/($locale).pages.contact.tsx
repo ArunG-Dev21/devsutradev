@@ -41,7 +41,7 @@ export default function Contact() {
           <div>
             <h3
               className="text-xl font-serif text-stone-900 dark:text-foreground mb-4"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+              style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
             >
               Get in Touch
             </h3>
@@ -120,7 +120,7 @@ export default function Contact() {
 
           <h3
             className="text-2xl font-light mb-8 relative z-10"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
           >
             Send a Message
           </h3>
@@ -130,7 +130,7 @@ export default function Contact() {
             action="https://api.web3forms.com/submit"
             method="POST"
           >
-            <input type="hidden" name="access_key" value="e4362a3a-74fa-4754-be81-2abed67b1206" />
+            <input type="hidden" name="access_key" value="a0e01713-7ca7-4057-a3ed-14088821f17d" />
             <input type="hidden" name="subject" value="New Contact Form Submission – Devasutra" />
             <input type="hidden" name="redirect" value="https://web3forms.com/success" />
             <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />

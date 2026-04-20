@@ -338,7 +338,7 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
-                      alt={item.title}
+                      alt=""
                       width={100}
                       height={100}
                       sizes="100px"
@@ -454,9 +454,10 @@ export function HeaderMenu({
                 {item.imageUrl ? (
                   <Image
                     src={item.imageUrl}
-                    alt={item.title}
+                    alt=""
                     width={400}
                     height={500}
+                    loading="lazy"
                     sizes="(min-width: 768px) 33vw, 50vw"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-active:scale-105"
                   />
@@ -586,7 +587,7 @@ function HeaderMenuMobileToggle() {
   return (
     <button
       onClick={() => open('mobile')}
-      className="p-1.5 border border-black rounded-full hover:text-accent transition cursor-pointer flex items-center justify-center"
+      className="p-1.5 border border-border rounded-full hover:text-accent transition cursor-pointer flex items-center justify-center"
       aria-label="Open menu"
     >
       <svg
@@ -670,7 +671,7 @@ function DesktopSearchBar() {
     <div ref={containerRef} className="hidden md:block relative group/search">
       <form
         onSubmit={handleSubmit}
-        className="flex items-center bg-transparent rounded-[30px] px-3 md:px-4 lg:px-5 py-2 md:py-2 lg:py-2.5 2xl:py-3 gap-2 lg:gap-3 w-44 md:w-44 lg:w-64 xl:w-[22rem] 2xl:w-[28rem] transition-all duration-300 border border-gray-300 hover:border-[#F14514] focus-within:!border-[#F14514] focus-within:shadow-[0_0_0_1px_#F14514]"
+        className="flex items-center bg-transparent rounded-[30px] px-3 md:px-4 lg:px-5 py-2 md:py-2 lg:py-2.5 2xl:py-3 gap-2 lg:gap-3 w-44 md:w-44 lg:w-64 xl:w-[22rem] 2xl:w-[28rem] transition-all duration-300 border border-border hover:border-[#F14514] focus-within:!border-[#F14514] focus-within:shadow-[0_0_0_1px_#F14514]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -678,7 +679,7 @@ function DesktopSearchBar() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-gray-800 shrink-0 transition-colors group-focus-within/search:text-[#F14514]"
+          className="w-3.5 h-3.5 md:w-4 md:h-4 lg:w-5 lg:h-5 text-muted-foreground shrink-0 transition-colors group-focus-within/search:text-[#F14514]"
         >
           <path
             strokeLinecap="round"
@@ -695,7 +696,7 @@ function DesktopSearchBar() {
           onFocus={(e) => {
             if (e.target.value.length > 0) setOpen(true);
           }}
-          className="header-search-input flex-1 text-xs md:text-xs lg:text-sm xl:text-base text-gray-800 placeholder-gray-800 bg-transparent outline-none ring-0 border-none shadow-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
+          className="header-search-input flex-1 text-xs md:text-xs lg:text-sm xl:text-base text-foreground placeholder:text-muted-foreground/70 bg-transparent outline-none ring-0 border-none shadow-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
           autoComplete="off"
         />
       </form>
@@ -1020,7 +1021,7 @@ function CartBadge({ count }: { count: number | null }) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className="relative p-1.5 border border-black rounded-full text-foreground transition cursor-pointer flex items-center justify-center"
+      className="relative p-1.5 border border-border dark:border-white rounded-full text-foreground transition cursor-pointer flex items-center justify-center"
       aria-label={`Cart with ${count ?? 0} items`}
     >
       <img
@@ -1028,12 +1029,12 @@ function CartBadge({ count }: { count: number | null }) {
         alt=""
         width={36}
         height={36}
-        className="w-7 h-7 md:w-8 md:h-8 object-contain"
+        className="w-7 h-7 md:w-8 md:h-8 object-contain dark:invert"
         loading="lazy"
       />
       {(count ?? 0) > 0 && (
         <span
-          className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center bg-black text-white"
+          className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center bg-foreground text-background"
         >
           {count}
         </span>

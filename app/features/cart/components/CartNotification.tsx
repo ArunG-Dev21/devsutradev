@@ -60,6 +60,11 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
 
   const showNotification = useCallback(
     (title?: string, image?: { url: string; altText?: string | null }) => {
+      if (image?.url && typeof window !== 'undefined') {
+        const preload = new window.Image();
+        preload.src = image.url;
+      }
+
       const id = Math.random().toString(36).slice(2, 9);
       const item: NotificationItem = {
         id,
@@ -117,13 +122,13 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
       {notifications.length > 0 && (
         <div
           aria-live="polite"
-          className="fixed top-4 right-4 z-[110000] flex flex-col-reverse items-end gap-3 pointer-events-none"
+          className="fixed top-4 right-3 sm:right-4 z-[110000] flex flex-col-reverse items-end gap-3 pointer-events-none"
           style={{ maxHeight: 'calc(100vh - 2rem)' }}
         >
           {notifications.map((notif, index) => (
             <div
               key={notif.id}
-              className={`pointer-events-auto w-[min(380px,calc(100vw-2rem))] rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] bg-white dark:bg-[#111] border border-stone-100 dark:border-white/8 ${
+              className={`pointer-events-auto w-[min(380px,calc(100vw-1.5rem))] rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.55)] bg-white/98 dark:bg-card border border-stone-200/80 dark:border-border ${
                 notif.exiting ? 'cart-notif-exit' : 'cart-notif-enter'
               }`}
               style={{
@@ -131,7 +136,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
               }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 pt-3 pb-2.5 border-b border-stone-100 dark:border-white/6">
+              <div className="flex items-center justify-between px-3 pt-3 pb-2.5 border-b border-stone-100 dark:border-border/70">
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center justify-center w-4.5 h-4.5 rounded-full bg-green-500 shrink-0">
                     <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round">
@@ -145,7 +150,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
                 <button
                   type="button"
                   onClick={() => dismiss(notif.id)}
-                  className="w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-stone-100 dark:bg-white/[0.07] hover:bg-stone-200 dark:hover:bg-white/[0.14] text-stone-400 dark:text-white/40 hover:text-stone-700 dark:hover:text-white"
+                    className="w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-colors bg-stone-100 dark:bg-muted hover:bg-stone-200 dark:hover:bg-muted/80 text-stone-400 dark:text-muted-foreground hover:text-stone-700 dark:hover:text-foreground"
                   aria-label="Dismiss"
                 >
                   <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
@@ -155,14 +160,16 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
               </div>
 
               {/* Body */}
-              <div className="flex items-center gap-3.5 px-4 py-3">
-                <div className="shrink-0 w-[68px] h-[68px] rounded-lg overflow-hidden bg-stone-50 dark:bg-white/5 border border-stone-100 dark:border-white/[0.07]">
+              <div className="flex items-center gap-3.5 px-3 py-3">
+                <div className="shrink-0 w-[68px] h-[68px] rounded-lg overflow-hidden bg-stone-50 dark:bg-muted border border-stone-100 dark:border-border">
                   {notif.image ? (
                     <img
                       src={notif.image.url}
                       alt={notif.image.altText || notif.title}
                       width={68}
                       height={68}
+                      loading="eager"
+                      decoding="sync"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -179,7 +186,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
                   <button
                     type="button"
                     onClick={() => handleViewCart(notif.id)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[9px] font-bold tracking-[0.16em] uppercase cursor-pointer transition-all duration-150 active:scale-95 bg-stone-900 text-white hover:bg-stone-700 dark:bg-white dark:text-black dark:hover:bg-stone-100"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[9px] font-bold tracking-[0.16em] uppercase cursor-pointer transition-all duration-150 active:scale-95 bg-stone-900 text-white hover:bg-stone-700 dark:bg-foreground dark:text-background dark:hover:opacity-90"
                   >
                     View Bag
                     <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -190,7 +197,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
               </div>
 
               {/* Progress bar */}
-              <div className="h-[2px] bg-stone-100 dark:bg-white/6">
+              <div className="h-[2px] bg-stone-100 dark:bg-border">
                 <div
                   key={notif.id}
                   className="h-full origin-left bg-stone-700 dark:bg-white/40"

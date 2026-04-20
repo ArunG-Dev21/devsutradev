@@ -32,7 +32,7 @@ export function ProductPrice({
           )}
         </div>
       ) : price ? (
-        <span className="text-2xl lg:text-3xl font-light text-stone-900 dark:text-stone-100 tracking-wide" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+        <span className="text-2xl lg:text-3xl font-light text-stone-900 dark:text-stone-100 tracking-wide" style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}>
           <Money withoutTrailingZeros data={price} />
         </span>
       ) : (

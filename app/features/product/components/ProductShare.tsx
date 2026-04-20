@@ -18,25 +18,25 @@ export function ProductShare({ title }: { title: string }) {
         {
             name: 'WhatsApp',
             href: `https://wa.me/?text=${encodeURIComponent(`${title} — ${url}`)}`,
-            className: 'hover:bg-[#25D366] hover:text-white hover:border-[#25D366]',
+            className: 'bg-[#25D366] text-white border-[#25D366]',
             icon: <WhatsAppIcon />,
         },
         {
             name: 'Facebook',
             href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-            className: 'hover:bg-[#1877F2] hover:text-white hover:border-[#1877F2]',
+            className: 'bg-[#1877F2] text-white border-[#1877F2]',
             icon: <FacebookIcon />,
         },
         {
             name: 'X (Twitter)',
             href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
-            className: 'hover:bg-black hover:text-white hover:border-black dark:hover:bg-white dark:hover:text-black dark:hover:border-white',
+            className: 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white',
             icon: <XIcon />,
         },
         {
             name: 'Email',
             href: `mailto:?subject=${encodedTitle}&body=${encodeURIComponent(`Check this out: ${title}\n\n${url}`)}`,
-            className: 'hover:bg-gray-600 hover:text-white hover:border-gray-600',
+            className: 'bg-[#5F6368] text-white border-[#5F6368]',
             icon: <EmailIcon />,
         },
     ];
@@ -60,7 +60,7 @@ export function ProductShare({ title }: { title: string }) {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground transition-all duration-300 hover:-translate-y-1 ${link.className}`}
+                        className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-200 active:scale-95 ${link.className}`}
                         aria-label={`Share on ${link.name}`}
                     >
                         {link.icon}
@@ -71,7 +71,7 @@ export function ProductShare({ title }: { title: string }) {
 
                 <button
                     onClick={() => { void copyToClipboard(); }}
-                    className="group relative flex items-center gap-2 px-4 h-10 rounded-full bg-muted/30 border border-border hover:bg-foreground hover:text-background hover:border-foreground transition-all duration-300 ml-auto sm:ml-0"
+                    className="group relative flex items-center gap-2 px-3 h-10 rounded-full bg-muted/30 border border-border hover:bg-foreground hover:text-background hover:border-foreground transition-all duration-300 ml-auto sm:ml-0"
                     type="button"
                 >
                     {copied ? (

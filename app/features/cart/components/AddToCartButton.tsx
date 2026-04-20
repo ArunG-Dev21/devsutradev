@@ -57,14 +57,16 @@ function AddToCartInner({
 }) {
   const { showNotification } = useCartNotification();
   const wasSubmitted = useRef(false);
+  const notifiedOptimistically = useRef(false);
+  const isDisabled = Boolean(disabled) || fetcher.state !== 'idle';
 
   useEffect(() => {
     if (fetcher.state === 'submitting') wasSubmitted.current = true;
     if (wasSubmitted.current && fetcher.state === 'idle') {
       wasSubmitted.current = false;
-      showNotification(productTitle, productImage);
+      notifiedOptimistically.current = false;
     }
-  }, [fetcher.state, showNotification, productTitle, productImage]);
+  }, [fetcher.state]);
 
   return (
     <>
@@ -75,9 +77,15 @@ function AddToCartInner({
       />
       <button
         type="submit"
-        onClick={onClick}
-        disabled={disabled ?? fetcher.state !== 'idle'}
-        className={`w-full py-4 rounded-full text-[11px] font-medium tracking-[0.2em] uppercase transition-all duration-300 border flex justify-center items-center gap-2 group ${disabled ?? fetcher.state !== 'idle'
+        onClick={() => {
+          if (!isDisabled && !notifiedOptimistically.current) {
+            notifiedOptimistically.current = true;
+            showNotification(productTitle, productImage);
+          }
+          onClick?.();
+        }}
+        disabled={isDisabled}
+        className={`w-full py-4 rounded-full text-[11px] font-medium tracking-[0.2em] uppercase transition-all duration-300 border flex justify-center items-center gap-2 group ${isDisabled
             ? 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
             : 'bg-white border-gray-800 text-gray-800 hover:bg-black hover:border-black hover:text-white cursor-pointer'
           }`}

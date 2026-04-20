@@ -3,6 +3,7 @@ import type { Route } from './+types/($locale).policies.$handle';
 import { type Shop } from '@shopify/hydrogen/storefront-api-types';
 import { sanitizeHtml } from '~/lib/sanitizer';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
+import { generateMeta, stripHtml, truncate } from '~/lib/seo';
 
 type SelectedPolicies = keyof Pick<
   Shop,
@@ -10,10 +11,16 @@ type SelectedPolicies = keyof Pick<
 >;
 
 export const meta: Route.MetaFunction = ({ data }) => {
-  return [{ title: `${data?.policy.title ?? 'Policy'} | Devasutra` }];
+  const policy = (data as any)?.policy;
+  const origin = (data as any)?.seoOrigin || '';
+  return generateMeta({
+    title: `${policy?.title ?? 'Policy'} | Devasutra`,
+    description: truncate(stripHtml(policy?.body ?? ''), 155) || 'Read Devasutra policy details.',
+    canonical: `${origin}/policies/${policy?.handle || ''}`,
+  });
 };
 
-export async function loader({ params, context }: Route.LoaderArgs) {
+export async function loader({ params, context, request }: Route.LoaderArgs) {
   if (!params.handle) {
     throw new Response('No handle was passed in', { status: 404 });
   }
@@ -40,7 +47,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
     throw new Response('Could not find the policy', { status: 404 });
   }
 
-  return { policy };
+  return { policy, seoOrigin: new URL(request.url).origin };
 }
 
 export default function Policy() {
@@ -48,12 +55,11 @@ export default function Policy() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative overflow-hidden border-b border-border/70 bg-linear-to-b from-stone-100/75 via-background to-background dark:from-stone-950/40 dark:via-background dark:to-background">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,rgba(201,161,101,0.18),transparent_58%)]" />
+      <section className="relative overflow-hidden border-b border-border/70 bg-background">
         <RouteBreadcrumbBanner variant="light" className="relative z-10 !bg-transparent" />
-        <div className="container mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
+        <div className="container mx-auto max-w-5xl px-3 py-12 sm:px-6 md:py-16 lg:px-8">
           <Link
-            className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/85 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/85 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground transition-colors hover:text-foreground"
             to="/policies"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -63,7 +69,7 @@ export default function Policy() {
           </Link>
 
           <div className="mt-8 max-w-3xl">
-            <span className="inline-flex items-center rounded-full border border-amber-200/70 bg-amber-50/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-900 dark:border-amber-400/20 dark:bg-amber-500/10 dark:text-amber-200">
+            <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
               Legal Document
             </span>
             <h1 className="mt-5 font-heading text-4xl font-medium uppercase leading-[1.05] tracking-[0.04em] text-foreground sm:text-5xl md:text-6xl">
@@ -76,8 +82,8 @@ export default function Policy() {
         </div>
       </section>
 
-      <section className="container mx-auto max-w-5xl px-4 py-10 sm:px-6 md:py-14 lg:px-8">
-        <div className="overflow-hidden rounded-[30px] border border-border/70 bg-card/95 shadow-[0_24px_60px_-42px_rgba(0,0,0,0.4)]">
+      <section className="container mx-auto max-w-5xl px-3 py-10 sm:px-6 md:py-14 lg:px-8">
+        <div className="overflow-hidden rounded-[30px] border border-border/70 bg-card/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_24px_60px_-42px_rgba(0,0,0,0.4)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_60px_-42px_rgba(0,0,0,0.7)]">
           <div className="border-b border-border/70 px-5 py-4 sm:px-8">
             <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               <span>Devasutra</span>

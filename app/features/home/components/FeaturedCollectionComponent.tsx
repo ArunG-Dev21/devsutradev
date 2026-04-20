@@ -80,7 +80,7 @@ function ATCIconButton({
       className={[
         sizeClasses,
         'flex items-center justify-center rounded-full shrink-0',
-        'bg-white border border-black transition-all duration-200 ease-out cursor-pointer select-none',
+        'bg-white border border-black dark:border-white transition-all duration-200 ease-out cursor-pointer select-none',
         'hover:bg-black group/atc',
         isAdding
           ? 'opacity-60 scale-[0.97] cursor-not-allowed'
@@ -108,7 +108,7 @@ function ATCIconButton({
         <img
           src="/icons/add-bag.png"
           alt={ariaLabel}
-          className={`${iconSize} object-contain group-hover/atc:invert`}
+          className={`${iconSize} object-contain dark:invert dark:brightness-0 group-hover/atc:invert`}
         />
       )}
     </button>
@@ -240,7 +240,7 @@ function AddToCartButton({
           'border transition-all duration-200 ease-out cursor-pointer select-none group/atc',
           showSizePicker
             ? 'bg-foreground border-foreground text-background'
-            : 'bg-white border-black hover:bg-black hover:text-white',
+            : 'bg-white border-black dark:border-white hover:bg-black hover:text-white',
         ].join(' ')}
         aria-label={showSizePicker ? 'Close size picker' : 'Select size'}
       >
@@ -252,7 +252,7 @@ function AddToCartButton({
           <img
             src="/icons/add-bag.png"
             alt="Select size"
-            className="w-5 h-5 sm:w-7 sm:h-7 object-contain group-hover/atc:invert"
+            className="w-5 h-5 sm:w-7 sm:h-7 object-contain dark:invert dark:brightness-0 group-hover/atc:invert"
           />
         )}
       </button>

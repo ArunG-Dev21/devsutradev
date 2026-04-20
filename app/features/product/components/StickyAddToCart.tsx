@@ -530,7 +530,7 @@ export function StickyAddToCart({
                             <div className="min-w-0">
                                 <p
                                     className="text-sm font-light text-stone-900 dark:text-foreground truncate"
-                                    style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                                    style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
                                 >
                                     {product.title}
                                 </p>

@@ -269,6 +269,18 @@ export const FOOTER_QUERY = `#graphql
     menu(handle: $footerMenuHandle) {
       ...Menu
     }
+    blogs(first: 10) {
+      nodes {
+        handle
+        articles(first: 3, sortKey: PUBLISHED_AT, reverse: true) {
+          nodes {
+            handle
+            title
+            publishedAt
+          }
+        }
+      }
+    }
   }
   ${MENU_FRAGMENT}
 ` as const;

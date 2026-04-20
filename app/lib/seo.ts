@@ -13,6 +13,8 @@ export const SEO_DEFAULTS = {
     'Discover authentic devotional ornaments — Rudraksha, Karungali, Gemstone bracelets, Sacred Malas & more. Handcrafted, blessed & lab certified.',
   twitterHandle: '@devasutra',
   locale: 'en_IN',
+  themeColorLight: '#ffffff',
+  themeColorDark: '#171717',
 } as const;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -56,11 +58,10 @@ export function generateMeta(seo: SeoMeta) {
   const metas: Array<Record<string, string>> = [
     { title: seo.title },
     { name: 'description', content: seo.description },
+    { name: 'robots', content: seo.noIndex ? 'noindex, nofollow' : 'index, follow' },
+    { name: 'theme-color', content: SEO_DEFAULTS.themeColorLight, media: '(prefers-color-scheme: light)' },
+    { name: 'theme-color', content: SEO_DEFAULTS.themeColorDark, media: '(prefers-color-scheme: dark)' },
   ];
-
-  if (seo.noIndex) {
-    metas.push({ name: 'robots', content: 'noindex, nofollow' });
-  }
 
   // Open Graph
   metas.push(
@@ -83,6 +84,7 @@ export function generateMeta(seo: SeoMeta) {
   // Twitter Card
   metas.push(
     { name: 'twitter:card', content: seo.ogImage ? 'summary_large_image' : 'summary' },
+    { name: 'twitter:site', content: SEO_DEFAULTS.twitterHandle },
     { name: 'twitter:title', content: seo.title },
     { name: 'twitter:description', content: seo.description },
   );

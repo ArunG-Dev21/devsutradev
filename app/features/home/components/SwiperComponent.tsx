@@ -136,7 +136,7 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
                       {/* CTA Button */}
                       <Link
                         to={slide.ctaLink}
-                        className="inline-flex items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 bg-white text-black text-[11px] sm:text-xs md:text-sm uppercase font-medium tracking-wider rounded-full border border-white transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
+                        className="inline-flex items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 bg-white text-black text-[11px] sm:text-xs md:text-sm uppercase font-medium tracking-wider rounded-full transition-all duration-300 hover:bg-black hover:text-white hover:border-white no-underline"
                       >
                         {slide.ctaText}
                         <svg

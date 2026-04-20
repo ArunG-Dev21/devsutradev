@@ -137,7 +137,7 @@ const VARIANT_STYLES: Record<
     separator: 'text-white',
   },
   light: {
-    wrapper: 'bg-background/95',
+    wrapper: 'bg-transparent',
     container: 'container mx-auto px-4 py-4 sm:px-6 lg:px-8',
     nav: 'flex w-full items-center gap-1.5 overflow-x-auto whitespace-nowrap text-[10px] uppercase tracking-[0.14em] text-foreground md:w-fit md:gap-2 md:text-xs md:tracking-[0.2em]',
     link: 'text-foreground transition-opacity hover:opacity-65',
