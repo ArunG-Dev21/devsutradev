@@ -9,7 +9,7 @@ export async function loader({request, context}: Route.LoaderArgs) {
   const shopId = parseGid(shop.id).id;
   const body = robotsTxtData({url: url.origin, shopId});
 
-  return new Response(body, {
+  const response = new Response(body, {
     status: 200,
     headers: {
       'Content-Type': 'text/plain',
@@ -17,6 +17,9 @@ export async function loader({request, context}: Route.LoaderArgs) {
       'Cache-Control': `max-age=${60 * 60 * 24}`,
     },
   });
+  // Ensure robots.txt is indexable
+  response.headers.set('X-Robots-Tag', 'index, follow');
+  return response;
 }
 
 function robotsTxtData({url, shopId}: {shopId?: string; url?: string}) {
