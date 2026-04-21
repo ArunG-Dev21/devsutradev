@@ -60,6 +60,7 @@ function formatDate(date: string) {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    timeZone: 'UTC',
   }).format(new Date(date));
 }
 

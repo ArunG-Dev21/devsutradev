@@ -42,8 +42,20 @@ function extractFirstStringField(obj: unknown, keys: string[]): string | null {
   return null;
 }
 
+const FETCH_TIMEOUT_MS = 8000;
+
+async function fetchWithTimeout(url: string | URL, options?: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url.toString(), { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
 async function fetchJson(url: URL): Promise<unknown> {
-  const res = await fetch(url.toString());
+  const res = await fetchWithTimeout(url);
   if (!res.ok) {
     throw new Error(`Judge.me API request failed: ${res.status} ${res.statusText}`);
   }
@@ -51,7 +63,7 @@ async function fetchJson(url: URL): Promise<unknown> {
 }
 
 async function fetchTextOrJson(url: URL): Promise<string | unknown> {
-  const res = await fetch(url.toString());
+  const res = await fetchWithTimeout(url);
   if (!res.ok) {
     throw new Error(`Judge.me API request failed: ${res.status} ${res.statusText}`);
   }

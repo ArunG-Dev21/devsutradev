@@ -617,6 +617,7 @@ export default function Collection() {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
+                            timeZone: 'UTC',
                           }).format(new Date(article.publishedAt))}
                         </time>
                         <h3 className="mt-2 text-base font-medium text-gray-900 leading-snug line-clamp-2">

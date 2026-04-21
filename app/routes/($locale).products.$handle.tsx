@@ -521,11 +521,11 @@ export default function Product() {
                   key={img.url}
                   ref={(el) => (imageRefs.current[idx] = el)}
                   data-index={idx}
-                  className="w-full shrink-0 snap-center rounded-[24px] bg-[#F6F6F6] aspect-[3/2] sm:aspect-square relative flex items-center justify-center"
+                  className="w-full shrink-0 snap-center rounded-[24px] bg-[#F6F6F6] aspect-[3/2] overflow-hidden relative flex items-center justify-center"
                 >
                   <Image
                     data={img}
-                    className="w-full h-full object-cover sm:object-contain object-center mix-blend-multiply rounded-xl"
+                    className="w-full h-full object-cover object-center mix-blend-multiply rounded-xl"
                     draggable={false}
                     sizes="(min-width: 1024px) 50vw, 100vw"
                   />
