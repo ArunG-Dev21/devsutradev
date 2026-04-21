@@ -356,7 +356,7 @@ export default function Article() {
         <div className="h-full bg-foreground transition-[width] duration-100" style={{ width: `${progress}%` }} />
       </div>
 
-      <RouteBreadcrumbBanner variant="light" className="!bg-transparent border-b border-border/30" />
+      <RouteBreadcrumbBanner variant="light" className="bg-transparent! border-b border-border/30" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">

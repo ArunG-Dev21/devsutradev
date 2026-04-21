@@ -69,9 +69,9 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
               <div className="h-7 sm:h-9 md:h-10 w-3/4 rounded-lg bg-stone-300/40 dark:bg-white/[0.07]" />
               <div className="h-7 sm:h-9 md:h-10 w-1/2 rounded-lg bg-stone-300/40 dark:bg-white/[0.07]" />
               {/* Subheading skeleton */}
-              <div className="h-4 sm:h-5 md:h-6 w-2/3 rounded-md bg-stone-200/50 dark:bg-white/[0.05] mt-2" />
+              <div className="h-4 sm:h-5 md:h-6 w-2/3 rounded-md bg-stone-200/50 dark:bg-white/5 mt-2" />
               {/* CTA skeleton */}
-              <div className="h-10 sm:h-11 md:h-12 w-40 sm:w-44 md:w-48 rounded-full bg-stone-300/30 dark:bg-white/[0.06] mt-3" />
+              <div className="h-10 sm:h-11 md:h-12 w-40 sm:w-44 md:w-48 rounded-full bg-stone-300/30 dark:bg-white/6 mt-3" />
             </div>
           </div>
         </div>
@@ -115,7 +115,7 @@ export function SwiperComponent({ slides }: SwiperComponentProps) {
                 />
 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
                 {/* Content */}
                 <div className="relative h-full flex items-end">

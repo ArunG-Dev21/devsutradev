@@ -92,14 +92,14 @@ function ATCIconButton({
     >
       {isAdding ? (
         <svg
-          className={`animate-spin ${size === 'sm' ? 'w-3 h-3 sm:w-3.5 h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
+          className={`animate-spin ${size === 'sm' ? 'w-3 h-3 sm:w-3.5 sm:h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
         >
           <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
         </svg>
       ) : justAdded ? (
         <svg
-          className={`${size === 'sm' ? 'w-3 h-3 sm:w-3.5 h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
+          className={`${size === 'sm' ? 'w-3 h-3 sm:w-3.5 sm:h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
         >
           <path d="M5 13l4 4L19 7" />
@@ -380,7 +380,7 @@ function ProductCard({
             <StarRating
               rating={reviewSummary.averageRating}
               count={reviewSummary.reviewCount}
-              className="absolute top-2 right-2 z-[4]"
+              className="absolute top-2 right-2 z-4"
             />
           )}
           {!isUnavailable && (
@@ -626,7 +626,7 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
       <div className="px-3 sm:px-6 md:px-8 lg:px-6 2xl:px-14 py-4 sm:py-6 2xl:py-8">
         <div
           ref={scrollerRef}
-          className="grid grid-flow-col grid-rows-2 auto-cols-[calc((100%_-_0.75rem)/2)] xl:auto-cols-[calc((100%_-_2.5rem)/3)] gap-3 sm:gap-4 2xl:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory"
+          className="grid grid-flow-col grid-rows-2 auto-cols-[calc((100%-0.75rem)/2)] xl:auto-cols-[calc((100%-2.5rem)/3)] gap-3 sm:gap-4 2xl:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory"
           aria-label={`${collection.title} products`}
         >
           {sortedProducts.map((product) => {

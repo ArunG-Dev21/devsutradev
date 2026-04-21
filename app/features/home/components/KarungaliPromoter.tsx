@@ -333,7 +333,7 @@ function KarungaliProductCard({
                         <StarRating
                             rating={reviewSummary.averageRating}
                             count={reviewSummary.reviewCount}
-                            className="absolute top-2 right-2 z-[4]"
+                            className="absolute top-2 right-2 z-4"
                         />
                     )}
                     {!isUnavailable && (
@@ -447,7 +447,7 @@ export function KarungaliPromoter({
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 lg:gap-6">
 
                     {/* ─── Left: Hero Infographic Card ── */}
-                    <div className="lg:col-span-2 relative rounded-3xl overflow-hidden bg-neutral-900 min-h-[440px] lg:min-h-0 lg:aspect-[3/4]">
+                    <div className="lg:col-span-2 relative rounded-3xl overflow-hidden bg-neutral-900 min-h-[440px] lg:min-h-0 lg:aspect-3/4">
                         {hasImages && (
                             <img
                                 key={activeImageIdx}
@@ -459,7 +459,7 @@ export function KarungaliPromoter({
                                 className="absolute inset-0 w-full h-full object-cover animate-[fadeIn_0.6s_ease]"
                             />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/5 pointer-events-none" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-black/5 pointer-events-none" />
                         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 z-10">
                             <h3 className="text-white font-heading text-xl md:text-2xl lg:text-4xl uppercase font-bold leading-snug mb-3 drop-shadow-lg">
                                 {introTitle}

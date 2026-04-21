@@ -125,7 +125,7 @@ function CartCheckoutActions({
           <a
             href={checkoutUrl}
             target="_self"
-            className="flex-[3] flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
+            className="flex-3 flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
           >
             <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
             Checkout
@@ -134,7 +134,7 @@ function CartCheckoutActions({
           <button
             type="button"
             disabled
-            className="flex-[3] flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60"
+            className="flex-3 flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60"
           >
             <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
             Checkout

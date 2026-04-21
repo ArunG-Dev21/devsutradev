@@ -691,7 +691,7 @@ function CollectionAllAddButton({
     <button
       type="submit"
       disabled={!availableForSale || fetcher.state !== 'idle'}
-      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-card border border-border text-foreground text-xs sm:text-base rounded-full transition-colors group-hover:bg-foreground group-hover:text-background disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
+      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-card border border-border text-foreground text-xs sm:text-base rounded-full group-hover:bg-foreground group-hover:text-background disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
       aria-label="Add to bag"
     >
       <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 dark:invert group-hover:invert group-hover:brightness-0 dark:group-hover:brightness-100 transition-all" />
@@ -844,7 +844,7 @@ function CollectionAllProductATC({ product }: { product: any }) {
       <button
         type="button"
         onClick={() => setShowSizes((s) => !s)}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-base rounded-full transition-colors disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out ${
+        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-base rounded-full disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out ${
           showSizes
             ? 'bg-foreground border-foreground text-background'
             : 'bg-card border border-border text-foreground hover:bg-foreground hover:text-background'

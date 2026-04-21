@@ -463,7 +463,7 @@ export default function Product() {
         <div className="grid lg:grid-cols-[55%_1fr] gap-10 lg:gap-14 lg:items-start">
 
           {/* ── LEFT: Image Gallery ── */}
-          <div className="flex flex-col lg:flex-row gap-2 lg:gap-5 relative w-full overflow-hidden lg:overflow-visible lg:sticky lg:top-[96px] lg:h-[max-content]">
+          <div className="flex flex-col lg:flex-row gap-2 lg:gap-5 relative w-full overflow-hidden lg:overflow-visible lg:sticky lg:top-[96px] lg:h-max">
 
             {/* Desktop Thumbnails (Sticky sidebar) */}
             {images.length > 1 && (
@@ -521,7 +521,7 @@ export default function Product() {
                   key={img.url}
                   ref={(el) => (imageRefs.current[idx] = el)}
                   data-index={idx}
-                  className="w-full shrink-0 snap-center rounded-[24px] bg-[#F6F6F6] aspect-[3/2] overflow-hidden relative flex items-center justify-center"
+                  className="w-full shrink-0 snap-center rounded-[24px] bg-[#F6F6F6] aspect-3/2 overflow-hidden relative flex items-center justify-center"
                 >
                   <Image
                     data={img}
@@ -852,7 +852,7 @@ export default function Product() {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8">
 
                       {/* Score + stars */}
-                      <div className="flex-shrink-0 flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-2 sm:border-r sm:border-stone-200 sm:dark:border-stone-700 sm:pr-8">
+                      <div className="shrink-0 flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-2 sm:border-r sm:border-stone-200 sm:dark:border-stone-700 sm:pr-8">
                         <span
                           className="text-6xl font-bold text-[#F14514] dark:text-[#F14514] leading-none"
                           style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
@@ -1026,7 +1026,7 @@ export default function Product() {
       {/* ── Share Modal (animated bottom-sheet on mobile, centred panel on desktop) ── */}
       {shareOpen && (
         <div
-          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
+          className="fixed inset-0 z-60 flex items-end sm:items-center justify-center"
           role="dialog"
           aria-modal="true"
           aria-label="Share product"
@@ -1133,12 +1133,12 @@ function CouponCard({ code, label, offer }: { code: string; label?: string; offe
         <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white z-10" />
 
         {/* Festival Offer badge */}
-        <span className="absolute right-0 top-0 z-[2] text-[9px] tracking-[0.14em] uppercase bg-linear-to-br from-[#f14514] to-[#d4370d] text-white rounded-bl-lg rounded-tr-xl px-2 py-0.5">
+        <span className="absolute right-0 top-0 z-2 text-[9px] tracking-[0.14em] uppercase bg-linear-to-br from-[#f14514] to-[#d4370d] text-white rounded-bl-lg rounded-tr-xl px-2 py-0.5">
           ✦ Festival Offer ✦
         </span>
 
         {/* Content */}
-        <div className="relative z-[1] flex items-stretch">
+        <div className="relative z-1 flex items-stretch">
           {/* Icon */}
           <div className="flex items-center px-4 sm:px-5 py-4 sm:py-5 shrink-0">
             <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">

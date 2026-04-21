@@ -48,14 +48,14 @@ function ATCIconButton({
     >
       {isAdding ? (
         <svg
-          className={`animate-spin ${size === 'sm' ? 'w-3 h-3 sm:w-3.5 h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
+          className={`animate-spin ${size === 'sm' ? 'w-3 h-3 sm:w-3.5 sm:h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
         >
           <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
         </svg>
       ) : justAdded ? (
         <svg
-          className={`${size === 'sm' ? 'w-3 h-3 sm:w-3.5 h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
+          className={`${size === 'sm' ? 'w-3 h-3 sm:w-3.5 sm:h-3.5' : 'w-3.5 h-3.5 sm:w-4 sm:h-4'} text-black group-hover/atc:text-white`}
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
         >
           <path d="M5 13l4 4L19 7" />
@@ -419,7 +419,7 @@ export function StickyAddToCart({
         <>
             {/* ── Mobile: bottom sticky (below xl) ── */}
             <div
-                className={`lg:hidden fixed left-2 right-2 z-50 transition-transform duration-300 ease-out bottom-[calc(4.375rem_+_env(safe-area-inset-bottom)_+_6px)] md:bottom-2 ${
+                className={`lg:hidden fixed left-2 right-2 z-50 transition-transform duration-300 ease-out bottom-[calc(4.375rem+env(safe-area-inset-bottom)+6px)] md:bottom-2 ${
                     isVisible ? "translate-y-0" : "translate-y-full"
                 }`}
             >
@@ -450,7 +450,7 @@ export function StickyAddToCart({
                     <div className="px-2 py-2.5 flex items-center gap-3">
                         {/* Product image */}
                         {product.featuredImage && (
-                            <div className="w-14 h-14 rounded-lg overflow-hidden border border-stone-200 dark:border-border flex-shrink-0">
+                            <div className="w-14 h-14 rounded-lg overflow-hidden border border-stone-200 dark:border-border shrink-0">
                                 <Image
                                     data={product.featuredImage}
                                     className="w-full h-full object-cover"
@@ -465,7 +465,7 @@ export function StickyAddToCart({
                                 {product.title}
                             </p>
                             {selectedVariant.price && (
-                                <div className="mt-1 flex items-center gap-2 [&_.product-price_span]:!text-sm [&_.product-price_span]:lg:!text-sm [&_.product-price_s]:!text-xs [&_.product-price_s]:sm:!text-xs">
+                                <div className="mt-1 flex items-center gap-2 [&_.product-price_span]:text-sm! [&_.product-price_span]:lg:text-sm! [&_.product-price_s]:text-xs! [&_.product-price_s]:sm:text-xs!">
                                     <ProductPrice
                                         price={selectedVariant.price}
                                         compareAtPrice={selectedVariant.compareAtPrice}
@@ -475,7 +475,7 @@ export function StickyAddToCart({
                         </div>
 
                         {/* Add to cart / Size toggle */}
-                        <div className="flex-shrink-0 flex items-center gap-2">
+                        <div className="shrink-0 flex items-center gap-2">
                             <AddToCartCircle 
                                 product={product} 
                                 showSizePicker={showSizePicker} 
@@ -523,7 +523,7 @@ export function StickyAddToCart({
                         {/* Left: product info */}
                         <div className="flex items-center gap-4 min-w-0 flex-1">
                             {product.featuredImage && (
-                                <div className="w-11 h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-border flex-shrink-0">
+                                <div className="w-11 h-11 rounded-lg overflow-hidden border border-stone-200 dark:border-border shrink-0">
                                     <Image
                                         data={product.featuredImage}
                                         className="w-full h-full object-cover"
@@ -539,7 +539,7 @@ export function StickyAddToCart({
                                     {product.title}
                                 </p>
                                 {selectedVariant.price && (
-                                    <div className="mt-0.5 flex items-center gap-2 [&_.product-price_span]:!text-sm [&_.product-price_span]:lg:!text-sm [&_.product-price_s]:!text-xs [&_.product-price_s]:sm:!text-xs">
+                                    <div className="mt-0.5 flex items-center gap-2 [&_.product-price_span]:text-sm! [&_.product-price_span]:lg:text-sm! [&_.product-price_s]:text-xs! [&_.product-price_s]:sm:text-xs!">
                                         <ProductPrice
                                             price={selectedVariant.price}
                                             compareAtPrice={selectedVariant.compareAtPrice}
@@ -550,7 +550,7 @@ export function StickyAddToCart({
                         </div>
 
                         {/* Right: action buttons */}
-                        <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="flex items-center gap-3 shrink-0">
                             <AddToCartLongButton
                                 product={product}
                                 showSizePicker={showSizePicker}
