@@ -72,6 +72,7 @@ export function Aside({
   return (
     <div
       aria-modal
+      data-lenis-prevent
       className={`overlay fixed inset-0 z-100 transition-opacity duration-400 ease-in-out ${expanded ? 'expanded opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible'}`}
       role="dialog"
     >
@@ -135,6 +136,18 @@ Aside.Provider = function AsideProvider({ children }: { children: ReactNode }) {
 
     setType(mode);
   }, []);
+
+  // Stop Lenis smooth-scroll while any aside panel is open so it cannot
+  // intercept wheel / touch events meant for the modal content.
+  useEffect(() => {
+    const lenis = (window as any).__lenis;
+    if (!lenis) return;
+    if (type !== 'closed') {
+      lenis.stop();
+    } else {
+      lenis.start();
+    }
+  }, [type]);
 
   const close = useCallback(() => {
     if (type === 'mobile') {

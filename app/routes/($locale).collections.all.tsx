@@ -1,5 +1,5 @@
 import type { Route } from './+types/($locale).collections.all';
-import { useLoaderData, useSearchParams } from 'react-router';
+import { Link, useLoaderData, useSearchParams } from 'react-router';
 import { getPaginationVariables, Image, Money, CartForm } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
 import { CollectionHeroBanner } from '~/features/collection/components/CollectionHeroBanner';
@@ -570,7 +570,7 @@ function CollectionAllCard({
           </span>
         )}
 
-        <a href={`/products/${product.handle}`} className="absolute inset-0 block">
+        <Link to={`/products/${product.handle}`} prefetch="intent" className="absolute inset-0 block">
           {product.featuredImage && (
             <Image
               data={product.featuredImage}
@@ -606,7 +606,7 @@ function CollectionAllCard({
               <span className="text-5xl opacity-20 text-gray-400">✦</span>
             </div>
           )}
-        </a>
+        </Link>
 
         {(() => {
           const pid = String(product.id).split('/').pop();
@@ -632,11 +632,11 @@ function CollectionAllCard({
             )}% Off
           </span>
         )}
-        <a href={`/products/${product.handle}`} className="block">
+        <Link to={`/products/${product.handle}`} prefetch="intent" className="block">
           <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-foreground">
             {product.title}
           </h3>
-        </a>
+        </Link>
 
         <div className="flex items-center gap-2">
           <Money

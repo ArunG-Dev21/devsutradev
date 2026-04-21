@@ -673,7 +673,7 @@ function CollectionHandleCard({
           </span>
         )}
 
-        <a href={`/products/${product.handle}`} className="absolute inset-0 block">
+        <Link to={`/products/${product.handle}`} prefetch="intent" className="absolute inset-0 block">
           {product.featuredImage && (
             <Image
               data={product.featuredImage}
@@ -709,7 +709,7 @@ function CollectionHandleCard({
               <span className="text-5xl opacity-20 text-gray-400">✦</span>
             </div>
           )}
-        </a>
+        </Link>
 
         {(() => {
           const pid = String(product.id).split('/').pop();
@@ -725,11 +725,11 @@ function CollectionHandleCard({
       </div>
 
       <div className="bg-card rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-border/40 relative z-10">
-        <a href={`/products/${product.handle}`} className="block">
+        <Link to={`/products/${product.handle}`} prefetch="intent" className="block">
           <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-foreground">
             {product.title}
           </h3>
-        </a>
+        </Link>
 
         <div className="flex items-center gap-2">
           <Money
