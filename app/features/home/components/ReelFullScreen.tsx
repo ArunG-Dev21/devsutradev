@@ -81,7 +81,7 @@ function ReelSizePill({
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesAdd}
-      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1 }] }}
+      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1, selectedVariant: variant as any }] }}
       fetcherKey={`reel-size-${productId}-${variant.id}`}
     >
       {(fetcher) => (
@@ -255,7 +255,7 @@ function ReelATCButton({
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesAdd}
-      inputs={{ lines: [{ merchandiseId: product.variantId!, quantity: 1 }] }}
+      inputs={{ lines: [{ merchandiseId: product.variantId!, quantity: 1, selectedVariant: { id: product.variantId! } as any }] }}
       fetcherKey={`reel-atc-${product.id}`}
     >
       {(fetcher) => (

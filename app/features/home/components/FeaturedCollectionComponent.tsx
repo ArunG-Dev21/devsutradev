@@ -186,7 +186,7 @@ function SizePillForm({
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesAdd}
-      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1 }] }}
+      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1, selectedVariant: variant as any }] }}
       fetcherKey={`add-size-${productId}-${variant.id}`}
     >
       {(fetcher) => (

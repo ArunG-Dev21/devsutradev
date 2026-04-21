@@ -771,7 +771,7 @@ function CollectionAllSizePill({
     <CartForm
       route="/cart"
       action={CartForm.ACTIONS.LinesAdd}
-      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1 }] }}
+      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1, selectedVariant: variant as any }] }}
       fetcherKey={`all-size-${productId}-${variant.id}`}
     >
       {(fetcher) => (

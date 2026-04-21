@@ -1241,7 +1241,7 @@ function RecommendedProducts({ products }: { products: any[] }) {
                 <CartForm
                   route="/cart"
                   inputs={{
-                    lines: [{ merchandiseId: product.variants?.nodes?.[0]?.id, quantity: 1 }],
+                    lines: [{ merchandiseId: product.variants?.nodes?.[0]?.id, quantity: 1, selectedVariant: product.variants?.nodes?.[0] as any }],
                   }}
                   action={CartForm.ACTIONS.LinesAdd}
                 >
