@@ -14,7 +14,7 @@ function formatDate(iso?: string) {
   if (!iso) return null;
   const dt = new Date(iso);
   if (Number.isNaN(dt.getTime())) return null;
-  return dt.toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: 'numeric'});
+  return new Intl.DateTimeFormat('en-IN', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}).format(dt);
 }
 
 function Stars({rating, size = 'sm'}: {rating: number; size?: 'xs' | 'sm'}) {

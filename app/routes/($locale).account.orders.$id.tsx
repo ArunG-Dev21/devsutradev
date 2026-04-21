@@ -66,9 +66,9 @@ export default function OrderRoute() {
           </h2>
           <div className="flex flex-wrap items-center justify-center gap-2 mt-1.5 text-sm text-muted-foreground">
             <span>
-              {new Date(order.processedAt!).toLocaleDateString(undefined, {
-                year: 'numeric', month: 'long', day: 'numeric',
-              })}
+              {new Intl.DateTimeFormat('en-IN', {
+                year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+              }).format(new Date(order.processedAt!))}
             </span>
             {order.confirmationNumber && (
               <>

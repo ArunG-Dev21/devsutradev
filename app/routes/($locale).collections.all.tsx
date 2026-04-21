@@ -530,12 +530,12 @@ export default function Collection() {
                 <p className="text-sm text-muted-foreground mb-6">
                   Try adjusting your filters or browse all categories.
                 </p>
-                <a
-                  href="/collections/all"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-xs font-semibold tracking-wide rounded-full hover:opacity-80 transition-opacity"
+                <button
+                  onClick={clearAllFilters}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-xs font-semibold tracking-wide rounded-full hover:opacity-80 transition-opacity cursor-pointer"
                 >
                   Clear Filters
-                </a>
+                </button>
               </div>
             )}
           </div>

@@ -206,9 +206,9 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-muted-foreground">
           <span>
-            {new Date(order.processedAt).toLocaleDateString(undefined, {
-              year: 'numeric', month: 'long', day: 'numeric',
-            })}
+            {new Intl.DateTimeFormat('en-IN', {
+              year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+            }).format(new Date(order.processedAt))}
           </span>
           <span className="font-semibold text-foreground">
             <Money withoutTrailingZeros data={order.totalPrice} />
