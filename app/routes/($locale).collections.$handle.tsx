@@ -105,11 +105,12 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     relatedArticles = deduped.slice(0, 4);
   }
 
-  // Fetch Judge.me review summaries for all products in the collection
+  // Fetch Judge.me review summaries for products in the collection.
+  // Best-effort enrichment: the helper enforces its own timeout so the
+  // loader is never blocked by judge.me latency.
   let reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
   const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
   const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
-  console.log('[JudgeMe] Token exists:', !!judgeMeToken, 'Domain:', shopDomain);
   if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string') {
     try {
       const { getJudgeMeBatchSummaries } = await import('~/lib/judgeme.server');
@@ -119,24 +120,20 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
           handle: p.handle,
         }))
         .filter((p: any) => p.id);
-      console.log('[JudgeMe] Product entries:', JSON.stringify(productEntries));
       const summaryMap = await getJudgeMeBatchSummaries({
         shopDomain,
         apiToken: judgeMeToken,
         products: productEntries,
+        timeoutMs: 800,
       });
-      console.log('[JudgeMe] Summary map size:', summaryMap.size);
-      // Convert Map to a plain object so it serialises safely across the loader boundary
       for (const [id, summary] of summaryMap) {
-        console.log('[JudgeMe] Found review:', id, summary);
         reviewSummaries[id] = summary;
       }
-    } catch (err) {
-      console.error('[JudgeMe] Batch fetch error:', err);
+    } catch {
+      // Non-critical: render the page without review stars.
     }
   }
 
-  console.log('[JudgeMe] Final reviewSummaries:', JSON.stringify(reviewSummaries));
   return { collection, relatedArticles, reviewSummaries };
 }
 

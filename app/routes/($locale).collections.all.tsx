@@ -125,6 +125,7 @@ async function loadCriticalData({ context, request }: Route.LoaderArgs) {
         shopDomain,
         apiToken: judgeMeToken,
         products: productEntries,
+        timeoutMs: 800,
       });
       for (const [id, summary] of summaryMap) {
         reviewSummaries[id] = summary;

@@ -283,6 +283,13 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
     toggle: () => setIsOpen((v) => !v),
   }));
 
+  // Only render nav cards for collections that actually exist in Shopify.
+  // A hard-coded handle that doesn't resolve server-side turns into a 404
+  // on click AND on prefetch — the latter piles concurrent loader work
+  // onto workerd, which on Windows can crash with an access violation.
+  const availableHandles = new Set<string>(
+    (collections?.nodes ?? []).map((c: any) => c.handle),
+  );
   const SECONDARY_NAV_ITEMS = [
     { title: 'Karungali', handle: 'karungali' },
     { title: 'Rudraksha', handle: 'rudraksha' },
@@ -290,7 +297,7 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
     { title: 'Shiva Idols', handle: 'shiva-idols' },
     { title: 'Pyrite Stones', handle: 'pyrite-stones' },
     { title: 'Pyramids', handle: 'pyramids' },
-  ];
+  ].filter((item) => availableHandles.has(item.handle));
 
   return (
     <>
@@ -389,6 +396,10 @@ export function HeaderMenu({
       ? new URL(url).pathname
       : url;
 
+  // Mirror the SubNavIsland filter: skip any handle Shopify didn't return.
+  const availableHandles = new Set<string>(
+    (collections?.nodes ?? []).map((c: any) => c.handle),
+  );
   const SECONDARY_NAV_ITEMS = [
     { title: 'Karungali', handle: 'karungali' },
     { title: 'Rudraksha', handle: 'rudraksha' },
@@ -396,7 +407,7 @@ export function HeaderMenu({
     { title: 'Shiva Idols', handle: 'shiva-idols' },
     { title: 'Pyrite Stones', handle: 'pyrite-stones' },
     { title: 'Pyramids', handle: 'pyramids' },
-  ];
+  ].filter((item) => availableHandles.has(item.handle));
 
   const mobileCollectionCards = [
     {

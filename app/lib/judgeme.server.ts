@@ -230,8 +230,9 @@ export async function getJudgeMeBatchSummaries(options: {
   shopDomain: string;
   apiToken: string;
   products: Array<{ id: string; handle: string }>;
+  timeoutMs?: number;
 }): Promise<Map<string, JudgeMeSummary>> {
-  const { shopDomain, apiToken, products } = options;
+  const { shopDomain, apiToken, products, timeoutMs = 800 } = options;
   const result = new Map<string, JudgeMeSummary>();
 
   if (!products.length) return result;
@@ -285,6 +286,20 @@ export async function getJudgeMeBatchSummaries(options: {
     if (summary && summary.reviewCount > 0) result.set(id, summary);
   });
 
-  await Promise.allSettled(fetches);
+  // Hard timeout: Judge.me is a best-effort enrichment; it must never
+  // block the loader. If it exceeds `timeoutMs`, return whatever has
+  // resolved so far and let the rest populate the in-memory cache in
+  // the background for the next request.
+  const batch = Promise.allSettled(fetches);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<'timeout'>((resolve) => {
+    timer = setTimeout(() => resolve('timeout'), timeoutMs);
+  });
+
+  try {
+    await Promise.race([batch, timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
   return result;
 }

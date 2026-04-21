@@ -31,6 +31,7 @@ import {
 } from '~/lib/seo';
 import { sanitizeHtml } from '~/lib/sanitizer';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
+import { StarRating } from '~/shared/components/StarRating';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   const product = (data as any)?.product;
@@ -112,14 +113,41 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     }
   }
 
-  return { product, recommendedProducts, judgeme, judgemeEnabled, judgemeRequireLogin, seoOrigin: new URL(request.url).origin };
+  // Star-rating summaries for the "You may also like" rail. Same timeout
+  // guard as the collection loaders so judge.me latency can't stall the
+  // product page.
+  let recommendedReviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
+  if (judgemeEnabled && recommendedProducts.length > 0) {
+    try {
+      const { getJudgeMeBatchSummaries } = await import('~/lib/judgeme.server');
+      const productEntries = recommendedProducts
+        .map((p: any) => ({
+          id: String(p.id).split('/').pop() || '',
+          handle: p.handle,
+        }))
+        .filter((p) => p.id);
+      const summaryMap = await getJudgeMeBatchSummaries({
+        shopDomain,
+        apiToken: judgeMeToken as string,
+        products: productEntries,
+        timeoutMs: 800,
+      });
+      for (const [id, summary] of summaryMap) {
+        recommendedReviewSummaries[id] = summary;
+      }
+    } catch {
+      // Non-critical
+    }
+  }
+
+  return { product, recommendedProducts, recommendedReviewSummaries, judgeme, judgemeEnabled, judgemeRequireLogin, seoOrigin: new URL(request.url).origin };
 }
 
 // ─── Main Product Component ───────────────────────────────────────────────────
 
 export default function Product() {
   const data = useLoaderData<typeof loader>() as any;
-  const { product, recommendedProducts, judgeme, judgemeEnabled, judgemeRequireLogin } = data;
+  const { product, recommendedProducts, recommendedReviewSummaries, judgeme, judgemeEnabled, judgemeRequireLogin } = data;
   const seoOrigin = data?.seoOrigin || '';
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const productFormRef = useRef<HTMLDivElement>(null);
@@ -1020,7 +1048,10 @@ export default function Product() {
         </div>
 
         {/* ── "You May Also Like" ── */}
-        <RecommendedProducts products={recommendedProducts} />
+        <RecommendedProducts
+          products={recommendedProducts}
+          reviewSummaries={recommendedReviewSummaries}
+        />
       </main>
 
       {/* ── Share Modal (animated bottom-sheet on mobile, centred panel on desktop) ── */}
@@ -1175,7 +1206,13 @@ function CouponCard({ code, label, offer }: { code: string; label?: string; offe
 
 // ─── Recommended Products ─────────────────────────────────────────────────────
 
-function RecommendedProducts({ products }: { products: any[] }) {
+function RecommendedProducts({
+  products,
+  reviewSummaries,
+}: {
+  products: any[];
+  reviewSummaries?: Record<string, { averageRating: number; reviewCount: number }>;
+}) {
   const displayProducts = products?.slice(0, 4) ?? [];
 
   if (displayProducts.length === 0) return null;
@@ -1198,65 +1235,63 @@ function RecommendedProducts({ products }: { products: any[] }) {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-        {displayProducts.map((product: any, index: number) => (
-          <div
-            key={product.id}
-            className="group bg-[#f6f6f6] dark:bg-muted border border-transparent dark:border-border rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all h-full"
-          >
-            {/* Image */}
-            <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
-              <Link to={`/products/${product.handle}`} prefetch="intent" className="block w-full h-full">
-                {product.featuredImage ? (
-                  <Image
-                    data={product.featuredImage}
-                    className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-105"
-                    loading={index < 2 ? 'eager' : 'lazy'}
-                    sizes="(min-width: 1024px) 25vw, 50vw"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-transparent">
-                    <span className="text-5xl opacity-20 text-gray-400">✦</span>
-                  </div>
-                )}
-              </Link>
-            </div>
-
-            {/* Detail card */}
-            <div className="bg-white dark:bg-card rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 dark:border-border/40 relative z-10">
-              <Link to={`/products/${product.handle}`} prefetch="intent" className="block">
-                <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black dark:text-foreground">
-                  {product.title}
-                </h3>
-              </Link>
-
-              <div className="flex items-center gap-2">
-                <Money
-                  withoutTrailingZeros
-                  data={product.priceRange.minVariantPrice}
-                  className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black dark:text-foreground leading-none"
-                />
-              </div>
-
-              <div className="mt-auto pt-2">
-                <CartForm
-                  route="/cart"
-                  inputs={{
-                    lines: [{ merchandiseId: product.variants?.nodes?.[0]?.id, quantity: 1, selectedVariant: product.variants?.nodes?.[0] as any }],
-                  }}
-                  action={CartForm.ACTIONS.LinesAdd}
-                >
-                  {(fetcher) => (
-                    <RelatedProductAddButton
-                      fetcher={fetcher}
-                      availableForSale={product.variants?.nodes?.[0]?.availableForSale}
-                      productTitle={product.title}
+        {displayProducts.map((product: any, index: number) => {
+          const pid = String(product.id).split('/').pop();
+          const summary = pid ? reviewSummaries?.[pid] : undefined;
+          return (
+            <div
+              key={product.id}
+              className="group bg-[#f6f6f6] dark:bg-muted border border-transparent dark:border-border rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all h-full"
+            >
+              {/* Image */}
+              <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
+                <Link to={`/products/${product.handle}`} prefetch="intent" className="block w-full h-full">
+                  {product.featuredImage ? (
+                    <Image
+                      data={product.featuredImage}
+                      className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-105"
+                      loading={index < 2 ? 'eager' : 'lazy'}
+                      sizes="(min-width: 1024px) 25vw, 50vw"
                     />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-transparent">
+                      <span className="text-5xl opacity-20 text-gray-400">✦</span>
+                    </div>
                   )}
-                </CartForm>
+                </Link>
+
+                {summary && (
+                  <StarRating
+                    rating={summary.averageRating}
+                    count={summary.reviewCount}
+                    className="absolute top-2 right-2 z-10"
+                  />
+                )}
+              </div>
+
+              {/* Detail card */}
+              <div className="bg-white dark:bg-card rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-black/10 dark:border-border/40 relative z-10">
+                <Link to={`/products/${product.handle}`} prefetch="intent" className="block">
+                  <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-black dark:text-foreground">
+                    {product.title}
+                  </h3>
+                </Link>
+
+                <div className="flex items-center gap-2">
+                  <Money
+                    withoutTrailingZeros
+                    data={product.priceRange.minVariantPrice}
+                    className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black dark:text-foreground leading-none"
+                  />
+                </div>
+
+                <div className="mt-auto pt-2">
+                  <RelatedProductATC product={product} />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
@@ -1293,6 +1328,170 @@ function RelatedProductAddButton({
       <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 dark:invert dark:brightness-0 group-hover:invert group-hover:brightness-0 transition-all" />
       {availableForSale ? 'Add to Bag' : 'Sold Out'}
     </button>
+  );
+}
+
+// ─── Related product size-pill (inner — component so useEffect works) ────────
+function RelatedSizePillInner({
+  fetcher,
+  variant,
+  productTitle,
+  productImage,
+  onAdded,
+}: {
+  fetcher: any;
+  variant: { id: string; availableForSale: boolean; title?: string };
+  productTitle: string;
+  productImage?: { url: string; altText?: string | null };
+  onAdded: () => void;
+}) {
+  const { showNotification } = useCartNotification();
+  const prevState = useRef<string>('idle');
+
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
+      showNotification(productTitle, productImage);
+      onAdded();
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, showNotification, productTitle, productImage, onAdded]);
+
+  const isAdding = fetcher.state !== 'idle';
+
+  return (
+    <button
+      type="submit"
+      disabled={!variant.availableForSale || isAdding}
+      className={[
+        'px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-medium tracking-wide uppercase border transition-all duration-150 cursor-pointer select-none',
+        !variant.availableForSale
+          ? 'border-gray-200 text-gray-300 line-through cursor-not-allowed'
+          : isAdding
+            ? 'border-gray-900 bg-gray-900 text-white opacity-70 cursor-not-allowed'
+            : 'border-gray-300 text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white active:scale-95',
+      ].join(' ')}
+      aria-label={`Add size ${variant.title ?? ''}`}
+    >
+      {isAdding ? (
+        <svg className="animate-spin inline-block w-3 h-3" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
+          <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      ) : (
+        variant.title ?? '—'
+      )}
+    </button>
+  );
+}
+
+function RelatedSizePill({
+  variant,
+  productTitle,
+  productImage,
+  productId,
+  onAdded,
+}: {
+  variant: { id: string; availableForSale: boolean; title?: string };
+  productTitle: string;
+  productImage?: { url: string; altText?: string | null };
+  productId: string;
+  onAdded: () => void;
+}) {
+  return (
+    <CartForm
+      route="/cart"
+      action={CartForm.ACTIONS.LinesAdd}
+      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1, selectedVariant: variant as any }] }}
+      fetcherKey={`rec-size-${productId}-${variant.id}`}
+    >
+      {(fetcher) => (
+        <RelatedSizePillInner
+          fetcher={fetcher}
+          variant={variant}
+          productTitle={productTitle}
+          productImage={productImage}
+          onAdded={onAdded}
+        />
+      )}
+    </CartForm>
+  );
+}
+
+// ─── Smart ATC for "You may also like" cards ─────────────────────────────────
+function RelatedProductATC({ product }: { product: any }) {
+  const [showSizes, setShowSizes] = useState(false);
+  const variants: Array<{ id: string; availableForSale: boolean; title?: string }> =
+    product.variants?.nodes ?? [];
+  const firstVariant = variants[0];
+  const isAvailable = firstVariant?.availableForSale ?? false;
+  const hasMultiple = variants.length > 1;
+
+  if (!isAvailable) {
+    return (
+      <button
+        disabled
+        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-card border border-gray-300 dark:border-border text-gray-400 dark:text-muted-foreground text-xs sm:text-base rounded-full cursor-not-allowed"
+      >
+        Sold Out
+      </button>
+    );
+  }
+
+  if (!hasMultiple) {
+    return (
+      <CartForm
+        route="/cart"
+        inputs={{ lines: [{ merchandiseId: firstVariant.id, quantity: 1, selectedVariant: firstVariant as any }] }}
+        action={CartForm.ACTIONS.LinesAdd}
+      >
+        {(fetcher) => (
+          <RelatedProductAddButton
+            fetcher={fetcher}
+            availableForSale={isAvailable}
+            productTitle={product.title}
+          />
+        )}
+      </CartForm>
+    );
+  }
+
+  return (
+    <div>
+      {showSizes && (
+        <div className="mb-2">
+          <p className="text-[9px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-1.5">Select Size</p>
+          <div className="flex flex-wrap gap-1.5">
+            {variants.map((v) => (
+              <RelatedSizePill
+                key={v.id}
+                variant={v}
+                productTitle={product.title}
+                productImage={product.featuredImage ?? undefined}
+                productId={product.id}
+                onAdded={() => setShowSizes(false)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => setShowSizes((s) => !s)}
+        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 border text-xs sm:text-base rounded-full transition-all duration-200 cursor-pointer group ${
+          showSizes
+            ? 'bg-foreground border-foreground text-background'
+            : 'bg-white dark:bg-card border-gray-800 dark:border-border text-gray-800 dark:text-foreground hover:bg-black/90 dark:hover:bg-foreground hover:text-white dark:hover:text-background'
+        }`}
+        aria-label="Select size"
+      >
+        <img
+          src="/icons/add-bag.png"
+          alt=""
+          className={`w-4 h-4 md:w-6 md:h-6 shrink-0 transition-all dark:invert ${showSizes ? 'invert brightness-0 dark:brightness-100' : 'group-hover:invert group-hover:brightness-0 dark:group-hover:brightness-100'}`}
+        />
+        {showSizes ? 'Close' : 'Select Size'}
+      </button>
+    </div>
   );
 }
 
@@ -1433,6 +1632,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       id
       title
       handle
+      tags
       featuredImage {
         id
         altText
@@ -1446,10 +1646,11 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
           currencyCode
         }
       }
-      variants(first: 1) {
+      variants(first: 10) {
         nodes {
           id
           availableForSale
+          title
         }
       }
     }
