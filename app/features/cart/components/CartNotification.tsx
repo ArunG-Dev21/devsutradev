@@ -7,7 +7,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { useNavigate } from "react-router";
+import { useAside } from "~/shared/components/Aside";
 
 type CartNotificationContextValue = {
   showNotification: (productTitle?: string, productImage?: { url: string; altText?: string | null }) => void;
@@ -30,7 +30,7 @@ const MAX_VISIBLE = 5;
 export function CartNotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-  const navigate = useNavigate();
+  const { open } = useAside();
 
   const clearTimerForId = useCallback((id: string) => {
     const t = timersRef.current.get(id);
@@ -92,8 +92,8 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
 
   const handleViewCart = useCallback((id: string) => {
     dismiss(id);
-    void navigate('/cart');
-  }, [dismiss, navigate]);
+    open('cart');
+  }, [dismiss, open]);
 
   // Escape key dismisses all
   useEffect(() => {
@@ -122,7 +122,7 @@ export function CartNotificationProvider({ children }: { children: ReactNode }) 
       {notifications.length > 0 && (
         <div
           aria-live="polite"
-          className="fixed top-4 right-3 sm:right-4 z-[110000] flex flex-col-reverse items-end gap-3 pointer-events-none"
+          className="fixed top-4 right-3 sm:right-4 z-110000 flex flex-col-reverse items-end gap-3 pointer-events-none"
           style={{ maxHeight: 'calc(100vh - 2rem)' }}
         >
           {notifications.map((notif, index) => (

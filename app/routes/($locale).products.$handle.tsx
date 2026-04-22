@@ -817,8 +817,7 @@ export default function Product() {
                     What Our Customers Say
                   </p>
                   <h3
-                    className="text-2xl sm:text-[28px] font-light text-stone-900 dark:text-foreground leading-tight"
-                    style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
+                    className="text-2xl sm:text-[28px] text-stone-900 dark:text-foreground leading-tight"
                   >
                     Customer Reviews
                   </h3>
@@ -972,8 +971,8 @@ export default function Product() {
             {/* ── DEMO: How to Wear ── */}
             <div className="mt-14">
               <div className="mb-8">
-                <p className="text-[10px] tracking-[0.3em] uppercase text-stone-400 dark:text-muted-foreground mb-1.5">Guide</p>
-                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-widest">
+                <p className="text-[10px] tracking-[0.3em] md:text-left text-center uppercase text-stone-400 dark:text-muted-foreground mb-1.5">Guide</p>
+                <h3 className="text-2xl md:text-left text-center sm:text-3xl font-heading font-semibold text-stone-900 dark:text-foreground leading-tight">
                   How to Wear & Care
                 </h3>
               </div>

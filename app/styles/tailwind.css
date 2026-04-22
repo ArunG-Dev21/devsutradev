@@ -56,6 +56,10 @@
   animation: shipping-gradient-shift 4.5s linear infinite;
 }
 
+.dark .text-shipping-gradient {
+  background-image: linear-gradient(90deg, #f14514 0%, #ffffff 22%, #ef4444 50%, #ffffff 78%, #f14514 100%);
+}
+
 /* ── Custom transition duration for overlay exit ── */
 @utility duration-1200 {
   transition-duration: 1200ms;

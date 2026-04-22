@@ -246,7 +246,7 @@ function CartDiscounts({
           const info = couponInfoMap[code.toUpperCase()];
           const reason = info?.offer ?? info?.label ?? 'Not applicable to your current cart';
           return (
-            <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-1">
+            <div className="flex items-center gap-2 rounded-md border border-dashed border-black dark:border-white/50 px-3 py-1">
               <svg
                 className="w-3.5 h-3.5 text-yellow-500 shrink-0"
                 viewBox="0 0 24 24" fill="currentColor"
@@ -254,8 +254,8 @@ function CartDiscounts({
                 <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
               </svg>
               <div className="flex-1 min-w-0">
-                <code className="font-mono text-[11px] sm:text-xs font-semibold tracking-widest text-black">{code}</code>
-                <p className="text-[9px] sm:text-[10px] text-black/60 leading-none mt-0.5 truncate">{reason}</p>
+                <code className="font-mono text-[11px] sm:text-xs font-semibold tracking-widest text-black dark:text-white">{code}</code>
+                <p className="text-[9px] sm:text-[10px] text-black/60 dark:text-white/60 leading-none mt-0.5 truncate">{reason}</p>
               </div>
               <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
                 <button type="submit" className="text-[9px] font-bold uppercase tracking-wider text-[#F14514] cursor-pointer shrink-0">
@@ -320,8 +320,8 @@ function CartDiscounts({
             <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-background z-10" />
             <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-background z-10" />
             <div className="flex items-center px-3 py-3 shrink-0">
-              <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="#000" strokeWidth={2}>
+              <div className="w-7 h-7 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center">
+                <svg className="w-3.5 h-3.5 text-[#f14514]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
                 </svg>
@@ -461,7 +461,7 @@ function CartDiscountsAside({
           const info = couponInfoMap[code.toUpperCase()];
           const reason = info?.offer ?? info?.label ?? 'Not applicable to your current cart';
           return (
-            <div className="flex items-center gap-2 rounded-md border border-dashed border-black px-3 py-2">
+            <div className="flex items-center gap-2 rounded-md border border-dashed border-black dark:border-white/50 px-3 py-2">
               <svg
                 className="w-6 h-6 text-[#f14514] shrink-0"
                 viewBox="0 0 24 24" fill="currentColor"
@@ -469,8 +469,8 @@ function CartDiscountsAside({
                 <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
               </svg>
               <div className="flex flex-1 flex-col justify-between min-w-0">
-                <code className="font-mono text-[11px] font-semibold tracking-widest text-black">{code}</code>
-                <p className="text-xs text-black/60 leading-none truncate">{reason}</p>
+                <code className="font-mono text-[11px] font-semibold tracking-widest text-black dark:text-white">{code}</code>
+                <p className="text-xs text-black/60 dark:text-white/60 leading-none truncate">{reason}</p>
               </div>
               <UpdateDiscountForm discountCodes={allCodes.filter((c) => c !== code)}>
                 <button type="submit" className="text-[9px] font-bold uppercase tracking-wider text-[#F14514] cursor-pointer shrink-0">
@@ -530,19 +530,19 @@ function CartDiscountsAside({
         <UpdateDiscountForm key={code} discountCodes={[...appliedCodes, code]}>
           <button
             type="submit"
-            className="relative flex items-stretch w-full rounded-xl bg-black hover:bg-zinc-900 transition cursor-pointer"
+            className="relative flex items-stretch w-full rounded-xl bg-black dark:bg-zinc-800 border border-transparent dark:border-zinc-700 transition cursor-pointer group"
           >
-            <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white z-10" />
-            <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white z-10" />
+            <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-card border-r border-border dark:border-zinc-700 z-10" />
+            <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-card border-l border-border dark:border-zinc-700 z-10" />
             <div className="flex items-center px-3 py-3 shrink-0">
-              <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="#000" strokeWidth={2}>
+              <div className="w-6 h-6 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center">
+                <svg className="w-3 h-3 text-[#f14514]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
                 </svg>
               </div>
             </div>
-            <div className="self-stretch w-0 border-l border-dashed border-white/40" />
+            <div className="self-stretch w-0 border-l border-dashed border-white/40 dark:border-white/20" />
             <div className="flex-1 flex items-stretch gap-2 px-2.5 py-2.5 min-w-0">
               <div className="flex flex-col justify-center gap-0.5 shrink-0">
                 {label && (

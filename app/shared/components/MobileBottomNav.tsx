@@ -165,7 +165,7 @@ function CartCount({ cart: resolvedCart }: { cart: CartApiQueryFragment | null }
 
   return (
     <span
-      className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold flex items-center justify-center bg-black text-white"
+      className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold flex items-center justify-center bg-black text-white dark:invert"
     >
       {count > 99 ? "99+" : count}
     </span>
