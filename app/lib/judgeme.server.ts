@@ -95,9 +95,10 @@ function normalizeReview(input: any): JudgeMeReview | null {
     String(input?.body ?? input?.review ?? input?.content ?? input?.message ?? '')
       .trim();
 
-  if (!body) return null;
-
   const title = typeof input?.title === 'string' ? input.title.trim() : undefined;
+
+  // Drop only when the review has no usable content at all (no body, no title, no rating).
+  if (!body && !title && !rating) return null;
 
   const reviewerName =
     String(
@@ -122,17 +123,32 @@ function normalizeReview(input: any): JudgeMeReview | null {
     input?.media ??
     [];
 
+  const extractPictureUrl = (u: unknown): string | null => {
+    if (typeof u === 'string') return u;
+    if (!u || typeof u !== 'object') return null;
+    const obj = u as Record<string, unknown>;
+    // Judge.me hides moderated images via { hidden: true }
+    if (obj.hidden === true) return null;
+    // Judge.me's actual response shape: { urls: { original, huge, compact }, hidden }
+    if (obj.urls && typeof obj.urls === 'object') {
+      const urls = obj.urls as Record<string, unknown>;
+      for (const key of ['original', 'huge', 'compact', 'small', 'thumbnail']) {
+        const val = urls[key];
+        if (typeof val === 'string' && val.length > 0) return val;
+      }
+    }
+    // Fallbacks for older / alternative shapes.
+    for (const key of ['url', 'src', 'href', 'original', 'huge', 'compact']) {
+      const val = obj[key];
+      if (typeof val === 'string' && val.length > 0) return val;
+    }
+    return null;
+  };
+
   const pictureUrls =
     Array.isArray(pictureUrlsRaw)
       ? pictureUrlsRaw
-          .map((u: unknown) => {
-            if (typeof u === 'string') return u;
-            if (u && typeof u === 'object' && 'url' in u) {
-              const url = (u as {url?: unknown}).url;
-              if (typeof url === 'string') return url;
-            }
-            return null;
-          })
+          .map(extractPictureUrl)
           .filter((u): u is string => typeof u === 'string' && u.length > 0)
       : [];
 
@@ -232,7 +248,7 @@ export async function getJudgeMeBatchSummaries(options: {
   products: Array<{ id: string; handle: string }>;
   timeoutMs?: number;
 }): Promise<Map<string, JudgeMeSummary>> {
-  const { shopDomain, apiToken, products, timeoutMs = 800 } = options;
+  const { shopDomain, apiToken, products, timeoutMs = 2500 } = options;
   const result = new Map<string, JudgeMeSummary>();
 
   if (!products.length) return result;

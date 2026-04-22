@@ -262,7 +262,18 @@ export function ErrorBoundary() {
   let errorStatus = 500;
 
   if (isRouteErrorResponse(error)) {
-    errorMessage = error?.data?.message ?? error.data;
+    const data: unknown = error.data;
+    if (data && typeof data === 'object' && 'message' in data && typeof (data as {message?: unknown}).message === 'string') {
+      errorMessage = (data as {message: string}).message;
+    } else if (typeof data === 'string') {
+      errorMessage = data;
+    } else if (data != null) {
+      try {
+        errorMessage = JSON.stringify(data);
+      } catch {
+        errorMessage = String(data);
+      }
+    }
     errorStatus = error.status;
   } else if (error instanceof Error) {
     errorMessage = error.message;

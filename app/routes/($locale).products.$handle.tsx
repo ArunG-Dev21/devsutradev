@@ -547,7 +547,9 @@ export default function Product() {
               {images.map((img, idx) => (
                 <div
                   key={img.url}
-                  ref={(el) => (imageRefs.current[idx] = el)}
+                  ref={(el) => {
+                    imageRefs.current[idx] = el;
+                  }}
                   data-index={idx}
                   className="w-full shrink-0 snap-center rounded-[24px] bg-[#F6F6F6] aspect-3/2 overflow-hidden relative flex items-center justify-center"
                 >

@@ -22,6 +22,12 @@ export function CartLineItem({
   reviewSummary?: { averageRating: number; reviewCount: number };
 }) {
   const { id, merchandise } = line;
+  const productHandle = merchandise?.product?.handle ?? '';
+  const selectedOptions = merchandise?.selectedOptions;
+
+  // Hooks must run unconditionally — call them before any early return.
+  const lineItemUrl = useVariantUrl(productHandle, selectedOptions);
+  const { close } = useAside();
 
   // Optimistic lines from useOptimisticCart may not have full merchandise data.
   // Skip rendering if essential product info is missing to prevent crashes.
@@ -29,9 +35,7 @@ export function CartLineItem({
     return null;
   }
 
-  const { product, title, image, selectedOptions } = merchandise;
-  const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
-  const { close } = useAside();
+  const { product, title, image } = merchandise;
   const lineItemChildren = childrenMap[id];
   const childrenLabelId = `cart-line-children-${id}`;
   const visibleOptions = (selectedOptions || []).filter(
