@@ -4,14 +4,23 @@ import { CartForm, Money, type OptimisticCart } from '@shopify/hydrogen';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, type FetcherWithComponents } from 'react-router';
 import { useAside } from '~/shared/components/Aside';
+import { useFetcher } from 'react-router';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
   layout: CartLayout;
+  unselectedLineIds?: Set<string>;
+  selectedCount?: number;
+  totalCount?: number;
+  selectedSubtotalAmount?: number;
 };
 
-export function CartSummary({ cart, layout }: CartSummaryProps) {
+export function CartSummary({ cart, layout, unselectedLineIds, selectedCount, totalCount, selectedSubtotalAmount }: CartSummaryProps) {
   const { close } = useAside();
+  const currencyCode = cart?.cost?.subtotalAmount?.currencyCode || 'INR';
+  const subtotalObj = selectedSubtotalAmount !== undefined 
+    ? { amount: selectedSubtotalAmount.toString(), currencyCode } 
+    : cart?.cost?.subtotalAmount;
 
   return (
     <div
@@ -24,8 +33,8 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
       <div className="flex items-center justify-between mb-1">
         <span className={`font-semibold text-black ${layout === 'aside' ? 'text-base' : 'text-base sm:text-lg'}`}>Subtotal</span>
         <span className={`font-medium text-black ${layout === 'aside' ? 'text-lg' : 'text-lg sm:text-xl'}`}>
-          {cart?.cost?.subtotalAmount?.amount ? (
-            <Money className="font-montserrat" withoutTrailingZeros data={cart.cost.subtotalAmount} />
+          {subtotalObj ? (
+            <Money className="font-montserrat" withoutTrailingZeros data={subtotalObj} />
           ) : (
             '—'
           )}
@@ -55,8 +64,15 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
           </span>
         </div>
 
+
+
         {/* Checkout Button */}
-        <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} layout={layout} />
+        <CartCheckoutActions 
+          checkoutUrl={cart?.checkoutUrl} 
+          layout={layout} 
+          unselectedLineIds={unselectedLineIds} 
+          selectedCount={selectedCount}
+        />
       </div>
 
       {/* Payment logos */}
@@ -95,12 +111,53 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
 function CartCheckoutActions({
   checkoutUrl,
   layout,
+  unselectedLineIds,
+  selectedCount,
 }: {
   checkoutUrl?: string;
   layout: CartLayout;
+  unselectedLineIds?: Set<string>;
+  selectedCount?: number;
 }) {
   const { close } = useAside();
+  const fetcher = useFetcher();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  useEffect(() => {
+    if (isCheckingOut && fetcher.state === 'idle' && fetcher.data) {
+       // removal complete, redirect
+       window.location.href = checkoutUrl!;
+    }
+  }, [fetcher.state, isCheckingOut, checkoutUrl]);
+
   if (!checkoutUrl) return null;
+
+  const hasUnselected = unselectedLineIds && unselectedLineIds.size > 0;
+  const isZeroSelected = selectedCount === 0;
+  const isLoading = isCheckingOut || fetcher.state !== 'idle';
+  const isDisabled = isZeroSelected || isLoading;
+
+  const handleCheckoutClick = (e: React.MouseEvent) => {
+    if (isZeroSelected) {
+      e.preventDefault();
+      return;
+    }
+    if (hasUnselected) {
+      e.preventDefault();
+      setIsCheckingOut(true);
+      
+      const lines = Array.from(unselectedLineIds);
+      fetcher.submit(
+        {
+          cartFormInput: JSON.stringify({
+            action: CartForm.ACTIONS.LinesRemove,
+            inputs: { lineIds: lines },
+          })
+        },
+        { method: 'POST', action: '/cart' }
+      );
+    }
+  };
 
   if (layout === 'aside') {
     return (
@@ -109,10 +166,18 @@ function CartCheckoutActions({
         <a
           href={checkoutUrl}
           target="_self"
-          className="flex-3 flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
+          onClick={handleCheckoutClick}
+          className={`flex-3 flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 ${isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:opacity-90'} bg-foreground text-background`}
         >
-          <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
-          Checkout
+          {isLoading ? (
+             <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+               <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2.5" />
+               <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+             </svg>
+          ) : (
+            <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
+          )}
+          {isLoading ? 'Processing...' : 'Checkout'}
         </a>
 
         {/* View bag — 1/4 width */}
@@ -140,10 +205,18 @@ function CartCheckoutActions({
       <a
         href={checkoutUrl}
         target="_self"
-        className="flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 text-center text-[11px] sm:text-sm tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
+        onClick={handleCheckoutClick}
+        className={`flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 text-center text-[11px] sm:text-sm tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 ${isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:opacity-90'} bg-foreground text-background`}
       >
-        <img src='/icons/rps.png' alt='' width={24} height={24} className='w-6 h-6' />
-        PROCEED TO CHECKOUT
+        {isLoading ? (
+             <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
+               <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2.5" />
+               <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+             </svg>
+        ) : (
+          <img src='/icons/rps.png' alt='' width={24} height={24} className='w-6 h-6' />
+        )}
+        {isLoading ? 'PROCESSING...' : 'PROCEED TO CHECKOUT'}
       </a>
     </div>
   );

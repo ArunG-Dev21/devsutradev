@@ -167,7 +167,7 @@ function ReelATCInner({
 }
 
 // ─── Reel ATC Button (single or multi-variant) ───────────────────────────────
-function ReelATCButton({
+export function ReelATCButton({
   product,
 }: {
   product: SocialReel['products'][number];

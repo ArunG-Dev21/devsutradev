@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router';
-import { ReelFullScreen } from './ReelFullScreen';
+import { ReelFullScreen, ReelATCButton } from './ReelFullScreen';
 
 export interface SocialReel {
   id: string;
@@ -45,6 +45,102 @@ const TagIcon = ({ className = '' }: { className?: string }) => (
 function getClientX(e: TouchEvent | MouseEvent): number {
   if ('touches' in e) return e.touches[0]?.clientX ?? 0;
   return e.clientX;
+}
+
+/* ── scroller wrapper with disappearing buttons ── */
+function ProductPillScroller({ children }: { children: React.ReactNode }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setShowLeft(scrollLeft > 5);
+    setShowRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth - 5);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    // small delay to allow images to render and calculate width
+    const timer = setTimeout(checkScroll, 100);
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll, children]);
+
+  // Prevent internal scrolling from bubbling up to the main reel slider
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const stopPropagation = (e: Event) => e.stopPropagation();
+
+    // Native event listeners are required here because the parent reel uses native listeners
+    el.addEventListener('touchstart', stopPropagation, { passive: false });
+    el.addEventListener('touchmove', stopPropagation, { passive: false });
+    el.addEventListener('mousedown', stopPropagation);
+
+    return () => {
+      el.removeEventListener('touchstart', stopPropagation);
+      el.removeEventListener('touchmove', stopPropagation);
+      el.removeEventListener('mousedown', stopPropagation);
+    };
+  }, []);
+
+  const scrollBy = (offset: number) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div className="relative w-full group/scroller">
+      <div
+        ref={scrollRef}
+        onScroll={checkScroll}
+        className="
+          backdrop-blur-xl
+          bg-white/20 dark:bg-black/40
+          border border-white/30 dark:border-white/10
+          rounded-full
+          px-1.5 py-1.5
+          w-full
+          flex gap-2 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth
+        "
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+
+      {showLeft && (
+        <button
+          onClick={(e) => { e.stopPropagation(); scrollBy(-150); }}
+          className="absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-white border border-border rounded-full flex items-center justify-center shadow-md z-10 opacity-0 md:group-hover/scroller:opacity-100 transition-opacity"
+          aria-label="Scroll left"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+      )}
+
+      {showRight && (
+        <button
+          onClick={(e) => { e.stopPropagation(); scrollBy(150); }}
+          className="absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-white border border-border rounded-full flex items-center justify-center shadow-md z-10 opacity-0 md:group-hover/scroller:opacity-100 transition-opacity"
+          aria-label="Scroll right"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
 }
 
 /* ── active-card video player ── */
@@ -285,11 +381,60 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                     </button>
                   )}
 
-                  {/* product-count badge */}
-                  {reel.products && reel.products.length > 0 && !isActive && (
-                    <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-[rgba(30,30,30,0.65)] backdrop-blur-md text-white text-[10px] font-medium px-3 py-1 rounded-full whitespace-nowrap border border-white/[0.12] pointer-events-none transition-opacity">
-                      <TagIcon className="w-3 h-3 shrink-0" />
-                      <span>{reel.products.length}</span>
+                  {/* product pills */}
+                  {reel.products && reel.products.length > 0 && (
+                    <div 
+                      className="absolute bottom-3 left-0 w-full px-2 z-20 pointer-events-auto flex justify-center"
+                    >
+                      <ProductPillScroller>
+                        {reel.products.map((product) => (
+                          <div
+                            key={product.id}
+                            className="
+                              group flex items-center justify-between gap-1
+                              shrink-0 w-[92%] sm:w-[240px] snap-center
+                              px-1.5 py-1.5 rounded-full
+                              transition-all duration-200
+                              bg-white dark:bg-zinc-900
+                              border border-black/5 dark:border-white/10
+                              shadow-sm
+                            "
+                          >
+                            <Link 
+                              to={`/products/${product.handle}`} 
+                              onClick={(e) => e.stopPropagation()} 
+                              className="flex items-center gap-2.5 min-w-0 flex-1 px-1"
+                            >
+                              <div className="relative shrink-0">
+                                {product.image ? (
+                                  <img
+                                    src={product.image}
+                                    alt={product.title}
+                                    loading="lazy"
+                                    className="w-10 h-10 rounded-full object-cover shadow-[0_4px_12px_rgba(0,0,0,0.12)]"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 rounded-full bg-muted" />
+                                )}
+                              </div>
+                              <div className="min-w-0 flex flex-col justify-center">
+                                <p className="text-[12px] font-semibold text-zinc-900 dark:text-zinc-100 truncate leading-tight tracking-tight">
+                                  {product.title}
+                                </p>
+                                {product.price && (
+                                  <p className="text-[11px] font-medium text-[#F14514] mt-[2px]">
+                                    {product.price}
+                                  </p>
+                                )}
+                              </div>
+                            </Link>
+                            
+                            <div className="shrink-0" onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
+                              <ReelATCButton product={product} />
+                            </div>
+                          </div>
+                        ))}
+                      </ProductPillScroller>
                     </div>
                   )}
                 </div>
@@ -299,81 +444,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
         </div>
       </div>
 
-{/* ── Tagged products dock (Premium Glass Style) ── */}
-{activeReel?.products?.length > 0 && (
-  <div className="relative mt-5 sm:mt-7 z-20 flex justify-center px-3 pointer-events-none">
-    
-    {/* Glass container */}
-    <div className="
-      pointer-events-auto
-      backdrop-blur-xl
-      bg-background/70 dark:bg-card/70
-      border border-border/60
-      rounded-full
-      px-2 py-2 sm:px-3 sm:py-3
-      max-w-[92vw] sm:max-w-[680px]
-      transition-all duration-300
-    ">
 
-      <div className="flex gap-3 overflow-x-auto no-scrollbar">
-
-        {activeReel.products.map((product) => (
-          <Link
-            key={product.id}
-            to={`/products/${product.handle}`}
-            className="
-              group flex items-center gap-3
-              shrink-0 w-[180px] sm:w-[200px]
-              px-2 py-2 rounded-full
-              transition-all duration-200
-              bg-background/50 dark:bg-card/50
-              border border-border/50
-            "
-          >
-            {/* Image */}
-            <div className="relative">
-              {product.image ? (
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  loading="lazy"
-                  className="
-                    w-11 h-11 rounded-full object-cover
-                    shadow-[0_4px_12px_rgba(0,0,0,0.12)]
-                    group-hover:scale-105 transition
-                  "
-                />
-              ) : (
-                <div className="w-11 h-11 rounded-full bg-muted" />
-              )}
-            </div>
-
-            {/* Text */}
-            <div className="min-w-0 flex flex-col justify-center">
-              <p className="
-                text-[12px] font-semibold text-foreground
-                truncate leading-tight
-                tracking-tight
-              ">
-                {product.title}
-              </p>
-
-              {product.price && (
-                <p className="
-                  text-[11px] font-medium text-orange-600
-                  mt-[2px]
-                ">
-                  {product.price}
-                </p>
-              )}
-            </div>
-          </Link>
-        ))}
-
-      </div>
-    </div>
-  </div>
-)}
 
       {/* ── Pagination dots ── */}
       <div className="flex justify-center gap-1.5 mt-8 sm:mt-10 relative z-10">

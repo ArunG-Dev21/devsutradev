@@ -329,13 +329,13 @@ function ProductCard({
 
   return (
     <div
-      className="group/card relative bg-card text-card-foreground rounded-2xl overflow-hidden flex flex-col border hover:-translate-y-0.5 transition-all duration-300 ease-out"
+      className="group/card relative bg-card text-card-foreground rounded-2xl overflow-hidden flex flex-col border hover:-translate-y-0.5 transition-all duration-300 ease-out h-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* ── IMAGE ── */}
-      <Link to={`/products/${product.handle}`} className="block">
-        <div className="relative aspect-[1/0.90] overflow-hidden bg-stone-100 m-1.5 sm:m-2 xl:m-2.5 rounded-lg">
+      <Link to={`/products/${product.handle}`} className="flex-1 flex flex-col min-h-0 block">
+        <div className="relative flex-none lg:flex-1 aspect-[1/0.90] lg:aspect-auto overflow-hidden bg-stone-100 m-1.5 sm:m-2 xl:m-2.5 rounded-lg">
           {product.featuredImage && (
             <Image
               data={product.featuredImage}
@@ -451,42 +451,11 @@ function ProductCard({
 }
 
 export function FeaturedCollectionComponent({ collection, reviewSummaries }: FeaturedCollectionProps) {
-  const [sortKey, setSortKey] = useState('price-asc');
   const [quickViewProduct, setQuickViewProduct] = useState<ProductNode | null>(null);
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  // hoveredId removed — hover state is now per-card inside ProductCard
 
-  const sortButtonRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
-  const sortedProducts = useMemo(() => {
-    const products = [...collection.products.nodes];
-    switch (sortKey) {
-      case 'price-asc':
-        return products.sort((a, b) =>
-          parseFloat(a.priceRange.minVariantPrice.amount) -
-          parseFloat(b.priceRange.minVariantPrice.amount),
-        );
-      case 'price-desc':
-        return products.sort((a, b) =>
-          parseFloat(b.priceRange.minVariantPrice.amount) -
-          parseFloat(a.priceRange.minVariantPrice.amount),
-        );
-      case 'az':
-        return products.sort((a, b) => a.title.localeCompare(b.title));
-      case 'za':
-        return products.sort((a, b) => b.title.localeCompare(a.title));
-      default:
-        return products;
-    }
-  }, [collection.products.nodes, sortKey]);
-
-  const sortOptions = [
-    { value: 'price-asc', label: 'Price: Low → High' },
-    { value: 'price-desc', label: 'Price: High → Low' },
-    { value: 'az', label: 'Name: A → Z' },
-    { value: 'za', label: 'Name: Z → A' },
-  ];
+  const sortedProducts = collection.products.nodes;
 
   const getProductScrollStep = useCallback(() => {
     const scroller = scrollerRef.current;
@@ -512,121 +481,21 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
     scroller.scrollBy({ left: -getProductScrollStep(), behavior: 'smooth' });
   }, [getProductScrollStep]);
 
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-
-    scroller.scrollLeft = 0;
-  }, [sortKey]);
-
   return (
-    <div className="relative bg-background text-foreground flex flex-col">
+    <div className="relative bg-background text-foreground flex flex-col h-full">
 
       {/* ── HEADER ── */}
-      <div className="px-4 sm:px-6 md:px-8 lg:px-6 2xl:px-14 pt-8 lg:pt-6 2xl:pt-12 bg-background lg:sticky lg:top-0 z-10">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-medium leading-tight uppercase tracking-tight mb-2 lg:mb-3 font-heading">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-6 2xl:px-14 pt-4 lg:pt-5 2xl:pt-6 bg-background lg:sticky lg:top-0 z-10 shrink-0">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-medium leading-tight uppercase tracking-tight mb-2 font-heading">
           {collection.title}
         </h2>
-
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <span className="text-xs sm:text-sm xl:text-xl uppercase font-medium tracking-wider text-[#F14514]">
-            PICK FROM OUR BEST
-          </span>
-
-<div className="relative" ref={sortButtonRef}>
-  <button
-    onClick={() => setIsSortOpen((prev) => !prev)}
-    className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-medium tracking-wide uppercase
-    text-foreground bg-background border border-border
-    hover:bg-muted hover:border-foreground/20
-    transition-all duration-200 cursor-pointer"
-  >
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      className="opacity-70"
-    >
-      <path d="M3 6h18M7 12h10M11 18h2" />
-    </svg>
-
-    Sort
-
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      className={`transition-transform duration-200 opacity-70 ${
-        isSortOpen ? "rotate-180" : ""
-      }`}
-    >
-      <path d="M6 9l6 6 6-6" />
-    </svg>
-  </button>
-
-  {/* ── SORT DROPDOWN ── */}
-  {isSortOpen && (
-    <>
-      <button
-        type="button"
-        className="fixed inset-0 z-40 w-full h-full cursor-default"
-        aria-label="Close sort dropdown"
-        onClick={() => setIsSortOpen(false)}
-      />
-
-      <div
-        className="absolute top-full right-0 mt-3 z-50 w-56 rounded-xl overflow-hidden
-        bg-card border border-border shadow-2xl"
-      >
-        <p
-          className="px-5 pt-3 pb-2 text-[10px] tracking-widest uppercase
-          font-semibold text-muted-foreground border-b border-border"
-        >
-          Sort By
-        </p>
-
-        <div className="py-1">
-          {sortOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => {
-                setSortKey(option.value);
-                setIsSortOpen(false);
-              }}
-              className={`
-                w-full text-left px-5 py-3 text-sm flex items-center justify-between
-                transition-all duration-150 cursor-pointer rounded-none
-
-                ${
-                  sortKey === option.value
-                    ? "text-foreground bg-muted"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                }
-              `}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  )}
-</div>
-
-        </div>
       </div>
 
       {/* ── HORIZONTAL PRODUCT RAIL ── */}
-      <div className="px-3 sm:px-6 md:px-8 lg:px-6 2xl:px-14 py-4 sm:py-6 2xl:py-8">
+      <div className="px-3 sm:px-6 md:px-8 lg:px-6 2xl:px-14 py-4 sm:py-6 2xl:py-8 flex-1 flex flex-col min-h-0">
         <div
           ref={scrollerRef}
-          className="grid grid-flow-col grid-rows-2 auto-cols-[calc((100%-0.75rem)/2)] xl:auto-cols-[calc((100%-2.5rem)/3)] gap-3 sm:gap-4 2xl:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory"
+          className="grid grid-flow-col grid-rows-2 auto-cols-[calc((100%-0.75rem)/2)] xl:auto-cols-[calc((100%-2.5rem)/3)] gap-3 sm:gap-4 2xl:gap-5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory flex-1 min-h-0"
           aria-label={`${collection.title} products`}
         >
           {sortedProducts.map((product) => {
@@ -636,7 +505,7 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
               <div
                 key={product.id}
                 data-featured-product-card
-                className="min-w-0 snap-start"
+                className="min-w-0 snap-start h-full"
               >
                 <ProductCard
                   product={product}
@@ -649,7 +518,7 @@ export function FeaturedCollectionComponent({ collection, reviewSummaries }: Fea
         </div>
 
         {/* ── FOOTER ── */}
-        <div className="mt-4 flex items-center gap-2 sm:gap-3">
+        <div className="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 shrink-0 pb-2">
           <Link
             to={`/collections/${collection.handle}`}
             className="group inline-flex min-w-0 flex-1 items-center justify-center gap-2.5 rounded-full border border-foreground/12 bg-background/85 px-4 py-2.5 sm:px-5 text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.18em] text-foreground/85 shadow-[0_10px_28px_-22px_rgba(0,0,0,0.55)] transition-all duration-200 hover:border-foreground/20 hover:bg-muted/55 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/10 focus:ring-offset-2"

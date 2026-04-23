@@ -56,6 +56,16 @@ export const CART_QUERY_FRAGMENT = `#graphql
           coupon_offer: metafield(namespace: "custom", key: "coupon_offer") {
             value
           }
+          variants(first: 20) {
+            nodes {
+              id
+              availableForSale
+              selectedOptions {
+                name
+                value
+              }
+            }
+          }
         }
         selectedOptions {
           name
@@ -119,6 +129,16 @@ export const CART_QUERY_FRAGMENT = `#graphql
           }
           coupon_offer: metafield(namespace: "custom", key: "coupon_offer") {
             value
+          }
+          variants(first: 20) {
+            nodes {
+              id
+              availableForSale
+              selectedOptions {
+                name
+                value
+              }
+            }
           }
         }
         selectedOptions {

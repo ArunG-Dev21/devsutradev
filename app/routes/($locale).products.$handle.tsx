@@ -1279,11 +1279,12 @@ function RecommendedProducts({
                 </Link>
 
                 <div className="flex items-center gap-2">
-                  <Money
-                    withoutTrailingZeros
-                    data={product.priceRange.minVariantPrice}
-                    className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black dark:text-foreground leading-none font-montserrat"
-                  />
+                  <span className="text-[16px] sm:text-[22px] text-black dark:text-foreground leading-none font-montserrat">
+                    <Money
+                      withoutTrailingZeros
+                      data={product.priceRange.minVariantPrice}
+                    />
+                  </span>
                 </div>
 
                 <div className="mt-auto pt-2">

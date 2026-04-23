@@ -92,7 +92,44 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
 
   const cartRatings = ratingsFetcher.data?.summaries ?? {};
 
-  const subtotal = parseFloat(cart?.cost?.subtotalAmount?.amount || '0');
+  const [unselectedLineIds, setUnselectedLineIds] = useState<Set<string>>(new Set());
+
+  const handleToggleSelection = (id: string, checked: boolean) => {
+    setUnselectedLineIds((prev) => {
+      const next = new Set(prev);
+      if (checked) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const lineNodes = cart?.lines?.nodes ?? [];
+  const parentLines = useMemo(() => lineNodes.filter((l) => !('parentRelationship' in l && l.parentRelationship?.parent)), [lineNodes]);
+  const totalCount = parentLines.length;
+  const selectedCount = totalCount - unselectedLineIds.size;
+
+  const handleToggleAll = (selectAll: boolean) => {
+    if (selectAll) {
+      setUnselectedLineIds(new Set());
+    } else {
+      setUnselectedLineIds(new Set(parentLines.map(l => l.id)));
+    }
+  };
+
+  const selectedSubtotalAmount = useMemo(() => {
+     let sum = 0;
+     for (const line of parentLines) {
+       if (!unselectedLineIds.has(line.id)) {
+          sum += parseFloat(line.cost?.totalAmount?.amount || '0');
+       }
+     }
+     return sum;
+  }, [parentLines, unselectedLineIds]);
+
+  const subtotal = selectedSubtotalAmount;
   const shippingProgress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
   const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
@@ -127,6 +164,16 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
 
           <div className="flex-1 min-h-0 overflow-y-auto px-5">
             <CartEmpty hidden={linesCount} layout={layout} />
+            {cartHasItems && (
+              <CartSelectionHeader 
+                totalCount={totalCount}
+                selectedCount={selectedCount}
+                selectedSubtotalAmount={selectedSubtotalAmount}
+                currencyCode={cart?.cost?.subtotalAmount?.currencyCode || 'INR'}
+                onToggleAll={handleToggleAll}
+                layout={layout}
+              />
+            )}
             <ul className="pt-3 space-y-3 pb-2">
               {(cart?.lines?.nodes ?? []).map((line) => {
                 if ('parentRelationship' in line && line.parentRelationship?.parent) return null;
@@ -138,6 +185,8 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
                     layout={layout}
                     childrenMap={childrenMap}
                     reviewSummary={pid ? cartRatings[pid] : undefined}
+                    isSelected={!unselectedLineIds.has(line.id)}
+                    onToggleSelection={(checked) => handleToggleSelection(line.id, checked)}
                   />
                 );
               })}
@@ -154,7 +203,16 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
             )}
           </div>
 
-          {cartHasItems && <CartSummary cart={cart} layout={layout} />}
+          {cartHasItems && (
+            <CartSummary 
+              cart={cart} 
+              layout={layout} 
+              unselectedLineIds={unselectedLineIds}
+              selectedCount={selectedCount}
+              totalCount={totalCount}
+              selectedSubtotalAmount={selectedSubtotalAmount}
+            />
+          )}
         </>
       ) : (
         /* ── PAGE LAYOUT ── */
@@ -162,6 +220,16 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
           <div className={cartHasItems ? 'flex flex-col lg:flex-row gap-6 lg:gap-0 items-start' : 'flex flex-col'}>
             <div className={cartHasItems ? 'w-full lg:w-3/5 xl:w-2/3' : 'w-full'}>
               <CartEmpty hidden={linesCount} layout={layout} />
+              {cartHasItems && (
+                <CartSelectionHeader 
+                  totalCount={totalCount}
+                  selectedCount={selectedCount}
+                  selectedSubtotalAmount={selectedSubtotalAmount}
+                  currencyCode={cart?.cost?.subtotalAmount?.currencyCode || 'INR'}
+                  onToggleAll={handleToggleAll}
+                  layout={layout}
+                />
+              )}
               <ul>
                 {(cart?.lines?.nodes ?? []).map((line) => {
                   if ('parentRelationship' in line && line.parentRelationship?.parent) return null;
@@ -173,6 +241,8 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
                       layout={layout}
                       childrenMap={childrenMap}
                       reviewSummary={pid ? cartRatings[pid] : undefined}
+                      isSelected={!unselectedLineIds.has(line.id)}
+                      onToggleSelection={(checked) => handleToggleSelection(line.id, checked)}
                     />
                   );
                 })}
@@ -181,7 +251,14 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
 
             {cartHasItems && (
               <div className="w-full lg:w-2/5 xl:w-1/3 lg:sticky lg:top-8">
-                <CartSummary cart={cart} layout={layout} />
+                <CartSummary 
+                  cart={cart} 
+                  layout={layout} 
+                  unselectedLineIds={unselectedLineIds}
+                  selectedCount={selectedCount}
+                  totalCount={totalCount}
+                  selectedSubtotalAmount={selectedSubtotalAmount}
+                />
               </div>
             )}
           </div>
@@ -579,6 +656,49 @@ function CartEmpty({
           />
         </svg>
       </Link>
+    </div>
+  );
+}
+
+function CartSelectionHeader({
+  totalCount,
+  selectedCount,
+  selectedSubtotalAmount,
+  currencyCode,
+  onToggleAll,
+  layout
+}: {
+  totalCount: number;
+  selectedCount: number;
+  selectedSubtotalAmount: number;
+  currencyCode: string;
+  onToggleAll: (selectAll: boolean) => void;
+  layout: CartLayout;
+}) {
+  if (totalCount === 0) return null;
+  const isAllSelected = selectedCount === totalCount;
+  return (
+    <div className={`flex items-center gap-3 sm:gap-4 ${layout === 'aside' ? 'pb-3 mb-2 pt-3 border-b border-border' : 'pb-4 mb-4 pt-1 border-b border-border'}`}>
+      <div 
+        className="cursor-pointer relative z-10 pl-1"
+        onClick={() => onToggleAll(!isAllSelected)}
+      >
+        <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border shadow-sm ${isAllSelected ? 'bg-[#F14514] border-[#F14514] text-white' : 'bg-white border-gray-300'}`}>
+          {isAllSelected && (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
+        </div>
+      </div>
+      <div className="flex-1 flex justify-between items-center text-[13px] sm:text-sm">
+        <span className="font-medium text-foreground">
+          {selectedCount}/{totalCount} items Selected
+        </span>
+        <span className="font-semibold text-foreground">
+          <Money className="font-montserrat" withoutTrailingZeros data={{ amount: selectedSubtotalAmount.toString(), currencyCode }} />
+        </span>
+      </div>
     </div>
   );
 }

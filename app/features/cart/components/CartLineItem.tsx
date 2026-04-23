@@ -15,11 +15,15 @@ export function CartLineItem({
   line,
   childrenMap,
   reviewSummary,
+  isSelected,
+  onToggleSelection,
 }: {
   layout: CartLayout;
   line: CartLine;
   childrenMap: LineItemChildrenMap;
   reviewSummary?: { averageRating: number; reviewCount: number };
+  isSelected?: boolean;
+  onToggleSelection?: (checked: boolean) => void;
 }) {
   const { id, merchandise } = line;
   const productHandle = merchandise?.product?.handle ?? '';
@@ -45,6 +49,20 @@ export function CartLineItem({
     /mm/i.test(`${option.name} ${option.value}`),
   );
   const inlineOptions = visibleOptions.filter((option) => option !== mmOption);
+
+  const totalAmount = parseFloat(line?.cost?.totalAmount?.amount || '0');
+  const compareAtUnitAmount = parseFloat(line?.cost?.compareAtAmountPerQuantity?.amount || '0');
+  const quantity = line?.quantity || 1;
+  const compareAtTotal = compareAtUnitAmount * quantity;
+
+  const hasDiscount = compareAtTotal > totalAmount;
+  const discountPercentage = hasDiscount 
+    ? Math.round(((compareAtTotal - totalAmount) / compareAtTotal) * 100)
+    : 0;
+
+  const [showSizePicker, setShowSizePicker] = useState(false);
+  const variants = (product as any).variants?.nodes || [];
+  const hasMultipleVariants = variants.length > 1;
 
   return (
     <li
@@ -81,6 +99,24 @@ export function CartLineItem({
                 count={reviewSummary.reviewCount}
                 className="absolute bottom-1.5 left-1.5 z-10 shadow-sm"
               />
+            )}
+            {onToggleSelection && (
+              <div 
+                className="absolute top-1.5 left-1.5 z-20"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onToggleSelection(!isSelected);
+                }}
+              >
+                <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors cursor-pointer border shadow-sm ${isSelected ? 'bg-[#F14514] border-[#F14514] text-white' : 'bg-white border-gray-300'}`}>
+                  {isSelected && (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </div>
+              </div>
             )}
           </Link>
         )}
@@ -134,16 +170,30 @@ export function CartLineItem({
           )}
 
           {/* Price */}
-          <div className="mt-1.5 sm:mt-2 text-2xl sm:text-lg text-foreground">
-            {line?.cost?.totalAmount ? (
-              <span className="leading-none">
-                <Money className="font-montserrat" withoutTrailingZeros data={line.cost.totalAmount} />
-              </span>
-            ) : null}
+          <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1.5 sm:gap-2">
+            <span className="text-lg text-foreground font-montserrat">
+              {line?.cost?.totalAmount ? (
+                <Money withoutTrailingZeros data={line.cost.totalAmount} />
+              ) : (
+                '—'
+              )}
+            </span>
+            {hasDiscount && (
+              <>
+                <s className="text-xs sm:text-sm text-stone-400 dark:text-stone-500 tracking-wide line-through">
+                  <Money className="font-montserrat" withoutTrailingZeros data={{ amount: compareAtTotal.toString(), currencyCode: line.cost.totalAmount.currencyCode }} />
+                </s>
+                <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold tracking-widest uppercase rounded-full dark:bg-stone-800 text-[#F14514] border dark:text-stone-300 dark:border-stone-700">
+                  -{discountPercentage}%
+                </span>
+              </>
+            )}
           </div>
 
-          {/* Quantity controls */}
-          <CartLineQuantity line={line} />
+          {/* Controls: Quantity */}
+          <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-3">
+            <CartLineQuantity line={line} />
+          </div>
         </div>
 
         {/* Remove */}
@@ -151,14 +201,64 @@ export function CartLineItem({
           <CartLineRemoveButton lineIds={[id]} disabled={!!line.isOptimistic} />
         </div>
 
+        {/* Size Picker positioned absolute on the right bottom */}
         {mmOption ? (
-          <div
-            className={`pointer-events-none absolute rounded-full px-3 py-1.5 text-[11px] font-medium border text-black shadow-2xl ${layout === 'page'
-                ? 'bottom-1 right-1 sm:bottom-4 sm:right-4'
-                : 'bottom-1 right-1'
-              }`}
-          >
-            {mmOption.value}
+          <div className={`absolute ${layout === 'page' ? 'bottom-1 right-1 sm:bottom-4 sm:right-4' : 'bottom-1 right-1'}`}>
+            <div className="relative">
+              {hasMultipleVariants ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowSizePicker(!showSizePicker); }}
+                    className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] sm:text-[11px] font-medium border border-gray-300 text-black bg-white hover:bg-gray-50 transition-colors pointer-events-auto cursor-pointer"
+                  >
+                    Size: {mmOption.value}
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                  
+                  {showSizePicker && (
+                    <div className="absolute bottom-full right-0 mb-1 bg-white border border-border rounded-xl shadow-xl p-2 w-[160px] z-[60]">
+                      <div className="flex justify-between items-center mb-2 px-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Select Size</span>
+                        <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowSizePicker(false); }} className="text-muted-foreground hover:text-foreground">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {variants.map((v: any) => {
+                          const vSize = v.selectedOptions.find((o: any) => /mm/i.test(`${o.name} ${o.value}`));
+                          if (!vSize) return null;
+                          const isSelected = v.id === line.merchandise.id;
+                          return (
+                            <CartLineUpdateButton key={v.id} lines={[{ id: line.id, merchandiseId: v.id }]}>
+                              <button
+                                onClick={() => setShowSizePicker(false)}
+                                disabled={!v.availableForSale}
+                                className={`px-2 py-1 text-[10px] font-medium rounded-full border transition-all ${
+                                  isSelected 
+                                    ? 'bg-black text-white border-black' 
+                                    : v.availableForSale 
+                                      ? 'bg-white text-black border-gray-200 hover:border-black' 
+                                      : 'bg-gray-50 text-gray-400 border-gray-100 line-through opacity-60 cursor-not-allowed'
+                                }`}
+                              >
+                                {vSize.value}
+                              </button>
+                            </CartLineUpdateButton>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="pointer-events-none rounded-full px-2.5 py-1 text-[10px] sm:text-[11px] font-medium border border-gray-300 text-black bg-white">
+                  Size: {mmOption.value}
+                </div>
+              )}
+            </div>
           </div>
         ) : null}
       </div>
@@ -192,7 +292,7 @@ function CartLineQuantity({ line }: { line: CartLine }) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="flex items-center mt-3 sm:mt-3 w-fit border border-gray-300 rounded-lg overflow-hidden">
+    <div className="flex items-center w-fit border border-gray-300 rounded-lg overflow-hidden">
       <CartLineUpdateButton lines={[{ id: lineId, quantity: prevQuantity }]}>
         <button
           aria-label="Decrease quantity"
@@ -202,15 +302,15 @@ function CartLineQuantity({ line }: { line: CartLine }) {
           disabled={quantity <= 1 || !!isOptimistic}
           name="decrease-quantity"
           value={prevQuantity}
-          className="w-8 h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
+          className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
         >
-          <span aria-hidden="true" className="text-2xl sm:text-2xl">
+          <span aria-hidden="true" className="text-xl sm:text-2xl">
             -
           </span>
         </button>
       </CartLineUpdateButton>
 
-      <span className="w-8 h-8 flex items-center justify-center text-sm text-black border-x border-gray-300 select-none">
+      <span className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-xs sm:text-sm text-black border-x border-gray-300 select-none">
         {quantity}
       </span>
 
@@ -221,9 +321,9 @@ function CartLineQuantity({ line }: { line: CartLine }) {
           name="increase-quantity"
           value={nextQuantity}
           disabled={!!isOptimistic}
-          className="w-8 h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
+          className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-black hover:bg-gray-100 transition disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer"
         >
-          <span aria-hidden="true" className="text-xl sm:text-2xl leading-none">
+          <span aria-hidden="true" className="text-lg sm:text-xl leading-none">
             +
           </span>
         </button>
