@@ -11,8 +11,7 @@ type CartSummaryProps = {
 };
 
 export function CartSummary({ cart, layout }: CartSummaryProps) {
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const termsId = layout === 'aside' ? 'terms-aside' : 'terms-page';
+  const { close } = useAside();
 
   return (
     <div
@@ -26,7 +25,7 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
         <span className={`font-semibold text-black ${layout === 'aside' ? 'text-base' : 'text-base sm:text-lg'}`}>Subtotal</span>
         <span className={`font-medium text-black ${layout === 'aside' ? 'text-lg' : 'text-lg sm:text-xl'}`}>
           {cart?.cost?.subtotalAmount?.amount ? (
-            <Money withoutTrailingZeros data={cart.cost.subtotalAmount} />
+            <Money className="font-montserrat" withoutTrailingZeros data={cart.cost.subtotalAmount} />
           ) : (
             '—'
           )}
@@ -47,29 +46,17 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
 
       {/* Terms + Checkout as a tight unit */}
       <div className={layout === 'aside' ? '' : 'mb-1'}>
-        {/* Terms checkbox */}
-        <label
-          htmlFor={termsId}
-          className={`flex items-center gap-2 cursor-pointer select-none group ${layout === 'aside' ? 'mb-2.5 py-2 border-t border-border' : 'mb-4 sm:mb-5 py-4 sm:py-5 border-y border-border'
-            }`}
-        >
-          <input
-            type="checkbox"
-            id={termsId}
-            checked={termsAccepted}
-            onChange={(e) => setTermsAccepted(e.target.checked)}
-            className="rounded border-border text-foreground focus:ring-ring h-3.5 w-3.5 cursor-pointer accent-foreground shrink-0"
-          />
-          <span className={`text-muted-foreground leading-snug group-hover:text-foreground transition-colors ${layout === 'aside' ? 'text-xs' : 'text-xs'}`}>
-            I agree to the{' '}
-            <Link to="/policies/terms-of-service" className="underline hover:text-foreground" onClick={(e) => e.stopPropagation()}>terms</Link>
-            {' & '}
-            <Link to="/policies/refund-policy" className="underline hover:text-foreground" onClick={(e) => e.stopPropagation()}>refund policy</Link>
+        <div className={`text-center ${layout === 'aside' ? 'mb-2.5 py-2 border-t border-border' : 'mb-4 sm:mb-5 py-4 sm:py-5 border-y border-border'}`}>
+          <span className={`text-muted-foreground leading-snug transition-colors ${layout === 'aside' ? 'text-[10px]' : 'text-[11px] sm:text-xs'}`}>
+            By Checking out, you agree to Devasutra's{' '}
+            <Link to="/policies/terms-of-service" onClick={() => layout === 'aside' && close()} className="text-[#F14514] no-underline hover:opacity-80">Terms of use</Link>
+            {' and '}
+            <Link to="/policies/privacy-policy" onClick={() => layout === 'aside' && close()} className="text-[#F14514] no-underline hover:opacity-80">Privacy Policy</Link>
           </span>
-        </label>
+        </div>
 
         {/* Checkout Button */}
-        <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} layout={layout} termsAccepted={termsAccepted} />
+        <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} layout={layout} />
       </div>
 
       {/* Payment logos */}
@@ -86,15 +73,15 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
           ].map((icon) => (
             <div
               key={icon.alt}
-              className={`flex items-center justify-center bg-white rounded border border-gray-200 ${layout === 'aside' ? 'w-9 h-5' : 'w-11 h-6'}`}
+              className={`flex items-center justify-center bg-white rounded border border-black/10 ${layout === 'aside' ? 'w-10 h-6' : 'w-12 h-7'}`}
             >
               <img
                 src={icon.src}
                 alt={icon.alt}
-                width={28}
-                height={12}
-                sizes="28px"
-                className={`w-auto object-contain ${layout === 'aside' ? 'max-h-2.5' : 'max-h-3'}`}
+                width={32}
+                height={16}
+                sizes="32px"
+                className={`w-auto object-contain ${layout === 'aside' ? 'max-h-3.5' : 'max-h-4'}`}
                 loading="lazy"
               />
             </div>
@@ -108,11 +95,9 @@ export function CartSummary({ cart, layout }: CartSummaryProps) {
 function CartCheckoutActions({
   checkoutUrl,
   layout,
-  termsAccepted,
 }: {
   checkoutUrl?: string;
   layout: CartLayout;
-  termsAccepted: boolean;
 }) {
   const { close } = useAside();
   if (!checkoutUrl) return null;
@@ -121,25 +106,14 @@ function CartCheckoutActions({
     return (
       <div className="flex gap-2">
         {/* Checkout — 3/4 width */}
-        {termsAccepted ? (
-          <a
-            href={checkoutUrl}
-            target="_self"
-            className="flex-3 flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
-          >
-            <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
-            Checkout
-          </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="flex-3 flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60"
-          >
-            <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
-            Checkout
-          </button>
-        )}
+        <a
+          href={checkoutUrl}
+          target="_self"
+          className="flex-3 flex items-center justify-center gap-2 py-1.5 text-center text-[11px] tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
+        >
+          <img src='/icons/rps.png' alt='' width={20} height={20} className='w-5 h-5 shrink-0' />
+          Checkout
+        </a>
 
         {/* View bag — 1/4 width */}
         <Link
@@ -163,25 +137,14 @@ function CartCheckoutActions({
 
   return (
     <div className="flex flex-col gap-2">
-      {termsAccepted ? (
-        <a
-          href={checkoutUrl}
-          target="_self"
-          className="flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 text-center text-[11px] sm:text-sm tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
-        >
-          <img src='/icons/rps.png' alt='' width={24} height={24} className='w-6 h-6' />
-          PROCEED TO CHECKOUT
-        </a>
-      ) : (
-        <button
-          type="button"
-          disabled
-          className="flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 text-center text-[11px] sm:text-sm tracking-[0.12em] uppercase font-semibold rounded-lg bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-60"
-        >
-          <img src='/icons/rps.png' alt='' width={24} height={24} className='w-6 h-6' />
-          PROCEED TO CHECKOUT
-        </button>
-      )}
+      <a
+        href={checkoutUrl}
+        target="_self"
+        className="flex items-center justify-center gap-2 w-full py-2.5 sm:py-3 text-center text-[11px] sm:text-sm tracking-[0.12em] uppercase font-semibold rounded-lg no-underline transition-all duration-300 hover:opacity-90 bg-foreground text-background"
+      >
+        <img src='/icons/rps.png' alt='' width={24} height={24} className='w-6 h-6' />
+        PROCEED TO CHECKOUT
+      </a>
     </div>
   );
 }

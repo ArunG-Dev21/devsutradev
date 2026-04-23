@@ -643,13 +643,13 @@ function CollectionAllCard({
           <Money
             data={product.priceRange.minVariantPrice}
             withoutTrailingZeros
-            className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-foreground leading-none"
+            className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-foreground leading-none font-montserrat"
           />
           {product.variants?.nodes?.[0]?.compareAtPrice && (
             <s
               className="text-[12px] sm:text-[16px] text-gray-400 font-medium whitespace-nowrap"
             >
-              <Money withoutTrailingZeros data={product.variants.nodes[0].compareAtPrice} />
+              <Money className="font-montserrat" withoutTrailingZeros data={product.variants.nodes[0].compareAtPrice} />
             </s>
           )}
           {!product.variants?.nodes?.[0]?.compareAtPrice &&

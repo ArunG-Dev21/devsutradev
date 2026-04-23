@@ -211,7 +211,7 @@ function OrderItem({ order }: { order: OrderItemFragment }) {
             }).format(new Date(order.processedAt))}
           </span>
           <span className="font-semibold text-foreground">
-            <Money withoutTrailingZeros data={order.totalPrice} />
+            <Money className="font-montserrat" withoutTrailingZeros data={order.totalPrice} />
           </span>
           {fulfillmentStatus && (
             <span className="text-xs uppercase tracking-wider font-medium">

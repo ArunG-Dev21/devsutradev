@@ -465,7 +465,7 @@ function RecommendationCard({
         <Money
           withoutTrailingZeros
           data={product.priceRange.minVariantPrice}
-          className="text-xl font-light text-foreground"
+          className="text-xl font-light text-foreground font-montserrat"
         />
 
         {/* Add to Bag button — shown on all screen sizes */}

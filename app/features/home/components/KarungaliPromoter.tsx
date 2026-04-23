@@ -367,7 +367,7 @@ function KarungaliProductCard({
                             {product.title}
                         </p>
                         <span className="block text-sm sm:text-base font-medium text-foreground mt-0.5 leading-none">
-                            <Money withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
+                            <Money className="font-montserrat" withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
                         </span>
                     </Link>
                 </div>

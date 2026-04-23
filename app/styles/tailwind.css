@@ -9,6 +9,7 @@
 
 @import '@fontsource-variable/cormorant/wght.css';
 @import '@fontsource-variable/cormorant/wght-italic.css';
+@import '@fontsource-variable/comfortaa/wght.css';
 @import '@fontsource-variable/montserrat/wght.css';
 @import '@fontsource-variable/montserrat/wght-italic.css';
 
@@ -21,8 +22,9 @@
 /* Design System Tokens */
 @theme {
   --font-heading: 'Cormorant Variable', serif;
-  --font-subheading: 'Montserrat Variable', sans-serif;
-  --font-body: 'Montserrat Variable', sans-serif;
+  --font-subheading: 'Comfortaa Variable', sans-serif;
+  --font-body: 'Comfortaa Variable', sans-serif;
+  --font-montserrat: 'Montserrat Variable', sans-serif;
 }
 
 @utility text-glow {

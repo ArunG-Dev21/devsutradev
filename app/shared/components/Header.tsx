@@ -725,7 +725,7 @@ function DesktopSearchBar() {
                               <p className="text-sm text-text-main truncate">{product.title}</p>
                               {price && (
                                 <span className="text-xs text-foreground font-medium">
-                                  <Money withoutTrailingZeros data={price} />
+                                  <Money className="font-montserrat" withoutTrailingZeros data={price} />
                                 </span>
                               )}
                             </div>

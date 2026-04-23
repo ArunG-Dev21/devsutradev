@@ -137,7 +137,7 @@ export function CartLineItem({
           <div className="mt-1.5 sm:mt-2 text-2xl sm:text-lg text-foreground">
             {line?.cost?.totalAmount ? (
               <span className="leading-none">
-                <Money withoutTrailingZeros data={line.cost.totalAmount} />
+                <Money className="font-montserrat" withoutTrailingZeros data={line.cost.totalAmount} />
               </span>
             ) : null}
           </div>

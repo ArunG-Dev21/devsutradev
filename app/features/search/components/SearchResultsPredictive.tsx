@@ -261,7 +261,7 @@ function SearchResultsPredictiveProducts({
                   <div className="mt-1">
                     {price && (
                       <span className="text-sm font-medium text-foreground/70">
-                        <Money withoutTrailingZeros data={price} />
+                        <Money className="font-montserrat" withoutTrailingZeros data={price} />
                       </span>
                     )}
                   </div>

@@ -413,7 +413,7 @@ function ProductCard({
               {product.title}
             </p>
             <span className="block text-sm sm:text-base xl:text-lg font-medium text-foreground mt-1.5 leading-none">
-              <Money withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
+              <Money className="font-montserrat" withoutTrailingZeros data={product.priceRange.minVariantPrice as any} />
             </span>
           </Link>
         </div>

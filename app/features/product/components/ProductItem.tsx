@@ -43,7 +43,7 @@ export function ProductItem({
           {product.title}
         </h3>
         <div className="text-base md:text-lg font-semibold tracking-wide text-text-main">
-          <Money withoutTrailingZeros data={product.priceRange.minVariantPrice} />
+          <Money className="font-montserrat" withoutTrailingZeros data={product.priceRange.minVariantPrice} />
         </div>
       </div>
     </Link>

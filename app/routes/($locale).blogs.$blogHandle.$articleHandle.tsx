@@ -190,7 +190,7 @@ function SidebarProductCard({ product }: { product: any }) {
         <div className="mt-1.5 flex items-center justify-between gap-2">
           <Money
             data={product.priceRange.minVariantPrice}
-            className="text-sm font-semibold text-foreground"
+            className="text-sm font-semibold text-foreground font-montserrat"
           />
           <span className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-muted-foreground transition-colors group-hover:text-foreground">
             View →

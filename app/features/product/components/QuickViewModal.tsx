@@ -142,13 +142,13 @@ export function QuickViewModal({ product, onClose, reviewSummary }: QuickViewMod
 
                     <div className="flex items-baseline gap-2 mb-8">
                         <span className="text-lg font-normal text-foreground">
-                            <Money withoutTrailingZeros data={product.priceRange.minVariantPrice} />
+                            <Money className="font-montserrat" withoutTrailingZeros data={product.priceRange.minVariantPrice} />
                         </span>
                         {product.compareAtPriceRange?.minVariantPrice &&
                             parseFloat(product.compareAtPriceRange.minVariantPrice.amount) >
                             parseFloat(product.priceRange.minVariantPrice.amount) && (
                             <s className="text-base text-muted-foreground">
-                                <Money withoutTrailingZeros data={product.compareAtPriceRange.minVariantPrice} />
+                                <Money className="font-montserrat" withoutTrailingZeros data={product.compareAtPriceRange.minVariantPrice} />
                             </s>
                         )}
                     </div>

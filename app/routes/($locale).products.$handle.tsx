@@ -1282,7 +1282,7 @@ function RecommendedProducts({
                   <Money
                     withoutTrailingZeros
                     data={product.priceRange.minVariantPrice}
-                    className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black dark:text-foreground leading-none"
+                    className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-black dark:text-foreground leading-none font-montserrat"
                   />
                 </div>
 

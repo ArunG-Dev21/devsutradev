@@ -119,23 +119,23 @@ export default function OrderRoute() {
                       {discountPercentage ? (
                         `-${discountPercentage}% OFF`
                       ) : (
-                        discountValue && <Money withoutTrailingZeros data={discountValue!} />
+                        discountValue && <Money className="font-montserrat" withoutTrailingZeros data={discountValue!} />
                       )}
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal</span>
-                  <span><Money withoutTrailingZeros data={order.subtotal!} /></span>
+                  <span><Money className="font-montserrat" withoutTrailingZeros data={order.subtotal!} /></span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>Tax</span>
-                  <span><Money withoutTrailingZeros data={order.totalTax!} /></span>
+                  <span><Money className="font-montserrat" withoutTrailingZeros data={order.totalTax!} /></span>
                 </div>
                 <div className="pt-3 mt-1 border-t border-border flex justify-between items-center">
                   <span className="text-[11px] font-semibold uppercase tracking-widest text-foreground">Total</span>
                   <span className="text-xl font-medium text-foreground">
-                    <Money withoutTrailingZeros data={order.totalPrice!} />
+                    <Money className="font-montserrat" withoutTrailingZeros data={order.totalPrice!} />
                   </span>
                 </div>
               </div>
@@ -218,11 +218,11 @@ function OrderLineRow({ lineItem }: { lineItem: OrderLineItemFullFragment }) {
 
       <div className="text-right shrink-0">
         <p className="font-semibold text-foreground text-sm">
-          {totalMoney ? <Money withoutTrailingZeros data={totalMoney} /> : null}
+          {totalMoney ? <Money className="font-montserrat" withoutTrailingZeros data={totalMoney} /> : null}
         </p>
         {totalDiscountAmount > 0 && beforeMoney && (
           <p className="text-xs text-muted-foreground line-through mt-0.5">
-            <Money withoutTrailingZeros data={beforeMoney} />
+            <Money className="font-montserrat" withoutTrailingZeros data={beforeMoney} />
           </p>
         )}
       </div>
