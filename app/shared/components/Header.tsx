@@ -371,9 +371,10 @@ export function HeaderMenu({
   const { close } = useAside();
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `group flex items-center gap-4 py-3.5 transition-colors duration-200 ${isActive
-      ? 'text-foreground'
-      : 'text-muted-foreground hover:text-foreground'
+    `group flex justify-center items-center gap-2.5 p-1.5 rounded-xl border transition-all duration-200 ${
+      isActive
+        ? 'border-foreground text-foreground bg-foreground/5'
+        : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground hover:bg-muted/30'
     }`;
 
   const chevron = (
@@ -485,34 +486,26 @@ export function HeaderMenu({
       <div className="w-full h-px bg-border/60 my-2" />
 
       {/* ── Main Navigation ── */}
-      <div className="flex flex-col px-6">
+      <div className="grid grid-cols-2 gap-3 px-6 pb-6">
         <NavLink to="/" end replace onClick={close} className={navLinkClass}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-          </svg>
-          <span className="text-base font-medium">Home</span>
-          {chevron}
+          {/* Replace src with your PNG/SVG */}
+          <img src="/icons/home-icon.png" alt="Home" className="w-8 h-8 object-contain opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all dark:invert" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+          <span className="text-xs sm:text-sm font-semibold tracking-wide uppercase mt-1">Home</span>
         </NavLink>
         <NavLink to="/pages/about" replace onClick={close} className={navLinkClass}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-          </svg>
-          <span className="text-base font-medium">About</span>
-          {chevron}
+          {/* Replace src with your PNG/SVG */}
+          <img src="/icons/about-icon.png" alt="About" className="w-8 h-8 object-contain opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all dark:invert" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+          <span className="text-xs sm:text-sm font-semibold tracking-wide uppercase mt-1">About</span>
         </NavLink>
         <NavLink to="/pages/contact" replace onClick={close} className={navLinkClass}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-          </svg>
-          <span className="text-base font-medium">Contact</span>
-          {chevron}
+          {/* Replace src with your PNG/SVG */}
+          <img src="/icons/contact-icon.png" alt="Contact" className="w-8 h-8 object-contain opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all dark:invert" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+          <span className="text-xs sm:text-sm font-semibold tracking-wide uppercase mt-1">Contact</span>
         </NavLink>
         <NavLink to="/blogs" replace onClick={close} className={navLinkClass}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-          </svg>
-          <span className="text-base font-medium">Blog</span>
-          {chevron}
+          {/* Replace src with your PNG/SVG */}
+          <img src="/icons/blog-icon.png" alt="Blog" className="w-8 h-8 object-contain opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all dark:invert" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+          <span className="text-xs sm:text-sm font-semibold tracking-wide uppercase mt-1">Blog</span>
         </NavLink>
       </div>
 

@@ -6,11 +6,14 @@ import {
   STATE_EVENT,
 } from '~/lib/audioController';
 import { useTheme } from '~/context/theme';
+import { useLocation } from 'react-router';
 
 export function FloatingControls() {
   const [playing, setPlaying] = useState(false);
   const [visible, setVisible] = useState(true);
   const { toggle: toggleTheme } = useTheme();
+  const location = useLocation();
+  const isProductRoute = location.pathname.includes('/products/');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -74,9 +77,9 @@ export function FloatingControls() {
         href="https://wa.me/919876543210?text=Hi%2C%20I%20need%20help%20with%20Devasutra"
         target="_blank"
         rel="noopener noreferrer"
-        className="
+        className={`
           fixed right-4 md:right-6
-          bottom-[calc(4.375rem_+_env(safe-area-inset-bottom)_+_14px)] md:bottom-6
+          ${isProductRoute ? 'bottom-[calc(4.375rem_+_env(safe-area-inset-bottom)_+_104px)]' : 'bottom-[calc(4.375rem_+_env(safe-area-inset-bottom)_+_14px)]'} md:bottom-6
           z-[70]
           w-12 h-12 md:w-13 md:h-13
           rounded-full
@@ -86,7 +89,7 @@ export function FloatingControls() {
           transition-transform duration-200
           hover:scale-105 active:scale-95
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-background
-        "
+        `}
         aria-label="Chat on WhatsApp"
       >
         <svg className="w-6 h-6 md:w-7 md:h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
