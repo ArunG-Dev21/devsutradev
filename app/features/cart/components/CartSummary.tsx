@@ -57,7 +57,7 @@ export function CartSummary({ cart, layout, unselectedLineIds, selectedCount, to
       <div className={layout === 'aside' ? '' : 'mb-1'}>
         <div className={`text-center ${layout === 'aside' ? 'mb-2.5 py-2 border-t border-border' : 'mb-4 sm:mb-5 py-4 sm:py-5 border-y border-border'}`}>
           <span className={`text-muted-foreground leading-snug transition-colors ${layout === 'aside' ? 'text-[10px]' : 'text-[11px] sm:text-xs'}`}>
-            By Checking out, you agree to Devasutra's{' '}
+            By Checking out, you agree to Devasutra's <br/>{' '}
             <Link to="/policies/terms-of-service" onClick={() => layout === 'aside' && close()} className="text-[#F14514] no-underline hover:opacity-80">Terms of use</Link>
             {' and '}
             <Link to="/policies/privacy-policy" onClick={() => layout === 'aside' && close()} className="text-[#F14514] no-underline hover:opacity-80">Privacy Policy</Link>

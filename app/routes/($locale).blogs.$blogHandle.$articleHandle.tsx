@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useFetcher } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
 import type { Route } from './+types/($locale).blogs.$blogHandle.$articleHandle';
 import { Image, Money } from '@shopify/hydrogen';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
@@ -13,6 +13,8 @@ import {
 } from '~/lib/seo';
 import { sanitizeHtml, cleanShopifyHtml } from '~/lib/sanitizer';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
+import { ProductShare } from '~/features/product/components/ProductShare';
+import { WishlistHeart } from '~/shared/components/WishlistHeart';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   const article = (data as any)?.article;
@@ -33,55 +35,6 @@ export const meta: Route.MetaFunction = ({ data }) => {
     ogImage,
   });
 };
-
-export async function action({ request, context }: Route.ActionArgs) {
-  const form = await request.formData();
-  const articleId = String(form.get('articleId') ?? '').trim();
-  const blogId = String(form.get('blogId') ?? '').trim();
-  const name = String(form.get('name') ?? '').trim();
-  const email = String(form.get('email') ?? '').trim();
-  const body = String(form.get('body') ?? '').trim();
-
-  if (!name || !email || !body || !articleId || !blogId) {
-    return { error: 'All fields are required.' };
-  }
-
-  const adminToken = (context.env as any).SHOPIFY_ADMIN_API_ACCESS_TOKEN as string | undefined;
-  if (!adminToken) {
-    return { error: 'Comment submission is not configured.' };
-  }
-
-  // GIDs are like gid://shopify/Article/123456 — extract the numeric portion
-  const numericArticleId = articleId.split('/').pop();
-  const numericBlogId = blogId.split('/').pop();
-
-  const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
-  const res = await fetch(
-    `https://${shopDomain}/admin/api/2024-10/comments.json`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': adminToken,
-      },
-      body: JSON.stringify({
-        comment: {
-          body,
-          author: name,
-          email,
-          article_id: numericArticleId,
-          blog_id: numericBlogId,
-        },
-      }),
-    },
-  );
-
-  if (res.status === 201) return { ok: true };
-
-  const json = await res.json().catch(() => ({}));
-  const msg = (json as any)?.errors?.base?.[0] ?? 'Failed to submit comment.';
-  return { error: msg };
-}
 
 export async function loader(args: Route.LoaderArgs) {
   const criticalData = await loadCriticalData(args);
@@ -125,7 +78,7 @@ async function loadCriticalData({ context, request, params }: Route.LoaderArgs) 
     // silently ignore
   }
 
-  return { article, blogHandle, blogTitle: blog.title, blogId: blog.id, relatedProducts };
+  return { article, blogHandle, blogTitle: blog.title, relatedProducts };
 }
 
 const COLLECTION_MAP: Record<string, { href: string; label: string; keyword: string }> = {
@@ -167,126 +120,55 @@ function SidebarProductCard({ product }: { product: any }) {
     <Link
       to={`/products/${product.handle}`}
       prefetch="intent"
-      className="group block rounded-2xl bg-muted/60 p-2 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+      className="group/card block rounded-2xl overflow-hidden bg-card ring-1 ring-border/50 hover:-translate-y-0.5 transition-all duration-300 ease-out no-underline"
     >
-      <div className="aspect-square overflow-hidden rounded-xl bg-background">
+      {/* Image area */}
+      <div className="relative aspect-square bg-muted overflow-hidden m-2 rounded-xl">
         {product.featuredImage ? (
           <Image
             data={product.featuredImage}
             aspectRatio="1/1"
-            sizes="(min-width: 1280px) 180px, 40vw"
-            className="h-full w-full object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-500 group-hover:scale-[1.05]"
+            sizes="(min-width: 1280px) 224px, 40vw"
+            className="w-full h-full object-cover rounded-xl transition-transform duration-500 ease-out group-hover/card:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <span className="text-4xl opacity-20 text-gray-300">✦</span>
-          </div>
+          <div className="w-full h-full bg-linear-to-br from-amber-50 via-orange-50 to-orange-100 dark:from-neutral-800 dark:via-neutral-750 dark:to-neutral-700" />
         )}
+        {/* Subtle inner glow */}
+        <div className="absolute inset-0 bg-linear-to-t from-background/30 to-transparent pointer-events-none" />
+        <div className="absolute bottom-2 left-2 z-10">
+          <WishlistHeart
+            productId={product.id}
+            className="w-8 h-8 bg-white/90 backdrop-blur-sm border border-stone-200 shadow-sm hover:bg-white"
+            size={16}
+          />
+        </div>
       </div>
-      <div className="mt-1.5 rounded-xl border border-border/50 bg-card p-3">
-        <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground">
-          {product.title}
-        </h3>
-        <div className="mt-1.5 flex items-center justify-between gap-2">
+
+      {/* Info strip */}
+      <div className="relative px-3 sm:px-4 py-3 sm:py-4 flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm sm:text-base font-medium text-foreground line-clamp-1 leading-snug">
+            {product.title}
+          </p>
           <Money
             data={product.priceRange.minVariantPrice}
-            className="text-sm font-semibold text-foreground font-montserrat"
+            className="text-base sm:text-lg font-medium text-foreground mt-0.5 leading-none block font-montserrat"
           />
-          <span className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-muted-foreground transition-colors group-hover:text-foreground">
-            View →
-          </span>
+        </div>
+        <div className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-foreground text-background rotate-[-35deg] transition-transform duration-300 ease-out">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          </svg>
         </div>
       </div>
     </Link>
   );
 }
 
-/* ──────────── Comment form ──────────── */
-function CommentForm({ articleId, blogId }: { articleId: string; blogId: string }) {
-  const fetcher = useFetcher<typeof action>();
-  const isSubmitting = fetcher.state !== 'idle';
-  const result = fetcher.data;
-
-  if (result?.ok) {
-    return (
-      <div className="mt-10 rounded-2xl border border-gray-200 bg-gray-50 px-6 py-10 text-center">
-        <svg className="mx-auto mb-3 h-8 w-8 text-gray-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-        </svg>
-        <p className="font-medium text-gray-900">Comment submitted!</p>
-        <p className="mt-1 text-sm text-gray-500">It will appear after review.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-10 border-t border-gray-200 pt-10">
-      <h2 className="text-xl font-semibold text-gray-900">Leave a comment</h2>
-      <fetcher.Form method="post" className="mt-6 space-y-4">
-        <input type="hidden" name="articleId" value={articleId} />
-        <input type="hidden" name="blogId" value={blogId} />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="comment-name" className="block text-xs font-medium uppercase tracking-[0.16em] text-gray-500 mb-1.5">
-              Name *
-            </label>
-            <input
-              id="comment-name"
-              name="name"
-              type="text"
-              required
-              placeholder="Your name"
-              className="block w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label htmlFor="comment-email" className="block text-xs font-medium uppercase tracking-[0.16em] text-gray-500 mb-1.5">
-              Email *
-            </label>
-            <input
-              id="comment-email"
-              name="email"
-              type="email"
-              required
-              placeholder="you@email.com"
-              className="block w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="comment-body" className="block text-xs font-medium uppercase tracking-[0.16em] text-gray-500 mb-1.5">
-            Comment *
-          </label>
-          <textarea
-            id="comment-body"
-            name="body"
-            required
-            rows={4}
-            placeholder="Share your thoughts…"
-            className="block w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
-          />
-        </div>
-        {result?.error ? (
-          <p className="text-sm text-red-500">{result.error}</p>
-        ) : null}
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-xs text-gray-400">Comments are moderated.</p>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-full bg-foreground px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-background transition-opacity hover:opacity-80 disabled:opacity-50"
-          >
-            {isSubmitting ? 'Submitting…' : 'Post comment'}
-          </button>
-        </div>
-      </fetcher.Form>
-    </div>
-  );
-}
-
 /* ──────────── Page ──────────── */
 export default function Article() {
-  const { article, blogHandle, blogTitle, blogId, relatedProducts, seoOrigin } =
+  const { article, blogHandle, blogTitle, relatedProducts, seoOrigin } =
     useLoaderData<typeof loader>();
   const { title, image, contentHtml, author, tags } = article;
   const collectionLink = getCollectionLink(blogHandle, title, contentHtml);
@@ -294,6 +176,17 @@ export default function Article() {
 
   const articleRef = useRef<HTMLElement>(null);
   const [progress, setProgress] = useState(0);
+
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareIn, setShareIn] = useState(false);
+  const openShare = () => {
+    setShareOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setShareIn(true)));
+  };
+  const closeShare = () => {
+    setShareIn(false);
+    setTimeout(() => setShareOpen(false), 300);
+  };
 
   useEffect(() => {
     let rafId = 0;
@@ -363,16 +256,28 @@ export default function Article() {
 
           {/* ── Article ── */}
           <div className="min-w-0 flex-1 max-w-6xl">
-            {/* Back link */}
-            <Link
-              to={`/blogs/${blogHandle}`}
-              className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors mb-6"
-            >
-              <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-              </svg>
-              {blogTitle || 'Blog'}
-            </Link>
+            {/* Back link + Share */}
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <Link
+                to={`/blogs/${blogHandle}`}
+                className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+                {blogTitle || 'Blog'}
+              </Link>
+              <button
+                type="button"
+                onClick={openShare}
+                className="w-9 h-9 rounded-full border border-stone-200 bg-white flex items-center justify-center text-stone-500 hover:text-stone-900 hover:border-stone-400 hover:bg-stone-50 transition-all duration-200 shrink-0"
+                aria-label="Share this article"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                </svg>
+              </button>
+            </div>
 
             {/* Tags */}
             {tags && tags.length > 0 ? (
@@ -440,7 +345,7 @@ export default function Article() {
               {relatedProducts.length > 0 ? (
                 <div className="mt-10 border-t border-gray-200 pt-8 lg:hidden">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-base font-semibold text-gray-900">You might also like</h3>
+                    <h3 className="text-base font-semibold uppercase text-gray-900">You might also like</h3>
                     <Link
                       to={collectionLink.href}
                       className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors"
@@ -464,8 +369,6 @@ export default function Article() {
                 </div>
               ) : null}
 
-              {/* Comment form */}
-              <CommentForm articleId={article.id} blogId={blogId} />
             </article>
           </div>
 
@@ -507,6 +410,57 @@ export default function Article() {
 
         </div>
       </div>
+
+      {/* ── Share Modal (animated bottom-sheet on mobile, centred panel on desktop) ── */}
+      {shareOpen && (
+        <div
+          className="fixed inset-0 z-60 flex items-end sm:items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Share article"
+        >
+          <div
+            className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${shareIn ? 'opacity-100' : 'opacity-0'}`}
+            onClick={closeShare}
+          />
+          <div
+            className={`
+              relative z-10 w-full sm:max-w-sm
+              bg-white
+              rounded-t-3xl sm:rounded-2xl
+              shadow-2xl
+              transition-all duration-300 ease-out
+              ${shareIn
+                ? 'translate-y-0 sm:scale-100 opacity-100'
+                : 'translate-y-full sm:translate-y-0 sm:scale-95 opacity-0'
+              }
+            `}
+          >
+            <div className="sm:hidden flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-stone-200" />
+            </div>
+            <div className="flex items-center justify-between px-5 pt-4 pb-3 sm:pt-5 border-b border-stone-100">
+              <div>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-stone-400 font-bold mb-0.5">Share</p>
+                <h2 className="text-sm font-semibold text-stone-900 leading-snug max-w-[220px] truncate">{title}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={closeShare}
+                className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 hover:text-stone-900 transition-colors shrink-0 ml-3"
+                aria-label="Close share sheet"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="px-5 pt-4 pb-6">
+              <ProductShare title={title} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

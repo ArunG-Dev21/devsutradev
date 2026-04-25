@@ -32,6 +32,7 @@ import {
 import { sanitizeHtml } from '~/lib/sanitizer';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 import { StarRating } from '~/shared/components/StarRating';
+import { WishlistHeart } from '~/shared/components/WishlistHeart';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   const product = (data as any)?.product;
@@ -622,17 +623,24 @@ export default function Product() {
             {/* ╔══ Single bordered product panel ══╗ */}
             <div className="relative border border-stone-200 rounded-2xl bg-white overflow-hidden mb-6">
 
-              {/* Share button — absolute top-right */}
-              <button
-                type="button"
-                onClick={openShare}
-                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full border border-stone-200 bg-white flex items-center justify-center text-stone-500 hover:text-stone-900 hover:border-stone-400 hover:bg-stone-50 transition-all duration-200"
-                aria-label="Share this product"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-                </svg>
-              </button>
+              {/* Wishlist + Share — absolute top-right */}
+              <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+                <WishlistHeart
+                  productId={product.id}
+                  className="w-9 h-9 border border-stone-200 bg-white hover:border-stone-400 hover:bg-stone-50"
+                  size={16}
+                />
+                <button
+                  type="button"
+                  onClick={openShare}
+                  className="w-9 h-9 rounded-full border border-stone-200 bg-white flex items-center justify-center text-stone-500 hover:text-stone-900 hover:border-stone-400 hover:bg-stone-50 transition-all duration-200"
+                  aria-label="Share this product"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                  </svg>
+                </button>
+              </div>
 
               {/* ── Main info (padded) ── */}
               <div className="px-5 pt-5 pb-4">

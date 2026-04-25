@@ -105,7 +105,7 @@ function ProductPillScroller({ children }: { children: React.ReactNode }) {
           backdrop-blur-xl
           bg-white/20 dark:bg-black/40
           border border-white/30 dark:border-white/10
-          rounded-full
+          rounded-[28px]
           px-1.5 py-1.5
           w-full
           flex gap-2 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth
@@ -393,7 +393,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                             className="
                               group flex items-center justify-between gap-1
                               shrink-0 w-[92%] sm:w-[240px] snap-center
-                              px-1.5 py-1.5 rounded-full
+                              px-1.5 py-1.5 rounded-[24px]
                               transition-all duration-200
                               bg-white dark:bg-zinc-900
                               border border-black/5 dark:border-white/10

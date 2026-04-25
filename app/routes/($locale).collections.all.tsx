@@ -5,6 +5,7 @@ import { PaginatedResourceSection } from '~/features/collection/components/Pagin
 import { CollectionHeroBanner } from '~/features/collection/components/CollectionHeroBanner';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 import { StarRating } from '~/shared/components/StarRating';
+import { WishlistHeart } from '~/shared/components/WishlistHeart';
 
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useCartNotification } from '~/features/cart/components/CartNotification'; type CategoryFilter = {
@@ -620,6 +621,14 @@ function CollectionAllCard({
             />
           ) : null;
         })()}
+
+        <div className="absolute bottom-2 left-2 z-10">
+          <WishlistHeart
+            productId={product.id}
+            className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-stone-200 shadow-sm hover:bg-white"
+            size={18}
+          />
+        </div>
       </div>
 
       <div className="bg-card rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-border/40 relative z-10">

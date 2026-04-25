@@ -198,20 +198,41 @@ export function ReelATCButton({
 
   if (hasMultiple) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
-        {showSizes && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'flex-end', maxWidth: 140 }}>
-            {variants.map((v) => (
-              <ReelSizePill
-                key={v.id}
-                variant={v}
-                productTitle={product.title}
-                productImage={product.image}
-                productId={product.id}
-                onAdded={closeSizes}
-              />
-            ))}
-          </div>
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative"
+        style={{ flexShrink: 0 }}
+      >
+        {showSizes && typeof document !== 'undefined' && createPortal(
+          <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowSizes(false); }}
+          >
+            <div 
+              className="bg-white dark:bg-zinc-900 border border-border rounded-xl shadow-xl p-3 w-[85%] max-w-[220px]" 
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Select Size</span>
+                <button onClick={() => setShowSizes(false)} className="text-muted-foreground hover:text-foreground cursor-pointer">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-start">
+                {variants.map((v) => (
+                  <ReelSizePill
+                    key={v.id}
+                    variant={v}
+                    productTitle={product.title}
+                    productImage={product.image}
+                    productId={product.id}
+                    onAdded={closeSizes}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>,
+          document.body
         )}
         <button
           type="button"
@@ -252,9 +273,10 @@ export function ReelATCButton({
 
   // Single variant — CartForm delegates rendering to ReelATCInner (a real component)
   return (
-    <CartForm
-      route="/cart"
-      action={CartForm.ACTIONS.LinesAdd}
+    <div onClick={(e) => e.stopPropagation()}>
+      <CartForm
+        route="/cart"
+        action={CartForm.ACTIONS.LinesAdd}
       inputs={{ lines: [{ merchandiseId: product.variantId!, quantity: 1, selectedVariant: { id: product.variantId! } as any }] }}
       fetcherKey={`reel-atc-${product.id}`}
     >
@@ -266,6 +288,7 @@ export function ReelATCButton({
         />
       )}
     </CartForm>
+    </div>
   );
 }
 

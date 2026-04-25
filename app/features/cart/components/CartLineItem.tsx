@@ -109,7 +109,7 @@ export function CartLineItem({
                   onToggleSelection(!isSelected);
                 }}
               >
-                <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors cursor-pointer border shadow-sm ${isSelected ? 'bg-[#F14514] border-[#F14514] text-white' : 'bg-white border-gray-300'}`}>
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors cursor-pointer border shadow-sm ${isSelected ? 'bg-[#F14514] border-[#F14514] text-white' : 'bg-white border-gray-300'}`}>
                   {isSelected && (
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />

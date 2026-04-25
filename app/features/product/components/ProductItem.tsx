@@ -5,6 +5,7 @@ import type {
   CollectionItemFragment,
 } from 'storefrontapi.generated';
 import { useVariantUrl } from '~/lib/variants';
+import { WishlistHeart } from '~/shared/components/WishlistHeart';
 
 export function ProductItem({
   product,
@@ -36,6 +37,13 @@ export function ProductItem({
           />
         )}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-white/5 transition-colors duration-500" />
+        <div className="absolute bottom-2 left-2 z-10">
+          <WishlistHeart
+            productId={product.id}
+            className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-stone-200 shadow-sm hover:bg-white"
+            size={18}
+          />
+        </div>
       </div>
 
       <div className="flex flex-col items-center text-center mt-auto px-2 pb-3">

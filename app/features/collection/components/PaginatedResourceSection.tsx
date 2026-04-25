@@ -45,7 +45,8 @@ export function PaginatedResourceSection<NodesType>({
             ) : (
               resourcesMarkup
             )}
-            <div className="flex justify-center pt-10 pb-4">
+            <div className="flex justify-center pt
+            -10">
               <NextLink className="group inline-flex items-center gap-2 px-8 py-3 bg-stone-900 text-white text-xs font-semibold tracking-[0.15em] uppercase rounded-full shadow-md hover:bg-stone-800 hover:scale-[1.03] transition-all duration-300 cursor-pointer">
                 {isLoading ? (
                   <span className="inline-flex items-center gap-2">
