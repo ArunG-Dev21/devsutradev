@@ -445,25 +445,66 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
 
 
 
-      {/* ── Pagination dots ── */}
-      <div className="flex justify-center gap-1.5 mt-8 sm:mt-10 relative z-10">
-        {reels.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            className="flex items-center justify-center border-0 bg-transparent p-0 cursor-pointer min-w-[24px] min-h-[24px]"
-          >
-            <span
-              className={[
-                'h-1.5 rounded-full transition-all duration-300 block',
-                i === activeIndex
-                  ? 'w-5 bg-foreground opacity-100'
-                  : 'w-1.5 bg-muted-foreground opacity-40',
-              ].join(' ')}
-            />
-          </button>
-        ))}
+      {/* ── Pagination ── */}
+      <div className="flex items-center justify-center gap-3 sm:gap-5 mt-10 sm:mt-12 px-4 relative z-10">
+        <button
+          type="button"
+          onClick={() => goTo(activeIndex - 1)}
+          aria-label="Previous slide"
+          className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-border bg-card text-foreground hover:bg-foreground hover:text-background hover:border-foreground transition-colors duration-200 shrink-0"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+
+        <div
+          role="tablist"
+          aria-label="Reel pagination"
+          className="flex items-center gap-1.5 sm:gap-2 max-w-[50vw] sm:max-w-[420px] overflow-x-auto no-scrollbar py-1"
+        >
+          {reels.map((_, i) => {
+            const isActive = i === activeIndex;
+            return (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => goTo(i)}
+                className="group/dot relative flex items-center justify-center p-2 -m-2 cursor-pointer shrink-0"
+              >
+                <span
+                  className={[
+                    'block h-[5px] rounded-full',
+                    'transition-[width,background-color,opacity] duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
+                    isActive
+                      ? 'w-8 bg-foreground'
+                      : 'w-[5px] bg-foreground/20 group-hover/dot:bg-foreground/55',
+                  ].join(' ')}
+                />
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="hidden sm:flex items-baseline font-mono text-[11px] tracking-[0.18em] tabular-nums shrink-0 select-none">
+          <span className="text-foreground font-semibold">{String(activeIndex + 1).padStart(2, '0')}</span>
+          <span className="text-muted-foreground/40 mx-1.5">/</span>
+          <span className="text-muted-foreground">{String(reels.length).padStart(2, '0')}</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => goTo(activeIndex + 1)}
+          aria-label="Next slide"
+          className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-border bg-card text-foreground hover:bg-foreground hover:text-background hover:border-foreground transition-colors duration-200 shrink-0"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
       </div>
 
       {/* ── Instagram CTA ── */}

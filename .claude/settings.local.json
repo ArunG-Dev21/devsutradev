@@ -15,7 +15,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(echo \"EXIT: $?\")",
       "Read(//tmp/**)",
-      "mcp__shopify-dev-mcp__learn_shopify_api"
+      "mcp__shopify-dev-mcp__learn_shopify_api",
+      "Bash(git *)"
     ]
   }
 }

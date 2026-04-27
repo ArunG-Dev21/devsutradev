@@ -867,6 +867,48 @@ export type SocialReelsQuery = {
   };
 };
 
+export type WishlistProductsQueryVariables = StorefrontAPI.Exact<{
+  ids:
+    | Array<StorefrontAPI.Scalars['ID']['input']>
+    | StorefrontAPI.Scalars['ID']['input'];
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type WishlistProductsQuery = {
+  nodes: Array<
+    StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle' | 'vendor'> & {
+        featuredImage?: StorefrontAPI.Maybe<
+          Pick<
+            StorefrontAPI.Image,
+            'id' | 'altText' | 'url' | 'width' | 'height'
+          >
+        >;
+        priceRange: {
+          minVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+          maxVariantPrice: Pick<
+            StorefrontAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+        };
+        variants: {
+          nodes: Array<
+            Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+              compareAtPrice?: StorefrontAPI.Maybe<
+                Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>
+              >;
+            }
+          >;
+        };
+      }
+    >
+  >;
+};
+
 export type MoneyRecommendationsFragment = Pick<
   StorefrontAPI.MoneyV2,
   'amount' | 'currencyCode'
@@ -2076,6 +2118,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query SocialReels {\n    metaobjects(type: "social_reel", first: 20) {\n      nodes {\n        id\n        fields {\n          key\n          value\n          reference {\n            ... on Video {\n              id\n              sources {\n                url\n                mimeType\n                format\n              }\n            }\n            ... on GenericFile {\n              id\n              url\n              mimeType\n            }\n            ... on MediaImage {\n              image { url altText width height }\n            }\n          }\n          references(first: 10) {\n            nodes {\n              ... on Product {\n                id\n                handle\n                title\n                featuredImage { url altText width height }\n                priceRange {\n                  minVariantPrice { amount currencyCode }\n                }\n                variants(first: 10) {\n                  nodes { id availableForSale title }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: SocialReelsQuery;
     variables: SocialReelsQueryVariables;
+  };
+  '#graphql\n  query WishlistProducts(\n    $ids: [ID!]!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(country: $country, language: $language) {\n    nodes(ids: $ids) {\n      ... on Product {\n        id\n        title\n        handle\n        vendor\n        featuredImage {\n          id\n          altText\n          url\n          width\n          height\n        }\n        priceRange {\n          minVariantPrice { amount currencyCode }\n          maxVariantPrice { amount currencyCode }\n        }\n        variants(first: 1) {\n          nodes {\n            id\n            availableForSale\n            compareAtPrice { amount currencyCode }\n          }\n        }\n      }\n    }\n  }\n': {
+    return: WishlistProductsQuery;
+    variables: WishlistProductsQueryVariables;
   };
   '#graphql\n  fragment MoneyRecommendations on MoneyV2 {\n    amount\n    currencyCode\n  }\n\n  fragment RecommendedProduct on Product {\n    id\n    handle\n    title\n    tags\n    featuredImage {\n      url\n      altText\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyRecommendations\n      }\n    }\n    variants(first: 1) {\n      nodes {\n        id\n        availableForSale\n      }\n    }\n  }\n\n  query Recommendations(\n    $country: CountryCode\n    $language: LanguageCode\n    $collectionsFirst: Int!\n    $productsFirst: Int!\n  ) @inContext(country: $country, language: $language) {\n    collections(first: $collectionsFirst) {\n      nodes {\n        id\n        handle\n        products(first: $productsFirst) {\n          nodes {\n            ...RecommendedProduct\n          }\n        }\n      }\n    }\n  }\n': {
     return: RecommendationsQuery;
