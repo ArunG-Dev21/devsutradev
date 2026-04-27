@@ -34,6 +34,7 @@ export interface TestimonialItem {
     rating: number;
     text: string;
     avatar: string;
+    image?: string;
     productHandle?: string | null;
     productTitle?: string | null;
     productImage?: string | null;
@@ -111,7 +112,7 @@ function ProductSpotlight({
                 <div className="min-w-0 flex-1">
                     <p className="text-sm sm:text-base font-medium text-foreground line-clamp-1 leading-snug">{productTitle}</p>
                     {productPrice && (
-                        <p className="text-lg sm:text-xl font-medium text-foreground mt-0.5 leading-none">{productPrice}</p>
+                        <p className="text-lg sm:text-xl font-medium text-foreground mt-0.5 leading-none font-montserrat">{productPrice}</p>
                     )}
                 </div>
                 <div className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-foreground text-background rotate-[-35deg] transition-transform duration-300 ease-out">
@@ -193,13 +194,13 @@ function Hotspot({
 /* ---------------------- Customer Tag ---------------------- */
 function CustomerTag({ name, avatar }: { name: string; avatar?: string }) {
     return (
-        <div className="inline-flex items-center gap-1.5 bg-black/50 backdrop-blur-sm rounded-full pl-0.5 pr-2.5 py-0.5">
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-black/50 backdrop-blur-sm rounded-full pl-0.5 pr-2.5 sm:pr-3 py-0.5 sm:py-1">
             {avatar ? (
-                <img src={avatar} alt={name} width={20} height={20} sizes="20px" className="w-5 h-5 rounded-full object-cover ring-1 ring-white/20" />
+                <img src={avatar} alt={name} width={36} height={36} sizes="(min-width: 1024px) 32px, (min-width: 640px) 28px, 24px" className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full object-cover ring-1 ring-white/20" />
             ) : (
-                <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center" />
+                <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full bg-white/20 flex items-center justify-center" />
             )}
-            <span className="text-[10px] text-white font-medium truncate">{name}</span>
+            <span className="text-[11px] sm:text-xs md:text-sm text-white font-medium truncate">{name}</span>
         </div>
     );
 }
@@ -252,13 +253,14 @@ function ReelTile({ reel, className = "" }: { reel: ReelItem; className?: string
 
 /* ---------------------- Image Tile (Testimonial) ---------------------- */
 function ImageTile({ testimonial, className = "" }: { testimonial: TestimonialItem; className?: string }) {
-    const hasAvatar = !!testimonial.avatar && testimonial.avatar.length > 0;
+    const tileImage = testimonial.image || testimonial.avatar;
+    const hasImage = !!tileImage && tileImage.length > 0;
     return (
         <div className={`relative rounded-2xl h-full min-h-[180px] sm:min-h-[240px] group ${className}`}>
             <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none bg-muted">
-                {hasAvatar ? (
+                {hasImage ? (
                     <img
-                        src={testimonial.avatar}
+                        src={tileImage}
                         alt={testimonial.name}
                         width={800}
                         height={800}
@@ -284,24 +286,24 @@ function ImageTile({ testimonial, className = "" }: { testimonial: TestimonialIt
                     />
                 </div>
             </div>
-            <div className="absolute bottom-3 left-3 right-3 z-40 pointer-events-none">
-                <CustomerTag name={testimonial.name} avatar={testimonial.avatar} />
+            <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-40 pointer-events-none flex flex-col items-start gap-2 sm:gap-3">
                 {testimonial.text && (
-                    <div className="mt-1.5 flex items-start gap-1.5">
+                    <div className="flex items-start gap-1.5 sm:gap-2">
                         {/* Quotation icon */}
                         <svg
-                            className="w-3 h-3 text-amber-300/80 shrink-0 mt-0.5"
+                            className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-amber-300/80 shrink-0 mt-0.5"
                             fill="currentColor"
                             viewBox="0 0 32 32"
                             aria-hidden="true"
                         >
                             <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
                         </svg>
-                        <p className="text-[10px] text-white/85 italic line-clamp-2 pointer-events-auto leading-snug">
+                        <p className="text-xs sm:text-sm md:text-base text-white/85 italic line-clamp-2 sm:line-clamp-3 pointer-events-auto leading-snug">
                             {testimonial.text}
                         </p>
                     </div>
                 )}
+                <CustomerTag name={testimonial.name} avatar={testimonial.avatar} />
             </div>
             <Hotspot
                 productHandle={testimonial.productHandle}

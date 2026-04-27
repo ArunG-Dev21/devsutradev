@@ -93,7 +93,7 @@ export function SplitHero({ featuredProducts }: SplitHeroProps) {
                   {product.title}
                 </h3>
 
-                <p className="text-sm text-text-muted">
+                <p className="text-sm text-text-muted font-montserrat">
                   {product.price}
                 </p>
 

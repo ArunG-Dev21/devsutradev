@@ -268,7 +268,7 @@ function FilterSidebar({
                       className={`text-xs lg:text-[13px] transition-colors ${isActive
                         ? 'text-foreground font-medium'
                         : 'text-muted-foreground group-hover:text-foreground'
-                        }`}
+                        } ${opt.includes('₹') ? 'font-montserrat' : ''}`}
                     >
                       {opt}
                     </span>

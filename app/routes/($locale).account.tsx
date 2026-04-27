@@ -5,7 +5,9 @@ import {
   Outlet,
   useLoaderData,
   useLocation,
+  useNavigation,
 } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
 import type { Route } from './+types/($locale).account';
 import { CUSTOMER_DETAILS_QUERY } from '~/graphql/customer-account/CustomerDetailsQuery';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
@@ -131,51 +133,48 @@ const MENU_ITEMS = [
 
 function AccountMenu() {
   const location = useLocation();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
-    <nav role="navigation" className="rounded-2xl border border-border bg-card overflow-hidden">
-      <div className="px-4 pt-4 pb-1">
-        <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-muted-foreground/70 px-1">
-          Navigation
-        </p>
-      </div>
-      <div className="p-2 space-y-0.5">
-        {MENU_ITEMS.map((item) => {
-          const isActive =
-            location.pathname.includes(item.to) ||
-            (location.pathname === '/account' && item.name === 'Orders');
-          return (
-            <NavLink
-              key={item.name}
-              to={item.to}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-foreground text-background'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-              }`}
-            >
-              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-              </svg>
-              {item.name}
-              {isActive && (
-                <svg className="ml-auto w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+    <>
+      <nav role="navigation" className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="px-4 pt-4 pb-1">
+          <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-muted-foreground/70 px-1">
+            Navigation
+          </p>
+        </div>
+        <div className="p-2 space-y-0.5">
+          {MENU_ITEMS.map((item) => {
+            const isActive =
+              location.pathname.includes(item.to) ||
+              (location.pathname === '/account' && item.name === 'Orders');
+            return (
+              <NavLink
+                key={item.name}
+                to={item.to}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'bg-foreground text-background'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                }`}
+              >
+                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                 </svg>
-              )}
-            </NavLink>
-          );
-        })}
+                {item.name}
+                {isActive && (
+                  <svg className="ml-auto w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                )}
+              </NavLink>
+            );
+          })}
 
-        <div className="pt-1 border-t border-border/60 mt-1">
-          <Form method="POST" action="/account/logout">
+          <div className="pt-1 border-t border-border/60 mt-1">
             <button
-              type="submit"
-              onClick={(e) => {
-                if (!window.confirm('Are you sure you want to sign out?')) {
-                  e.preventDefault();
-                }
-              }}
+              type="button"
+              onClick={() => setConfirmOpen(true)}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-red-600 hover:bg-red-50/60 dark:hover:bg-red-950/20 transition-all duration-200 text-left cursor-pointer"
             >
               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -183,9 +182,115 @@ function AccountMenu() {
               </svg>
               Sign Out
             </button>
+          </div>
+        </div>
+      </nav>
+
+      <LogoutConfirmModal open={confirmOpen} onClose={() => setConfirmOpen(false)} />
+    </>
+  );
+}
+
+function LogoutConfirmModal({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
+  const navigation = useNavigation();
+  const isLoggingOut =
+    navigation.state !== 'idle' &&
+    navigation.formAction === '/account/logout';
+  const confirmRef = useRef<HTMLButtonElement>(null);
+
+  // Esc to close + lock scroll + autofocus the confirm button
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isLoggingOut) onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    confirmRef.current?.focus();
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open, onClose, isLoggingOut]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="logout-confirm-title"
+      aria-describedby="logout-confirm-desc"
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
+    >
+      {/* Backdrop */}
+      <button
+        type="button"
+        aria-label="Close dialog"
+        onClick={() => !isLoggingOut && onClose()}
+        className="absolute inset-0 bg-stone-900/50 backdrop-blur-sm border-0 p-0 cursor-default"
+      />
+
+      {/* Card */}
+      <div className="relative z-10 w-full sm:w-[440px] sm:max-w-[92vw] bg-card text-card-foreground border border-border shadow-2xl rounded-t-2xl sm:rounded-2xl p-6 sm:p-7 m-0 sm:m-4 transform transition-all">
+        {/* Icon */}
+        <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-red-50 dark:bg-red-950/40 text-red-600 mx-auto sm:mx-0 mb-4">
+          <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+          </svg>
+        </div>
+
+        <h2
+          id="logout-confirm-title"
+          className="text-lg sm:text-xl font-semibold text-foreground text-center sm:text-left"
+        >
+          Sign out of your account?
+        </h2>
+        <p
+          id="logout-confirm-desc"
+          className="mt-2 text-sm text-muted-foreground text-center sm:text-left leading-relaxed"
+        >
+          You will need to sign in again to view your orders, wishlist, and saved addresses.
+        </p>
+
+        <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoggingOut}
+            className="inline-flex justify-center items-center px-5 py-2.5 rounded-full text-sm font-medium border border-border bg-background text-foreground hover:bg-muted/60 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <Form method="POST" action="/account/logout" className="contents">
+            <button
+              ref={confirmRef}
+              type="submit"
+              disabled={isLoggingOut}
+              className="inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-red-600 text-white hover:bg-red-700 active:bg-red-800 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isLoggingOut ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
+                    <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                  </svg>
+                  Signing out…
+                </>
+              ) : (
+                'Sign Out'
+              )}
+            </button>
           </Form>
         </div>
       </div>
-    </nav>
+    </div>
   );
 }

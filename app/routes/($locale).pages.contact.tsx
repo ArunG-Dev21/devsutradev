@@ -23,7 +23,7 @@ export default function Contact() {
           Reach Out
         </span>
         <h1
-          className="text-4xl sm:text-5xl font-heading md:text-6xl tracking-wide text-stone-900 dark:text-foreground mb-6"
+          className="text-4xl sm:text-5xl font-heading md:text-5xl lg:text-6xl tracking-wide text-stone-900 dark:text-foreground mb-6"
         >
           We Are Here To Help
         </h1>

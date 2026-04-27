@@ -271,13 +271,21 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
     if (diff > n / 2) diff -= n;
     if (diff < -n / 2) diff += n;
     const abs = Math.abs(diff);
+    const sign = Math.sign(diff);
     const gap = Math.min(vw * 0.35, 300);
+    // Cap rotation, depth and scale so far cards don't degenerate into a sliver.
+    const rotateY = -sign * Math.min(abs * 18, 60);
+    const translateZ = -Math.min(abs * 80, 320);
+    const scale = abs === 0 ? 1 : Math.max(0.6, 1 - abs * 0.1);
+    // All cards remain visible; opacity fades with distance and the side
+    // gradient overlays then blend them into the page background.
+    const opacity = abs === 0 ? 1 : Math.max(0.18, 1 - abs * 0.22);
     return {
-      transform: `translateX(calc(-50% + ${diff * gap}px)) translateZ(${-abs * 80}px) rotateY(${-diff * 18}deg) scale(${abs === 0 ? 1 : Math.max(0.75, 1 - abs * 0.1)})`,
-      opacity: abs <= 1 ? (abs === 0 ? 1 : 0.6) : 0,
-      zIndex: 10 - abs,
-      pointerEvents: (abs <= 4 ? 'auto' : 'none') as React.CSSProperties['pointerEvents'],
-      filter: abs === 0 ? 'none' : `brightness(${1 - abs * 0.08})`,
+      transform: `translateX(calc(-50% + ${diff * gap}px)) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
+      opacity,
+      zIndex: 100 - abs,
+      pointerEvents: (abs <= 1 ? 'auto' : 'none') as React.CSSProperties['pointerEvents'],
+      filter: abs === 0 ? 'none' : `brightness(${Math.max(0.55, 1 - abs * 0.08)})`,
       transition: 'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.5s ease, filter 0.5s ease',
       willChange: 'transform, opacity',
     };
@@ -421,7 +429,7 @@ export function SocialFeed({ reels, instagramUrl = 'https://www.instagram.com/de
                                   {product.title}
                                 </p>
                                 {product.price && (
-                                  <p className="text-[11px] font-medium text-[#F14514] mt-[2px]">
+                                  <p className="text-[11px] font-medium text-[#F14514] mt-[2px] font-montserrat">
                                     {product.price}
                                   </p>
                                 )}

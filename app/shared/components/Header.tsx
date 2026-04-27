@@ -204,7 +204,7 @@ export function Header({
                   lightSrc={BRAND_LOGO_LIGHT_SRC}
                   darkSrc={BRAND_LOGO_DARK_SRC}
                   alt={shop.name}
-                  className="h-8 md:h-8 lg:h-9 xl:h-11 2xl:h-12 w-auto object-contain"
+                  className="h-8 md:h-6 lg:h-8 xl:h-10 2xl:h-12 w-auto object-contain"
                 />
               </NavLink>
             </div>
@@ -532,7 +532,7 @@ function HeaderCtas({
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-5 h-5 xl:w-8 xl:h-8"
+          className="w-5 h-5 md:w-4 md:h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6"
         >
           <path
             strokeLinecap="round"
@@ -555,7 +555,7 @@ function HeaderCtas({
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-5 h-5 xl:w-8 xl:h-8"
+          className="w-5 h-5 md:w-4 md:h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6"
         >
           <path
             strokeLinecap="round"
@@ -661,7 +661,7 @@ function DesktopSearchBar() {
     <div ref={containerRef} className="hidden md:block relative group/search">
       <form
         onSubmit={handleSubmit}
-        className="flex items-center bg-transparent rounded-[30px] px-3 md:px-4 lg:px-5 py-2 md:py-2 lg:py-2.5 2xl:py-3 gap-2 lg:gap-3 w-44 md:w-44 lg:w-64 xl:w-[22rem] 2xl:w-[28rem] transition-all duration-300 border border-border hover:border-[#F14514] focus-within:!border-[#F14514] focus-within:shadow-[0_0_0_1px_#F14514]"
+        className="flex items-center bg-transparent rounded-[30px] px-3 md:px-3 lg:px-4 py-2 md:py-1.5 lg:py-2 2xl:py-3 gap-2 lg:gap-3 w-44 md:w-36 lg:w-56 xl:w-[22rem] 2xl:w-[28rem] transition-all duration-300 border border-border hover:border-[#F14514] focus-within:!border-[#F14514] focus-within:shadow-[0_0_0_1px_#F14514]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -1019,7 +1019,7 @@ function CartBadge({ count }: { count: number | null }) {
         alt=""
         width={36}
         height={36}
-        className="w-7 h-7 md:w-8 md:h-8 object-contain dark:invert"
+        className="w-7 h-7 md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 object-contain dark:invert"
         loading="lazy"
       />
       {(count ?? 0) > 0 && (
@@ -1103,7 +1103,7 @@ function HeaderDropdown({ title, items }: { title: string; items: typeof ABOUT_L
   return (
     <div className="relative group">
       {/* Trigger */}
-      <button className="flex items-center gap-1 lg:gap-1.5 text-[10px] md:text-[10px] lg:text-xs xl:text-sm tracking-[0.12em] uppercase text-foreground hover:text-[#F14514] transition-colors duration-300 py-1.5 lg:py-2">
+      <button className="flex items-center gap-1 lg:gap-1.5 text-[10px] md:text-[9px] lg:text-[10px] xl:text-xs tracking-[0.12em] uppercase text-foreground hover:text-[#F14514] transition-colors duration-300 py-1.5 lg:py-2">
         {title}
         <svg className="w-3.5 h-3.5 text-muted-foreground group-hover:rotate-180 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

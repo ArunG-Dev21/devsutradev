@@ -152,7 +152,6 @@ function RecommendationCard({
           withoutTrailingZeros
           data={product.priceRange.minVariantPrice}
           className="text-base sm:text-xl font-medium text-black leading-none font-montserrat"
-          style={{ fontFamily: "'Cormorant Variable', Georgia, serif" }}
         />
 
         <div className="mt-auto pt-2">
