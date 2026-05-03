@@ -2,15 +2,23 @@ export function TrustBadges() {
   return (
     <>
       {/* Trust / About Section */}
-      <section id="about" className="dark:bg-black bg-stone-50 py-20 lg:py-28">
-        <div className="mx-auto container px-6 text-center scroll-reveal">
+      <section
+        id="about"
+        className="relative overflow-hidden dark:bg-black bg-stone-50 py-20 lg:py-28"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-no-repeat bg-cover bg-center opacity-20 md:bg-center"
+          style={{ backgroundImage: "url('/our_promise_banner.svg')" }}
+        />
+        <div className="relative z-10 mx-auto container px-6 text-center scroll-reveal">
           <span className="text-[#F14514] text-xs font-medium tracking-[0.25em] uppercase">
             Our Promise
           </span>
-          <h2 className="text-3xl lg:text-5xl font-heading uppercase font-medium text-foreground mt-3 mb-6">
+          <h2 className="text-3xl lg:text-5xl font-heading uppercase font-medium text-black mt-3 mb-6">
             Crafted with Intention
           </h2>
-          <p className="text-muted-foreground text-base lg:text-lg leading-relaxed max-w-2xl lg:max-w-3xl mx-auto">
+          <p className="text-black text-base lg:text-lg leading-relaxed max-w-2xl lg:max-w-3xl mx-auto">
             Every devotional bracelet in our collection is handcrafted by skilled
             artisans using authentic, ethically sourced materials. We honor
             centuries-old traditions to bring you pieces that carry genuine
@@ -38,10 +46,10 @@ export function TrustBadges() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-lg font-heading font-medium text-foreground mb-2">
+              <h3 className="text-lg xl:text-3xl font-heading font-medium text-foreground mb-2">
                 Authentic Materials
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-black leading-relaxed">
                 Genuine Rudraksha, Sandalwood, Tiger Eye, and sacred gemstones.
               </p>
             </div>
@@ -66,10 +74,10 @@ export function TrustBadges() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-lg font-heading font-medium text-foreground mb-2">
+              <h3 className="text-lg xl:text-3xl font-heading font-medium text-foreground mb-2">
                 Blessed & Purified
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-black leading-relaxed">
                 Each piece undergoes traditional purification rituals before
                 reaching you.
               </p>
@@ -95,10 +103,10 @@ export function TrustBadges() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-lg font-heading font-medium text-foreground mb-2">
+              <h3 className="text-lg xl:text-3xl font-heading font-medium text-foreground mb-2">
                 Spiritual Energy
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-black leading-relaxed">
                 Designed to enhance meditation, promote healing, and offer
                 protection.
               </p>

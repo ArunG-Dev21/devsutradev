@@ -2,36 +2,26 @@ import { NavLink } from 'react-router';
 import { Image } from '@shopify/hydrogen';
 import { useRouteLoaderData } from 'react-router';
 import type { RootLoader } from '~/root';
-
-const SECONDARY_NAV_ITEMS = [
-  { title: 'Karungali', handle: 'karungali' },
-  { title: 'Rudraksha', handle: 'rudraksha' },
-  { title: 'Bracelets', handle: 'bracelets' },
-  { title: 'Shiva Idols', handle: 'shiva-idols' },
-  { title: 'Pyrite Stones', handle: 'pyrite-stones' },
-  { title: 'Pyramids', handle: 'pyramids' },
-];
+import { getSecondaryNavItems } from '~/lib/secondaryNav';
 
 /**
  * Mobile-only collection navigation bar — mirrors the desktop SubNavIsland
  * that is hidden on small screens. Placed below the Swiper hero section.
  * Horizontally scrollable with no visible scrollbar.
+ *
+ * Pulls the same canonical list as the desktop sub-nav and the side menu,
+ * with titles read directly from Shopify.
  */
 export function MobileCollectionNav() {
   const rootData = useRouteLoaderData<RootLoader>('root');
   const collections = (rootData?.header as any)?.collections;
-
-  const getCollectionImage = (handle: string): string | null => {
-    if (!collections?.nodes) return null;
-    const col = collections.nodes.find((c: any) => c.handle === handle);
-    return col?.image?.url ?? null;
-  };
+  const items = getSecondaryNavItems(collections);
 
   return (
     <div className="md:hidden bg-background border-b border-border shadow-[0_4px_10px_rgb(0,0,0,0.02)]">
       <div className="flex gap-5 px-5 py-4 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {SECONDARY_NAV_ITEMS.map((item) => {
-          const imageUrl = getCollectionImage(item.handle);
+        {items.map((item) => {
+          const imageUrl = item.image?.url ?? null;
 
           return (
             <NavLink

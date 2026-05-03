@@ -32,6 +32,7 @@ export function CartLineItem({
   // Hooks must run unconditionally — call them before any early return.
   const lineItemUrl = useVariantUrl(productHandle, selectedOptions);
   const { close } = useAside();
+  const [showSizePicker, setShowSizePicker] = useState(false);
 
   // Optimistic lines from useOptimisticCart may not have full merchandise data.
   // Skip rendering if essential product info is missing to prevent crashes.
@@ -60,7 +61,6 @@ export function CartLineItem({
     ? Math.round(((compareAtTotal - totalAmount) / compareAtTotal) * 100)
     : 0;
 
-  const [showSizePicker, setShowSizePicker] = useState(false);
   const variants = (product as any).variants?.nodes || [];
   const hasMultipleVariants = variants.length > 1;
 

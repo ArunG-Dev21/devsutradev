@@ -17,6 +17,7 @@ import { ProductShare } from '~/features/product/components/ProductShare';
 import { StickyAddToCart } from '~/features/product/components/StickyAddToCart';
 import { JudgeMeReviews } from '~/features/product/components/JudgeMeReviews';
 import { JudgeMeReviewForm } from '~/features/product/components/JudgeMeReviewForm';
+import { ProductCareGuide } from '~/features/product/components/ProductCareGuide';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import { Suspense, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useCartNotification } from '~/features/cart/components/CartNotification';
@@ -117,7 +118,7 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
   // Star-rating summaries for the "You may also like" rail. Same timeout
   // guard as the collection loaders so judge.me latency can't stall the
   // product page.
-  let recommendedReviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
+  const recommendedReviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
   if (judgemeEnabled && recommendedProducts.length > 0) {
     try {
       const { getJudgeMeBatchSummaries } = await import('~/lib/judgeme.server');
@@ -978,40 +979,8 @@ export default function Product() {
               )}
             </div>
 
-            {/* ── DEMO: How to Wear ── */}
-            <div className="mt-14">
-              <div className="mb-8">
-                <p className="text-[10px] tracking-[0.3em] md:text-left text-center uppercase text-stone-400 dark:text-muted-foreground mb-1.5">Guide</p>
-                <h3 className="text-2xl md:text-left text-center sm:text-3xl font-heading font-semibold text-stone-900 dark:text-foreground leading-tight">
-                  How to Wear & Care
-                </h3>
-              </div>
-              <div className="relative">
-                {/* Vertical connector line */}
-                <div className="absolute left-4.75 top-8 bottom-8 w-px bg-linear-to-b from-[#F14514]/40 via-[#F14514]/20 to-transparent dark:from-[#F14514]/40 dark:via-[#F14514]/15" />
-                <div className="space-y-4">
-                  {[
-                    { step: '01', title: 'Cleanse before wearing', desc: 'Wash the rudraksha with clean water on a Monday morning before first use.' },
-                    { step: '02', title: 'Wear on the right wrist or neck', desc: 'For maximum benefit, wear touching the skin. Avoid synthetic clothing contact.' },
-                    { step: '03', title: 'Monthly oil treatment', desc: 'Apply a drop of sandalwood or sesame oil monthly to keep the surface nourished.' },
-                    { step: '04', title: 'Remove during sleep & bathing', desc: 'Take off during bathing and sleep to extend the life of the thread and bead.' },
-                  ].map((item) => (
-                    <div key={item.step} className="flex gap-5 items-start group hover:-translate-y-0.5 transition-all duration-300">
-                      {/* Step circle */}
-                      <div className="relative z-10 w-10 h-10 rounded-full bg-white dark:bg-card border-2 border-[#F14514] dark:border-[#F14514] flex items-center justify-center shrink-0 group-hover:border-[#F14514] transition-all duration-300">
-                        <span className="text-[11px] font-bold text-[#F14514] dark:text-[#F14514] tracking-wide">
-                          {item.step}
-                        </span>
-                      </div>
-                      <div className="bg-white dark:bg-card border border-stone-200/60 dark:border-border rounded-2xl p-5 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] flex-1 transition-all duration-300">
-                        <p className="text-[11px] font-bold tracking-widest uppercase text-stone-900 dark:text-foreground mb-2">{item.title}</p>
-                        <p className="text-xs text-stone-600 dark:text-muted-foreground leading-relaxed">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            {/* ── How to Wear & Care (dynamic per collection) ── */}
+            <ProductCareGuide product={product as any} />
 
             {/* ── DEMO: FAQs ── */}
             <div className="mt-14 mb-10">
@@ -1552,6 +1521,14 @@ const PRODUCT_FRAGMENT = `#graphql
     vendor
     handle
     tags
+    productType
+    collections(first: 6) {
+      nodes {
+        id
+        handle
+        title
+      }
+    }
     descriptionHtml
     description
     encodedVariantExistence

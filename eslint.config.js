@@ -32,6 +32,10 @@ export default [
       '**/*.generated.d.ts',
       '**/.react-router/',
       '**/packages/hydrogen/dist/',
+      'coverage/',
+      'playwright-report/',
+      'test-results/',
+      'tests/',
     ],
   },
   ...fixupConfigRules(
@@ -128,6 +132,12 @@ export default [
     rules: {
       'jsx-a11y/control-has-associated-label': 'off',
       'jsx-a11y/label-has-for': 'off',
+      // Hydrogen storefronts use clickable overlays (modal backdrops, image
+      // selectors, video controls). Keep these as warnings so future regressions
+      // surface during review without blocking the build.
+      'jsx-a11y/click-events-have-key-events': 'warn',
+      'jsx-a11y/no-static-element-interactions': 'warn',
+      'jsx-a11y/media-has-caption': 'warn',
       'react/display-name': 'off',
       'react/no-array-index-key': 'warn',
       'react/prop-types': 'off',

@@ -221,7 +221,7 @@ function LenisInit() {
       (window as any).__lenis = lenis;
     }
 
-    init();
+    void init();
 
     return () => {
       cancelled = true;

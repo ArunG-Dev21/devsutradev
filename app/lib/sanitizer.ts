@@ -8,11 +8,11 @@ import { FilterXSS, escapeAttrValue, whiteList } from 'xss';
 
 const sanitizer = new FilterXSS({
   // Extend default whitelist with common attributes needed for Hydrogen/Tailwind
-  onIgnoreTagAttr: function (tag: string, name: string, value: string, isWhiteAttr: boolean) {
+  onIgnoreTagAttr(_tag: string, name: string, value: string) {
     if (name === 'class' || name === 'style' || name === 'loading') {
-      // Allow class, style, and loading on all tags
       return name + '="' + escapeAttrValue(value) + '"';
     }
+    return undefined;
   },
   // We can inherit defaults or merge. Here we rely on xss's sensible defaults.
   // Plus we enable iframe and video for rich content:

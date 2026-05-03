@@ -495,7 +495,7 @@ function CertShowcase() {
         <div className="flex flex-col gap-3">
             <div className="relative aspect-4/3 rounded-xl overflow-hidden bg-muted border border-border">
                 <img
-                    src="/certificate-card3.png"
+                    src="/certificate-card.jpg"
                     alt="Lab Certificate – Rudraksha 5 Mukhi"
                     width={800}
                     height={600}
@@ -645,11 +645,11 @@ export function WhyDevasutra({ reels = [], testimonials = [] }: WhyDevasutraProp
             key={s.label}
             className="text-center py-0 border-r border-border last:border-0 relative"
           >
-            <p className="text-2xl md:text-3xl font-bold text-white tabular-nums">
+            <p className="text-2xl md:text-3xl font-montserrat text-white tabular-nums">
               {s.value}
             </p>
 
-            <p className="text-[11px] text-white mt-0.5 tracking-wide">
+            <p className="text-[12px] text-white mt-0.5 tracking-wide">
               {s.label}
             </p>
           </div>

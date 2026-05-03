@@ -6,6 +6,7 @@ import { Link, type FetcherWithComponents } from 'react-router';
 import { useAside } from '~/shared/components/Aside';
 import { useFetcher } from 'react-router';
 
+
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
   layout: CartLayout;
@@ -57,7 +58,7 @@ export function CartSummary({ cart, layout, unselectedLineIds, selectedCount, to
       <div className={layout === 'aside' ? '' : 'mb-1'}>
         <div className={`text-center ${layout === 'aside' ? 'mb-2.5 py-2 border-t border-border' : 'mb-4 sm:mb-5 py-4 sm:py-5 border-y border-border'}`}>
           <span className={`text-muted-foreground leading-snug transition-colors ${layout === 'aside' ? 'text-[10px]' : 'text-[11px] sm:text-xs'}`}>
-            By Checking out, you agree to Devasutra's <br/>{' '}
+            By Checking out, you agree to Devasutra&apos;s <br/>{' '}
             <Link to="/policies/terms-of-service" onClick={() => layout === 'aside' && close()} className="text-[#F14514] no-underline hover:opacity-80">Terms of use</Link>
             {' and '}
             <Link to="/policies/privacy-policy" onClick={() => layout === 'aside' && close()} className="text-[#F14514] no-underline hover:opacity-80">Privacy Policy</Link>
@@ -125,10 +126,13 @@ function CartCheckoutActions({
 
   useEffect(() => {
     if (isCheckingOut && fetcher.state === 'idle' && fetcher.data) {
-       // removal complete, redirect
-       window.location.href = checkoutUrl!;
+      const refreshedCheckoutUrl = fetcher.data?.cart?.checkoutUrl || checkoutUrl;
+      if (refreshedCheckoutUrl) {
+        window.location.href = refreshedCheckoutUrl;
+      }
+      setIsCheckingOut(false);
     }
-  }, [fetcher.state, isCheckingOut, checkoutUrl]);
+  }, [fetcher.data, fetcher.state, isCheckingOut, checkoutUrl]);
 
   if (!checkoutUrl) return null;
 
@@ -147,7 +151,7 @@ function CartCheckoutActions({
       setIsCheckingOut(true);
       
       const lines = Array.from(unselectedLineIds);
-      fetcher.submit(
+      void fetcher.submit(
         {
           cartFormInput: JSON.stringify({
             action: CartForm.ACTIONS.LinesRemove,

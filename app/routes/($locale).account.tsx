@@ -25,7 +25,7 @@ export function shouldRevalidate() {
 
 export async function loader({ context }: Route.LoaderArgs) {
   const { customerAccount } = context;
-  customerAccount.handleAuthStatus();
+  await customerAccount.handleAuthStatus();
 
   const { data, errors } = await customerAccount.query(CUSTOMER_DETAILS_QUERY, {
     variables: {

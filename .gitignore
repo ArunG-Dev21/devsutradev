@@ -1,31 +1,185 @@
-# dependencies
+# ──────────────────────────────────────────────────────────────
+# Dependencies
+# ──────────────────────────────────────────────────────────────
 node_modules/
+jspm_packages/
 
-# build outputs
+# Yarn (Berry / PnP)
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# pnpm
+.pnpm-store/
+
+# ──────────────────────────────────────────────────────────────
+# Build outputs
+# ──────────────────────────────────────────────────────────────
 /build
 /dist
 /public/build
+/.output
+/.vercel
+/.netlify
 
-# caches
+# ──────────────────────────────────────────────────────────────
+# Caches
+# ──────────────────────────────────────────────────────────────
 .cache/
 .mf/
 .react-router/
+.vite/
+.turbo/
+.parcel-cache/
+.swc/
+.npm/
+.eslintcache
+.stylelintcache
+.prettiercache
 
-# environment variables
+# ──────────────────────────────────────────────────────────────
+# Environment variables (NEVER commit secrets)
+# Keep example files so contributors know what's required.
+# ──────────────────────────────────────────────────────────────
 .env
 .env.*
+!.env.example
+!.env.sample
 
-# shopify cli files
+# Common secret/credential files
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.keystore
+secrets.json
+credentials.json
+service-account*.json
+google-credentials*.json
+gcp-key*.json
+aws-credentials
+.aws/
+.netrc
+
+# ──────────────────────────────────────────────────────────────
+# Shopify / Oxygen
+# ──────────────────────────────────────────────────────────────
 .shopify/
+.oxygen/
 
-# typescript
+# ──────────────────────────────────────────────────────────────
+# TypeScript
+# ──────────────────────────────────────────────────────────────
 *.tsbuildinfo
 
-# lint
+# ──────────────────────────────────────────────────────────────
+# Logs
+# ──────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ──────────────────────────────────────────────────────────────
+# Lint / type-check artifacts
+# ──────────────────────────────────────────────────────────────
 lint_results.json
 
-# OS files
-.DS_Store
-Thumbs.db
+# ──────────────────────────────────────────────────────────────
+# Tests
+# ──────────────────────────────────────────────────────────────
+/coverage
+/playwright-report
+/test-results
+/playwright/.cache
+.nyc_output/
+*.lcov
 
+# ──────────────────────────────────────────────────────────────
+# OS files
+# ──────────────────────────────────────────────────────────────
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ──────────────────────────────────────────────────────────────
+# Editors / IDEs
+# ──────────────────────────────────────────────────────────────
+# VSCode — only ignore personal settings; team-shared files stay tracked
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+.history/
+
+# JetBrains (WebStorm/IDEA)
+.idea/
+*.iml
+
+# Vim / Emacs / Sublime
+*.swp
+*.swo
+*.swn
+*~
+*.sublime-workspace
+*.sublime-project
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.ntvs*
+*.njsproj
+*.sln
+
+# ──────────────────────────────────────────────────────────────
+# Local AI / coding-tool overrides (personal, not team-shared)
+# ──────────────────────────────────────────────────────────────
+.claude/settings.local.json
+.cursor/settings.local.json
+.aider*
+.continue/
+.zed/
+
+# ──────────────────────────────────────────────────────────────
+# Misc
+# ──────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.temp
+*.pid
+*.seed
+*.pid.lock
+
+# Local-only project docs / generated reports
 PROJECT_ARCHITECTURE.md
+TEST_REPORT.md

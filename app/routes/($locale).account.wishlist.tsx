@@ -1,8 +1,8 @@
-import { Link, useFetcher, useLoaderData } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
 import type { Route } from './+types/($locale).account.wishlist';
-import { Image, Money } from '@shopify/hydrogen';
 import type { CurrencyCode } from '@shopify/hydrogen/storefront-api-types';
 import { CUSTOMER_WISHLIST_QUERY } from '~/graphql/customer-account/CustomerWishlistQueries';
+import { ProductCard } from '~/features/product/components/ProductCard';
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: 'Wishlist | Devasutra' }];
@@ -15,27 +15,35 @@ type WishlistMetafieldResult = {
   } | null;
 };
 
+type Money = { amount: string; currencyCode: CurrencyCode };
+
+type WishlistImage = {
+  id: string | null;
+  altText: string | null;
+  url: string;
+  width: number | null;
+  height: number | null;
+};
+
 type WishlistProduct = {
   id: string;
   title: string;
   handle: string;
   vendor: string;
-  featuredImage: {
-    id: string | null;
-    altText: string | null;
-    url: string;
-    width: number | null;
-    height: number | null;
-  } | null;
+  tags: string[];
+  featuredImage: WishlistImage | null;
+  images: { nodes: WishlistImage[] };
   priceRange: {
-    minVariantPrice: { amount: string; currencyCode: CurrencyCode };
-    maxVariantPrice: { amount: string; currencyCode: CurrencyCode };
+    minVariantPrice: Money;
+    maxVariantPrice: Money;
   };
   variants: {
     nodes: Array<{
       id: string;
+      title: string;
       availableForSale: boolean;
-      compareAtPrice: { amount: string; currencyCode: CurrencyCode } | null;
+      price: Money;
+      compareAtPrice: Money | null;
     }>;
   };
 };
@@ -58,7 +66,7 @@ function parseList(value: string | null | undefined): string[] {
 
 export async function loader({ context }: Route.LoaderArgs) {
   const { customerAccount, storefront } = context;
-  customerAccount.handleAuthStatus();
+  await customerAccount.handleAuthStatus();
 
   const { data: customerData } =
     await customerAccount.query<WishlistMetafieldResult>(
@@ -67,7 +75,13 @@ export async function loader({ context }: Route.LoaderArgs) {
   const ids = parseList(customerData?.customer?.metafield?.value);
 
   if (ids.length === 0) {
-    return { products: [] as WishlistProduct[] };
+    return {
+      products: [] as WishlistProduct[],
+      reviewSummaries: {} as Record<
+        string,
+        { averageRating: number; reviewCount: number }
+      >,
+    };
   }
 
   const { nodes } = await storefront.query<WishlistProductsResult>(
@@ -78,11 +92,41 @@ export async function loader({ context }: Route.LoaderArgs) {
     (n): n is WishlistProduct => n !== null,
   );
 
-  return { products };
+  // Best-effort Judge.me review summary enrichment (matches collection page).
+  const reviewSummaries: Record<
+    string,
+    { averageRating: number; reviewCount: number }
+  > = {};
+  const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
+  const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
+  if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string') {
+    try {
+      const { getJudgeMeBatchSummaries } = await import('~/lib/judgeme.server');
+      const productEntries = products
+        .map((p) => ({
+          id: String(p.id).split('/').pop() || '',
+          handle: p.handle,
+        }))
+        .filter((p) => p.id);
+      const summaryMap = await getJudgeMeBatchSummaries({
+        shopDomain,
+        apiToken: judgeMeToken,
+        products: productEntries,
+        timeoutMs: 800,
+      });
+      for (const [id, summary] of summaryMap) {
+        reviewSummaries[id] = summary;
+      }
+    } catch {
+      // Non-critical: render the page without review stars.
+    }
+  }
+
+  return { products, reviewSummaries };
 }
 
 export default function Wishlist() {
-  const { products } = useLoaderData<typeof loader>();
+  const { products, reviewSummaries } = useLoaderData<typeof loader>();
 
   return (
     <div>
@@ -98,10 +142,14 @@ export default function Wishlist() {
       {products.length === 0 ? (
         <EmptyState />
       ) : (
-        <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
-          {products.map((product) => (
+        <ul className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
+          {products.map((product, index) => (
             <li key={product.id}>
-              <WishlistCard product={product} />
+              <ProductCard
+                product={product}
+                index={index}
+                reviewSummaries={reviewSummaries}
+              />
             </li>
           ))}
         </ul>
@@ -143,85 +191,6 @@ function EmptyState() {
   );
 }
 
-function WishlistCard({ product }: { product: WishlistProduct }) {
-  const fetcher = useFetcher({ key: 'wishlist:mutate' });
-  const isRemoving =
-    fetcher.state !== 'idle' &&
-    fetcher.formData?.get('productId') === product.id;
-  const compareAt = product.variants?.nodes?.[0]?.compareAtPrice;
-
-  return (
-    <div className="group/card relative rounded-2xl overflow-hidden bg-card ring-1 ring-border/50 transition-all duration-300 hover:-translate-y-0.5">
-      <Link
-        to={`/products/${product.handle}`}
-        prefetch="intent"
-        className="block no-underline"
-      >
-        <div className="relative aspect-square bg-muted overflow-hidden m-2 rounded-xl">
-          {product.featuredImage ? (
-            <Image
-              data={product.featuredImage}
-              aspectRatio="1/1"
-              sizes="(min-width: 1024px) 280px, 50vw"
-              className="w-full h-full object-cover rounded-xl transition-transform duration-500 ease-out group-hover/card:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full bg-linear-to-br from-amber-50 via-orange-50 to-orange-100 dark:from-neutral-800 dark:to-neutral-700" />
-          )}
-        </div>
-        <div className="px-3 sm:px-4 py-3">
-          <p className="text-sm font-medium text-foreground line-clamp-1 leading-snug">
-            {product.title}
-          </p>
-          <div className="mt-1 flex items-baseline gap-2">
-            <Money
-              data={product.priceRange.minVariantPrice}
-              withoutTrailingZeros
-              className="text-base font-medium text-foreground font-montserrat"
-            />
-            {compareAt ? (
-              <s className="text-xs text-muted-foreground">
-                <Money
-                  data={compareAt}
-                  withoutTrailingZeros
-                  className="font-montserrat"
-                />
-              </s>
-            ) : null}
-          </div>
-        </div>
-      </Link>
-
-      <button
-        type="button"
-        disabled={isRemoving}
-        onClick={() => {
-          const fd = new FormData();
-          fd.append('productId', product.id);
-          fd.append('op', 'remove');
-          fetcher.submit(fd, { method: 'post', action: '/api/wishlist' });
-        }}
-        aria-label="Remove from wishlist"
-        className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/95 backdrop-blur-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-[#F14514] hover:border-stone-300 transition-all disabled:opacity-50"
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 18 18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
-    </div>
-  );
-}
-
 const WISHLIST_PRODUCTS_QUERY = `#graphql
   query WishlistProducts(
     $ids: [ID!]!
@@ -234,6 +203,7 @@ const WISHLIST_PRODUCTS_QUERY = `#graphql
         title
         handle
         vendor
+        tags
         featuredImage {
           id
           altText
@@ -241,14 +211,25 @@ const WISHLIST_PRODUCTS_QUERY = `#graphql
           width
           height
         }
+        images(first: 2) {
+          nodes {
+            id
+            altText
+            url
+            width
+            height
+          }
+        }
         priceRange {
           minVariantPrice { amount currencyCode }
           maxVariantPrice { amount currencyCode }
         }
-        variants(first: 1) {
+        variants(first: 10) {
           nodes {
             id
+            title
             availableForSale
+            price { amount currencyCode }
             compareAtPrice { amount currencyCode }
           }
         }

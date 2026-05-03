@@ -23,7 +23,7 @@ export function WishlistHeart({
         e.preventDefault();
         e.stopPropagation();
         if (!isLoggedIn) {
-          if (showLoggedOutPrompt) navigate('/account/login');
+          if (showLoggedOutPrompt) void navigate('/account/login');
           return;
         }
         toggle(productId);

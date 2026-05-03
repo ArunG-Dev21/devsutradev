@@ -23,7 +23,7 @@ export function useWishlist() {
 
   useEffect(() => {
     if (loadFetcher.state === 'idle' && !loadFetcher.data) {
-      loadFetcher.load(ENDPOINT);
+      void loadFetcher.load(ENDPOINT);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -54,7 +54,7 @@ export function useWishlist() {
     const fd = new FormData();
     fd.append('productId', productId);
     fd.append('op', op);
-    mutateFetcher.submit(fd, { method: 'post', action: ENDPOINT });
+    void mutateFetcher.submit(fd, { method: 'post', action: ENDPOINT });
   }
 
   return {

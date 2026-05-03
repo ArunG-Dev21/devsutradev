@@ -2,7 +2,6 @@ import type { Route } from './+types/($locale).collections.all';
 import { Link, useLoaderData, useSearchParams } from 'react-router';
 import { getPaginationVariables, Image, Money, CartForm } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
-import { CollectionHeroBanner } from '~/features/collection/components/CollectionHeroBanner';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
 import { StarRating } from '~/shared/components/StarRating';
 import { WishlistHeart } from '~/shared/components/WishlistHeart';
@@ -73,15 +72,13 @@ const FILTER_GROUPS: Array<{ id: 'category' | 'price'; label: string; options: F
 const CATEGORY_BY_ID = new Map(CATEGORY_FILTERS.map((item) => [item.id, item]));
 const PRICE_BY_ID = new Map(PRICE_FILTERS.map((item) => [item.id, item]));
 
-const ALL_PRODUCTS_HERO = {
-  eyebrow: 'One Sacred Catalogue',
-  title: 'All Products',
-  description:
-    'View the full Devasutra world in one place - Rudraksha, Karungali, bracelets, malas, and sacred essentials chosen for authenticity and everyday spiritual use.',
-  imageSrc: '/menu-all-collections.png',
-  imageAlt: 'All Devasutra products',
-  align: 'center' as const,
-  highlights: ['Rudraksha', 'Karungali', 'Bracelets', 'All Products'],
+// Responsive banner — browser picks the matching <source> by viewport width.
+// Provide one image per breakpoint (drop replacements at these paths anytime).
+const ALL_PRODUCTS_HERO_IMAGES = {
+  mobile: '/menu-all-collections-mobile.png',
+  tablet: '/menu-all-collections.png',
+  desktop: '/menu-all-collections.png',
+  alt: 'All Devasutra products',
 };
 
 export const meta: Route.MetaFunction = () => {
@@ -110,7 +107,7 @@ async function loadCriticalData({ context, request }: Route.LoaderArgs) {
   });
 
   // Fetch Judge.me review summaries for all products
-  let reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
+  const reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
   const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
   const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
   if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string') {
@@ -422,17 +419,22 @@ export default function Collection() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <CollectionHeroBanner
-        eyebrow={ALL_PRODUCTS_HERO.eyebrow}
-        title={ALL_PRODUCTS_HERO.title}
-        description={ALL_PRODUCTS_HERO.description}
-        imageSrc={ALL_PRODUCTS_HERO.imageSrc}
-        imageAlt={ALL_PRODUCTS_HERO.imageAlt}
-        align={ALL_PRODUCTS_HERO.align}
-        highlights={ALL_PRODUCTS_HERO.highlights}
-        breadcrumb={<RouteBreadcrumbBanner variant="overlay" />}
-        breadcrumbPlacement="inside-top"
-      />
+      <section className="relative overflow-hidden border-b border-border/70 bg-muted">
+        <div className="relative min-h-[450px] sm:min-h-[300px] md:min-h-[400px] lg:min-h-[400px] 2xl:min-h-[500px]">
+          <div className="absolute inset-x-0 top-0 z-30">
+            <RouteBreadcrumbBanner variant="overlay" />
+          </div>
+          <picture>
+            <source media="(min-width: 1024px)" srcSet={ALL_PRODUCTS_HERO_IMAGES.desktop} />
+            <source media="(min-width: 640px)" srcSet={ALL_PRODUCTS_HERO_IMAGES.tablet} />
+            <img
+              src={ALL_PRODUCTS_HERO_IMAGES.mobile}
+              alt={ALL_PRODUCTS_HERO_IMAGES.alt}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </picture>
+        </div>
+      </section>
 
       <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8 md:py-12 max-w-480 mx-auto">
         <div className="flex gap-8 items-start">

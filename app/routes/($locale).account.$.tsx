@@ -5,7 +5,7 @@ import type { Route } from './+types/($locale).account.$';
 // If the user is not logged in, handleAuthStatus() redirects to login.
 export async function loader({ context }: Route.LoaderArgs) {
   try {
-    context.customerAccount.handleAuthStatus();
+    await context.customerAccount.handleAuthStatus();
   } catch (error) {
     console.error('[Account Auth Status Error]', error);
     // If auth check fails, send user to login explicitly

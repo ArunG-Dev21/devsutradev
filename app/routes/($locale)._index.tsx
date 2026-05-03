@@ -6,6 +6,9 @@ import { TrustBadges } from '~/features/home/components/TrustBadges';
 import { WhyDevasutra } from '~/features/home/components/WhyDevasutra';
 import { KarungaliPromoter } from '~/features/home/components/KarungaliPromoter';
 import { SocialFeed } from '~/features/home/components/SocialFeed';
+import { ShopByIntention } from '~/features/home/components/ShopByIntention';
+import { KarungaliParallaxBackground } from '~/features/home/components/KarungaliParallaxBackground';
+import { INTENTIONS_QUERY, parseIntentions } from '~/lib/intentions';
 import socialFeedStyles from '~/styles/social-feed.css?url';
 import {
   SEO_DEFAULTS,
@@ -38,7 +41,8 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
     { collection, karungaliMaala, karungaliBracelets },
     slidesResult,
     testimonialsResult,
-    socialReelsResult
+    socialReelsResult,
+    intentionsResult,
   ] = await Promise.all([
     storefront.query(FEATURED_COLLECTION_WITH_PRODUCTS_QUERY, {
       variables: { first: 12 },
@@ -46,10 +50,13 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
     storefront.query(HOMEPAGE_SLIDES_QUERY),
     storefront.query(TESTIMONIALS_QUERY),
     storefront.query(SOCIAL_REELS_QUERY),
+    storefront.query(INTENTIONS_QUERY),
   ]);
 
+  const intentions = parseIntentions(intentionsResult);
+
   // Fetch Judge.me review summaries for featured + karungali products
-  let reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
+  const reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
   const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
   const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
   if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string') {
@@ -283,6 +290,7 @@ async function loadCriticalData({ context }: Route.LoaderArgs) {
     socialReels,
     testimonials: imageTestimonials,
     reviewSummaries,
+    intentions,
   };
 }
 
@@ -301,10 +309,13 @@ export default function Homepage() {
       {data.featuredCollection && (
         <Hero collection={data.featuredCollection} slides={data.heroSlides} reviewSummaries={data.reviewSummaries} />
       )}
+      <ShopByIntention intentions={data.intentions} />
       <TrustBadges />
       <WhyDevasutra reels={data.testimonialReels} testimonials={data.testimonials} />
       <link rel="stylesheet" href={socialFeedStyles} />
-      <KarungaliPromoter tabs={data.karungaliTabs} reviewSummaries={data.reviewSummaries} />
+      <KarungaliParallaxBackground>
+        <KarungaliPromoter tabs={data.karungaliTabs} reviewSummaries={data.reviewSummaries} />
+      </KarungaliParallaxBackground>
       {data.socialReels && <SocialFeed reels={data.socialReels} />}
     </div>
   );

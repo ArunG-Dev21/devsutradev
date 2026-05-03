@@ -19,6 +19,7 @@ import {
 } from '~/lib/search';
 
 import { BRAND_LOGO_DARK_SRC, BRAND_LOGO_LIGHT_SRC } from '~/lib/branding';
+import { getSecondaryNavItems } from '~/lib/secondaryNav';
 
 const SEARCH_PLACEHOLDERS = [
   'Karungali mala',
@@ -283,21 +284,9 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
     toggle: () => setIsOpen((v) => !v),
   }));
 
-  // Only render nav cards for collections that actually exist in Shopify.
-  // A hard-coded handle that doesn't resolve server-side turns into a 404
-  // on click AND on prefetch — the latter piles concurrent loader work
-  // onto workerd, which on Windows can crash with an access violation.
-  const availableHandles = new Set<string>(
-    (collections?.nodes ?? []).map((c: any) => c.handle),
-  );
-  const SECONDARY_NAV_ITEMS = [
-    { title: 'Karungali', handle: 'karungali' },
-    { title: 'Rudraksha', handle: 'rudraksha' },
-    { title: 'Bracelets', handle: 'bracelets' },
-    { title: 'Shiva Idols', handle: 'shiva-idols' },
-    { title: 'Pyrite Stones', handle: 'pyrite-stones' },
-    { title: 'Pyramids', handle: 'pyramids' },
-  ].filter((item) => availableHandles.has(item.handle));
+  // Titles come straight from Shopify; missing handles are skipped so a
+  // hard-coded handle that doesn't resolve never renders a 404 link.
+  const SECONDARY_NAV_ITEMS = getSecondaryNavItems(collections);
 
   return (
     <>
@@ -306,7 +295,7 @@ const SubNavIsland = forwardRef<SubNavIslandHandle, {
           <nav className="inline-flex items-center gap-3 lg:gap-4 align-middle">
             {SECONDARY_NAV_ITEMS.map((item) => {
               const url = `/collections/${item.handle}`;
-              const imageUrl = getCollectionImage(url);
+              const imageUrl = item.image?.url ?? getCollectionImage(url);
 
               return (
                 <NavLink
@@ -397,18 +386,8 @@ export function HeaderMenu({
       ? new URL(url).pathname
       : url;
 
-  // Mirror the SubNavIsland filter: skip any handle Shopify didn't return.
-  const availableHandles = new Set<string>(
-    (collections?.nodes ?? []).map((c: any) => c.handle),
-  );
-  const SECONDARY_NAV_ITEMS = [
-    { title: 'Karungali', handle: 'karungali' },
-    { title: 'Rudraksha', handle: 'rudraksha' },
-    { title: 'Bracelets', handle: 'bracelets' },
-    { title: 'Shiva Idols', handle: 'shiva-idols' },
-    { title: 'Pyrite Stones', handle: 'pyrite-stones' },
-    { title: 'Pyramids', handle: 'pyramids' },
-  ].filter((item) => availableHandles.has(item.handle));
+  // Same canonical list and Shopify-driven titles as the desktop sub-nav.
+  const SECONDARY_NAV_ITEMS = getSecondaryNavItems(collections);
 
   const mobileCollectionCards = [
     {
@@ -421,7 +400,7 @@ export function HeaderMenu({
       id: item.handle,
       title: item.title,
       url: `/collections/${item.handle}`,
-      imageUrl: getCollectionImage(`/collections/${item.handle}`),
+      imageUrl: item.image?.url ?? getCollectionImage(`/collections/${item.handle}`),
     })),
   ];
 

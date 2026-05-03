@@ -16,7 +16,14 @@
       "Bash(echo \"EXIT: $?\")",
       "Read(//tmp/**)",
       "mcp__shopify-dev-mcp__learn_shopify_api",
-      "Bash(git *)"
+      "Bash(git *)",
+      "WebSearch",
+      "WebFetch(domain:judge.me)",
+      "WebFetch(domain:feedback.judge.me)",
+      "Bash(npx vitest *)",
+      "Bash(npx tsc *)",
+      "mcp__shopify-dev-mcp__search_docs_chunks",
+      "WebFetch(domain:www.shopifystatus.com)"
     ]
   }
 }

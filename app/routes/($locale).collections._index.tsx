@@ -3,8 +3,16 @@ import type {Route} from './+types/($locale).collections._index';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/features/collection/components/PaginatedResourceSection';
-import {CollectionHeroBanner} from '~/features/collection/components/CollectionHeroBanner';
 import {RouteBreadcrumbBanner} from '~/shared/components/RouteBreadcrumbBanner';
+
+// Responsive banner — browser picks the matching <source> by viewport width.
+// Provide one image per breakpoint (drop replacements at these paths anytime).
+const COLLECTIONS_HERO_IMAGES = {
+  mobile: '/menu-all-collections-mobile.png',
+  tablet: '/menu-all-collections.png',
+  desktop: '/menu-all-collections.png',
+  alt: 'Devasutra sacred collections',
+};
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -46,17 +54,22 @@ export default function Collections() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <CollectionHeroBanner
-        eyebrow="Sacred Offerings"
-        title="Our Collections"
-        description="From Rudraksha to Karungali and spiritual bracelets, each collection is arranged to help you discover the material, meaning, and energy that best fits your practice."
-        imageSrc="/menu-all-collections.png"
-        imageAlt="Devasutra sacred collections"
-        align="right"
-        highlights={['Rudraksha', 'Karungali', 'Bracelets', 'Sacred Living']}
-        breadcrumb={<RouteBreadcrumbBanner variant="overlay" />}
-        breadcrumbPlacement="inside-top"
-      />
+      <section className="relative overflow-hidden border-b border-border/70 bg-muted">
+        <div className="relative min-h-[450px] sm:min-h-[300px] md:min-h-[400px] lg:min-h-[400px] 2xl:min-h-[500px]">
+          <div className="absolute inset-x-0 top-0 z-30">
+            <RouteBreadcrumbBanner variant="overlay" />
+          </div>
+          <picture>
+            <source media="(min-width: 1024px)" srcSet={COLLECTIONS_HERO_IMAGES.desktop} />
+            <source media="(min-width: 640px)" srcSet={COLLECTIONS_HERO_IMAGES.tablet} />
+            <img
+              src={COLLECTIONS_HERO_IMAGES.mobile}
+              alt={COLLECTIONS_HERO_IMAGES.alt}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </picture>
+        </div>
+      </section>
 
       <div className="container mx-auto px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <PaginatedResourceSection<CollectionFragment>

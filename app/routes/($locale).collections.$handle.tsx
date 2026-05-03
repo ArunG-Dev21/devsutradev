@@ -1,15 +1,14 @@
 import { Link, redirect, useLoaderData } from 'react-router';
 import type { Route } from './+types/($locale).collections.$handle';
-import { getPaginationVariables, Analytics, Image, Money, CartForm } from '@shopify/hydrogen';
+import { getPaginationVariables, Analytics, Image } from '@shopify/hydrogen';
 import { PaginatedResourceSection } from '~/features/collection/components/PaginatedResourceSection';
 import { redirectIfHandleIsLocalized } from '~/lib/redirect';
 import type { ProductItemFragment } from 'storefrontapi.generated';
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { useCartNotification } from '~/features/cart/components/CartNotification';
-import { CollectionHeroBanner } from '~/features/collection/components/CollectionHeroBanner';
 import { RouteBreadcrumbBanner } from '~/shared/components/RouteBreadcrumbBanner';
-import { StarRating } from '~/shared/components/StarRating';
-import { WishlistHeart } from '~/shared/components/WishlistHeart';
+import { ProductCard } from '~/features/product/components/ProductCard';
+import { ShopByIntention } from '~/features/home/components/ShopByIntention';
+import { INTENTIONS_QUERY, parseIntentions, type IntentionItem } from '~/lib/intentions';
 import {
   generateMeta,
   truncate,
@@ -49,11 +48,14 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
 
   if (!handle) throw redirect('/collections');
 
-  const [{ collection }] = await Promise.all([
+  const [{ collection }, intentionsResult] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: { handle, ...paginationVariables },
     }),
+    storefront.query(INTENTIONS_QUERY),
   ]);
+
+  const intentions = parseIntentions(intentionsResult);
 
   if (!collection) {
     throw new Response(`Collection ${handle} not found`, { status: 404 });
@@ -109,7 +111,7 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
   // Fetch Judge.me review summaries for products in the collection.
   // Best-effort enrichment: the helper enforces its own timeout so the
   // loader is never blocked by judge.me latency.
-  let reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
+  const reviewSummaries: Record<string, { averageRating: number; reviewCount: number }> = {};
   const judgeMeToken = context.env.JUDGEME_PRIVATE_API_TOKEN;
   const shopDomain = context.env.PUBLIC_STORE_DOMAIN;
   if (typeof judgeMeToken === 'string' && typeof shopDomain === 'string') {
@@ -135,7 +137,7 @@ async function loadCriticalData({ context, params, request }: Route.LoaderArgs) 
     }
   }
 
-  return { collection, relatedArticles, reviewSummaries };
+  return { collection, relatedArticles, reviewSummaries, intentions };
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {
@@ -160,43 +162,52 @@ const FILTER_GROUPS = [
   },
 ];
 
-const COLLECTION_HERO_CONTENT: Record<
+// Per-collection responsive banner images. Browser picks the matching <source>
+// based on viewport width — provide one image per breakpoint.
+const COLLECTION_HERO_IMAGES: Record<
   string,
   {
-    eyebrow: string;
-    description: string;
-    imageSrc: string;
-    imageAlt: string;
-    align: 'center' | 'right';
-    highlights: string[];
+    mobile: string;
+    tablet: string;
+    desktop: string;
+    alt?: string;
   }
 > = {
   rudraksha: {
-    eyebrow: 'Handpicked and Energised',
-    description:
-      'Sacred Rudraksha beads chosen for devotion, focus, protection, and a deeper daily connection to sadhana.',
-    imageSrc: '/bg-rudraksha.png',
-    imageAlt: 'Rudraksha collection banner',
-    align: 'right',
-    highlights: ['Lab Selected', 'Sacred Seed', 'Daily Sadhana'],
+    mobile: '/bg-rudraksha-mobile.png',
+    tablet: '/bg-rudraksha-tablet.png',
+    desktop: '/bg-rudraksha.png',
+    alt: 'Rudraksha collection',
   },
   karungali: {
-    eyebrow: 'Protective Tamil Ebony',
-    description:
-      'Authentic Karungali pieces rooted in traditional use for grounding, steadiness, and shielding from heavy energies.',
-    imageSrc: '/bg-karungali.png',
-    imageAlt: 'Karungali collection banner',
-    align: 'right',
-    highlights: ['Grounding', 'Protective', 'Tamil Heritage'],
+    mobile: '/bg-karungali-mobile.png',
+    tablet: '/bg-karungali-tablet.png',
+    desktop: '/bg-karungali.png',
+    alt: 'Karungali collection',
   },
   bracelets: {
-    eyebrow: 'Wearable Sacred Energy',
-    description:
-      'Bracelets designed to carry intention beautifully - spiritual companions for protection, balance, and everyday ritual.',
-    imageSrc: '/bg-bracelet.png',
-    imageAlt: 'Bracelets collection banner',
-    align: 'right',
-    highlights: ['Everyday Wear', 'Intentional Design', 'Blessed Pieces'],
+    mobile: '/bg-bracelet-mobile.png',
+    tablet: '/bg-bracelet.png',
+    desktop: '/bg-bracelet.png',
+    alt: 'Bracelets collection',
+  },
+  pyramids: {
+    mobile: '/bg-pyramid-mobile.jpeg',
+    tablet: '/bg-pyramid.jpeg',
+    desktop: '/bg-pyramid.jpeg',
+    alt: 'Pyramid collection',
+  },
+  'pyrite-stones': {
+    mobile: '/bg-pyrite-tortoise-mobile.png',
+    tablet: '/bg-pyrite-tortoise-tablet.png',
+    desktop: '/bg-pyrite-tortoise.png',
+    alt: 'Pyrite stones collection',
+  },
+  'shiva-linga': {
+    mobile: '/Shiva-linga-mobile.png',
+    tablet: '/Shiva-linga.png',
+    desktop: '/Shiva-linga.png',
+    alt: 'Shiva Linga collection',
   },
 };
 
@@ -385,13 +396,19 @@ function CustomSortDropdown({ sort, onSortChange, variant = 'default' }: { sort:
 }
 
 export default function Collection() {
-  const { collection, relatedArticles, reviewSummaries } = useLoaderData<typeof loader>() as any;
+  const { collection, relatedArticles, reviewSummaries, intentions } = useLoaderData<typeof loader>() as any;
   const seoOrigin = ((useLoaderData<typeof loader>()) as any).seoOrigin || '';
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState('featured');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const heroConfig =
-    COLLECTION_HERO_CONTENT[collection.handle.toLowerCase()] || null;
+  const collectionHandle = collection.handle.toLowerCase();
+  const matchingIntention: IntentionItem | undefined = (intentions ?? []).find(
+    (i: IntentionItem) => i.collectionHandle?.toLowerCase() === collectionHandle,
+  );
+  const heroImages =
+    !matchingIntention && COLLECTION_HERO_IMAGES[collectionHandle]
+      ? COLLECTION_HERO_IMAGES[collectionHandle]
+      : null;
 
   function toggleFilter(f: string) {
     setActiveFilters((prev) =>
@@ -455,21 +472,47 @@ export default function Collection() {
           ),
         }}
       />
-      <CollectionHeroBanner
-        eyebrow={heroConfig?.eyebrow || 'Handpicked and Energised'}
-        title={collection.title}
-        description={
-          heroConfig?.description ||
-          collection.description ||
-          `Explore the ${collection.title} collection from Devasutra.`
-        }
-        imageSrc={heroConfig?.imageSrc || '/bg-slug.jpg'}
-        imageAlt={heroConfig?.imageAlt || `${collection.title} collection banner`}
-        align={heroConfig?.align || 'center'}
-        highlights={heroConfig?.highlights || ['Authentic', 'Energised', 'Sacred Living']}
-        breadcrumb={<RouteBreadcrumbBanner variant="overlay" />}
-        breadcrumbPlacement="inside-top"
-      />
+      {matchingIntention ? (
+        <section className="relative border-b border-border/70 bg-white">
+          <RouteBreadcrumbBanner variant="light" />
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-10 lg:pb-14">
+            <div className="text-center max-w-3xl mx-auto">
+              <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl uppercase font-medium text-foreground tracking-tight">
+                {matchingIntention.name}
+              </h1>
+              {matchingIntention.focus && (
+                <p className="mt-4 text-sm lg:text-base text-muted-foreground leading-relaxed">
+                  {matchingIntention.focus}
+                </p>
+              )}
+              {collection.description && (
+                <p className="mt-3 text-sm text-muted-foreground/80 leading-relaxed max-w-2xl mx-auto">
+                  {collection.description}
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="relative overflow-hidden border-b border-border/70 bg-muted">
+          <div className="relative min-h-[450px] sm:min-h-[300px] md:min-h-[400px] lg:min-h-[400px] 2xl:min-h-[500px]">
+            <div className="absolute inset-x-0 top-0 z-30">
+              <RouteBreadcrumbBanner variant="overlay" />
+            </div>
+            {heroImages ? (
+              <picture>
+                <source media="(min-width: 1024px)" srcSet={heroImages.desktop} />
+                <source media="(min-width: 640px)" srcSet={heroImages.tablet} />
+                <img
+                  src={heroImages.mobile}
+                  alt={heroImages.alt || `${collection.title} collection`}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </picture>
+            ) : null}
+          </div>
+        </section>
+      )}
 
       {/* BODY */}
       <div className="w-full px-3 sm:px-6 lg:px-8 xl:px-12 py-8 md:py-12 max-w-[1920px] mx-auto">
@@ -547,7 +590,7 @@ export default function Collection() {
               resourcesClassName="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8"
             >
               {({ node: product, index }) => (
-                <CollectionHandleCard
+                <ProductCard
                   key={product.id}
                   product={product}
                   index={index}
@@ -569,6 +612,18 @@ export default function Collection() {
                 >
                   Clear Filters
                 </button>
+              </div>
+            )}
+
+            {intentions && intentions.length > 0 && (
+              <div className="mt-14 border-t border-gray-200 pt-2 -mx-3 sm:-mx-6 lg:-mx-8 xl:-mx-12">
+                <ShopByIntention
+                  intentions={intentions}
+                  excludeHandle={collection.handle}
+                  eyebrow="Browse By Intention"
+                  heading="Looking For Something Different?"
+                  description="Pivot to a piece aligned with what you're seeking right now."
+                />
               </div>
             )}
 
@@ -642,331 +697,6 @@ export default function Collection() {
           },
         }}
       />
-    </div>
-  );
-}
-
-function CollectionHandleCard({
-  product,
-  index,
-  reviewSummaries,
-}: {
-  product: any;
-  index: number;
-  reviewSummaries: any;
-}) {
-  const [isHovered, setIsHovered] = useState(false);
-  const secondaryImage = product.images?.nodes?.[1] ?? null;
-
-  return (
-    <div
-      className="group bg-muted rounded-[24px] p-2 sm:p-2.5 flex flex-col transition-all h-full"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="relative aspect-square overflow-hidden rounded-3xl mb-2 sm:mb-3 bg-transparent shrink-0">
-        {product.tags && product.tags.includes('New') && (
-          <span className="absolute top-2.5 left-2.5 bg-green-200/90 text-green-800 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded shadow-inner z-10 transition-opacity">
-            New
-          </span>
-        )}
-
-        <Link to={`/products/${product.handle}`} prefetch="intent" className="absolute inset-0 block">
-          {product.featuredImage && (
-            <Image
-              data={product.featuredImage}
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal"
-              sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
-              loading={index < 8 ? 'eager' : 'lazy'}
-              style={{
-                opacity: isHovered && secondaryImage ? 0 : 1,
-                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                transition: 'opacity 0.55s ease, transform 0.65s ease',
-                willChange: 'opacity, transform',
-                zIndex: 1,
-              }}
-            />
-          )}
-          {secondaryImage && (
-            <Image
-              data={secondaryImage}
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal"
-              sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
-              loading="lazy"
-              style={{
-                opacity: isHovered ? 1 : 0,
-                transform: isHovered ? 'scale(1.02)' : 'scale(1.07)',
-                transition: 'opacity 0.55s ease, transform 0.65s ease',
-                willChange: 'opacity, transform',
-                zIndex: 2,
-              }}
-            />
-          )}
-          {!product.featuredImage && (
-            <div className="w-full h-full flex items-center justify-center bg-transparent">
-              <span className="text-5xl opacity-20 text-gray-400">✦</span>
-            </div>
-          )}
-        </Link>
-
-        {(() => {
-          const pid = String(product.id).split('/').pop();
-          const summary = pid ? reviewSummaries?.[pid] : null;
-          return summary ? (
-            <StarRating
-              rating={summary.averageRating}
-              count={summary.reviewCount}
-              className="absolute top-2 right-2 z-10"
-            />
-          ) : null;
-        })()}
-
-        <div className="absolute bottom-2 left-2 z-10">
-          <WishlistHeart
-            productId={product.id}
-            className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-stone-200 shadow-sm hover:bg-white"
-            size={18}
-          />
-        </div>
-      </div>
-
-      <div className="bg-card rounded-3xl p-3 sm:p-4 flex flex-col flex-1 gap-2 border border-border/40 relative z-10">
-        <Link to={`/products/${product.handle}`} prefetch="intent" className="block">
-          <h3 className="text-sm sm:text-lg leading-tight line-clamp-1 text-foreground">
-            {product.title}
-          </h3>
-        </Link>
-
-        <div className="flex items-center gap-2">
-          <Money
-            data={product.priceRange.minVariantPrice}
-            withoutTrailingZeros
-            className="text-[16px] sm:text-[22px] border-none shadow-none font-medium text-foreground leading-none font-montserrat"
-          />
-          {product.variants?.nodes?.[0]?.compareAtPrice && (
-            <s className="text-[12px] sm:text-[16px] text-gray-400 font-medium whitespace-nowrap">
-              <Money className="font-montserrat" withoutTrailingZeros data={product.variants.nodes[0].compareAtPrice} />
-            </s>
-          )}
-          {product.variants?.nodes?.[0]?.compareAtPrice && (
-            <span className="absolute top-0 right-0 ml-auto px-2 py-1 sm:py-2 text-[10px] sm:text-sm font-medium rounded-tr-2xl rounded-bl-2xl bg-linear-to-br from-[#f14514] to-[#d4370d] text-white">
-              −
-              {Math.round(
-                ((parseFloat(product.variants.nodes[0].compareAtPrice.amount) -
-                  parseFloat(product.priceRange.minVariantPrice.amount)) /
-                  parseFloat(product.variants.nodes[0].compareAtPrice.amount)) *
-                100,
-              )}
-              %
-            </span>
-          )}
-          {!product.variants?.nodes?.[0]?.compareAtPrice &&
-            product.priceRange.maxVariantPrice.amount !==
-              product.priceRange.minVariantPrice.amount && (
-              <span className="text-[10px] text-gray-400 block -ml-1">onwards</span>
-            )}
-        </div>
-
-        <div className="mt-auto pt-2">
-          <CollectionProductATC product={product} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CollectionAddButton({
-  fetcher,
-  availableForSale,
-  productTitle,
-  productImage,
-}: {
-  fetcher: any;
-  availableForSale?: boolean;
-  productTitle: string;
-  productImage?: { url: string; altText?: string | null };
-}) {
-  const { showNotification } = useCartNotification();
-  const prevState = useRef(fetcher.state);
-
-  useEffect(() => {
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
-      showNotification(productTitle, productImage);
-    }
-    prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle, productImage]);
-
-  return (
-    <button
-      type="submit"
-      disabled={!availableForSale || fetcher.state !== 'idle'}
-      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-card border border-border text-foreground text-xs sm:text-base rounded-full group-hover:bg-foreground group-hover:text-background disabled:cursor-not-allowed cursor-pointer group transition-all duration-300 ease-in-out"
-      aria-label="Add to bag"
-    >
-      <img src="/icons/add-bag.png" alt="" className="w-4 h-4 md:w-6 md:h-6 shrink-0 dark:invert group-hover:invert dark:group-hover:invert-0 group-hover:brightness-0 dark:group-hover:brightness-100 transition-all" />
-      {availableForSale ? 'Add to Bag' : 'Sold Out'}
-    </button>
-  );
-}
-
-// ─── Size pill inner — must be a proper component so useEffect works ─────────
-function CollectionSizePillInner({
-  fetcher,
-  variant,
-  productTitle,
-  productImage,
-  onAdded,
-}: {
-  fetcher: any;
-  variant: { id: string; availableForSale: boolean; title?: string };
-  productTitle: string;
-  productImage?: { url: string; altText?: string | null };
-  onAdded: () => void;
-}) {
-  const { showNotification } = useCartNotification();
-  const prevState = useRef<string>('idle');
-
-  useEffect(() => {
-    if (prevState.current !== 'idle' && fetcher.state === 'idle') {
-      showNotification(productTitle, productImage);
-      onAdded();
-    }
-    prevState.current = fetcher.state;
-  }, [fetcher.state, showNotification, productTitle, productImage, onAdded]);
-
-  const isAdding = fetcher.state !== 'idle';
-
-  return (
-    <button
-      type="submit"
-      disabled={!variant.availableForSale || isAdding}
-      className={[
-        'px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-medium tracking-wide uppercase border transition-all duration-150 cursor-pointer select-none',
-        !variant.availableForSale
-          ? 'border-gray-200 text-gray-300 line-through cursor-not-allowed'
-          : isAdding
-            ? 'border-gray-900 bg-gray-900 text-white opacity-70 cursor-not-allowed'
-            : 'border-gray-300 text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white active:scale-95',
-      ].join(' ')}
-      aria-label={`Add size ${variant.title ?? ''}`}
-    >
-      {isAdding ? (
-        <svg className="animate-spin inline-block w-3 h-3" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
-          <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-        </svg>
-      ) : (
-        variant.title ?? '—'
-      )}
-    </button>
-  );
-}
-
-// ─── Size pill form wrapper for collection page ───────────────────────────────
-function CollectionSizePill({
-  variant,
-  productTitle,
-  productImage,
-  productId,
-  onAdded,
-}: {
-  variant: { id: string; availableForSale: boolean; title?: string };
-  productTitle: string;
-  productImage?: { url: string; altText?: string | null };
-  productId: string;
-  onAdded: () => void;
-}) {
-  return (
-    <CartForm
-      route="/cart"
-      action={CartForm.ACTIONS.LinesAdd}
-      inputs={{ lines: [{ merchandiseId: variant.id, quantity: 1, selectedVariant: variant as any }] }}
-      fetcherKey={`col-size-${productId}-${variant.id}`}
-    >
-      {(fetcher) => (
-        <CollectionSizePillInner
-          fetcher={fetcher}
-          variant={variant}
-          productTitle={productTitle}
-          productImage={productImage}
-          onAdded={onAdded}
-        />
-      )}
-    </CartForm>
-  );
-}
-
-// ─── Smart ATC for collection cards ──────────────────────────────────────────
-function CollectionProductATC({ product }: { product: any }) {
-  const [showSizes, setShowSizes] = useState(false);
-  const variants: Array<{ id: string; availableForSale: boolean; title?: string }> = product.variants?.nodes ?? [];
-  const firstVariant = variants[0];
-  const isAvailable = firstVariant?.availableForSale ?? false;
-  const hasMultiple = variants.length > 1;
-
-  if (!isAvailable) {
-    return (
-      <button disabled className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-400 text-xs sm:text-base rounded-full cursor-not-allowed">
-        Sold Out
-      </button>
-    );
-  }
-
-  if (!hasMultiple) {
-    return (
-      <CartForm
-        route="/cart"
-        inputs={{ lines: [{ merchandiseId: firstVariant.id, quantity: 1, selectedVariant: firstVariant }] }}
-        action={CartForm.ACTIONS.LinesAdd}
-      >
-        {(fetcher) => (
-          <CollectionAddButton
-            fetcher={fetcher}
-            availableForSale={isAvailable}
-            productTitle={product.title}
-            productImage={product.featuredImage ?? undefined}
-          />
-        )}
-      </CartForm>
-    );
-  }
-
-  return (
-    <div>
-      {showSizes && (
-        <div className="mb-2">
-          <p className="text-[9px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-1.5">Select Size</p>
-          <div className="flex flex-wrap gap-1.5">
-            {variants.map((v) => (
-              <CollectionSizePill
-                key={v.id}
-                variant={v}
-                productTitle={product.title}
-                productImage={product.featuredImage ?? undefined}
-                productId={product.id}
-                onAdded={() => setShowSizes(false)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-      <button
-        type="button"
-        onClick={() => setShowSizes((s) => !s)}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 border text-xs sm:text-base rounded-full transition-all duration-200 cursor-pointer group ${
-          showSizes
-            ? 'bg-foreground border-foreground text-background'
-            : 'bg-card border-border text-foreground hover:bg-foreground hover:text-background'
-        }`}
-        aria-label="Select size"
-      >
-        <img
-          src="/icons/add-bag.png"
-          alt=""
-          className={`w-4 h-4 md:w-6 md:h-6 shrink-0 transition-all dark:invert ${showSizes ? 'invert brightness-0 dark:brightness-100' : 'group-hover:invert group-hover:brightness-0 dark:group-hover:brightness-100'}`}
-        />
-        {showSizes ? 'Close' : 'Select Size'}
-      </button>
     </div>
   );
 }

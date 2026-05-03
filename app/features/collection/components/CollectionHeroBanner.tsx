@@ -34,7 +34,7 @@ export function CollectionHeroBanner({
     <section className="relative overflow-hidden border-b border-border/70 bg-neutral-950 text-white">
       {breadcrumb && breadcrumbPlacement === 'above' ? breadcrumb : null}
 
-      <div className="relative min-h-[300px] sm:min-h-[360px] lg:min-h-[420px]">
+      <div className="relative min-h-[300px] sm:min-h-[360px] lg:min-h-[220px]">
         {breadcrumbInside ? (
           <div className="absolute inset-x-0 top-0 z-30">{breadcrumb}</div>
         ) : null}
